@@ -1,0 +1,105 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createServerSupabase } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabase/admin";
+import { issueCertificate } from "@/lib/services/certificate-service";
+
+export async function GET(request: NextRequest) {
+  try {
+    const supabase = createServerSupabase();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    const isAdmin = profile?.role === "super_admin";
+
+    let query = supabase
+      .from("certificates")
+      .select(
+        "*, course:courses(title, title_ar, slug), user:profiles!certificates_user_id_fkey(full_name)"
+      )
+      .order("issued_at", { ascending: false });
+
+    if (!isAdmin) {
+      query = query.eq("user_id", user.id);
+    }
+
+    const search = request.nextUrl.searchParams.get("search");
+    if (search) {
+      query = query.or(
+        `certificate_number.ilike.%${search}%,verification_code.ilike.%${search}%`
+      );
+    }
+
+    const { data, error } = await query;
+    if (error)
+      return NextResponse.json({ error: error.message }, { status: 500 });
+
+    return NextResponse.json({ data });
+  } catch {
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = createServerSupabase();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.role !== "super_admin")
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const { userId, courseId } = await request.json();
+    if (!userId || !courseId)
+      return NextResponse.json(
+        { error: "userId and courseId are required" },
+        { status: 400 }
+      );
+
+    // Find enrollment
+    const { data: enrollment } = await supabaseAdmin
+      .from("enrollments")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("course_id", courseId)
+      .single();
+
+    if (!enrollment)
+      return NextResponse.json(
+        { error: "No enrollment found" },
+        { status: 400 }
+      );
+
+    const certificate = await issueCertificate({
+      userId,
+      courseId,
+      enrollmentId: enrollment.id,
+    });
+
+    return NextResponse.json({ data: certificate }, { status: 201 });
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Internal server error";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}

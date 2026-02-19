@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: vifm-elearning
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.local
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - vifm-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: vifm-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/certbot:/var/www/certbot
+    depends_on:
+      - app
+    networks:
+      - vifm-network
+
+networks:
+  vifm-network:
+    driver: bridge

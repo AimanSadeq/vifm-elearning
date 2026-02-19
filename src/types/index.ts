@@ -1,0 +1,389 @@
+export type UserRole =
+  | "super_admin"
+  | "instructor"
+  | "corporate_admin"
+  | "learner";
+export type CourseStatus = "draft" | "published" | "archived";
+export type EnrollmentStatus = "active" | "completed" | "expired" | "suspended";
+export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
+export type PaymentMethod =
+  | "stripe"
+  | "paytabs"
+  | "bank_transfer"
+  | "promo_code"
+  | "corporate_license";
+export type ContentType = "video" | "document" | "quiz" | "assignment";
+export type QuestionType =
+  | "multiple_choice"
+  | "true_false"
+  | "short_answer"
+  | "multi_select";
+export type NotificationChannel = "email" | "whatsapp" | "in_app";
+export type WebinarStatus = "scheduled" | "live" | "completed" | "cancelled";
+export type ForumPostType = "question" | "discussion" | "announcement";
+export type SubscriptionPlan =
+  | "monthly"
+  | "quarterly"
+  | "annual"
+  | "lifetime";
+export type CertificateStatus = "issued" | "revoked" | "expired";
+export type DifficultyLevel =
+  | "beginner"
+  | "intermediate"
+  | "advanced"
+  | "expert";
+
+export interface Profile {
+  id: string;
+  email: string;
+  full_name: string;
+  full_name_ar?: string | null;
+  avatar_url?: string | null;
+  phone?: string | null;
+  role: UserRole;
+  organization_id?: string | null;
+  language: "en" | "ar";
+  timezone: string;
+  is_active: boolean;
+  last_login_at?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  name_ar?: string | null;
+  logo_url?: string | null;
+  domain?: string | null;
+  contact_email?: string | null;
+  contact_phone?: string | null;
+  address?: string | null;
+  license_type?: string | null;
+  max_seats?: number | null;
+  license_start_date?: string | null;
+  license_end_date?: string | null;
+  is_active: boolean;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  name_ar: string;
+  slug: string;
+  description?: string | null;
+  description_ar?: string | null;
+  icon?: string | null;
+  color?: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface Course {
+  id: string;
+  title: string;
+  title_ar?: string | null;
+  slug: string;
+  description?: string | null;
+  description_ar?: string | null;
+  short_description?: string | null;
+  short_description_ar?: string | null;
+  thumbnail_url?: string | null;
+  preview_video_url?: string | null;
+  category_id: string;
+  instructor_id?: string | null;
+  status: CourseStatus;
+  difficulty_level?: DifficultyLevel | null;
+  duration_hours?: number | null;
+  price: number;
+  currency: string;
+  is_featured: boolean;
+  is_free: boolean;
+  prerequisites?: string[] | null;
+  learning_outcomes?: string[] | null;
+  learning_outcomes_ar?: string[] | null;
+  tags?: string[] | null;
+  max_enrollment?: number | null;
+  enrollment_count: number;
+  average_rating: number;
+  rating_count: number;
+  completion_rate: number;
+  certificate_enabled: boolean;
+  passing_score: number;
+  metadata: Record<string, unknown>;
+  published_at?: string | null;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  category?: Category;
+  instructor?: Pick<Profile, "full_name" | "full_name_ar" | "avatar_url">;
+}
+
+export interface Module {
+  id: string;
+  course_id: string;
+  title: string;
+  title_ar?: string | null;
+  description?: string | null;
+  description_ar?: string | null;
+  sort_order: number;
+  is_preview: boolean;
+  duration_minutes: number;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  lessons?: Lesson[];
+}
+
+export interface Lesson {
+  id: string;
+  module_id: string;
+  course_id: string;
+  title: string;
+  title_ar?: string | null;
+  description?: string | null;
+  description_ar?: string | null;
+  content_type: ContentType;
+  sort_order: number;
+  duration_minutes: number;
+  is_preview: boolean;
+  is_mandatory: boolean;
+  video_url?: string | null;
+  video_hls_url?: string | null;
+  video_duration_seconds?: number | null;
+  video_thumbnail_url?: string | null;
+  document_url?: string | null;
+  document_type?: string | null;
+  content_html?: string | null;
+  content_html_ar?: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Enrollment {
+  id: string;
+  user_id: string;
+  course_id: string;
+  organization_id?: string | null;
+  status: EnrollmentStatus;
+  enrolled_at: string;
+  started_at?: string | null;
+  completed_at?: string | null;
+  expires_at?: string | null;
+  progress_percentage: number;
+  last_accessed_at?: string | null;
+  last_lesson_id?: string | null;
+  payment_id?: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  course?: Course;
+}
+
+export interface LessonProgress {
+  id: string;
+  user_id: string;
+  lesson_id: string;
+  course_id: string;
+  is_completed: boolean;
+  progress_seconds: number;
+  completed_at?: string | null;
+  last_accessed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Quiz {
+  id: string;
+  lesson_id?: string | null;
+  course_id: string;
+  title: string;
+  title_ar?: string | null;
+  description?: string | null;
+  description_ar?: string | null;
+  is_final_exam: boolean;
+  is_published: boolean;
+  passing_score: number;
+  time_limit_minutes?: number | null;
+  max_attempts: number;
+  shuffle_questions: boolean;
+  show_correct_answers: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  questions?: QuizQuestion[];
+}
+
+export interface QuizQuestion {
+  id: string;
+  quiz_id: string;
+  question_type: QuestionType;
+  question_text: string;
+  question_text_ar?: string | null;
+  explanation?: string | null;
+  explanation_ar?: string | null;
+  points: number;
+  sort_order: number;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  // Relations
+  options?: QuizOption[];
+}
+
+export interface QuizOption {
+  id: string;
+  question_id: string;
+  option_text: string;
+  option_text_ar?: string | null;
+  is_correct: boolean;
+  sort_order: number;
+}
+
+export interface QuizAttempt {
+  id: string;
+  quiz_id: string;
+  user_id: string;
+  score?: number | null;
+  total_points?: number | null;
+  percentage?: number | null;
+  passed?: boolean | null;
+  time_taken_seconds?: number | null;
+  attempt_number?: number | null;
+  answers: unknown[];
+  started_at: string;
+  completed_at?: string | null;
+  created_at: string;
+}
+
+export interface Certificate {
+  id: string;
+  user_id: string;
+  course_id: string;
+  enrollment_id?: string | null;
+  certificate_number: string;
+  verification_code: string;
+  verification_url?: string | null;
+  pdf_url?: string | null;
+  status: CertificateStatus;
+  issued_at: string;
+  expires_at?: string | null;
+  revoked_at?: string | null;
+  revoke_reason?: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  // Relations
+  course?: Course;
+  user?: Pick<Profile, "full_name" | "full_name_ar">;
+}
+
+export interface Payment {
+  id: string;
+  user_id: string;
+  course_id?: string | null;
+  organization_id?: string | null;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  payment_method: PaymentMethod;
+  stripe_payment_intent_id?: string | null;
+  stripe_session_id?: string | null;
+  paytabs_transaction_ref?: string | null;
+  bank_reference?: string | null;
+  promo_code_id?: string | null;
+  discount_amount: number;
+  invoice_number?: string | null;
+  invoice_url?: string | null;
+  metadata: Record<string, unknown>;
+  paid_at?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Webinar {
+  id: string;
+  title: string;
+  title_ar?: string | null;
+  description?: string | null;
+  description_ar?: string | null;
+  thumbnail_url?: string | null;
+  instructor_id?: string | null;
+  category_id?: string | null;
+  status: WebinarStatus;
+  meeting_url?: string | null;
+  meeting_id?: string | null;
+  scheduled_at: string;
+  duration_minutes: number;
+  recording_url?: string | null;
+  is_recording_public: boolean;
+  max_attendees?: number | null;
+  is_free: boolean;
+  price: number;
+  currency: string;
+  tags?: string[] | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  instructor?: Pick<Profile, "full_name" | "full_name_ar" | "avatar_url">;
+  category?: Category;
+}
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  channel: NotificationChannel;
+  status: string;
+  title: string;
+  title_ar?: string | null;
+  body: string;
+  body_ar?: string | null;
+  action_url?: string | null;
+  metadata: Record<string, unknown>;
+  read_at?: string | null;
+  sent_at?: string | null;
+  created_at: string;
+}
+
+export interface Review {
+  id: string;
+  user_id: string;
+  course_id: string;
+  rating: number;
+  review_text?: string | null;
+  is_visible: boolean;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  user?: Pick<Profile, "full_name" | "full_name_ar" | "avatar_url">;
+}
+
+export interface ForumPost {
+  id: string;
+  course_id: string;
+  lesson_id?: string | null;
+  author_id: string;
+  parent_id?: string | null;
+  post_type: ForumPostType;
+  title?: string | null;
+  title_ar?: string | null;
+  body: string;
+  body_ar?: string | null;
+  is_pinned: boolean;
+  is_resolved: boolean;
+  is_instructor_answer: boolean;
+  upvotes: number;
+  downvotes: number;
+  reply_count: number;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  author?: Pick<Profile, "full_name" | "full_name_ar" | "avatar_url">;
+  replies?: ForumPost[];
+}
