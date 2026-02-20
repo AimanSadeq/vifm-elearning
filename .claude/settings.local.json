@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(taskkill:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run dev:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "Bash(npx next build:*)",
+      "Bash(node -e:*)",
+      "Bash(node -e \"const p = require\\(''./node_modules/@hookform/resolvers/package.json''\\); console.log\\(''resolvers:'', p.version\\)\")",
+      "Bash(npx next dev:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(tasklist:*)",
+      "Bash(curl:*)",
+      "Bash(npx next --version)",
+      "Bash(npm install:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+    ]
+  }
+}
