@@ -2,8 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-function createSupabase() {
-  const cookieStore = cookies();
+async function createSupabase() {
+  const cookieStore = await cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -22,9 +22,10 @@ function createSupabase() {
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = createSupabase();
+  const { id: postId } = await params;
+  const supabase = await createSupabase();
 
   const {
     data: { user },
@@ -34,7 +35,6 @@ export async function PUT(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const postId = params.id;
   const body = await request.json();
 
   // Fetch existing post to verify ownership or instructor role

@@ -3,12 +3,13 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 interface RouteParams {
-  params: { certificateId: string };
+  params: Promise<{ certificateId: string }>;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createServerSupabase();
+    const { certificateId } = await params;
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .select(
         "*, course:courses(title, title_ar, slug), user:profiles!certificates_user_id_fkey(full_name)"
       )
-      .eq("id", params.certificateId)
+      .eq("id", certificateId)
       .single();
 
     if (error || !data)
@@ -40,7 +41,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createServerSupabase();
+    const { certificateId } = await params;
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -73,7 +75,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const { data, error } = await supabaseAdmin
       .from("certificates")
       .update(updateData)
-      .eq("id", params.certificateId)
+      .eq("id", certificateId)
       .select()
       .single();
 

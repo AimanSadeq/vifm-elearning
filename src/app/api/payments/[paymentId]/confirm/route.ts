@@ -7,12 +7,13 @@ import {
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 interface RouteParams {
-  params: { paymentId: string };
+  params: Promise<{ paymentId: string }>;
 }
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createServerSupabase();
+    const { paymentId } = await params;
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -34,7 +35,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const { data: payment } = await supabaseAdmin
       .from("payments")
       .select("*")
-      .eq("id", params.paymentId)
+      .eq("id", paymentId)
       .single();
 
     if (!payment)
@@ -51,7 +52,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     // Update payment
     await updatePaymentStatus({
-      paymentId: params.paymentId,
+      paymentId: paymentId,
       status: "completed",
       transactionId: transactionId ?? `bank-${Date.now()}`,
     });

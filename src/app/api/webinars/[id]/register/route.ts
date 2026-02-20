@@ -5,9 +5,10 @@ import { registerZoomAttendee } from "@/lib/services/zoom";
 
 export async function POST(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const cookieStore = cookies();
+  const { id } = await params;
+  const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -31,7 +32,7 @@ export async function POST(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const webinarId = params.id;
+  const webinarId = id;
 
   // Check if webinar exists
   const { data: webinar } = await supabase

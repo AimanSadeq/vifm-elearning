@@ -4,9 +4,10 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const cookieStore = cookies();
+  const { id } = await params;
+  const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -33,7 +34,7 @@ export async function PATCH(
   const { error } = await supabase
     .from("notifications")
     .update({ read_at: new Date().toISOString() })
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("user_id", user.id);
 
   if (error) {

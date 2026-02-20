@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 interface RouteParams {
-  params: { quizId: string };
+  params: Promise<{ quizId: string }>;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createServerSupabase();
+    const { quizId } = await params;
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     let query = supabase
       .from("quiz_attempts")
       .select("*")
-      .eq("quiz_id", params.quizId)
+      .eq("quiz_id", quizId)
       .order("created_at", { ascending: false });
 
     if (!isAdmin) {

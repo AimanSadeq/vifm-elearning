@@ -2,8 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-function createSupabase() {
-  const cookieStore = cookies();
+async function createSupabase() {
+  const cookieStore = await cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const supabase = createSupabase();
+  const supabase = await createSupabase();
 
   let query = supabase
     .from("forum_posts")
@@ -66,7 +66,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const supabase = createSupabase();
+  const supabase = await createSupabase();
 
   const {
     data: { user },

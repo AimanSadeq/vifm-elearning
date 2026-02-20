@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = createServerSupabase();
+    const supabase = await createServerSupabase();
 
     const {
       data: { user },

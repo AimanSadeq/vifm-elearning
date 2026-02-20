@@ -4,12 +4,13 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { quizQuestionSchema } from "@/lib/utils/validators";
 
 interface RouteParams {
-  params: { quizId: string };
+  params: Promise<{ quizId: string }>;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createServerSupabase();
+    const { quizId } = await params;
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { data: questions, error } = await supabase
       .from("quiz_questions")
       .select("*, options:quiz_options(*)")
-      .eq("quiz_id", params.quizId)
+      .eq("quiz_id", quizId)
       .order("sort_order");
 
     if (error)
@@ -54,7 +55,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createServerSupabase();
+    const { quizId } = await params;
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -82,7 +84,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { data: lastQ } = await supabaseAdmin
       .from("quiz_questions")
       .select("sort_order")
-      .eq("quiz_id", params.quizId)
+      .eq("quiz_id", quizId)
       .order("sort_order", { ascending: false })
       .limit(1)
       .single();
@@ -93,7 +95,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { data: question, error: qError } = await supabaseAdmin
       .from("quiz_questions")
       .insert({
-        quiz_id: params.quizId,
+        quiz_id: quizId,
         question_text: parsed.data.questionText,
         question_text_ar: parsed.data.questionTextAr ?? null,
         question_type: parsed.data.questionType,

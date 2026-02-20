@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -14,13 +14,14 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-export default function HomePage({
-  params: { locale },
+export default async function HomePage({
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  const t = useTranslations("landing");
-  const tc = useTranslations("common");
+  const { locale } = await params;
+  const t = await getTranslations("landing");
+  const tc = await getTranslations("common");
 
   const features = [
     {

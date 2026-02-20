@@ -4,12 +4,13 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { quizQuestionSchema } from "@/lib/utils/validators";
 
 interface RouteParams {
-  params: { quizId: string; questionId: string };
+  params: Promise<{ quizId: string; questionId: string }>;
 }
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createServerSupabase();
+    const { questionId } = await params;
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -44,7 +45,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         explanation: parsed.data.explanation ?? null,
         explanation_ar: parsed.data.explanationAr ?? null,
       })
-      .eq("id", params.questionId);
+      .eq("id", questionId);
 
     if (qError)
       return NextResponse.json({ error: qError.message }, { status: 500 });
@@ -54,11 +55,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       await supabaseAdmin
         .from("quiz_options")
         .delete()
-        .eq("question_id", params.questionId);
+        .eq("question_id", questionId);
 
       if (parsed.data.options.length > 0) {
         const options = parsed.data.options.map((opt, idx) => ({
-          question_id: params.questionId,
+          question_id: questionId,
           option_text: opt.optionText,
           option_text_ar: opt.optionTextAr ?? null,
           is_correct: opt.isCorrect,
@@ -73,7 +74,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const { data: full } = await supabaseAdmin
       .from("quiz_questions")
       .select("*, options:quiz_options(*)")
-      .eq("id", params.questionId)
+      .eq("id", questionId)
       .single();
 
     return NextResponse.json({ data: full });
@@ -87,7 +88,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createServerSupabase();
+    const { questionId } = await params;
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -106,7 +108,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const { error } = await supabaseAdmin
       .from("quiz_questions")
       .delete()
-      .eq("id", params.questionId);
+      .eq("id", questionId);
 
     if (error)
       return NextResponse.json({ error: error.message }, { status: 500 });

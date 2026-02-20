@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user is authenticated
-    const supabase = createServerSupabase();
+    const supabase = await createServerSupabase();
     const {
       data: { user },
       error: authError,

@@ -5,7 +5,7 @@ import { createEnrollmentFromPayment } from "@/lib/services/enrollment-service";
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerSupabase();
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();

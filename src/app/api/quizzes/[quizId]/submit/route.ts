@@ -9,12 +9,13 @@ import {
 import { issueCertificate } from "@/lib/services/certificate-service";
 
 interface RouteParams {
-  params: { quizId: string };
+  params: Promise<{ quizId: string }>;
 }
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createServerSupabase();
+    const { quizId } = await params;
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const body = await request.json();
     const parsed = submitQuizSchema.safeParse({
       ...body,
-      quizId: params.quizId,
+      quizId: quizId,
     });
     if (!parsed.success)
       return NextResponse.json(
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { data: quiz, error: quizError } = await supabaseAdmin
       .from("quizzes")
       .select("*")
-      .eq("id", params.quizId)
+      .eq("id", quizId)
       .single();
 
     if (quizError || !quiz)
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { count } = await supabaseAdmin
       .from("quiz_attempts")
       .select("*", { count: "exact", head: true })
-      .eq("quiz_id", params.quizId)
+      .eq("quiz_id", quizId)
       .eq("user_id", user.id);
 
     const attemptNumber = (count ?? 0) + 1;
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { data: questions } = await supabaseAdmin
       .from("quiz_questions")
       .select("*, options:quiz_options(*)")
-      .eq("quiz_id", params.quizId)
+      .eq("quiz_id", quizId)
       .order("sort_order");
 
     if (!questions || questions.length === 0)
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { data: attempt, error: attemptError } = await supabaseAdmin
       .from("quiz_attempts")
       .insert({
-        quiz_id: params.quizId,
+        quiz_id: quizId,
         user_id: user.id,
         score: result.score,
         max_score: result.maxScore,

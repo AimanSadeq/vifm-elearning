@@ -5,7 +5,7 @@ import { quizSchema } from "@/lib/utils/validators";
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createServerSupabase();
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerSupabase();
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();

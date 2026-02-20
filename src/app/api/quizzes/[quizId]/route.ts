@@ -4,12 +4,13 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { quizSchema } from "@/lib/utils/validators";
 
 interface RouteParams {
-  params: { quizId: string };
+  params: Promise<{ quizId: string }>;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createServerSupabase();
+    const { quizId } = await params;
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { data, error } = await supabase
       .from("quizzes")
       .select("*")
-      .eq("id", params.quizId)
+      .eq("id", quizId)
       .single();
 
     if (error || !data)
@@ -36,7 +37,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createServerSupabase();
+    const { quizId } = await params;
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -74,7 +76,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         show_correct_answers: parsed.data.showCorrectAnswers,
         is_published: body.isPublished ?? false,
       })
-      .eq("id", params.quizId)
+      .eq("id", quizId)
       .select()
       .single();
 
@@ -92,7 +94,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createServerSupabase();
+    const { quizId } = await params;
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -111,7 +114,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const { error } = await supabaseAdmin
       .from("quizzes")
       .delete()
-      .eq("id", params.quizId);
+      .eq("id", quizId);
 
     if (error)
       return NextResponse.json({ error: error.message }, { status: 500 });
