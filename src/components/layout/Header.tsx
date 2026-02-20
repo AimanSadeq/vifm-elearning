@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import { Menu, X, LogOut, User, LayoutDashboard } from "lucide-react";
+import { Menu, X, LogOut, User, LayoutDashboard, Settings } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -45,12 +46,16 @@ export function Header() {
         {/* Logo */}
         <Link
           href={`/${locale}`}
-          className="flex items-center gap-2 font-heading text-xl font-bold text-brand-900"
+          className="flex items-center"
         >
-          <span className="text-brand-600">VIFM</span>
-          <span className="hidden sm:inline text-muted-foreground font-normal text-sm">
-            Academy
-          </span>
+          <Image
+            src="/images/vifm-logo.png"
+            alt="VIFM - Virginia Institute of Finance and Management"
+            width={120}
+            height={40}
+            className="h-9 w-auto"
+            priority
+          />
         </Link>
 
         {/* Desktop Nav */}
@@ -68,6 +73,13 @@ export function Header() {
 
         {/* Right section */}
         <div className="flex items-center gap-2">
+          <Link
+            href={`/${locale}/admin/dashboard`}
+            className="hidden md:inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+          >
+            <Settings className="h-4 w-4" />
+            Admin
+          </Link>
           <LanguageSwitcher />
           {user && <NotificationBell />}
 
@@ -136,13 +148,13 @@ export function Header() {
             <>
               <Link
                 href={`/${locale}/login`}
-                className="hidden sm:inline-flex rounded-md px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+                className="hidden md:inline-flex rounded-md px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
               >
                 {t("login")}
               </Link>
               <Link
                 href={`/${locale}/register`}
-                className="hidden sm:inline-flex rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 transition-colors"
+                className="hidden md:inline-flex rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 transition-colors"
               >
                 {t("register")}
               </Link>

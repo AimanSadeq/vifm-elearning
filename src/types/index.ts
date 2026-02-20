@@ -113,6 +113,7 @@ export interface Course {
   rating_count: number;
   completion_rate: number;
   certificate_enabled: boolean;
+  sequential_locking_enabled: boolean;
   passing_score: number;
   metadata: Record<string, unknown>;
   published_at?: string | null;
@@ -156,6 +157,8 @@ export interface Lesson {
   video_hls_url?: string | null;
   video_duration_seconds?: number | null;
   video_thumbnail_url?: string | null;
+  captions_en_url?: string | null;
+  captions_ar_url?: string | null;
   document_url?: string | null;
   document_type?: string | null;
   content_html?: string | null;
@@ -193,8 +196,39 @@ export interface LessonProgress {
   course_id: string;
   is_completed: boolean;
   progress_seconds: number;
+  total_watch_time_seconds: number;
+  max_progress_seconds: number;
   completed_at?: string | null;
   last_accessed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type BookmarkType = "note" | "highlight" | "question" | "important";
+export type BookmarkColor = "yellow" | "blue" | "green" | "pink" | "orange";
+
+export interface Bookmark {
+  id: string;
+  user_id: string;
+  lesson_id: string;
+  course_id: string;
+  timestamp_seconds: number;
+  note?: string | null;
+  bookmark_type: BookmarkType;
+  color: BookmarkColor;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WatchStatistic {
+  id: string;
+  user_id: string;
+  lesson_id: string;
+  course_id: string;
+  total_watch_time_seconds: number;
+  play_count: number;
+  pause_count: number;
+  seek_count: number;
   created_at: string;
   updated_at: string;
 }

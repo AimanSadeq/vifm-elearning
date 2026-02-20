@@ -68,6 +68,27 @@ export const SIDEBAR_COLLAPSED_WIDTH = 80;
 export const VIDEO_PROGRESS_INTERVAL = 30_000; // 30 seconds
 export const VIDEO_COMPLETION_THRESHOLD = 0.9; // 90%
 export const SIGNED_URL_EXPIRY = 7200; // 2 hours in seconds
+export const VIDEO_MAX_RESTRICTED_SPEED = 1.5; // Max speed for restricted courses
+export const VIDEO_AUTOPLAY_COUNTDOWN_SECONDS = 5;
+export const PROGRESS_QUEUE_KEY = "vifm_progress_retry_queue";
+
+export const VIDEO_BOOKMARK_COLORS = {
+  yellow: "#facc15",
+  blue: "#60a5fa",
+  green: "#4ade80",
+  pink: "#f472b6",
+  orange: "#fb923c",
+} as const;
+
+export const VIDEO_QUALITY_LABELS: Record<number, string> = {
+  2160: "4K",
+  1440: "1440p",
+  1080: "1080p",
+  720: "720p",
+  480: "480p",
+  360: "360p",
+  240: "240p",
+};
 
 export const DEFAULT_PASSING_SCORE = 70;
 export const DEFAULT_MAX_QUIZ_ATTEMPTS = 3;

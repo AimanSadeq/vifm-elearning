@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 
 export function Footer() {
@@ -15,9 +16,13 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Brand */}
           <div className="md:col-span-1">
-            <h3 className="font-heading text-lg font-bold text-white">
-              VIFM Academy
-            </h3>
+            <Image
+              src="/images/vifm-logo.png"
+              alt="VIFM - Virginia Institute of Finance and Management"
+              width={140}
+              height={47}
+              className="h-10 w-auto brightness-0 invert"
+            />
             <p className="mt-3 text-sm text-brand-300">{t("description")}</p>
           </div>
 

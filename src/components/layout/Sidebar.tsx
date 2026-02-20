@@ -20,6 +20,8 @@ import {
   Trophy,
   Settings,
   ChevronDown,
+  PanelLeftClose,
+  PanelLeftOpen,
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -105,7 +107,15 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
   }
 }
 
-function SidebarItem({ item, locale }: { item: NavItem; locale: string }) {
+function SidebarItem({
+  item,
+  locale,
+  collapsed,
+}: {
+  item: NavItem;
+  locale: string;
+  collapsed: boolean;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const fullHref = `/${locale}${item.href}`;
@@ -115,6 +125,23 @@ function SidebarItem({ item, locale }: { item: NavItem; locale: string }) {
       item.children.some((c) => pathname === `/${locale}${c.href}`));
 
   if (item.children) {
+    if (collapsed) {
+      return (
+        <Link
+          href={fullHref}
+          title={item.label}
+          className={cn(
+            "flex items-center justify-center rounded-md p-2 transition-colors",
+            isActive
+              ? "bg-brand-50 text-brand-700"
+              : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+          )}
+        >
+          <item.icon className="h-5 w-5 shrink-0" />
+        </Link>
+      );
+    }
+
     return (
       <div>
         <button
@@ -159,6 +186,23 @@ function SidebarItem({ item, locale }: { item: NavItem; locale: string }) {
     );
   }
 
+  if (collapsed) {
+    return (
+      <Link
+        href={fullHref}
+        title={item.label}
+        className={cn(
+          "flex items-center justify-center rounded-md p-2 transition-colors",
+          isActive
+            ? "bg-brand-50 text-brand-700"
+            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+        )}
+      >
+        <item.icon className="h-5 w-5 shrink-0" />
+      </Link>
+    );
+  }
+
   return (
     <Link
       href={fullHref}
@@ -177,20 +221,52 @@ function SidebarItem({ item, locale }: { item: NavItem; locale: string }) {
 
 interface SidebarProps {
   role: UserRole;
+  collapsed: boolean;
+  onToggle: () => void;
 }
 
-export function Sidebar({ role }: SidebarProps) {
+export function Sidebar({ role, collapsed, onToggle }: SidebarProps) {
   const locale = useLocale();
   const t = useTranslations();
   const navItems = getNavItems(role, t);
 
   return (
-    <aside className="sidebar hidden lg:flex w-sidebar flex-col border-e bg-background h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto">
-      <nav className="flex flex-col gap-1 p-4">
+    <aside
+      className={cn(
+        "sidebar hidden md:flex flex-col border-e bg-background h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto transition-[width] duration-200",
+        collapsed ? "w-sidebar-collapsed" : "w-sidebar"
+      )}
+    >
+      <nav className={cn("flex flex-col gap-1", collapsed ? "p-2" : "p-4")}>
         {navItems.map((item) => (
-          <SidebarItem key={item.href} item={item} locale={locale} />
+          <SidebarItem
+            key={item.href}
+            item={item}
+            locale={locale}
+            collapsed={collapsed}
+          />
         ))}
       </nav>
+
+      <div className={cn("mt-auto border-t", collapsed ? "p-2" : "p-4")}>
+        <button
+          onClick={onToggle}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className={cn(
+            "flex items-center rounded-md text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors",
+            collapsed ? "justify-center p-2 w-full" : "gap-3 px-3 py-2 w-full"
+          )}
+        >
+          {collapsed ? (
+            <PanelLeftOpen className="h-5 w-5 shrink-0" />
+          ) : (
+            <>
+              <PanelLeftClose className="h-4 w-4 shrink-0" />
+              <span>Collapse</span>
+            </>
+          )}
+        </button>
+      </div>
     </aside>
   );
 }

@@ -10,26 +10,27 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // VIFM Brand Colors (placeholder — replace with actual brand hex)
+        // VIFM Brand Colors — from official brand kit
         brand: {
-          50: "#f0f4f8",
-          100: "#d9e2ec",
-          200: "#bcccdc",
-          300: "#9fb3c8",
-          400: "#829ab1",
-          500: "#627d98",
-          600: "#486581",
-          700: "#334e68",
-          800: "#243b53",
-          900: "#102a43",
-          950: "#0a1929",
+          50: "#f0f5fc",
+          100: "#d6e4f8",
+          200: "#a9c8ee",
+          300: "#7eabe2",
+          400: "#5391D5",  // Accent Blue
+          500: "#3e73b4",
+          600: "#2a5691",
+          700: "#1e3d6e",
+          800: "#121140",  // Navy Blue
+          900: "#111232",  // Dark Blue
+          950: "#010131",  // Primary Blue
         },
         accent: {
-          50: "#fff8f0",
-          100: "#ffe8cc",
-          500: "#f59e0b",
-          600: "#d97706",
-          700: "#b45309",
+          50: "#f0f5fc",
+          100: "#d6e4f8",
+          400: "#5391D5",  // Accent Blue
+          500: "#3e73b4",
+          600: "#2a5691",
+          700: "#1e3d6e",
         },
         success: { DEFAULT: "#10b981", light: "#d1fae5" },
         warning: { DEFAULT: "#f59e0b", light: "#fef3c7" },
@@ -66,8 +67,8 @@ const config: Config = {
         ring: "hsl(var(--ring))",
       },
       fontFamily: {
-        sans: ["Inter", "Noto Sans Arabic", "sans-serif"],
-        heading: ["Plus Jakarta Sans", "Noto Sans Arabic", "sans-serif"],
+        sans: ["Open Sans", "Noto Sans Arabic", "sans-serif"],
+        heading: ["Open Sans", "Noto Sans Arabic", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
       spacing: {

@@ -144,16 +144,16 @@ export default function HomePage({
         </section>
 
         {/* CTA Section */}
-        <section className="bg-brand-600 py-16 lg:py-20 text-white">
+        <section className="bg-brand-400 py-16 lg:py-20 text-white">
           <div className="container mx-auto px-4 text-center">
             <h2 className="font-heading text-3xl font-bold">
               {t("readyToStart")}
             </h2>
-            <p className="mt-4 text-lg text-brand-100">{t("joinLearners")}</p>
+            <p className="mt-4 text-lg text-white/80">{t("joinLearners")}</p>
             <div className="mt-8">
               <Link
                 href={`/${locale}/register`}
-                className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-3 text-sm font-semibold text-brand-900 hover:bg-brand-50 transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-3 text-sm font-semibold text-brand-950 hover:bg-brand-50 transition-colors"
               >
                 {t("getStarted")}
                 <ArrowRight className="h-4 w-4 rtl:rotate-180" />
