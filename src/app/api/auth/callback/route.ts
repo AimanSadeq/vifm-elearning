@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -33,7 +34,13 @@ export async function GET(request: Request) {
       } = await supabase.auth.getUser();
 
       if (user) {
-        const { data: existingProfile } = await supabase
+        // Use service role client to bypass RLS for profile creation
+        const adminClient = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+
+        const { data: existingProfile } = await adminClient
           .from("profiles")
           .select("id")
           .eq("id", user.id)
@@ -41,14 +48,20 @@ export async function GET(request: Request) {
 
         if (!existingProfile) {
           const metadata = user.user_metadata;
-          await supabase.from("profiles").insert({
-            id: user.id,
-            email: user.email!,
-            full_name: metadata?.full_name || user.email!.split("@")[0],
-            phone: metadata?.phone || null,
-            language: metadata?.language || "en",
-            role: "learner",
-          });
+          const { error: insertError } = await adminClient
+            .from("profiles")
+            .insert({
+              id: user.id,
+              email: user.email!,
+              full_name: metadata?.full_name || user.email!.split("@")[0],
+              phone: metadata?.phone || null,
+              language: metadata?.language || "en",
+              role: "learner",
+            });
+
+          if (insertError) {
+            console.error("Profile creation error:", insertError);
+          }
         }
       }
 
