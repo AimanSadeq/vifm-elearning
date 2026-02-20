@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { useSequentialLocking } from "@/lib/hooks/useSequentialLocking";
 import { useVideoBookmarks } from "@/lib/hooks/useVideoBookmarks";
 import { useWatchStatistics } from "@/lib/hooks/useWatchStatistics";
+import { useWatchedSegments } from "@/lib/hooks/useWatchedSegments";
 import { CoursePlayer } from "@/components/courses/CoursePlayer";
 import { VideoPlayer } from "@/components/video/VideoPlayer";
 import { useVideoProgress } from "@/components/video/VideoProgress";
@@ -21,7 +22,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThreadList } from "@/components/forums/ThreadList";
 import { useCoursePlayerStore } from "@/stores/course-player-store";
-import type { Course, Module, Lesson, LessonProgress } from "@/types";
+import { createTimeValidator } from "@/lib/utils/devtools-detection";
+import { sendBeaconProgress } from "@/lib/utils/progress-queue";
+import type { Course, Module, Lesson, LessonProgress, VideoConfig } from "@/types";
 
 export default function LessonPage() {
   const params = useParams();
@@ -43,8 +46,11 @@ export default function LessonPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showDiscussion, setShowDiscussion] = useState(false);
   const [videoCurrentTime, setVideoCurrentTime] = useState(0);
+  const [videoConfig, setVideoConfig] = useState<VideoConfig | null>(null);
 
   const seekToRef = useRef<((seconds: number) => void) | null>(null);
+  const timeValidatorRef = useRef(createTimeValidator());
+  const isNewSessionRef = useRef(true);
 
   const {
     isTheaterMode,
@@ -62,8 +68,19 @@ export default function LessonPage() {
       ? allLessons[currentIndex + 1]
       : null;
 
+  // Video duration for segments
+  const videoDuration = currentLesson?.video_duration_seconds ?? 0;
+
+  // Watched segments hook
+  const {
+    markSegment,
+    getCompletionPercentage,
+    mergeSegments,
+    getSegments,
+  } = useWatchedSegments({ duration: videoDuration });
+
   // Video progress hook
-  const { saveProgress, markComplete } = useVideoProgress({
+  const { saveProgress: baseSaveProgress, markComplete } = useVideoProgress({
     userId: user?.id ?? "",
     lessonId,
     courseId: course?.id ?? "",
@@ -89,8 +106,8 @@ export default function LessonPage() {
     courseId: course?.id ?? "",
   });
 
-  // Watch statistics — trackPlay/trackPause/trackSeek called internally by the hook
-  const { getStats } = useWatchStatistics({
+  // Watch statistics
+  const { trackPlay, trackPause, trackSeek, getStats } = useWatchStatistics({
     userId: user?.id ?? "",
     lessonId,
     courseId: course?.id ?? "",
@@ -102,6 +119,114 @@ export default function LessonPage() {
       router.push(`/${locale}/courses/${slug}/learn/${nextLesson.id}`);
     }
   }, [nextLesson, locale, slug, router]);
+
+  // Fetch video config on mount
+  useEffect(() => {
+    if (!lessonId) return;
+    async function fetchConfig() {
+      try {
+        const res = await fetch(`/api/video/config?lessonId=${lessonId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setVideoConfig(data);
+        }
+      } catch {
+        // Config fetch failed — use defaults
+      }
+    }
+    fetchConfig();
+  }, [lessonId]);
+
+  // Load existing progress including watched segments
+  const userId = user?.id;
+  useEffect(() => {
+    if (!userId || !lessonId) return;
+    async function loadProgress() {
+      try {
+        const res = await fetch(
+          `/api/video/progress?lessonId=${lessonId}&userId=${userId}`
+        );
+        if (res.ok) {
+          const { progress } = await res.json();
+          if (progress?.watched_segments && Array.isArray(progress.watched_segments)) {
+            mergeSegments(progress.watched_segments);
+          }
+        }
+      } catch {
+        // Silent fail
+      }
+    }
+    loadProgress();
+  }, [userId, lessonId, mergeSegments]);
+
+  // Enhanced save progress that includes new fields
+  const saveProgress = useCallback(
+    async (currentTime: number, duration: number) => {
+      if (!user?.id || !lessonId || !course?.id) return;
+
+      const segmentCompletion = getCompletionPercentage();
+      const threshold = videoConfig?.minimumWatchPercentage ?? 90;
+      const isCompleted = segmentCompletion >= threshold;
+
+      // Get time delta from validator
+      const { elapsedMs } = timeValidatorRef.current.stop();
+      const delta = elapsedMs / 1000;
+      timeValidatorRef.current.start();
+
+      // Validate time (warn-only)
+      timeValidatorRef.current.validate(delta);
+
+      const payload = {
+        userId: user.id,
+        lessonId,
+        courseId: course.id,
+        progressSeconds: Math.floor(currentTime),
+        isCompleted,
+        progressPercentage: Math.round(segmentCompletion),
+        videoCompleted: isCompleted,
+        totalWatchTimeDelta: delta,
+        isNewSession: isNewSessionRef.current,
+        watchedSegments: getSegments(),
+      };
+
+      // After first save, no longer a new session
+      isNewSessionRef.current = false;
+
+      try {
+        const res = await fetch("/api/video/progress", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          // Fall back to base save
+          await baseSaveProgress(currentTime, duration);
+        }
+      } catch {
+        await baseSaveProgress(currentTime, duration);
+      }
+    },
+    [user?.id, lessonId, course?.id, getCompletionPercentage, getSegments, videoConfig?.minimumWatchPercentage, baseSaveProgress]
+  );
+
+  // Consolidated beforeunload handler (single handler instead of duplicates)
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (!user?.id || !lessonId || !course?.id) return;
+
+      sendBeaconProgress({
+        userId: user.id,
+        lessonId,
+        courseId: course.id,
+        progressSeconds: Math.floor(videoCurrentTime),
+        watchedSegments: getSegments(),
+        isNewSession: false,
+      });
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [user?.id, lessonId, course?.id, videoCurrentTime, getSegments]);
 
   // Data fetching
   useEffect(() => {
@@ -182,6 +307,17 @@ export default function LessonPage() {
     if (slug && lessonId) fetchData();
   }, [slug, lessonId, user]);
 
+  // Start time validator when playing
+  const handlePlay = useCallback(() => {
+    trackPlay();
+    timeValidatorRef.current.start();
+  }, [trackPlay]);
+
+  const handlePause = useCallback(() => {
+    trackPause();
+    timeValidatorRef.current.stop();
+  }, [trackPause]);
+
   if (isLoading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
@@ -216,6 +352,7 @@ export default function LessonPage() {
     currentLesson.content_type === "video" && initialTime > 10;
 
   const stats = getStats();
+  const segmentCompletion = getCompletionPercentage();
 
   return (
     <CoursePlayer
@@ -288,7 +425,7 @@ export default function LessonPage() {
                   captionsArUrl={currentLesson.captions_ar_url}
                   bookmarks={bookmarks}
                   onSeekTo={seekToRef}
-                  restrictSpeed={false}
+                  restrictSpeed={!(videoConfig?.allowSpeedControl ?? true)}
                   isTheaterMode={isTheaterMode}
                   onTheaterToggle={toggleTheaterMode}
                   nextLesson={
@@ -303,9 +440,18 @@ export default function LessonPage() {
                       : null
                   }
                   onTimeUpdate={setVideoCurrentTime}
-                  userId={user?.id}
-                  lessonId={lessonId}
-                  courseId={course.id}
+                  // Watched segments integration
+                  watchedSegments={getSegments()}
+                  onSegmentUpdate={markSegment}
+                  // Per-lesson config
+                  allowSkipping={videoConfig?.allowSkipping ?? true}
+                  isFirstWatch={videoConfig?.isFirstWatch ?? false}
+                  minimumWatchPercentage={videoConfig?.minimumWatchPercentage}
+                  autoSaveIntervalSeconds={videoConfig?.autoSaveIntervalSeconds}
+                  // Watch statistics callbacks
+                  onPlay={handlePlay}
+                  onPause={handlePause}
+                  onSeek={trackSeek}
                 />
 
                 {/* Stats and bookmarks toggle row */}
@@ -315,19 +461,10 @@ export default function LessonPage() {
                       existingProgress?.total_watch_time_seconds ??
                       stats.totalWatchTime
                     }
-                    completionPercent={
-                      existingProgress?.is_completed
-                        ? 100
-                        : existingProgress?.progress_seconds &&
-                            currentLesson.video_duration_seconds
-                          ? Math.round(
-                              (existingProgress.progress_seconds /
-                                currentLesson.video_duration_seconds) *
-                                100
-                            )
-                          : 0
+                    completionPercent={Math.round(segmentCompletion)}
+                    viewCount={
+                      existingProgress?.view_count ?? stats.playCount
                     }
-                    viewCount={stats.playCount}
                   />
                   <Button
                     variant={showBookmarksPanel ? "default" : "outline"}

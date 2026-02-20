@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { SIGNED_URL_EXPIRY } from "@/lib/utils/constants";
+import { createCourseVideoSignedUrl } from "@/lib/supabase/video-storage";
 
 export async function POST(request: NextRequest) {
   try {
@@ -57,12 +58,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Generate signed URL using admin client
-    const adminClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-
     const videoPath = lesson.video_hls_url || lesson.video_url;
     if (!videoPath) {
       return NextResponse.json(
@@ -70,6 +65,22 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // Try course-videos bucket first (new), fall back to legacy videos bucket
+    const { url: courseVideoUrl } = await createCourseVideoSignedUrl(
+      videoPath,
+      SIGNED_URL_EXPIRY
+    );
+
+    if (courseVideoUrl) {
+      return NextResponse.json({ url: courseVideoUrl });
+    }
+
+    // Fallback: legacy "videos" bucket
+    const adminClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
     const { data: signedUrl, error: signError } = await adminClient.storage
       .from("videos")

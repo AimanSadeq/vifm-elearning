@@ -66,11 +66,22 @@ export const SIDEBAR_WIDTH = 280;
 export const SIDEBAR_COLLAPSED_WIDTH = 80;
 
 export const VIDEO_PROGRESS_INTERVAL = 30_000; // 30 seconds
-export const VIDEO_COMPLETION_THRESHOLD = 0.9; // 90%
+export const VIDEO_COMPLETION_THRESHOLD = 0.9; // 90% — fallback when per-lesson config is not set
 export const SIGNED_URL_EXPIRY = 7200; // 2 hours in seconds
 export const VIDEO_MAX_RESTRICTED_SPEED = 1.5; // Max speed for restricted courses
 export const VIDEO_AUTOPLAY_COUNTDOWN_SECONDS = 5;
 export const PROGRESS_QUEUE_KEY = "vifm_progress_retry_queue";
+
+// Watched segments: divides video into N equal segments for granular completion tracking
+export const WATCHED_SEGMENTS_COUNT = 100;
+
+// Per-lesson video config defaults (overridden by lesson-level DB values)
+export const VIDEO_DEFAULT_MINIMUM_WATCH_PERCENTAGE = 90;
+export const VIDEO_DEFAULT_AUTO_SAVE_INTERVAL_SECONDS = 30;
+export const VIDEO_DEFAULT_ALLOW_SPEED_CONTROL = true;
+export const VIDEO_DEFAULT_ALLOW_DOWNLOAD = false;
+export const VIDEO_DEFAULT_ALLOW_SKIPPING = true;
+export const VIDEO_DEFAULT_FORCE_WATCH_FIRST = false;
 
 export const VIDEO_BOOKMARK_COLORS = {
   yellow: "#facc15",

@@ -163,6 +163,14 @@ export interface Lesson {
   document_type?: string | null;
   content_html?: string | null;
   content_html_ar?: string | null;
+  // Per-lesson video config
+  force_watch_first?: boolean;
+  allow_speed_control?: boolean;
+  allow_download?: boolean;
+  minimum_watch_percentage?: number;
+  allow_skipping?: boolean;
+  auto_save_interval_seconds?: number;
+  is_active?: boolean;
   metadata: Record<string, unknown>;
   created_at: string;
   updated_at: string;
@@ -182,6 +190,10 @@ export interface Enrollment {
   last_accessed_at?: string | null;
   last_lesson_id?: string | null;
   payment_id?: string | null;
+  completed_lesson_ids?: string[];
+  total_lesson_items?: number;
+  completed_lesson_items?: number;
+  total_time_spent_seconds?: number;
   metadata: Record<string, unknown>;
   created_at: string;
   updated_at: string;
@@ -198,6 +210,11 @@ export interface LessonProgress {
   progress_seconds: number;
   total_watch_time_seconds: number;
   max_progress_seconds: number;
+  view_count?: number;
+  video_completed?: boolean;
+  first_viewed_at?: string | null;
+  watched_segments?: boolean[];
+  total_watch_time_delta_accumulated?: number;
   completed_at?: string | null;
   last_accessed_at: string;
   created_at: string;
@@ -214,10 +231,23 @@ export interface Bookmark {
   course_id: string;
   timestamp_seconds: number;
   note?: string | null;
+  title?: string | null;
+  page_number?: number | null;
   bookmark_type: BookmarkType;
   color: BookmarkColor;
+  metadata?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
+}
+
+export interface VideoConfig {
+  minimumWatchPercentage: number;
+  allowSpeedControl: boolean;
+  allowDownload: boolean;
+  allowSkipping: boolean;
+  autoSaveIntervalSeconds: number;
+  forceWatchFirst: boolean;
+  isFirstWatch: boolean;
 }
 
 export interface WatchStatistic {

@@ -27,7 +27,6 @@ import {
   VIDEO_BOOKMARK_COLORS,
 } from "@/lib/utils/constants";
 import { monitorDevTools } from "@/lib/utils/devtools-detection";
-import { sendBeaconProgress } from "@/lib/utils/progress-queue";
 import { useHlsPlayer } from "@/lib/hooks/useHlsPlayer";
 import { useTabVisibility } from "@/lib/hooks/useTabVisibility";
 import { QualitySelector } from "./QualitySelector";
@@ -41,7 +40,6 @@ interface VideoPlayerProps {
   onProgress?: (currentTime: number, duration: number) => void;
   onComplete?: () => void;
   initialTime?: number;
-  // New optional props (all backward-compatible)
   captionsEnUrl?: string | null;
   captionsArUrl?: string | null;
   bookmarks?: BookmarkItem[];
@@ -51,9 +49,18 @@ interface VideoPlayerProps {
   onTheaterToggle?: () => void;
   nextLesson?: { title: string; onPlay: () => void } | null;
   onTimeUpdate?: (seconds: number) => void;
-  userId?: string;
-  lessonId?: string;
-  courseId?: string;
+  // Watched segments integration
+  watchedSegments?: boolean[];
+  onSegmentUpdate?: (currentTime: number) => void;
+  // Per-lesson config props
+  allowSkipping?: boolean;
+  isFirstWatch?: boolean;
+  minimumWatchPercentage?: number;
+  autoSaveIntervalSeconds?: number;
+  // Callback props for watch statistics
+  onPlay?: () => void;
+  onPause?: () => void;
+  onSeek?: () => void;
 }
 
 const PLAYBACK_SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
@@ -75,9 +82,15 @@ export function VideoPlayer({
   onTheaterToggle,
   nextLesson,
   onTimeUpdate,
-  userId,
-  lessonId,
-  courseId,
+  watchedSegments,
+  onSegmentUpdate,
+  allowSkipping = true,
+  isFirstWatch = false,
+  minimumWatchPercentage,
+  autoSaveIntervalSeconds,
+  onPlay: onPlayCallback,
+  onPause: onPauseCallback,
+  onSeek: onSeekCallback,
 }: VideoPlayerProps) {
   const t = useTranslations("player");
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -86,6 +99,8 @@ export function VideoPlayer({
   const completionTriggered = useRef(false);
   const hideControlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Track max watched position for seek restriction
+  const maxWatchedPosition = useRef(initialTime);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -106,6 +121,39 @@ export function VideoPlayer({
   // Auto-play next state
   const [showNextOverlay, setShowNextOverlay] = useState(false);
   const [countdown, setCountdown] = useState(VIDEO_AUTOPLAY_COUNTDOWN_SECONDS);
+
+  // Determine completion threshold: per-lesson config or fallback
+  const completionThreshold =
+    minimumWatchPercentage != null
+      ? minimumWatchPercentage / 100
+      : VIDEO_COMPLETION_THRESHOLD;
+
+  // Determine auto-save interval
+  const saveInterval =
+    autoSaveIntervalSeconds != null
+      ? autoSaveIntervalSeconds * 1000
+      : VIDEO_PROGRESS_INTERVAL;
+
+  // Seek restriction: on first watch when skipping is not allowed, clamp forward seek
+  const seekRestricted = isFirstWatch && !allowSkipping;
+
+  // Initialize max watched position from watchedSegments if available
+  useEffect(() => {
+    if (watchedSegments && watchedSegments.length > 0 && duration > 0) {
+      // Find the last watched segment to set max watched position
+      let lastWatched = 0;
+      for (let i = watchedSegments.length - 1; i >= 0; i--) {
+        if (watchedSegments[i]) {
+          lastWatched = ((i + 1) / watchedSegments.length) * duration;
+          break;
+        }
+      }
+      maxWatchedPosition.current = Math.max(
+        maxWatchedPosition.current,
+        lastWatched
+      );
+    }
+  }, [watchedSegments, duration]);
 
   // HLS integration
   const {
@@ -141,19 +189,26 @@ export function VideoPlayer({
     );
   }, []);
 
-  // Expose seekTo via ref
+  // Expose seekTo via ref (with seek restriction)
   useEffect(() => {
     if (onSeekTo) {
       onSeekTo.current = (seconds: number) => {
         if (videoRef.current) {
-          videoRef.current.currentTime = seconds;
+          if (seekRestricted) {
+            videoRef.current.currentTime = Math.min(
+              seconds,
+              maxWatchedPosition.current
+            );
+          } else {
+            videoRef.current.currentTime = seconds;
+          }
         }
       };
     }
     return () => {
       if (onSeekTo) onSeekTo.current = null;
     };
-  }, [onSeekTo]);
+  }, [onSeekTo, seekRestricted]);
 
   // Set initial src for non-HLS
   useEffect(() => {
@@ -182,7 +237,7 @@ export function VideoPlayer({
     return () => video.removeEventListener("loadedmetadata", tryRestore);
   }, [hlsSrc, initialTime]);
 
-  // Progress tracking
+  // Progress tracking (uses per-lesson auto-save interval)
   useEffect(() => {
     if (isPlaying && onProgress) {
       progressInterval.current = setInterval(() => {
@@ -190,12 +245,12 @@ export function VideoPlayer({
         if (video) {
           onProgress(video.currentTime, video.duration);
         }
-      }, VIDEO_PROGRESS_INTERVAL);
+      }, saveInterval);
     }
     return () => {
       if (progressInterval.current) clearInterval(progressInterval.current);
     };
-  }, [isPlaying, onProgress]);
+  }, [isPlaying, onProgress, saveInterval]);
 
   // Playback rate enforcement
   useEffect(() => {
@@ -229,30 +284,11 @@ export function VideoPlayer({
     return () => observer.disconnect();
   }, [restrictSpeed]);
 
-  // sendBeacon on beforeunload
-  useEffect(() => {
-    const handleUnload = () => {
-      const video = videoRef.current;
-      if (!video || !userId || !lessonId || !courseId) return;
-      if (video.currentTime > 0 && video.duration > 0) {
-        sendBeaconProgress({
-          userId,
-          lessonId,
-          courseId,
-          progressSeconds: Math.floor(video.currentTime),
-        });
-      }
-    };
-    window.addEventListener("beforeunload", handleUnload);
-    return () => window.removeEventListener("beforeunload", handleUnload);
-  }, [userId, lessonId, courseId]);
-
   // Caption tracks
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    // Remove existing tracks
     const existingTracks = video.querySelectorAll("track");
     existingTracks.forEach((t) => t.remove());
 
@@ -298,11 +334,13 @@ export function VideoPlayer({
     if (video.paused) {
       video.play();
       setIsPlaying(true);
+      onPlayCallback?.();
     } else {
       video.pause();
       setIsPlaying(false);
+      onPauseCallback?.();
     }
-  }, []);
+  }, [onPlayCallback, onPauseCallback]);
 
   const toggleMute = useCallback(() => {
     const video = videoRef.current;
@@ -366,11 +404,18 @@ export function VideoPlayer({
         case "arrowleft":
           e.preventDefault();
           video.currentTime = Math.max(0, video.currentTime - 10);
+          onSeekCallback?.();
           break;
-        case "arrowright":
+        case "arrowright": {
           e.preventDefault();
-          video.currentTime = Math.min(video.duration, video.currentTime + 10);
+          let target = Math.min(video.duration, video.currentTime + 10);
+          if (seekRestricted) {
+            target = Math.min(target, maxWatchedPosition.current);
+          }
+          video.currentTime = target;
+          onSeekCallback?.();
           break;
+        }
         case "arrowup":
           e.preventDefault();
           handleVolumeChange(Math.min(1, volume + 0.1));
@@ -399,7 +444,7 @@ export function VideoPlayer({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [togglePlay, toggleMute, toggleFullscreen, togglePiP, handleVolumeChange, volume, onTheaterToggle]);
+  }, [togglePlay, toggleMute, toggleFullscreen, togglePiP, handleVolumeChange, volume, onTheaterToggle, seekRestricted, onSeekCallback]);
 
   const handleTimeUpdate = () => {
     const video = videoRef.current;
@@ -407,11 +452,19 @@ export function VideoPlayer({
     setCurrentTime(video.currentTime);
     onTimeUpdate?.(video.currentTime);
 
-    // Check completion
+    // Update max watched position
+    if (video.currentTime > maxWatchedPosition.current) {
+      maxWatchedPosition.current = video.currentTime;
+    }
+
+    // Mark watched segment
+    onSegmentUpdate?.(video.currentTime);
+
+    // Check completion using per-lesson threshold
     if (
       !completionTriggered.current &&
       video.duration > 0 &&
-      video.currentTime / video.duration >= VIDEO_COMPLETION_THRESHOLD
+      video.currentTime / video.duration >= completionThreshold
     ) {
       completionTriggered.current = true;
       onComplete?.();
@@ -424,7 +477,15 @@ export function VideoPlayer({
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const fraction = clickX / rect.width;
-    video.currentTime = fraction * video.duration;
+    let target = fraction * video.duration;
+
+    // Seek restriction: clamp forward seek on first watch
+    if (seekRestricted && target > maxWatchedPosition.current) {
+      target = maxWatchedPosition.current;
+    }
+
+    video.currentTime = target;
+    onSeekCallback?.();
   };
 
   const handleMouseMove = () => {
@@ -437,6 +498,7 @@ export function VideoPlayer({
 
   const handleEnded = () => {
     setIsPlaying(false);
+    onPauseCallback?.();
     onProgress?.(duration, duration);
 
     if (nextLesson) {
@@ -491,6 +553,12 @@ export function VideoPlayer({
   const speeds = restrictSpeed ? RESTRICTED_SPEEDS : PLAYBACK_SPEEDS;
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
+  // Watched segments progress bar overlay
+  const segmentFillPercent =
+    watchedSegments && watchedSegments.length > 0
+      ? (watchedSegments.filter(Boolean).length / watchedSegments.length) * 100
+      : 0;
+
   const VolumeIcon = isMuted || volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
   return (
@@ -509,6 +577,14 @@ export function VideoPlayer({
         className="h-full w-full"
         onClick={togglePlay}
         onTimeUpdate={handleTimeUpdate}
+        onPlay={() => {
+          setIsPlaying(true);
+          onPlayCallback?.();
+        }}
+        onPause={() => {
+          setIsPlaying(false);
+          onPauseCallback?.();
+        }}
         onLoadedMetadata={() => {
           const video = videoRef.current;
           if (video) setDuration(video.duration);
@@ -637,6 +713,14 @@ export function VideoPlayer({
           className="mb-3 h-1.5 w-full cursor-pointer rounded-full bg-white/30 relative group/progress"
           onClick={handleSeek}
         >
+          {/* Watched segments background (subtle overlay) */}
+          {watchedSegments && watchedSegments.length > 0 && (
+            <div
+              className="absolute inset-y-0 start-0 rounded-full bg-white/15"
+              style={{ width: `${segmentFillPercent}%` }}
+            />
+          )}
+
           {/* Progress fill */}
           <div
             className="h-full rounded-full bg-brand-500 transition-all relative"
@@ -645,6 +729,17 @@ export function VideoPlayer({
             {/* Scrubber thumb */}
             <div className="absolute end-0 top-1/2 -translate-y-1/2 h-3.5 w-3.5 rounded-full bg-brand-500 border-2 border-white shadow opacity-0 group-hover/progress:opacity-100 transition-opacity" />
           </div>
+
+          {/* Seek restriction indicator */}
+          {seekRestricted && duration > 0 && (
+            <div
+              className="absolute inset-y-0 rounded-full bg-red-500/20 pointer-events-none"
+              style={{
+                left: `${(maxWatchedPosition.current / duration) * 100}%`,
+                right: 0,
+              }}
+            />
+          )}
 
           {/* Bookmark dots on scrubber */}
           {bookmarks.map((bm) => {
@@ -662,7 +757,13 @@ export function VideoPlayer({
                 onClick={(e) => {
                   e.stopPropagation();
                   const video = videoRef.current;
-                  if (video) video.currentTime = bm.timestamp_seconds;
+                  if (video) {
+                    let target = bm.timestamp_seconds;
+                    if (seekRestricted && target > maxWatchedPosition.current) {
+                      target = maxWatchedPosition.current;
+                    }
+                    video.currentTime = target;
+                  }
                 }}
               />
             );
