@@ -42,6 +42,7 @@ export const courseSchema = z.object({
   isFree: z.boolean(),
   isFeatured: z.boolean(),
   certificateEnabled: z.boolean(),
+  certificateTemplateId: z.string().uuid().optional().or(z.literal("")),
   passingScore: z.number().min(0).max(100),
   learningOutcomes: z.array(z.string()).optional(),
   learningOutcomesAr: z.array(z.string()).optional(),
@@ -211,6 +212,56 @@ export const notificationPreferencesSchema = z.object({
   marketingEmails: z.boolean(),
 });
 
+export const certificateTemplateSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  nameAr: z.string().optional(),
+  templateKey: z.enum(["classic", "modern", "corporate", "elegant"]),
+  primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color"),
+  secondaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color"),
+  accentColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color"),
+  logoUrl: z.string().url().optional().or(z.literal("")),
+  organizationName: z.string().min(1, "Organization name is required"),
+  organizationNameAr: z.string().optional(),
+  isDefault: z.boolean(),
+  isActive: z.boolean(),
+});
+
+export const learningPathSchema = z.object({
+  title: z.string().min(3, "Title must be at least 3 characters"),
+  titleAr: z.string().optional(),
+  description: z.string().optional(),
+  descriptionAr: z.string().optional(),
+  difficultyLevel: z.enum(["beginner", "intermediate", "advanced", "expert"]),
+  categoryId: z.preprocess((val) => (val === "" ? undefined : val), z.string().uuid().optional()),
+  estimatedHours: z.number().min(0),
+  isPublished: z.boolean(),
+  isFeatured: z.boolean(),
+  sortOrder: z.number().min(0).default(0),
+  courses: z
+    .array(
+      z.object({
+        courseId: z.string().uuid(),
+        sortOrder: z.number().min(0),
+        isRequired: z.boolean(),
+      })
+    )
+    .optional(),
+});
+
+export const subscriptionPlanSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  nameAr: z.string().optional(),
+  description: z.string().optional(),
+  descriptionAr: z.string().optional(),
+  planType: z.enum(["monthly", "quarterly", "annual", "lifetime"]),
+  price: z.number().min(0),
+  currency: z.string(),
+  features: z.array(z.string()).optional(),
+  featuresAr: z.array(z.string()).optional(),
+  isActive: z.boolean(),
+  sortOrder: z.number().min(0).default(0),
+});
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type ProfileInput = z.infer<typeof profileSchema>;
@@ -226,3 +277,6 @@ export type OrganizationInput = z.infer<typeof organizationSchema>;
 export type WebinarInput = z.infer<typeof webinarSchema>;
 export type ForumPostInput = z.infer<typeof forumPostSchema>;
 export type NotificationPreferencesInput = z.infer<typeof notificationPreferencesSchema>;
+export type CertificateTemplateInput = z.infer<typeof certificateTemplateSchema>;
+export type LearningPathInput = z.infer<typeof learningPathSchema>;
+export type SubscriptionPlanInput = z.infer<typeof subscriptionPlanSchema>;

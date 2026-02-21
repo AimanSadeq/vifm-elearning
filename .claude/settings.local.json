@@ -24,7 +24,9 @@
       "Bash(git branch:*)",
       "Bash(git add:*)",
       "Bash(npx eslint:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(del \"C:\\\\Users\\\\AimanSadeq\\\\OneDrive - Virginia Institute of Finance\\\\VIFM eLearning Portal\\\\vifm-elearning\\\\src\\\\components\\\\providers\\\\AuthProvider.tsx\")",
+      "Bash(findstr:*)"
     ]
   }
 }

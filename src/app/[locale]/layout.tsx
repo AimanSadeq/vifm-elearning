@@ -2,6 +2,7 @@ import { Open_Sans, Noto_Sans_Arabic, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 import { LocaleHtmlAttributes } from "./locale-html-attributes";
 import "@/app/globals.css";
 
@@ -37,14 +38,16 @@ export default async function LocaleLayout({
       disableTransitionOnChange
     >
       <NextIntlClientProvider messages={messages}>
-        <LocaleHtmlAttributes locale={locale} dir={isRTL ? "rtl" : "ltr"} />
-        <div
+        <AuthProvider>
+          <LocaleHtmlAttributes locale={locale} dir={isRTL ? "rtl" : "ltr"} />
+          <div
           className={`${openSans.variable} ${notoArabic.variable} ${jetbrainsMono.variable} ${
             isRTL ? "font-[family-name:var(--font-arabic)]" : "font-[family-name:var(--font-sans)]"
           } antialiased`}
         >
           {children}
-        </div>
+          </div>
+        </AuthProvider>
       </NextIntlClientProvider>
     </ThemeProvider>
   );

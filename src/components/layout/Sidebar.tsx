@@ -22,6 +22,7 @@ import {
   ChevronDown,
   PanelLeftClose,
   PanelLeftOpen,
+  Route,
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -41,7 +42,9 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
       return [
         { icon: LayoutDashboard, label: t("dashboard.myCourses"), href: "/dashboard" },
         { icon: BookOpen, label: t("dashboard.myCourses"), href: "/my-courses" },
+        { icon: Route, label: "Learning Paths", href: "/my-learning-paths" },
         { icon: Award, label: t("dashboard.certificates"), href: "/certificates" },
+        { icon: CreditCard, label: "Subscription", href: "/subscription" },
         { icon: Bell, label: t("notifications.title"), href: "/notifications" },
         { icon: User, label: "Profile", href: "/profile" },
       ];
@@ -71,6 +74,7 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
             { label: "All Courses", href: "/admin/courses" },
             { label: "Create New", href: "/admin/courses/new" },
             { label: "Categories", href: "/admin/categories" },
+            { label: "Learning Paths", href: "/admin/learning-paths" },
           ],
         },
         { icon: Video, label: t("admin.manageWebinars"), href: "/admin/webinars" },
@@ -85,9 +89,18 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
             { label: "Invoices", href: "/admin/payments/invoices" },
             { label: "Promo Codes", href: "/admin/promo-codes" },
             { label: "Vouchers", href: "/admin/vouchers" },
+            { label: "Subscriptions", href: "/admin/subscriptions" },
           ],
         },
-        { icon: Award, label: t("admin.manageCertificates"), href: "/admin/certificates" },
+        {
+          icon: Award,
+          label: t("admin.manageCertificates"),
+          href: "/admin/certificates",
+          children: [
+            { label: "All Certificates", href: "/admin/certificates" },
+            { label: "Templates", href: "/admin/certificates/templates" },
+          ],
+        },
         {
           icon: BarChart3,
           label: t("admin.analytics"),

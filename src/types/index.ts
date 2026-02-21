@@ -29,6 +29,9 @@ export type SubscriptionPlan =
   | "annual"
   | "lifetime";
 export type CertificateStatus = "issued" | "revoked" | "expired";
+export type CertificateTemplateKey = "classic" | "modern" | "corporate" | "elegant";
+export type SubscriptionStatus = "active" | "cancelled" | "expired" | "past_due";
+export type LearningPathStatus = "active" | "completed" | "dropped";
 export type DifficultyLevel =
   | "beginner"
   | "intermediate"
@@ -115,6 +118,7 @@ export interface Course {
   rating_count: number;
   completion_rate: number;
   certificate_enabled: boolean;
+  certificate_template_id?: string | null;
   sequential_locking_enabled: boolean;
   passing_score: number;
   metadata: Record<string, unknown>;
@@ -484,4 +488,120 @@ export interface VoucherRedemption {
   voucher?: Voucher;
   course?: Course;
   user?: Pick<Profile, "full_name" | "full_name_ar">;
+}
+
+// ---------------------------------------------------------------------------
+// Certificate Templates
+// ---------------------------------------------------------------------------
+export interface CertificateTemplate {
+  id: string;
+  name: string;
+  name_ar?: string | null;
+  template_key: CertificateTemplateKey;
+  primary_color: string;
+  secondary_color: string;
+  accent_color: string;
+  logo_url?: string | null;
+  organization_name: string;
+  organization_name_ar?: string | null;
+  is_default: boolean;
+  is_active: boolean;
+  created_by?: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+// ---------------------------------------------------------------------------
+// Learning Paths
+// ---------------------------------------------------------------------------
+export interface LearningPath {
+  id: string;
+  title: string;
+  title_ar?: string | null;
+  description?: string | null;
+  description_ar?: string | null;
+  slug: string;
+  thumbnail_url?: string | null;
+  difficulty_level?: DifficultyLevel | null;
+  category_id?: string | null;
+  estimated_hours: number;
+  is_published: boolean;
+  is_featured: boolean;
+  sort_order: number;
+  enrollment_count: number;
+  created_by?: string | null;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  category?: Category;
+  courses?: LearningPathCourse[];
+}
+
+export interface LearningPathCourse {
+  id: string;
+  learning_path_id: string;
+  course_id: string;
+  sort_order: number;
+  is_required: boolean;
+  created_at: string;
+  // Relations
+  course?: Course;
+}
+
+export interface LearningPathEnrollment {
+  id: string;
+  learning_path_id: string;
+  user_id: string;
+  status: LearningPathStatus;
+  progress: number;
+  enrolled_at: string;
+  completed_at?: string | null;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  learning_path?: LearningPath;
+}
+
+// ---------------------------------------------------------------------------
+// Subscription Plans
+// ---------------------------------------------------------------------------
+export interface SubscriptionPlanConfig {
+  id: string;
+  name: string;
+  name_ar?: string | null;
+  description?: string | null;
+  description_ar?: string | null;
+  plan_type: SubscriptionPlan;
+  price: number;
+  currency: string;
+  features: string[];
+  features_ar?: string[];
+  stripe_product_id?: string | null;
+  stripe_price_id?: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_by?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Subscription {
+  id: string;
+  user_id: string;
+  plan: SubscriptionPlan;
+  status: SubscriptionStatus;
+  price: number;
+  currency: string;
+  stripe_subscription_id?: string | null;
+  stripe_customer_id?: string | null;
+  current_period_start?: string | null;
+  current_period_end?: string | null;
+  cancel_at_period_end: boolean;
+  cancelled_at?: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  user?: Pick<Profile, "full_name" | "full_name_ar" | "email">;
 }

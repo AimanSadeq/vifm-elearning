@@ -63,6 +63,7 @@ export function CourseForm({ initialData, mode }: CourseFormProps) {
   const [step, setStep] = useState(1);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [instructors, setInstructors] = useState<InstructorOption[]>([]);
+  const [certTemplates, setCertTemplates] = useState<Array<{ id: string; name: string; template_key: string }>>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
@@ -108,6 +109,7 @@ export function CourseForm({ initialData, mode }: CourseFormProps) {
       isFree: initialData?.isFree ?? false,
       isFeatured: initialData?.isFeatured ?? false,
       certificateEnabled: initialData?.certificateEnabled ?? true,
+      certificateTemplateId: initialData?.certificateTemplateId ?? "",
       passingScore: initialData?.passingScore ?? 70,
       learningOutcomes: initialData?.learningOutcomes ?? [],
       learningOutcomesAr: initialData?.learningOutcomesAr ?? [],
@@ -123,7 +125,7 @@ export function CourseForm({ initialData, mode }: CourseFormProps) {
       setIsLoadingData(true);
       const supabase = createClient();
 
-      const [categoriesRes, instructorsRes] = await Promise.all([
+      const [categoriesRes, instructorsRes, templatesRes] = await Promise.all([
         supabase
           .from("categories")
           .select("id, name, name_ar")
@@ -135,10 +137,16 @@ export function CourseForm({ initialData, mode }: CourseFormProps) {
           .in("role", ["instructor", "super_admin"])
           .eq("is_active", true)
           .order("full_name"),
+        supabase
+          .from("certificate_templates")
+          .select("id, name, template_key")
+          .eq("is_active", true)
+          .order("name"),
       ]);
 
       setCategories((categoriesRes.data as CategoryOption[]) ?? []);
       setInstructors((instructorsRes.data as InstructorOption[]) ?? []);
+      setCertTemplates(templatesRes.data ?? []);
       setIsLoadingData(false);
     }
 
@@ -251,6 +259,7 @@ export function CourseForm({ initialData, mode }: CourseFormProps) {
         is_free: data.isFree,
         is_featured: data.isFeatured,
         certificate_enabled: data.certificateEnabled,
+        certificate_template_id: data.certificateTemplateId || null,
         passing_score: data.passingScore,
         learning_outcomes: data.learningOutcomes ?? [],
         learning_outcomes_ar: data.learningOutcomesAr ?? [],
@@ -595,18 +604,36 @@ export function CourseForm({ initialData, mode }: CourseFormProps) {
         </div>
 
         {watchedValues.certificateEnabled && (
-          <div className="space-y-2 sm:max-w-xs">
-            <Label htmlFor="passingScore">Passing Score (%)</Label>
-            <Input
-              id="passingScore"
-              type="number"
-              min={0}
-              max={100}
-              {...register("passingScore", { valueAsNumber: true })}
-            />
-            {errors.passingScore && (
-              <p className="text-sm text-error">{errors.passingScore.message}</p>
-            )}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="passingScore">Passing Score (%)</Label>
+              <Input
+                id="passingScore"
+                type="number"
+                min={0}
+                max={100}
+                {...register("passingScore", { valueAsNumber: true })}
+              />
+              {errors.passingScore && (
+                <p className="text-sm text-error">{errors.passingScore.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="certificateTemplateId">Certificate Template</Label>
+              <select
+                id="certificateTemplateId"
+                {...register("certificateTemplateId")}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              >
+                <option value="">Default Template</option>
+                {certTemplates.map((tpl) => (
+                  <option key={tpl.id} value={tpl.id}>
+                    {tpl.name} ({tpl.template_key})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         )}
       </div>

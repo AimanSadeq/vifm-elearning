@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { generateCertificatePdf } from "./certificate-generator";
+import { generateCertificatePdf, type TemplateConfig } from "./certificate-generator";
 import type { Certificate } from "@/types";
 
 interface IssueCertificateParams {
@@ -31,7 +31,7 @@ export async function issueCertificate({
   const certificateNumber =
     certNumResult ?? `VIFM-${Date.now()}`;
 
-  // Get user and course info for the PDF
+  // Get user, course info, and certificate template
   const [{ data: profile }, { data: course }] = await Promise.all([
     supabaseAdmin
       .from("profiles")
@@ -40,13 +40,55 @@ export async function issueCertificate({
       .single(),
     supabaseAdmin
       .from("courses")
-      .select("title")
+      .select("title, certificate_template_id")
       .eq("id", courseId)
       .single(),
   ]);
 
   const userName = profile?.full_name ?? "Learner";
   const courseName = course?.title ?? "Course";
+
+  // Resolve template config
+  let templateConfig: TemplateConfig | undefined;
+
+  if (course?.certificate_template_id) {
+    const { data: template } = await supabaseAdmin
+      .from("certificate_templates")
+      .select("*")
+      .eq("id", course.certificate_template_id)
+      .single();
+
+    if (template) {
+      templateConfig = {
+        templateKey: template.template_key,
+        primaryColor: template.primary_color,
+        secondaryColor: template.secondary_color,
+        accentColor: template.accent_color,
+        logoUrl: template.logo_url,
+        organizationName: template.organization_name,
+      };
+    }
+  }
+
+  // Fallback to default template
+  if (!templateConfig) {
+    const { data: defaultTemplate } = await supabaseAdmin
+      .from("certificate_templates")
+      .select("*")
+      .eq("is_default", true)
+      .single();
+
+    if (defaultTemplate) {
+      templateConfig = {
+        templateKey: defaultTemplate.template_key,
+        primaryColor: defaultTemplate.primary_color,
+        secondaryColor: defaultTemplate.secondary_color,
+        accentColor: defaultTemplate.accent_color,
+        logoUrl: defaultTemplate.logo_url,
+        organizationName: defaultTemplate.organization_name,
+      };
+    }
+  }
 
   // Insert certificate record first to get the verification_code
   const { data: cert, error: insertError } = await supabaseAdmin
@@ -58,6 +100,7 @@ export async function issueCertificate({
       certificate_number: certificateNumber,
       status: "issued",
       issued_at: new Date().toISOString(),
+      template_id: course?.certificate_template_id ?? null,
     })
     .select("*")
     .single();
@@ -69,14 +112,17 @@ export async function issueCertificate({
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://academy.vifm.ae";
   const verificationUrl = `${baseUrl}/verify/${verificationCode}`;
 
-  // Generate PDF
-  const pdfBuffer = await generateCertificatePdf({
-    userName,
-    courseName,
-    certificateNumber,
-    issuedAt: cert.issued_at,
-    verificationUrl,
-  });
+  // Generate PDF with template
+  const pdfBuffer = await generateCertificatePdf(
+    {
+      userName,
+      courseName,
+      certificateNumber,
+      issuedAt: cert.issued_at,
+      verificationUrl,
+    },
+    templateConfig
+  );
 
   // Upload to Supabase Storage
   const filePath = `${userId}/${cert.id}.pdf`;

@@ -181,7 +181,10 @@ export function Header() {
         <MobileNav
           links={navLinks}
           locale={locale}
+          user={user}
+          dashboardHref={getDashboardHref()}
           onClose={() => setMobileOpen(false)}
+          onSignOut={signOut}
         />
       )}
     </header>
