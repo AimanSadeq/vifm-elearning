@@ -73,13 +73,15 @@ export function Header() {
 
         {/* Right section */}
         <div className="flex items-center gap-2">
-          <Link
-            href={`/${locale}/admin/dashboard`}
-            className="hidden md:inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
-          >
-            <Settings className="h-4 w-4" />
-            Admin
-          </Link>
+          {user?.role === "super_admin" && (
+            <Link
+              href={`/${locale}/admin/dashboard`}
+              className="hidden md:inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+            >
+              <Settings className="h-4 w-4" />
+              Admin
+            </Link>
+          )}
           <LanguageSwitcher />
           {user && <NotificationBell />}
 

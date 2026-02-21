@@ -26,7 +26,14 @@
       "Bash(npx eslint:*)",
       "Bash(timeout:*)",
       "Bash(del \"C:\\\\Users\\\\AimanSadeq\\\\OneDrive - Virginia Institute of Finance\\\\VIFM eLearning Portal\\\\vifm-elearning\\\\src\\\\components\\\\providers\\\\AuthProvider.tsx\")",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(claude mcp add:*)",
+      "Bash(claude plugin add:*)",
+      "Bash(claude plugin --help:*)",
+      "Bash(claude plugin install:*)",
+      "Bash(claude plugin marketplace:*)",
+      "Bash(claude plugin list:*)"
     ]
   }
 }
