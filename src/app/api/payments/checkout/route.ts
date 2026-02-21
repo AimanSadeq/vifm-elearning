@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     if (!user)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { courseId, promoCode } = await request.json();
+    const { courseId, promoCode, voucherId } = await request.json();
     if (!courseId)
       return NextResponse.json(
         { error: "courseId is required" },
@@ -52,10 +52,11 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
 
-    // Calculate price with promo
+    // Calculate price with promo or voucher discount
     let finalPrice = Number(course.price);
     let discountAmount = 0;
     let promoCodeId: string | null = null;
+    let appliedVoucherId: string | null = null;
 
     if (promoCode) {
       const { data: promo } = await supabaseAdmin
@@ -78,6 +79,32 @@ export async function POST(request: NextRequest) {
           discountAmount = finalPrice * (Number(promo.discount_value) / 100);
         } else {
           discountAmount = Number(promo.discount_value);
+        }
+        finalPrice = Math.max(0, finalPrice - discountAmount);
+      }
+    } else if (voucherId) {
+      // Apply voucher discount (percentage or fixed_amount — full_access is handled by /api/vouchers/redeem)
+      const { data: voucher } = await supabaseAdmin
+        .from("vouchers")
+        .select("*")
+        .eq("id", voucherId)
+        .eq("is_active", true)
+        .single();
+
+      if (
+        voucher &&
+        voucher.voucher_type !== "full_access" &&
+        (!voucher.expires_at || new Date(voucher.expires_at) > new Date()) &&
+        (!voucher.max_uses || voucher.current_uses < voucher.max_uses) &&
+        (!voucher.applicable_courses ||
+          voucher.applicable_courses.length === 0 ||
+          voucher.applicable_courses.includes(courseId))
+      ) {
+        appliedVoucherId = voucher.id;
+        if (voucher.voucher_type === "percentage") {
+          discountAmount = finalPrice * (Number(voucher.discount_value) / 100);
+        } else {
+          discountAmount = Number(voucher.discount_value);
         }
         finalPrice = Math.max(0, finalPrice - discountAmount);
       }
@@ -106,6 +133,7 @@ export async function POST(request: NextRequest) {
         courseId,
         userId: user.id,
         promoCodeId: promoCodeId ?? "",
+        voucherId: appliedVoucherId ?? "",
       },
       success_url: `${baseUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/courses/${course.slug}`,
@@ -118,11 +146,14 @@ export async function POST(request: NextRequest) {
       amount: finalPrice,
       currency: course.currency,
       status: "pending",
-      method: "stripe",
+      method: appliedVoucherId ? "voucher" : "stripe",
       transaction_id: session.id,
       promo_code_id: promoCodeId,
       discount_amount: discountAmount,
       gateway_response: { sessionId: session.id },
+      metadata: appliedVoucherId
+        ? { voucher_id: appliedVoucherId }
+        : {},
     });
 
     return NextResponse.json({

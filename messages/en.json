@@ -167,6 +167,8 @@
     "analytics": "Analytics",
     "settings": "Settings",
     "promoCodes": "Promo Codes",
+    "vouchers": "Vouchers",
+    "manageVouchers": "Manage Vouchers",
     "badges": "Badges",
     "notifications": "Notifications",
     "analyticsOverview": "Analytics Overview",
@@ -237,7 +239,15 @@
     "paymentFailed": "Payment Failed",
     "tryAgain": "Try Again",
     "invalidCode": "Invalid promo code",
-    "codeApplied": "Promo code applied!"
+    "codeApplied": "Promo code applied!",
+    "voucherCode": "Voucher Code",
+    "applyVoucher": "Apply Voucher",
+    "voucherApplied": "Voucher applied!",
+    "voucherFreeAccess": "This voucher grants free access to this course!",
+    "voucherDiscountApplied": "Voucher discount applied!",
+    "invalidVoucher": "Invalid voucher code",
+    "redeemVoucher": "Redeem Voucher & Start Learning",
+    "enrolling": "Enrolling..."
   },
   "certificates": {
     "myCertificates": "My Certificates",

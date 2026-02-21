@@ -167,6 +167,8 @@
     "analytics": "التحليلات",
     "settings": "الإعدادات",
     "promoCodes": "الرموز الترويجية",
+    "vouchers": "القسائم",
+    "manageVouchers": "إدارة القسائم",
     "badges": "الشارات",
     "notifications": "الإشعارات",
     "analyticsOverview": "نظرة عامة على التحليلات",
@@ -237,7 +239,15 @@
     "paymentFailed": "فشل الدفع",
     "tryAgain": "حاول مرة أخرى",
     "invalidCode": "رمز ترويجي غير صالح",
-    "codeApplied": "تم تطبيق الرمز الترويجي!"
+    "codeApplied": "تم تطبيق الرمز الترويجي!",
+    "voucherCode": "رمز القسيمة",
+    "applyVoucher": "تطبيق القسيمة",
+    "voucherApplied": "تم تطبيق القسيمة!",
+    "voucherFreeAccess": "هذه القسيمة تمنح وصولاً مجانياً لهذه الدورة!",
+    "voucherDiscountApplied": "تم تطبيق خصم القسيمة!",
+    "invalidVoucher": "رمز قسيمة غير صالح",
+    "redeemVoucher": "استرداد القسيمة وابدأ التعلم",
+    "enrolling": "جارٍ التسجيل..."
   },
   "certificates": {
     "myCertificates": "شهاداتي",

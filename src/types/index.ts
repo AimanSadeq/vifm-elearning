@@ -11,7 +11,9 @@ export type PaymentMethod =
   | "paytabs"
   | "bank_transfer"
   | "promo_code"
-  | "corporate_license";
+  | "corporate_license"
+  | "voucher";
+export type VoucherType = "full_access" | "percentage" | "fixed_amount";
 export type ContentType = "video" | "document" | "quiz" | "assignment";
 export type QuestionType =
   | "multiple_choice"
@@ -450,4 +452,36 @@ export interface ForumPost {
   // Relations
   author?: Pick<Profile, "full_name" | "full_name_ar" | "avatar_url">;
   replies?: ForumPost[];
+}
+
+export interface Voucher {
+  id: string;
+  code: string;
+  description?: string | null;
+  voucher_type: VoucherType;
+  discount_value?: number | null;
+  currency: string;
+  max_uses?: number | null;
+  current_uses: number;
+  applicable_courses: string[];
+  is_single_use: boolean;
+  is_active: boolean;
+  starts_at?: string | null;
+  expires_at?: string | null;
+  created_by?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VoucherRedemption {
+  id: string;
+  voucher_id: string;
+  user_id: string;
+  course_id?: string | null;
+  payment_id?: string | null;
+  redeemed_at: string;
+  // Relations
+  voucher?: Voucher;
+  course?: Course;
+  user?: Pick<Profile, "full_name" | "full_name_ar">;
 }

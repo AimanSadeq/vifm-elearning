@@ -91,6 +91,44 @@ export const promoCodeSchema = z.object({
   expiresAt: z.string().datetime().optional(),
 });
 
+export const voucherSchema = z
+  .object({
+    code: z.string().min(3).max(30).toUpperCase(),
+    description: z.string().optional(),
+    voucherType: z.enum(["full_access", "percentage", "fixed_amount"]),
+    discountValue: z.number().positive().optional(),
+    currency: z.string().default("USD"),
+    maxUses: z.number().positive().optional(),
+    isSingleUse: z.boolean().default(true),
+    applicableCourses: z.array(z.string().uuid()).optional(),
+    startsAt: z.string().optional(),
+    expiresAt: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.voucherType !== "full_access" && !data.discountValue) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Discount value is required for percentage and fixed amount vouchers",
+      path: ["discountValue"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.voucherType === "percentage" && data.discountValue) {
+        return data.discountValue >= 1 && data.discountValue <= 100;
+      }
+      return true;
+    },
+    {
+      message: "Percentage must be between 1 and 100",
+      path: ["discountValue"],
+    }
+  );
+
 export const organizationSchema = z.object({
   name: z.string().min(2),
   nameAr: z.string().optional(),
@@ -183,6 +221,7 @@ export type QuizInput = z.infer<typeof quizSchema>;
 export type QuizQuestionInput = z.infer<typeof quizQuestionSchema>;
 export type SubmitQuizInput = z.infer<typeof submitQuizSchema>;
 export type PromoCodeInput = z.infer<typeof promoCodeSchema>;
+export type VoucherInput = z.infer<typeof voucherSchema>;
 export type OrganizationInput = z.infer<typeof organizationSchema>;
 export type WebinarInput = z.infer<typeof webinarSchema>;
 export type ForumPostInput = z.infer<typeof forumPostSchema>;

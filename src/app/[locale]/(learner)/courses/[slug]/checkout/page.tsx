@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   Tag,
   CheckCircle,
+  Ticket,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { formatCurrency } from "@/lib/utils/formatters";
-import type { Course } from "@/types";
+import type { Course, VoucherType } from "@/types";
 
 type PaymentMethodType = "stripe" | "paytabs" | "bank_transfer";
 
@@ -26,6 +27,7 @@ export default function CheckoutPage() {
   const params = useParams();
   const slug = params.slug as string;
   const locale = useLocale();
+  const router = useRouter();
   const t = useTranslations("payments");
 
   const [course, setCourse] = useState<Course | null>(null);
@@ -40,6 +42,14 @@ export default function CheckoutPage() {
   const [bankDetails, setBankDetails] = useState<Record<string, string> | null>(
     null
   );
+
+  // Voucher state
+  const [voucherCode, setVoucherCode] = useState("");
+  const [voucherApplied, setVoucherApplied] = useState(false);
+  const [voucherError, setVoucherError] = useState("");
+  const [voucherId, setVoucherId] = useState<string | null>(null);
+  const [voucherType, setVoucherType] = useState<VoucherType | null>(null);
+  const [isRedeemingVoucher, setIsRedeemingVoucher] = useState(false);
 
   useEffect(() => {
     async function fetchCourse() {
@@ -80,6 +90,56 @@ export default function CheckoutPage() {
     }
   };
 
+  const handleApplyVoucher = async () => {
+    if (!voucherCode || !course) return;
+    setVoucherError("");
+
+    const res = await fetch("/api/vouchers/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: voucherCode, courseId: course.id }),
+    });
+
+    const { data } = await res.json();
+    if (data?.valid) {
+      setVoucherApplied(true);
+      setVoucherId(data.voucherId);
+      setVoucherType(data.voucherType);
+      if (data.voucherType !== "full_access") {
+        setDiscount(data.discountAmount);
+        setFinalPrice(data.finalPrice);
+      }
+    } else {
+      setVoucherError(data?.reason ?? "Invalid voucher code");
+    }
+  };
+
+  const handleRedeemVoucher = async () => {
+    if (!voucherId || !course) return;
+    setIsRedeemingVoucher(true);
+
+    try {
+      const res = await fetch("/api/vouchers/redeem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ voucherId, courseId: course.id }),
+      });
+
+      const { data, error } = await res.json();
+      if (error) {
+        setVoucherError(error);
+        return;
+      }
+
+      if (data?.enrolled) {
+        // Full access voucher — enrolled directly, go to course
+        router.push(`/${locale}/courses/${slug}/learn`);
+      }
+    } finally {
+      setIsRedeemingVoucher(false);
+    }
+  };
+
   const handleCheckout = async () => {
     if (!course) return;
     setIsProcessing(true);
@@ -92,6 +152,7 @@ export default function CheckoutPage() {
           body: JSON.stringify({
             courseId: course.id,
             promoCode: promoApplied ? promoCode : undefined,
+            voucherId: voucherApplied && voucherType !== "full_access" ? voucherId : undefined,
           }),
         });
         const { data, error } = await res.json();
@@ -112,6 +173,7 @@ export default function CheckoutPage() {
           body: JSON.stringify({
             courseId: course.id,
             promoCode: promoApplied ? promoCode : undefined,
+            voucherId: voucherApplied && voucherType !== "full_access" ? voucherId : undefined,
           }),
         });
         const { data, error } = await res.json();
@@ -264,7 +326,7 @@ export default function CheckoutPage() {
                       setPromoError("");
                     }}
                     className="ps-9"
-                    disabled={promoApplied}
+                    disabled={promoApplied || voucherApplied}
                   />
                 </div>
                 {promoApplied ? (
@@ -276,7 +338,7 @@ export default function CheckoutPage() {
                   <Button
                     variant="outline"
                     onClick={handleApplyPromo}
-                    disabled={!promoCode}
+                    disabled={!promoCode || voucherApplied}
                   >
                     {t("applyCode")}
                   </Button>
@@ -288,6 +350,57 @@ export default function CheckoutPage() {
               {promoApplied && (
                 <p className="mt-1 text-sm text-green-600 dark:text-green-400">
                   {t("codeApplied")}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Voucher code */}
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Ticket className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Have a voucher? Enter code here"
+                    value={voucherCode}
+                    onChange={(e) => {
+                      setVoucherCode(e.target.value.toUpperCase());
+                      setVoucherApplied(false);
+                      setVoucherError("");
+                      setVoucherId(null);
+                      setVoucherType(null);
+                    }}
+                    className="ps-9"
+                    disabled={voucherApplied || promoApplied}
+                  />
+                </div>
+                {voucherApplied ? (
+                  <Button variant="outline" disabled>
+                    <CheckCircle className="h-4 w-4 me-1 text-green-500" />
+                    Verified
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    onClick={handleApplyVoucher}
+                    disabled={!voucherCode || promoApplied}
+                  >
+                    Apply Voucher
+                  </Button>
+                )}
+              </div>
+              {voucherError && (
+                <p className="mt-1 text-sm text-destructive">{voucherError}</p>
+              )}
+              {voucherApplied && voucherType === "full_access" && (
+                <p className="mt-1 text-sm text-green-600 dark:text-green-400">
+                  This voucher grants free access to this course!
+                </p>
+              )}
+              {voucherApplied && voucherType !== "full_access" && (
+                <p className="mt-1 text-sm text-green-600 dark:text-green-400">
+                  Voucher discount applied!
                 </p>
               )}
             </CardContent>
@@ -328,22 +441,37 @@ export default function CheckoutPage() {
               <div className="flex justify-between font-semibold">
                 <span>{t("total")}</span>
                 <span>
-                  {formatCurrency(finalPrice, course.currency, locale)}
+                  {voucherApplied && voucherType === "full_access"
+                    ? "FREE"
+                    : formatCurrency(finalPrice, course.currency, locale)}
                 </span>
               </div>
 
-              <Button
-                className="w-full"
-                size="lg"
-                onClick={handleCheckout}
-                disabled={isProcessing}
-              >
-                {isProcessing
-                  ? "Processing..."
-                  : selectedMethod === "bank_transfer"
-                    ? "Get Bank Details"
-                    : "Proceed to Payment"}
-              </Button>
+              {voucherApplied && voucherType === "full_access" ? (
+                <Button
+                  className="w-full"
+                  size="lg"
+                  onClick={handleRedeemVoucher}
+                  disabled={isRedeemingVoucher}
+                >
+                  {isRedeemingVoucher
+                    ? "Enrolling..."
+                    : "Redeem Voucher & Start Learning"}
+                </Button>
+              ) : (
+                <Button
+                  className="w-full"
+                  size="lg"
+                  onClick={handleCheckout}
+                  disabled={isProcessing}
+                >
+                  {isProcessing
+                    ? "Processing..."
+                    : selectedMethod === "bank_transfer"
+                      ? "Get Bank Details"
+                      : "Proceed to Payment"}
+                </Button>
+              )}
             </CardContent>
           </Card>
         </div>
