@@ -35,7 +35,7 @@ export const courseSchema = z.object({
   shortDescription: z.string().max(200).optional(),
   shortDescriptionAr: z.string().max(200).optional(),
   categoryId: z.string().uuid(),
-  instructorId: z.string().uuid().optional(),
+  instructorId: z.preprocess((val) => (val === "" ? undefined : val), z.string().uuid().optional()),
   difficultyLevel: z.enum(["beginner", "intermediate", "advanced", "expert"]),
   price: z.number().min(0),
   currency: z.string(),

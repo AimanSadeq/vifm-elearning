@@ -228,36 +228,11 @@ export function CourseForm({ initialData, mode }: CourseFormProps) {
     setStep((prev) => Math.max(prev - 1, 1));
   };
 
-  // Upload thumbnail to Supabase storage
-  const uploadThumbnail = async (courseId: string): Promise<string | null> => {
-    if (!thumbnailFile) return null;
-
-    const supabase = createClient();
-    const fileExt = thumbnailFile.name.split(".").pop();
-    const filePath = `courses/${courseId}/thumbnail.${fileExt}`;
-
-    const { error } = await supabase.storage
-      .from("course-assets")
-      .upload(filePath, thumbnailFile, { upsert: true });
-
-    if (error) {
-      console.error("Thumbnail upload error:", error);
-      return null;
-    }
-
-    const { data: urlData } = supabase.storage
-      .from("course-assets")
-      .getPublicUrl(filePath);
-
-    return urlData.publicUrl;
-  };
-
-  // Submit handler
+  // Submit handler — sends data to server API route (bypasses RLS)
   const onSubmit = async (data: CourseInput, status: "draft" | "published") => {
     setSubmitError(null);
 
     try {
-      const supabase = createClient();
       const slug = initialData?.slug ?? generateSlug(data.title);
 
       const coursePayload: Record<string, unknown> = {
@@ -287,42 +262,52 @@ export function CourseForm({ initialData, mode }: CourseFormProps) {
         coursePayload.published_at = new Date().toISOString();
       }
 
-      let courseId: string;
+      const formData = new FormData();
+      formData.append(
+        "courseData",
+        JSON.stringify({
+          ...coursePayload,
+          mode,
+          courseId: initialData?.id,
+        })
+      );
 
-      if (mode === "edit" && initialData?.id) {
-        courseId = initialData.id;
-        const { error } = await supabase
-          .from("courses")
-          .update(coursePayload)
-          .eq("id", courseId);
-
-        if (error) throw error;
-      } else {
-        const { data: created, error } = await supabase
-          .from("courses")
-          .insert(coursePayload)
-          .select("id")
-          .single();
-
-        if (error) throw error;
-        courseId = created.id;
+      if (thumbnailFile) {
+        formData.append("thumbnail", thumbnailFile);
       }
 
-      // Upload thumbnail if selected
-      if (thumbnailFile) {
-        const thumbnailUrl = await uploadThumbnail(courseId);
-        if (thumbnailUrl) {
-          await supabase
-            .from("courses")
-            .update({ thumbnail_url: thumbnailUrl })
-            .eq("id", courseId);
-        }
+      // Get current session token for server auth
+      const supabase = createClient();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      console.log("[CourseForm] Session:", { hasSession: !!session, hasToken: !!session?.access_token, error: sessionError?.message });
+      if (!session?.access_token) {
+        throw new Error("Not authenticated. Please log in again.");
+      }
+
+      const res = await fetch("/api/admin/courses", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: formData,
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "Failed to save course");
       }
 
       router.push(`/${locale}/admin/courses`);
       router.refresh();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Something went wrong";
+      console.error("Course save error:", err);
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "object" && err !== null && "message" in err
+            ? String((err as { message: unknown }).message)
+            : "Something went wrong";
       setSubmitError(message);
     }
   };

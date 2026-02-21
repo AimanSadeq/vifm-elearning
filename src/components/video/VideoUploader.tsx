@@ -4,16 +4,51 @@ import { useState, useRef } from "react";
 import { Upload, FileVideo, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { createClient } from "@/lib/supabase/client";
 
 interface VideoUploaderProps {
   lessonId: string;
+  courseId: string;
   currentVideoUrl?: string | null;
   onUploadComplete: (url: string) => void;
 }
 
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 * 1024 * 1024)
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+}
+
+function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.round(seconds % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+function detectVideoDuration(file: File): Promise<number | null> {
+  return new Promise((resolve) => {
+    const video = document.createElement("video");
+    video.preload = "metadata";
+    const url = URL.createObjectURL(file);
+    video.src = url;
+    video.onloadedmetadata = () => {
+      const duration =
+        isFinite(video.duration) && video.duration > 0
+          ? video.duration
+          : null;
+      URL.revokeObjectURL(url);
+      resolve(duration);
+    };
+    video.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(null);
+    };
+  });
+}
+
 export function VideoUploader({
   lessonId,
+  courseId,
   currentVideoUrl,
   onUploadComplete,
 }: VideoUploaderProps) {
@@ -21,6 +56,11 @@ export function VideoUploader({
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<{
+    name: string;
+    size: number;
+    duration: number | null;
+  } | null>(null);
 
   const handleUpload = async (file: File) => {
     setError(null);
@@ -41,49 +81,69 @@ export function VideoUploader({
       return;
     }
 
-    const supabase = createClient();
-    const filePath = `lessons/${lessonId}/${Date.now()}-${file.name}`;
+    // Detect duration client-side
+    const duration = await detectVideoDuration(file);
+    setSelectedFile({ name: file.name, size: file.size, duration });
 
-    // Simulate progress since Supabase doesn't provide upload progress natively
+    // Build form data
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("courseId", courseId);
+    formData.append("lessonId", lessonId);
+    if (duration !== null) {
+      formData.append("duration", duration.toString());
+    }
+
+    // Simulate progress
     const progressTimer = setInterval(() => {
       setProgress((prev) => Math.min(prev + 5, 90));
     }, 500);
 
-    const { error: uploadError } = await supabase.storage
-      .from("videos")
-      .upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: true,
+    try {
+      const res = await fetch("/api/video/upload", {
+        method: "POST",
+        body: formData,
       });
 
-    clearInterval(progressTimer);
+      clearInterval(progressTimer);
 
-    if (uploadError) {
-      setError(uploadError.message);
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        setError(body?.error ?? `Upload failed (${res.status})`);
+        setIsUploading(false);
+        return;
+      }
+
+      setProgress(100);
+      const { path } = await res.json();
+      onUploadComplete(path);
+    } catch {
+      clearInterval(progressTimer);
+      setError("Network error — please try again");
+    } finally {
       setIsUploading(false);
-      return;
     }
-
-    setProgress(100);
-
-    // Update lesson with video path
-    await supabase
-      .from("lessons")
-      .update({ video_url: filePath })
-      .eq("id", lessonId);
-
-    onUploadComplete(filePath);
-    setIsUploading(false);
   };
 
   return (
     <div className="space-y-3">
       {currentVideoUrl && (
         <div className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm">
-          <FileVideo className="h-4 w-4 text-muted-foreground" />
+          <FileVideo className="h-4 w-4 shrink-0 text-muted-foreground" />
           <span className="flex-1 truncate text-muted-foreground">
             {currentVideoUrl}
           </span>
+        </div>
+      )}
+
+      {selectedFile && !isUploading && (
+        <div className="rounded-md border px-3 py-2 text-sm text-muted-foreground">
+          <span className="font-medium">{selectedFile.name}</span>
+          {" — "}
+          {formatFileSize(selectedFile.size)}
+          {selectedFile.duration !== null && (
+            <> — {formatDuration(selectedFile.duration)}</>
+          )}
         </div>
       )}
 

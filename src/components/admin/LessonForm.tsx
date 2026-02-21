@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
 import { lessonSchema, type LessonInput } from "@/lib/utils/validators";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
+import { VideoUploader } from "@/components/video/VideoUploader";
 import type { Lesson } from "@/types";
 
 interface LessonFormProps {
@@ -31,11 +32,15 @@ export function LessonForm({
   onCancel,
 }: LessonFormProps) {
   const [error, setError] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(
+    initialData?.video_url ?? null
+  );
   const isEditing = !!initialData;
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<LessonInput>({
     resolver: zodResolver(lessonSchema),
@@ -56,6 +61,8 @@ export function LessonForm({
           isMandatory: true,
         },
   });
+
+  const contentType = watch("contentType");
 
   const onSubmit = async (data: LessonInput) => {
     setError(null);
@@ -192,6 +199,26 @@ export function LessonForm({
               rows={2}
             />
           </div>
+
+          {/* Video upload section */}
+          {contentType === "video" && (
+            <div className="space-y-1">
+              <Label>Video File</Label>
+              {isEditing && initialData ? (
+                <VideoUploader
+                  lessonId={initialData.id}
+                  courseId={courseId}
+                  currentVideoUrl={videoUrl}
+                  onUploadComplete={(path) => setVideoUrl(path)}
+                />
+              ) : (
+                <div className="flex items-center gap-2 rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground">
+                  <Info className="h-4 w-4 shrink-0" />
+                  Save the lesson first, then upload the video.
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center gap-2 pt-2">
             <Button type="submit" size="sm" disabled={isSubmitting}>

@@ -94,5 +94,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next|api/webhooks|favicon.ico|assets).*)"],
+  matcher: ["/((?!_next|api|favicon.ico|assets).*)"],
 };
