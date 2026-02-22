@@ -4,10 +4,21 @@ import {
   createEnrollmentFromPayment,
   updatePaymentStatus,
 } from "@/lib/services/enrollment-service";
+import { verifyPayTabsCallback } from "@/lib/services/paytabs";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
+    // Verify webhook signature before processing
+    if (!verifyPayTabsCallback(body)) {
+      console.error("PayTabs callback: invalid signature");
+      return NextResponse.json(
+        { error: "Invalid signature" },
+        { status: 403 }
+      );
+    }
+
     const { tran_ref, payment_result } = body;
 
     if (!tran_ref)

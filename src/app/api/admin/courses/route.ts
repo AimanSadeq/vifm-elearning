@@ -7,11 +7,6 @@ export async function POST(request: NextRequest) {
     const authHeader = request.headers.get("authorization");
     const token = authHeader?.replace("Bearer ", "");
 
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-    console.log("[admin/courses] Service role key starts with:", serviceKey.substring(0, 10), "length:", serviceKey.length);
-    console.log("[admin/courses] Auth header present:", !!authHeader);
-    console.log("[admin/courses] Token length:", token?.length ?? 0);
-
     if (!token) {
       return NextResponse.json({ error: "Unauthorized - no token" }, { status: 401 });
     }
@@ -20,8 +15,6 @@ export async function POST(request: NextRequest) {
       data: { user },
       error: authError,
     } = await supabaseAdmin.auth.getUser(token);
-
-    console.log("[admin/courses] Auth result:", { userId: user?.id, authError: authError?.message });
 
     if (authError || !user) {
       return NextResponse.json({ error: `Unauthorized - ${authError?.message || "no user"}` }, { status: 401 });

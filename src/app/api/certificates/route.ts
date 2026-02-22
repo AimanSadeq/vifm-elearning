@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { issueCertificate } from "@/lib/services/certificate-service";
+import { escapeIlike } from "@/lib/utils/escape-search";
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,8 +34,9 @@ export async function GET(request: NextRequest) {
 
     const search = request.nextUrl.searchParams.get("search");
     if (search) {
+      const s = escapeIlike(search);
       query = query.or(
-        `certificate_number.ilike.%${search}%,verification_code.ilike.%${search}%`
+        `certificate_number.ilike.%${s}%,verification_code.ilike.%${s}%`
       );
     }
 

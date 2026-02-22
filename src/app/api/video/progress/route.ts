@@ -79,13 +79,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify auth — for sendBeacon we may not have auth cookies,
-    // so we accept the userId from the payload
+    // Verify auth — always require a valid session
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (user && user.id !== userId) {
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (user.id !== userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

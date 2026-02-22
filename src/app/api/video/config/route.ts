@@ -32,11 +32,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Fetch per-lesson config
+    // Fetch per-lesson config (including course_id for enrollment check)
     const { data: lesson, error: lessonError } = await supabase
       .from("lessons")
       .select(
-        "minimum_watch_percentage, allow_speed_control, allow_download, allow_skipping, auto_save_interval_seconds, force_watch_first"
+        "minimum_watch_percentage, allow_speed_control, allow_download, allow_skipping, auto_save_interval_seconds, force_watch_first, is_preview, module:modules!inner(course_id)"
       )
       .eq("id", lessonId)
       .single();
@@ -46,6 +46,26 @@ export async function GET(request: NextRequest) {
         { error: "Lesson not found" },
         { status: 404 }
       );
+    }
+
+    // Verify enrollment unless this is a preview lesson
+    if (!lesson.is_preview) {
+      const courseId = (lesson.module as { course_id: string })?.course_id;
+      if (courseId) {
+        const { data: enrollment } = await supabase
+          .from("enrollments")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("course_id", courseId)
+          .single();
+
+        if (!enrollment) {
+          return NextResponse.json(
+            { error: "Not enrolled in this course" },
+            { status: 403 }
+          );
+        }
+      }
     }
 
     // Check if this is a first watch (no progress or video not completed)

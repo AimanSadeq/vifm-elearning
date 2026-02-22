@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Users, Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { escapeIlike } from "@/lib/utils/escape-search";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
@@ -53,8 +54,9 @@ export default function AdminUsersPage() {
       }
 
       if (debouncedSearch) {
+        const s = escapeIlike(debouncedSearch);
         query = query.or(
-          `full_name.ilike.%${debouncedSearch}%,email.ilike.%${debouncedSearch}%`
+          `full_name.ilike.%${s}%,email.ilike.%${s}%`
         );
       }
 

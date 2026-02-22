@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CheckCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { escapeIlike } from "@/lib/utils/escape-search";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -45,8 +46,9 @@ export default function AdminPaymentsPage() {
       }
 
       if (debouncedSearch) {
+        const s = escapeIlike(debouncedSearch);
         query = query.or(
-          `transaction_id.ilike.%${debouncedSearch}%`
+          `transaction_id.ilike.%${s}%`
         );
       }
 

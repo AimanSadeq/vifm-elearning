@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
+import { escapeIlike } from "@/lib/utils/escape-search";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -49,8 +50,9 @@ export default function CorporateEmployeesPage() {
         .order("full_name");
 
       if (debouncedSearch) {
+        const s = escapeIlike(debouncedSearch);
         query = query.or(
-          `full_name.ilike.%${debouncedSearch}%,email.ilike.%${debouncedSearch}%`
+          `full_name.ilike.%${s}%,email.ilike.%${s}%`
         );
       }
 
