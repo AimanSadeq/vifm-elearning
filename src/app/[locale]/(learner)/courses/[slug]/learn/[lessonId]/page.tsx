@@ -21,6 +21,15 @@ import { QuizGate } from "@/components/quizzes/QuizGate";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { ThreadList } from "@/components/forums/ThreadList";
 import { useCoursePlayerStore } from "@/stores/course-player-store";
 import { createTimeValidator } from "@/lib/utils/devtools-detection";
@@ -46,6 +55,7 @@ export default function LessonPage() {
   const [overallProgress, setOverallProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [showDiscussion, setShowDiscussion] = useState(false);
+  const [showLockAlert, setShowLockAlert] = useState(false);
   const [videoCurrentTime, setVideoCurrentTime] = useState(0);
   const [videoConfig, setVideoConfig] = useState<VideoConfig | null>(null);
 
@@ -539,14 +549,21 @@ export default function LessonPage() {
           )}
 
           {nextLesson ? (
-            <Link
-              href={`/${locale}/courses/${slug}/learn/${nextLesson.id}`}
-            >
-              <Button size="sm">
+            isLocked(nextLesson.id) ? (
+              <Button size="sm" onClick={() => setShowLockAlert(true)}>
                 {t("overview") === "Overview" ? "Next Lesson" : "الدرس التالي"}
-                <ChevronRight className="h-4 w-4 ms-1 rtl:rotate-180" />
+                <Lock className="h-4 w-4 ms-1" />
               </Button>
-            </Link>
+            ) : (
+              <Link
+                href={`/${locale}/courses/${slug}/learn/${nextLesson.id}`}
+              >
+                <Button size="sm">
+                  {t("overview") === "Overview" ? "Next Lesson" : "الدرس التالي"}
+                  <ChevronRight className="h-4 w-4 ms-1 rtl:rotate-180" />
+                </Button>
+              </Link>
+            )
           ) : (
             <div />
           )}
@@ -575,6 +592,27 @@ export default function LessonPage() {
           )}
         </div>
       </div>
+
+      {/* Lock alert dialog */}
+      <AlertDialog open={showLockAlert} onOpenChange={setShowLockAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {locale === "ar" ? "الدرس مقفل" : "Lesson Locked"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {locale === "ar"
+                ? "يجب إكمال هذا الدرس قبل الانتقال إلى الدرس التالي."
+                : "Must complete this lesson before moving on to the next lesson."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>
+              {locale === "ar" ? "حسناً" : "OK"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </CoursePlayer>
   );
 }

@@ -607,7 +607,8 @@ export function VideoPlayer({
             if (countdownIntervalRef.current)
               clearInterval(countdownIntervalRef.current);
             setShowNextOverlay(false);
-            nextLesson.onPlay();
+            // Defer navigation to avoid setState-during-render
+            setTimeout(() => nextLesson.onPlay(), 0);
             return 0;
           }
           return prev - 1;
