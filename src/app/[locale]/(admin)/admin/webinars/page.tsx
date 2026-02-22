@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { escapeIlike } from "@/lib/utils/escape-search";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -44,8 +45,9 @@ export default function AdminWebinarsPage() {
       }
 
       if (debouncedSearch) {
+        const s = escapeIlike(debouncedSearch);
         query = query.or(
-          `title.ilike.%${debouncedSearch}%,title_ar.ilike.%${debouncedSearch}%`
+          `title.ilike.%${s}%,title_ar.ilike.%${s}%`
         );
       }
 

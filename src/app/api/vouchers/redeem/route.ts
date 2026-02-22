@@ -148,16 +148,22 @@ export async function POST(request: NextRequest) {
         `Failed to record voucher redemption: ${redemptionError.message}`
       );
 
-    // Increment current_uses
-    const { error: updateError } = await supabaseAdmin
-      .from("vouchers")
-      .update({ current_uses: voucher.current_uses + 1 })
-      .eq("id", voucher.id);
+    // Atomically increment current_uses (prevents race condition)
+    const { data: incremented, error: updateError } = await supabaseAdmin
+      .rpc("atomic_increment_voucher_usage", { p_voucher_id: voucher.id });
 
     if (updateError)
       throw new Error(
         `Failed to update voucher usage: ${updateError.message}`
       );
+
+    if (!incremented) {
+      // Race condition: voucher was used up between our check and increment
+      return NextResponse.json(
+        { error: "Voucher usage limit reached" },
+        { status: 400 }
+      );
+    }
 
     return NextResponse.json({
       data: {

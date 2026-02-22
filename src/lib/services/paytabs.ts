@@ -1,3 +1,5 @@
+import { createHmac } from "crypto";
+
 const PAYTABS_SERVER_KEY = process.env.PAYTABS_SERVER_KEY ?? "";
 const PAYTABS_PROFILE_ID = process.env.PAYTABS_PROFILE_ID ?? "";
 const PAYTABS_BASE_URL =
@@ -53,11 +55,31 @@ export async function createPaymentPage(
   return response.json();
 }
 
+/**
+ * Verify PayTabs IPN callback signature.
+ * PayTabs signs callbacks with HMAC-SHA256 using the server key.
+ */
 export function verifyPayTabsCallback(
-  serverKey: string,
   body: Record<string, unknown>
 ): boolean {
-  // PayTabs sends a signature in the callback
-  // For now, verify the server key matches
-  return !!serverKey && !!body.tran_ref;
+  if (!PAYTABS_SERVER_KEY) return false;
+
+  const signature = body.signature as string | undefined;
+  if (!signature) return false;
+
+  const tranRef = body.tran_ref as string;
+  const cartAmount = body.cart_amount as string;
+  const cartCurrency = body.cart_currency as string;
+  const responseCode =
+    (body.payment_result as Record<string, unknown>)?.response_code as string;
+
+  if (!tranRef || !cartAmount || !cartCurrency || !responseCode) return false;
+
+  // PayTabs HMAC: SHA256(server_key + tran_ref + cart_amount + cart_currency + response_code)
+  const data = `${PAYTABS_SERVER_KEY}${tranRef}${cartAmount}${cartCurrency}${responseCode}`;
+  const expectedSignature = createHmac("sha256", PAYTABS_SERVER_KEY)
+    .update(data)
+    .digest("hex");
+
+  return signature === expectedSignature;
 }

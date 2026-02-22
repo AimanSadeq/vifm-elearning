@@ -35,6 +35,15 @@ export async function GET(request: Request) {
 
   const supabase = await createSupabase();
 
+  // Require authentication
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   let query = supabase
     .from("forum_posts")
     .select(

@@ -42,7 +42,15 @@
       "Bash(head:*)",
       "Bash(cd \"C:/Users/AimanSadeq/OneDrive - Virginia Institute of Finance/VIFM eLearning Portal/vifm-elearning\" && npx supabase db execute --project-ref guvjbtepgeivfrjdhldx \"SELECT column_name, data_type, column_default FROM information_schema.columns WHERE table_name = 'profiles' AND table_schema = 'public' ORDER BY ordinal_position;\" 2>&1)",
       "Bash(cd:*)",
-      "mcp__supabase__apply_migration"
+      "mcp__supabase__apply_migration",
+      "Bash(echo supabase CLI not found via npx:*)",
+      "Bash(cd \"C:/Users/AimanSadeq/OneDrive - Virginia Institute of Finance/VIFM eLearning Portal/vifm-elearning\" && npx supabase link --project-ref guvjbtepgeivfrjdhldx 2>&1)",
+      "Bash(cd \"C:/Users/AimanSadeq/OneDrive - Virginia Institute of Finance/VIFM eLearning Portal/vifm-elearning\" && npx supabase db execute --project-ref guvjbtepgeivfrjdhldx \"SELECT tablename, rowsecurity FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename;\" 2>&1)",
+      "Bash(cd \"C:/Users/AimanSadeq/OneDrive - Virginia Institute of Finance/VIFM eLearning Portal/vifm-elearning\" && npx supabase db lint --linked --level error --schema public -o json 2>&1)",
+      "Bash(grep:*)",
+      "Bash(cd \"C:/Users/AimanSadeq/OneDrive - Virginia Institute of Finance/VIFM eLearning Portal/vifm-elearning\" && npx supabase db dump --linked --dry-run 2>&1 | grep PGPASSWORD | sed 's/export PGPASSWORD=\"//' | sed 's/\"//' | tr -d '\\\\r\\\\n' > /tmp/sb_pass.txt && echo \"Password extracted\")",
+      "Bash(true:*)",
+      "mcp__supabase__get_advisors"
     ]
   }
 }

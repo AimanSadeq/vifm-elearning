@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, MessageSquare, Bookmark, Lock, Play } from "lucide-react";
+import DOMPurify from "dompurify";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useSequentialLocking } from "@/lib/hooks/useSequentialLocking";
@@ -503,7 +504,7 @@ export default function LessonPage() {
                 <div
                   className="prose prose-brand max-w-none dark:prose-invert"
                   dangerouslySetInnerHTML={{
-                    __html: currentLesson.content_html,
+                    __html: DOMPurify.sanitize(currentLesson.content_html),
                   }}
                 />
               )}

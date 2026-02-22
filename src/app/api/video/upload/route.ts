@@ -49,6 +49,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 5. Validate file size (2 GB max)
+    const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: "File too large. Maximum size is 2 GB." },
+        { status: 413 }
+      );
+    }
+
     // 5. If instructor, verify they own the course
     if (profile.role === "instructor") {
       const { data: course } = await supabase

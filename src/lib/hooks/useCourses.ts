@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Course } from "@/types";
 import type { CourseFilterValues } from "@/components/courses/CourseFilters";
+import { escapeIlike } from "@/lib/utils/escape-search";
 
 interface UseCoursesCatalogOptions {
   filters: CourseFilterValues;
@@ -59,8 +60,9 @@ export function useCoursesCatalog({
 
       // Apply filters
       if (filters.search) {
+        const s = escapeIlike(filters.search);
         query = query.or(
-          `title.ilike.%${filters.search}%,title_ar.ilike.%${filters.search}%,description.ilike.%${filters.search}%`
+          `title.ilike.%${s}%,title_ar.ilike.%${s}%,description.ilike.%${s}%`
         );
       }
 

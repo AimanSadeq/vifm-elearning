@@ -7,10 +7,17 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   const rawNext = searchParams.get("next");
-  const next =
-    rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//")
-      ? rawNext
-      : "/en/dashboard";
+  const next = (() => {
+    if (!rawNext) return "/en/dashboard";
+    try {
+      const resolved = new URL(rawNext, origin);
+      return resolved.origin === origin
+        ? resolved.pathname + resolved.search
+        : "/en/dashboard";
+    } catch {
+      return "/en/dashboard";
+    }
+  })();
 
   if (code) {
     const cookieStore = await cookies();
