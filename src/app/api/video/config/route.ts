@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
 
     // Verify enrollment unless this is a preview lesson
     if (!lesson.is_preview) {
-      const courseId = (lesson.module as { course_id: string })?.course_id;
+      const courseId = (lesson.module as unknown as { course_id: string })?.course_id;
       if (courseId) {
         const { data: enrollment } = await supabase
           .from("enrollments")
