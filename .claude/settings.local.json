@@ -33,7 +33,16 @@
       "Bash(claude plugin --help:*)",
       "Bash(claude plugin install:*)",
       "Bash(claude plugin marketplace:*)",
-      "Bash(claude plugin list:*)"
+      "Bash(claude plugin list:*)",
+      "Bash(tail:*)",
+      "Bash(cd \"C:\\\\Users\\\\AimanSadeq\\\\OneDrive - Virginia Institute of Finance\\\\VIFM eLearning Portal\\\\vifm-elearning\" && npx playwright install chromium 2>&1)",
+      "Bash(cd \"C:\\\\Users\\\\AimanSadeq\\\\OneDrive - Virginia Institute of Finance\\\\VIFM eLearning Portal\\\\vifm-elearning\" && node debug-browser.js 2>&1)",
+      "mcp__supabase__execute_sql",
+      "Bash(which npx 2>/dev/null && npx supabase --version 2>/dev/null; which supabase 2>/dev/null && supabase --version 2>/dev/null)",
+      "Bash(head:*)",
+      "Bash(cd \"C:/Users/AimanSadeq/OneDrive - Virginia Institute of Finance/VIFM eLearning Portal/vifm-elearning\" && npx supabase db execute --project-ref guvjbtepgeivfrjdhldx \"SELECT column_name, data_type, column_default FROM information_schema.columns WHERE table_name = 'profiles' AND table_schema = 'public' ORDER BY ordinal_position;\" 2>&1)",
+      "Bash(cd:*)",
+      "mcp__supabase__apply_migration"
     ]
   }
 }

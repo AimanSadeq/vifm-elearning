@@ -9,21 +9,33 @@ const intlMiddleware = createMiddleware(routing);
 const protectedRoutes = [
   "/dashboard",
   "/my-courses",
-  "/courses/learn",
+  "/my-learning-paths",
   "/certificates",
   "/forums",
   "/profile",
   "/notifications",
+  "/payment",
+  "/subscription",
   "/admin",
   "/instructor",
   "/corporate",
 ];
+
+// Dynamic route patterns that also require auth
+const protectedPatterns = [
+  /^\/courses\/[^/]+\/learn/,
+  /^\/courses\/[^/]+\/checkout/,
+];
+
 const adminRoutes = ["/admin"];
 const instructorRoutes = ["/instructor"];
 const corporateRoutes = ["/corporate"];
 
 function getLocale(pathname: string): string {
-  return pathname.match(/^\/(en|ar)/)?.[1] || "en";
+  const segment = pathname.split("/")[1];
+  return (routing.locales as readonly string[]).includes(segment)
+    ? segment
+    : routing.defaultLocale;
 }
 
 export async function middleware(request: NextRequest) {
@@ -37,7 +49,6 @@ export async function middleware(request: NextRequest) {
       cookies: {
         getAll: () => request.cookies.getAll(),
         setAll(cookiesToSet) {
-          // Update request cookies so subsequent reads see refreshed values
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
@@ -54,50 +65,44 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Helper: copy Supabase auth cookies onto any response we return
+  // Helper: copy Supabase auth cookies onto any response
   const withAuthCookies = (response: NextResponse) => {
     supabaseResponse.cookies.getAll().forEach((cookie) => {
-      response.cookies.set(cookie.name, cookie.value);
+      response.cookies.set(cookie);
     });
     return response;
   };
 
-  // --- 2. Run intl middleware ---
-  const intlResponse = intlMiddleware(request);
-  withAuthCookies(intlResponse);
-
-  // --- 3. Check if route is protected ---
+  // --- 2. Check if route is protected ---
   const { pathname } = request.nextUrl;
-  const pathnameWithoutLocale = pathname.replace(/^\/(en|ar)/, "");
   const locale = getLocale(pathname);
-
-  const isProtected = protectedRoutes.some((route) =>
-    pathnameWithoutLocale.startsWith(route)
+  const localePrefix = new RegExp(
+    `^\\/(${(routing.locales as readonly string[]).join("|")})`
   );
+  const pathnameWithoutLocale = pathname.replace(localePrefix, "");
 
-  if (!isProtected) return intlResponse;
+  const isProtected =
+    protectedRoutes.some((route) =>
+      pathnameWithoutLocale.startsWith(route)
+    ) ||
+    protectedPatterns.some((pattern) => pattern.test(pathnameWithoutLocale));
+
+  // --- 3. If not protected, run intl middleware and return ---
+  if (!isProtected) return withAuthCookies(intlMiddleware(request));
 
   // --- 4. Authentication check ---
   if (!user) {
     const loginUrl = new URL(`/${locale}/login`, request.url);
-    loginUrl.searchParams.set("redirect", pathname);
+    const safePath =
+      pathname.startsWith("/") && !pathname.startsWith("//")
+        ? pathname
+        : `/${locale}/dashboard`;
+    loginUrl.searchParams.set("redirect", safePath);
     return withAuthCookies(NextResponse.redirect(loginUrl));
   }
 
-  // --- 5. Profile & role check ---
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile) {
-    return withAuthCookies(
-      NextResponse.redirect(new URL(`/${locale}/login`, request.url))
-    );
-  }
-
-  const role = profile.role;
+  // --- 5. Role from JWT app_metadata (synced via DB trigger, no query needed) ---
+  const role = (user.app_metadata?.role as string) ?? "learner";
 
   // --- 6. Role-based access control ---
   const dashboardUrl = new URL(`/${locale}/dashboard`, request.url);
@@ -123,9 +128,12 @@ export async function middleware(request: NextRequest) {
     return withAuthCookies(NextResponse.redirect(dashboardUrl));
   }
 
-  return intlResponse;
+  // --- 7. All checks passed, run intl middleware ---
+  return withAuthCookies(intlMiddleware(request));
 }
 
 export const config = {
-  matcher: ["/((?!_next|api|favicon.ico|assets).*)"],
+  matcher: [
+    "/((?!_next|api|favicon.ico|assets|sw\\.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff|woff2|ttf|eot)$).*)",
+  ],
 };
