@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { CATEGORIES } from "@/lib/utils/constants";
 import {
   GraduationCap,
   Clock,
@@ -13,6 +14,13 @@ import {
   ShieldCheck,
   ArrowRight,
 } from "lucide-react";
+
+const CATEGORY_ICONS = {
+  landmark: Landmark,
+  "brain-circuit": BrainCircuit,
+  target: Target,
+  "shield-check": ShieldCheck,
+} as const;
 
 export default async function HomePage({
   params,
@@ -46,12 +54,12 @@ export default async function HomePage({
     },
   ];
 
-  const categories = [
-    { icon: Landmark, name: "Finance & Banking", color: "#1E3A5F", slug: "finance-banking" },
-    { icon: BrainCircuit, name: "Data Analytics & AI", color: "#2D6A4F", slug: "data-analytics-ai" },
-    { icon: Target, name: "Strategy & Leadership", color: "#7B2D8B", slug: "strategy-leadership" },
-    { icon: ShieldCheck, name: "Compliance & Risk Management", color: "#B85C38", slug: "compliance-risk" },
-  ];
+  const categories = CATEGORIES.map((cat) => ({
+    icon: CATEGORY_ICONS[cat.icon as keyof typeof CATEGORY_ICONS],
+    name: locale === "ar" ? cat.nameAr : cat.name,
+    color: cat.color,
+    slug: cat.slug,
+  }));
 
   return (
     <>

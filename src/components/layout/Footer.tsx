@@ -100,7 +100,7 @@ export function Footer() {
             <ul className="mt-3 space-y-2">
               <li>
                 <Link
-                  href="#"
+                  href={`/${locale}/privacy-policy`}
                   className="text-sm text-brand-300 hover:text-white transition-colors"
                 >
                   {t("privacyPolicy")}
@@ -108,7 +108,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href={`/${locale}/terms-of-service`}
                   className="text-sm text-brand-300 hover:text-white transition-colors"
                 >
                   {t("termsOfService")}
