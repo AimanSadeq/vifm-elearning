@@ -2,60 +2,77 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
-import { CourseForm } from "@/components/admin/CourseForm";
+import { CourseEditor } from "@/components/admin/CourseEditor";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
-import type { CourseInput } from "@/lib/utils/validators";
+import { Toaster } from "sonner";
+import type { Course, Module, Lesson, Category } from "@/types";
 
 export default function EditCoursePage() {
   const params = useParams();
   const courseId = params.id as string;
-  const t = useTranslations("admin");
 
-  const [courseData, setCourseData] = useState<
-    (Partial<CourseInput> & { id: string; slug: string; status: string }) | null
-  >(null);
+  const [course, setCourse] = useState<Course | null>(null);
+  const [modules, setModules] = useState<(Module & { lessons: Lesson[] })[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [instructors, setInstructors] = useState<{ id: string; full_name: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchCourse() {
+    async function fetchData() {
       const supabase = createClient();
-      const { data, error } = await supabase
+
+      // Fetch course with relations
+      const { data: courseData } = await supabase
         .from("courses")
-        .select("*")
+        .select(
+          `*, category:categories(name, name_ar, slug), instructor:profiles!courses_instructor_id_fkey(full_name, full_name_ar, avatar_url)`
+        )
         .eq("id", courseId)
         .single();
 
-      if (!error && data) {
-        setCourseData({
-          id: data.id,
-          slug: data.slug,
-          status: data.status,
-          title: data.title,
-          titleAr: data.title_ar,
-          description: data.description,
-          descriptionAr: data.description_ar,
-          shortDescription: data.short_description,
-          shortDescriptionAr: data.short_description_ar,
-          categoryId: data.category_id,
-          instructorId: data.instructor_id,
-          difficultyLevel: data.difficulty_level,
-          price: data.price,
-          currency: data.currency,
-          isFree: data.is_free,
-          isFeatured: data.is_featured,
-          certificateEnabled: data.certificate_enabled,
-          passingScore: data.passing_score,
-          learningOutcomes: data.learning_outcomes,
-          learningOutcomesAr: data.learning_outcomes_ar,
-          tags: data.tags,
-        });
+      // Fetch modules with lessons
+      const { data: modulesData } = await supabase
+        .from("modules")
+        .select("*, lessons(*)")
+        .eq("course_id", courseId)
+        .order("sort_order", { ascending: true });
+
+      // Fetch categories
+      const { data: categoriesData } = await supabase
+        .from("categories")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order");
+
+      // Fetch instructors
+      const { data: instructorsData } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("role", ["super_admin", "instructor"])
+        .eq("is_active", true);
+
+      if (courseData) {
+        setCourse(courseData as Course);
       }
+
+      if (modulesData) {
+        // Sort lessons within each module
+        const sorted = modulesData.map((m) => ({
+          ...m,
+          lessons: (m.lessons || []).sort(
+            (a: Lesson, b: Lesson) => a.sort_order - b.sort_order
+          ),
+        })) as (Module & { lessons: Lesson[] })[];
+        setModules(sorted);
+      }
+
+      setCategories((categoriesData as Category[]) || []);
+      setInstructors(instructorsData || []);
       setIsLoading(false);
     }
 
-    if (courseId) fetchCourse();
+    if (courseId) fetchData();
   }, [courseId]);
 
   if (isLoading) {
@@ -66,7 +83,7 @@ export default function EditCoursePage() {
     );
   }
 
-  if (!courseData) {
+  if (!course) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
         <p className="text-muted-foreground">Course not found.</p>
@@ -75,9 +92,14 @@ export default function EditCoursePage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="font-heading text-2xl font-bold">{t("editCourse")}</h1>
-      <CourseForm mode="edit" initialData={courseData} />
-    </div>
+    <>
+      <Toaster position="top-right" richColors />
+      <CourseEditor
+        course={course}
+        modules={modules}
+        categories={categories}
+        instructors={instructors}
+      />
+    </>
   );
 }

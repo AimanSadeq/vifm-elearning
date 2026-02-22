@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { Plus, MoreHorizontal, Eye, Pencil, Trash2, BookOpen, ClipboardCheck } from "lucide-react";
+import { Plus, MoreHorizontal, Eye, Pencil, Trash2, ClipboardCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { escapeIlike } from "@/lib/utils/escape-search";
 import { Button } from "@/components/ui/button";
@@ -172,11 +172,6 @@ export default function AdminCoursesPage() {
           <Link href={`/${locale}/admin/courses/${item.id}/edit`}>
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
               <Pencil className="h-4 w-4" />
-            </Button>
-          </Link>
-          <Link href={`/${locale}/admin/courses/${item.id}/modules`}>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <BookOpen className="h-4 w-4" />
             </Button>
           </Link>
           <Link href={`/${locale}/admin/courses/${item.id}/quizzes`}>

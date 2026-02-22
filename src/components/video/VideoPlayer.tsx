@@ -16,7 +16,10 @@ import {
   Loader,
   AlertCircle,
   RefreshCw,
+  Keyboard,
+  X,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 import {
@@ -108,7 +111,13 @@ export function VideoPlayer({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [playbackSpeed, setPlaybackSpeed] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("videoPlayerSpeed");
+      return saved ? parseFloat(saved) : 1;
+    }
+    return 1;
+  });
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
@@ -117,6 +126,19 @@ export function VideoPlayer({
   const [errorMessage, setErrorMessage] = useState("");
   const [captionLanguage, setCaptionLanguage] = useState<"off" | "en" | "ar">("off");
   const [devtoolsOpen, setDevtoolsOpen] = useState(false);
+
+  // Keyboard shortcuts panel
+  const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
+
+  // Visual feedback overlays
+  const [showVolumeOverlay, setShowVolumeOverlay] = useState(false);
+  const [showSpeedOverlay, setShowSpeedOverlay] = useState(false);
+  const volumeOverlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const speedOverlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Double-tap detection for mobile
+  const lastTapTimeRef = useRef(0);
+  const lastTapXRef = useRef(0);
 
   // Auto-play next state
   const [showNextOverlay, setShowNextOverlay] = useState(false);
@@ -384,6 +406,59 @@ export function VideoPlayer({
     }
   }, []);
 
+  const showVolumeOverlayWithTimeout = useCallback(() => {
+    setShowVolumeOverlay(true);
+    if (volumeOverlayTimeoutRef.current) clearTimeout(volumeOverlayTimeoutRef.current);
+    volumeOverlayTimeoutRef.current = setTimeout(() => setShowVolumeOverlay(false), 1000);
+  }, []);
+
+  const showSpeedOverlayWithTimeout = useCallback(() => {
+    setShowSpeedOverlay(true);
+    if (speedOverlayTimeoutRef.current) clearTimeout(speedOverlayTimeoutRef.current);
+    speedOverlayTimeoutRef.current = setTimeout(() => setShowSpeedOverlay(false), 1000);
+  }, []);
+
+  const skip = useCallback(
+    (seconds: number) => {
+      const video = videoRef.current;
+      if (!video) return;
+      let target = video.currentTime + seconds;
+      if (seconds > 0 && seekRestricted) {
+        target = Math.min(target, maxWatchedPosition.current);
+      }
+      video.currentTime = Math.max(0, Math.min(video.duration, target));
+      onSeekCallback?.();
+    },
+    [seekRestricted, onSeekCallback]
+  );
+
+  const handleDoubleTap = useCallback(
+    (e: React.TouchEvent<HTMLVideoElement>) => {
+      const now = Date.now();
+      const tapX = e.touches[0]?.clientX ?? e.changedTouches[0]?.clientX;
+      const timeSinceLastTap = now - lastTapTimeRef.current;
+      const distanceFromLastTap = Math.abs(tapX - lastTapXRef.current);
+
+      if (timeSinceLastTap < 300 && timeSinceLastTap > 0 && distanceFromLastTap < 50) {
+        e.preventDefault();
+        const videoRect = videoRef.current?.getBoundingClientRect();
+        if (!videoRect) return;
+        const tapXRelative = tapX - videoRect.left;
+        const videoWidth = videoRect.width;
+        if (tapXRelative < videoWidth / 3) {
+          skip(-10);
+        } else if (tapXRelative > (videoWidth * 2) / 3) {
+          skip(10);
+        }
+        lastTapTimeRef.current = 0;
+      } else {
+        lastTapTimeRef.current = now;
+        lastTapXRef.current = tapX;
+      }
+    },
+    [skip]
+  );
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -403,29 +478,33 @@ export function VideoPlayer({
           break;
         case "arrowleft":
           e.preventDefault();
-          video.currentTime = Math.max(0, video.currentTime - 10);
-          onSeekCallback?.();
+          skip(-5);
           break;
-        case "arrowright": {
+        case "arrowright":
           e.preventDefault();
-          let target = Math.min(video.duration, video.currentTime + 10);
-          if (seekRestricted) {
-            target = Math.min(target, maxWatchedPosition.current);
-          }
-          video.currentTime = target;
-          onSeekCallback?.();
+          skip(5);
           break;
-        }
+        case "j":
+          e.preventDefault();
+          skip(-10);
+          break;
+        case "l":
+          e.preventDefault();
+          skip(10);
+          break;
         case "arrowup":
           e.preventDefault();
           handleVolumeChange(Math.min(1, volume + 0.1));
+          showVolumeOverlayWithTimeout();
           break;
         case "arrowdown":
           e.preventDefault();
           handleVolumeChange(Math.max(0, volume - 0.1));
+          showVolumeOverlayWithTimeout();
           break;
         case "m":
           toggleMute();
+          showVolumeOverlayWithTimeout();
           break;
         case "f":
           e.preventDefault();
@@ -439,12 +518,30 @@ export function VideoPlayer({
           e.preventDefault();
           togglePiP();
           break;
+        case "c":
+          e.preventDefault();
+          if (e.shiftKey && captionsEnUrl && captionsArUrl) {
+            setCaptionLanguage((prev) => (prev === "en" ? "ar" : prev === "ar" ? "off" : "en"));
+          } else if (captionsEnUrl || captionsArUrl) {
+            setCaptionLanguage((prev) => (prev === "off" ? (captionsEnUrl ? "en" : "ar") : "off"));
+          }
+          break;
+        case "?":
+          e.preventDefault();
+          setShowKeyboardShortcuts((s) => !s);
+          break;
+        case "escape":
+          if (showKeyboardShortcuts) {
+            e.preventDefault();
+            setShowKeyboardShortcuts(false);
+          }
+          break;
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [togglePlay, toggleMute, toggleFullscreen, togglePiP, handleVolumeChange, volume, onTheaterToggle, seekRestricted, onSeekCallback]);
+  }, [togglePlay, toggleMute, toggleFullscreen, togglePiP, handleVolumeChange, volume, onTheaterToggle, skip, showVolumeOverlayWithTimeout, captionsEnUrl, captionsArUrl, showKeyboardShortcuts]);
 
   const handleTimeUpdate = () => {
     const video = videoRef.current;
@@ -533,6 +630,10 @@ export function VideoPlayer({
     video.playbackRate = finalSpeed;
     setPlaybackSpeed(finalSpeed);
     setShowSpeedMenu(false);
+    showSpeedOverlayWithTimeout();
+    if (typeof window !== "undefined") {
+      localStorage.setItem("videoPlayerSpeed", finalSpeed.toString());
+    }
   };
 
   const retryLoad = () => {
@@ -576,6 +677,8 @@ export function VideoPlayer({
         poster={poster ?? undefined}
         className="h-full w-full"
         onClick={togglePlay}
+        onTouchEnd={handleDoubleTap}
+        onContextMenu={(e) => e.preventDefault()}
         onTimeUpdate={handleTimeUpdate}
         onPlay={() => {
           setIsPlaying(true);
@@ -613,93 +716,253 @@ export function VideoPlayer({
       )}
 
       {/* Buffering spinner */}
-      {isBuffering && !hasError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/30 z-10">
-          <Loader className="h-10 w-10 text-white animate-spin" />
-        </div>
-      )}
+      <AnimatePresence>
+        {isBuffering && !hasError && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex items-center justify-center bg-black/30 z-10"
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            >
+              <Loader className="h-10 w-10 text-white" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Error state */}
-      {hasError && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-10 gap-3">
-          <AlertCircle className="h-10 w-10 text-red-400" />
-          <p className="text-white text-sm text-center max-w-xs">{errorMessage}</p>
-          <button
-            onClick={retryLoad}
-            className="flex items-center gap-2 rounded-lg bg-white/20 px-4 py-2 text-sm text-white hover:bg-white/30"
+      <AnimatePresence>
+        {hasError && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-10 gap-3"
           >
-            <RefreshCw className="h-4 w-4" />
-            Retry
-          </button>
-        </div>
-      )}
+            <AlertCircle className="h-10 w-10 text-red-400" />
+            <p className="text-white text-sm text-center max-w-xs">{errorMessage}</p>
+            <button
+              onClick={retryLoad}
+              className="flex items-center gap-2 rounded-lg bg-white/20 px-4 py-2 text-sm text-white hover:bg-white/30"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Retry
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Play overlay for paused state */}
-      {!isPlaying && !isBuffering && !hasError && !showNextOverlay && (
-        <button
-          className="absolute inset-0 flex items-center justify-center bg-black/20 z-10"
-          onClick={togglePlay}
-          aria-label={t("fullscreen")}
-        >
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg">
-            <Play className="h-8 w-8 text-brand-900 ms-1" />
-          </div>
-        </button>
-      )}
+      <AnimatePresence>
+        {!isPlaying && !isBuffering && !hasError && !showNextOverlay && (
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex items-center justify-center bg-black/20 z-10"
+            onClick={togglePlay}
+            aria-label={t("fullscreen")}
+          >
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg"
+            >
+              <Play className="h-8 w-8 text-brand-900 ms-1" />
+            </motion.div>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Volume feedback overlay */}
+      <AnimatePresence>
+        {showVolumeOverlay && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="pointer-events-none absolute start-4 top-4 z-30"
+          >
+            <div className="flex items-center gap-3 rounded-lg bg-black/90 px-4 py-3 backdrop-blur-sm">
+              {isMuted || volume === 0 ? (
+                <VolumeX className="h-5 w-5 text-white" />
+              ) : (
+                <Volume2 className="h-5 w-5 text-white" />
+              )}
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 w-20 overflow-hidden rounded-full bg-white/30">
+                  <div
+                    className="h-full bg-brand-500 transition-all"
+                    style={{ width: `${isMuted ? 0 : volume * 100}%` }}
+                  />
+                </div>
+                <span className="min-w-[3ch] text-xs font-medium text-white tabular-nums">
+                  {isMuted ? "0" : Math.round(volume * 100)}%
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Speed feedback overlay */}
+      <AnimatePresence>
+        {showSpeedOverlay && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="pointer-events-none absolute end-4 top-4 z-30"
+          >
+            <div className="flex items-center gap-2 rounded-lg bg-black/90 px-4 py-3 backdrop-blur-sm">
+              <span className="text-sm font-medium text-white">{playbackSpeed}x</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Keyboard Shortcuts Panel */}
+      <AnimatePresence>
+        {showKeyboardShortcuts && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-30 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            onClick={() => setShowKeyboardShortcuts(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="max-w-xl rounded-lg bg-gray-900/95 p-5 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Keyboard className="h-5 w-5 text-brand-400" />
+                  <h3 className="text-lg font-bold text-white">Keyboard Shortcuts</h3>
+                </div>
+                <button
+                  onClick={() => setShowKeyboardShortcuts(false)}
+                  className="rounded-lg p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-400">Playback</h4>
+                  <div className="space-y-1.5 text-sm">
+                    {[
+                      ["Play/Pause", "Space / K"],
+                      ["Rewind 5s", "\u2190"],
+                      ["Forward 5s", "\u2192"],
+                      ["Rewind 10s", "J"],
+                      ["Forward 10s", "L"],
+                    ].map(([label, key]) => (
+                      <div key={label} className="flex justify-between">
+                        <span className="text-white/70">{label}</span>
+                        <kbd className="rounded bg-white/10 px-2 py-0.5 font-mono text-xs text-white">{key}</kbd>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-400">Volume & Display</h4>
+                  <div className="space-y-1.5 text-sm">
+                    {[
+                      ["Volume Up", "\u2191"],
+                      ["Volume Down", "\u2193"],
+                      ["Mute/Unmute", "M"],
+                      ["Fullscreen", "F"],
+                      ["Theater Mode", "T"],
+                      ["PiP", "I"],
+                      ["Captions", "C"],
+                      ["Shortcuts", "?"],
+                    ].map(([label, key]) => (
+                      <div key={label} className="flex justify-between">
+                        <span className="text-white/70">{label}</span>
+                        <kbd className="rounded bg-white/10 px-2 py-0.5 font-mono text-xs text-white">{key}</kbd>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 rounded-lg bg-brand-500/10 p-2 text-center">
+                <p className="text-xs text-white/60">
+                  Press <kbd className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-white">?</kbd> anytime to toggle this panel
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Auto-play next overlay */}
-      {showNextOverlay && nextLesson && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 z-20 gap-4">
-          <p className="text-white/70 text-sm">{t("upNext")}</p>
-          <p className="text-white text-lg font-semibold text-center max-w-sm">
-            {nextLesson.title}
-          </p>
-          <div className="relative h-16 w-16">
-            <svg className="h-16 w-16 -rotate-90" viewBox="0 0 64 64">
-              <circle
-                cx="32"
-                cy="32"
-                r="28"
-                stroke="white"
-                strokeWidth="3"
-                fill="none"
-                opacity={0.2}
-              />
-              <circle
-                cx="32"
-                cy="32"
-                r="28"
-                stroke="white"
-                strokeWidth="3"
-                fill="none"
-                strokeDasharray={`${((VIDEO_AUTOPLAY_COUNTDOWN_SECONDS - countdown) / VIDEO_AUTOPLAY_COUNTDOWN_SECONDS) * 175.93} 175.93`}
-                strokeLinecap="round"
-              />
-            </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-white text-xl font-bold">
-              {countdown}
-            </span>
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={cancelAutoplay}
-              className="rounded-lg border border-white/30 px-4 py-2 text-sm text-white hover:bg-white/10"
-            >
-              {t("cancelAutoplay")}
-            </button>
-            <button
-              onClick={() => {
-                cancelAutoplay();
-                nextLesson.onPlay();
-              }}
-              className="flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm text-white hover:bg-brand-600"
-            >
-              <SkipForward className="h-4 w-4" />
-              {t("playNow")}
-            </button>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showNextOverlay && nextLesson && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 z-20 gap-4"
+          >
+            <p className="text-white/70 text-sm">{t("upNext")}</p>
+            <p className="text-white text-lg font-semibold text-center max-w-sm">
+              {nextLesson.title}
+            </p>
+            <div className="relative h-16 w-16">
+              <svg className="h-16 w-16 -rotate-90" viewBox="0 0 64 64">
+                <circle
+                  cx="32"
+                  cy="32"
+                  r="28"
+                  stroke="white"
+                  strokeWidth="3"
+                  fill="none"
+                  opacity={0.2}
+                />
+                <circle
+                  cx="32"
+                  cy="32"
+                  r="28"
+                  stroke="white"
+                  strokeWidth="3"
+                  fill="none"
+                  strokeDasharray={`${((VIDEO_AUTOPLAY_COUNTDOWN_SECONDS - countdown) / VIDEO_AUTOPLAY_COUNTDOWN_SECONDS) * 175.93} 175.93`}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span className="absolute inset-0 flex items-center justify-center text-white text-xl font-bold">
+                {countdown}
+              </span>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={cancelAutoplay}
+                className="rounded-lg border border-white/30 px-4 py-2 text-sm text-white hover:bg-white/10"
+              >
+                {t("cancelAutoplay")}
+              </button>
+              <button
+                onClick={() => {
+                  cancelAutoplay();
+                  nextLesson.onPlay();
+                }}
+                className="flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm text-white hover:bg-brand-600"
+              >
+                <SkipForward className="h-4 w-4" />
+                {t("playNow")}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Controls */}
       <div

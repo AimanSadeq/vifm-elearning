@@ -13,6 +13,7 @@ import {
   Lock,
   Play,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils/cn";
@@ -150,10 +151,25 @@ export function ContentSidebar({
       {/* Progress */}
       <div className="border-b px-4 py-3">
         <div className="flex items-center justify-between text-xs mb-1">
-          <span className="text-muted-foreground">{tCourses("overview")}</span>
+          <span className="text-muted-foreground">
+            {(() => {
+              const totalLessons = modules.reduce((sum, m) => sum + (m.lessons?.length ?? 0), 0);
+              const completedLessons = modules
+                .flatMap((m) => m.lessons ?? [])
+                .filter((l) => progressMap[l.id]?.is_completed).length;
+              return `${completedLessons} of ${totalLessons} completed`;
+            })()}
+          </span>
           <span className="font-medium">{Math.round(overallProgress)}%</span>
         </div>
-        <Progress value={overallProgress} className="h-2" />
+        <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
+          <motion.div
+            className="h-full rounded-full bg-primary"
+            initial={{ width: 0 }}
+            animate={{ width: `${overallProgress}%` }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          />
+        </div>
       </div>
 
       {/* Search */}
@@ -245,12 +261,14 @@ export function ContentSidebar({
                   <p className="truncate text-sm font-medium">{moduleTitle}</p>
                   <div className="mt-1 flex items-center gap-2">
                     <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
-                      <div
+                      <motion.div
                         className={cn(
-                          "h-full rounded-full transition-all",
+                          "h-full rounded-full",
                           isComplete ? "bg-green-500" : "bg-primary"
                         )}
-                        style={{ width: `${progressPct}%` }}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progressPct}%` }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
                       />
                     </div>
                     <span className="text-xs text-muted-foreground">
