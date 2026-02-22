@@ -1,6 +1,6 @@
 import { Open_Sans, Noto_Sans_Arabic, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { LocaleHtmlAttributes } from "./locale-html-attributes";
@@ -27,6 +27,7 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const messages = await getMessages();
   const isRTL = locale === "ar";
 
@@ -37,7 +38,7 @@ export default async function LocaleLayout({
       enableSystem
       disableTransitionOnChange
     >
-      <NextIntlClientProvider messages={messages}>
+      <NextIntlClientProvider locale={locale} messages={messages}>
         <AuthProvider>
           <LocaleHtmlAttributes locale={locale} dir={isRTL ? "rtl" : "ltr"} />
           <div
