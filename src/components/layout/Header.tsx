@@ -15,7 +15,7 @@ export function Header() {
   const locale = useLocale();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const { user, signOut } = useAuth();
+  const { user, signOut, isLoading } = useAuth();
 
   const navLinks = [
     { href: `/${locale}`, label: t("home") },
@@ -85,7 +85,7 @@ export function Header() {
           <LanguageSwitcher />
           {user && <NotificationBell />}
 
-          {user ? (
+          {isLoading ? null : user ? (
             /* Logged in — user menu */
             <div className="relative">
               <button
