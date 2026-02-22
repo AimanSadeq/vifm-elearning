@@ -40,3 +40,6 @@ public/sw.js
 
 # supabase temp files
 supabase/.temp/
+
+# claude code local settings
+.claude/settings.local.json
