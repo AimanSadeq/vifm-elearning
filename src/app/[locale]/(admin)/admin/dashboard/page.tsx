@@ -1,14 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import {
   DollarSign,
   Users,
   BookOpen,
   TrendingUp,
   UserPlus,
+  PlusCircle,
+  BarChart3,
+  Video,
 } from "lucide-react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { StatCard } from "@/components/analytics/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,6 +48,7 @@ interface TopCourse {
 
 export default function AdminDashboardPage() {
   const t = useTranslations("admin");
+  const locale = useLocale();
 
   const [stats, setStats] = useState<DashboardStats>({
     totalRevenue: 0,
@@ -65,7 +70,7 @@ export default function AdminDashboardPage() {
       const [
         { count: usersCount },
         { count: enrollmentsCount },
-        { data: completedEnrollments },
+        { count: completedCount },
         { data: payments },
         { data: recentData },
         { data: coursesData },
@@ -79,7 +84,7 @@ export default function AdminDashboardPage() {
           .select("*", { count: "exact", head: true }),
         supabase
           .from("enrollments")
-          .select("id", { count: "exact" })
+          .select("id", { count: "exact", head: true })
           .eq("status", "completed"),
         supabase
           .from("payments")
@@ -100,8 +105,9 @@ export default function AdminDashboardPage() {
           .limit(10),
         supabase
           .from("courses")
-          .select("id, title, enrollment_count, average_rating, status")
+          .select("id, title, enrollment_count, average_rating, status, payments(amount)")
           .eq("status", "published")
+          .eq("payments.status", "completed")
           .order("enrollment_count", { ascending: false })
           .limit(10),
       ]);
@@ -111,7 +117,7 @@ export default function AdminDashboardPage() {
       const completionRate =
         enrollmentsCount && enrollmentsCount > 0
           ? Math.round(
-              ((completedEnrollments?.length ?? 0) / enrollmentsCount) * 100
+              ((completedCount ?? 0) / enrollmentsCount) * 100
             )
           : 0;
 
@@ -145,7 +151,9 @@ export default function AdminDashboardPage() {
           title: c.title as string,
           enrollment_count: c.enrollment_count as number,
           average_rating: c.average_rating as number,
-          revenue: 0,
+          revenue: (
+            (c.payments as Array<{ amount: number }>) ?? []
+          ).reduce((sum, p) => sum + (p.amount || 0), 0),
           status: c.status as string,
         })
       );
@@ -213,6 +221,13 @@ export default function AdminDashboardPage() {
       render: (item) => <span>{item.enrollment_count}</span>,
     },
     {
+      key: "revenue",
+      header: "Revenue",
+      render: (item) => (
+        <span>{formatCurrency(item.revenue)}</span>
+      ),
+    },
+    {
       key: "rating",
       header: "Rating",
       render: (item) => (
@@ -267,6 +282,38 @@ export default function AdminDashboardPage() {
           color="text-brand-600"
           bg="bg-brand-50"
         />
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <Link
+          href={`/${locale}/admin/courses/new`}
+          className="flex items-center gap-2 rounded-lg border border-border px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <PlusCircle className="h-4 w-4" />
+          Add Course
+        </Link>
+        <Link
+          href={`/${locale}/admin/users`}
+          className="flex items-center gap-2 rounded-lg border border-border px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <Users className="h-4 w-4" />
+          Manage Users
+        </Link>
+        <Link
+          href={`/${locale}/admin/analytics`}
+          className="flex items-center gap-2 rounded-lg border border-border px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <BarChart3 className="h-4 w-4" />
+          View Analytics
+        </Link>
+        <Link
+          href={`/${locale}/admin/webinars`}
+          className="flex items-center gap-2 rounded-lg border border-border px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <Video className="h-4 w-4" />
+          Manage Webinars
+        </Link>
       </div>
 
       {/* Tables */}
