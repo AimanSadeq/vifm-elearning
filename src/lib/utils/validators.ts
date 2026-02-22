@@ -262,6 +262,20 @@ export const subscriptionPlanSchema = z.object({
   sortOrder: z.number().min(0).default(0),
 });
 
+export const userFormSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  full_name: z.string().min(1, "Full name is required"),
+  full_name_ar: z.string().optional(),
+  phone: z.string().optional(),
+  role: z.enum(["super_admin", "instructor", "corporate_admin", "learner"]),
+  organization_id: z.string().uuid().optional().nullable(),
+  language: z.enum(["en", "ar"]).default("en"),
+  is_active: z.boolean().default(true),
+  password: z.string().min(8, "Password must be at least 8 characters").optional(),
+});
+
+export type UserFormInput = z.infer<typeof userFormSchema>;
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type ProfileInput = z.infer<typeof profileSchema>;
