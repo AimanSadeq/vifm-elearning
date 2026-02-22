@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { userFormSchema, type UserFormInput } from "@/lib/utils/validators";
+import { userFormSchema, userCreateSchema, type UserFormInput } from "@/lib/utils/validators";
 import {
   Dialog,
   DialogContent,
@@ -38,14 +38,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<UserFormInput>({
-    resolver: zodResolver(
-      isEditing
-        ? userFormSchema.partial({ password: true })
-        : userFormSchema.refine((d) => !!d.password, {
-            message: "Password is required",
-            path: ["password"],
-          })
-    ),
+    resolver: zodResolver(isEditing ? userFormSchema : userCreateSchema),
     defaultValues: {
       email: user?.email ?? "",
       full_name: user?.full_name ?? "",
