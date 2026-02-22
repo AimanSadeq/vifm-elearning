@@ -83,35 +83,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const supabase = createClient();
     let mounted = true;
 
-    console.log("[AuthProvider] useEffect running, setting up listeners");
-
-    // Primary: listen to auth state changes (fires INITIAL_SESSION on load)
+    // Primary: listen to auth state changes (fires INITIAL_SESSION on load).
+    // Defer the profile fetch via setTimeout to avoid potential issues with
+    // @supabase/ssr's Navigator Lock context during the callback.
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("[AuthProvider] onAuthStateChange fired:", event, !!session?.user);
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
       resolved.current = true;
 
       if (session?.user) {
-        const profile = await fetchProfile(session.user.id);
-        if (mounted) setUser(profile);
+        const userId = session.user.id;
+        setTimeout(async () => {
+          if (!mounted) return;
+          const profile = await fetchProfile(userId);
+          if (mounted) setUser(profile);
+        }, 0);
       } else {
-        if (mounted) setUser(null);
+        setUser(null);
       }
     });
 
     // Fallback: if onAuthStateChange hasn't fired after 1s (Navigator Lock stuck),
     // read the session directly from cookies to unblock the UI.
     const fallbackTimer = setTimeout(async () => {
-      console.log("[AuthProvider] Fallback timer fired, resolved:", resolved.current, "mounted:", mounted);
       if (resolved.current || !mounted) return;
 
       const userId = getUserIdFromCookie();
-      console.log("[AuthProvider] Cookie fallback userId:", userId);
       if (userId) {
         const profile = await fetchProfile(userId);
-        console.log("[AuthProvider] Cookie fallback profile:", !!profile);
         if (mounted && !resolved.current) {
           resolved.current = true;
           setUser(profile);
