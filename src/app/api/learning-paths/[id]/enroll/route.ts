@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export async function POST(
   _request: NextRequest,
@@ -20,7 +19,7 @@ export async function POST(
     }
 
     // Verify path exists and is published
-    const { data: path } = await supabaseAdmin
+    const { data: path } = await supabase
       .from("learning_paths")
       .select("id, is_published")
       .eq("id", pathId)
@@ -41,7 +40,7 @@ export async function POST(
     }
 
     // Idempotent: check for existing enrollment
-    const { data: existing } = await supabaseAdmin
+    const { data: existing } = await supabase
       .from("learning_path_enrollments")
       .select("id")
       .eq("learning_path_id", pathId)
@@ -53,7 +52,7 @@ export async function POST(
     }
 
     // Create enrollment
-    const { data: enrollment, error } = await supabaseAdmin
+    const { data: enrollment, error } = await supabase
       .from("learning_path_enrollments")
       .insert({
         learning_path_id: pathId,

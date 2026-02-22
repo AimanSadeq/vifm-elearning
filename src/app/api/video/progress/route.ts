@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { recalculateAllPathsForUser } from "@/lib/services/learning-path-service";
 
 export async function GET(request: NextRequest) {
   try {
@@ -188,6 +189,9 @@ export async function POST(request: NextRequest) {
       const completedItems = completedIds.length;
       const progressPct = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : pctg;
 
+      // Check if all lessons in the course are now completed
+      const courseCompleted = totalItems > 0 && completedItems >= totalItems;
+
       await supabase
         .from("enrollments")
         .update({
@@ -197,8 +201,16 @@ export async function POST(request: NextRequest) {
           completed_lesson_items: completedItems,
           total_time_spent_seconds: totalTime,
           progress_percentage: progressPct,
+          ...(courseCompleted ? { status: "completed", completed_at: new Date().toISOString() } : {}),
         })
         .eq("id", enrollment.id);
+
+      // If course just completed, recalculate learning path progress
+      if (courseCompleted) {
+        recalculateAllPathsForUser(supabase, userId as string).catch(() => {
+          // Non-critical — don't fail the progress save
+        });
+      }
     } else {
       // Fallback: just update last_lesson_id
       await supabase

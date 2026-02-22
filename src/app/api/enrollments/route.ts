@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { supabaseAdmin } from "@/lib/supabase/admin";
-import { createEnrollmentFromPayment } from "@/lib/services/enrollment-service";
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,8 +17,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
 
-    // Verify course is free
-    const { data: course } = await supabaseAdmin
+    // Verify course exists, is free, and is published
+    const { data: course } = await supabase
       .from("courses")
       .select("id, is_free, status")
       .eq("id", courseId)
@@ -44,10 +42,36 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
 
-    const enrollment = await createEnrollmentFromPayment({
-      userId: user.id,
-      courseId,
-    });
+    // Check if already enrolled
+    const { data: existing } = await supabase
+      .from("enrollments")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("course_id", courseId)
+      .single();
+
+    if (existing) {
+      return NextResponse.json({ data: existing }, { status: 200 });
+    }
+
+    // Create enrollment
+    const { data: enrollment, error: enrollError } = await supabase
+      .from("enrollments")
+      .insert({
+        user_id: user.id,
+        course_id: courseId,
+        status: "active",
+        enrolled_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (enrollError) {
+      return NextResponse.json(
+        { error: `Failed to enroll: ${enrollError.message}` },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ data: enrollment }, { status: 201 });
   } catch (err) {

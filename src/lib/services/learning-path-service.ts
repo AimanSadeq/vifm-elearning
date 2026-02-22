@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabase/admin";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Calculate and update a user's progress through a learning path.
@@ -10,11 +10,12 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
  * If all required courses are completed the enrollment is marked "completed".
  */
 export async function calculateLearningPathProgress(
+  supabase: SupabaseClient,
   userId: string,
   pathId: string
 ): Promise<{ progress: number; status: "active" | "completed" }> {
   // 1. Fetch all courses in the learning path
-  const { data: pathCourses } = await supabaseAdmin
+  const { data: pathCourses } = await supabase
     .from("learning_path_courses")
     .select("course_id, is_required")
     .eq("learning_path_id", pathId)
@@ -26,7 +27,7 @@ export async function calculateLearningPathProgress(
 
   // 2. Get the user's enrollments for those courses
   const courseIds = pathCourses.map((c) => c.course_id);
-  const { data: enrollments } = await supabaseAdmin
+  const { data: enrollments } = await supabase
     .from("enrollments")
     .select("course_id, status")
     .eq("user_id", userId)
@@ -48,7 +49,7 @@ export async function calculateLearningPathProgress(
     const progress = anyCompleted ? 100 : 0;
     const status = anyCompleted ? "completed" : "active";
 
-    await updateEnrollment(userId, pathId, progress, status);
+    await updateEnrollment(supabase, userId, pathId, progress, status);
     return { progress, status };
   }
 
@@ -61,12 +62,13 @@ export async function calculateLearningPathProgress(
     completedRequired >= totalRequired ? "completed" : "active";
 
   // 4. Update the enrollment record
-  await updateEnrollment(userId, pathId, progress, status);
+  await updateEnrollment(supabase, userId, pathId, progress, status);
 
   return { progress, status };
 }
 
 async function updateEnrollment(
+  supabase: SupabaseClient,
   userId: string,
   pathId: string,
   progress: number,
@@ -78,7 +80,7 @@ async function updateEnrollment(
     updateData.completed_at = new Date().toISOString();
   }
 
-  await supabaseAdmin
+  await supabase
     .from("learning_path_enrollments")
     .update(updateData)
     .eq("user_id", userId)
@@ -89,8 +91,11 @@ async function updateEnrollment(
  * Recalculate progress for all active learning path enrollments of a user.
  * Call this when a course enrollment status changes (e.g. course completed).
  */
-export async function recalculateAllPathsForUser(userId: string) {
-  const { data: enrollments } = await supabaseAdmin
+export async function recalculateAllPathsForUser(
+  supabase: SupabaseClient,
+  userId: string
+) {
+  const { data: enrollments } = await supabase
     .from("learning_path_enrollments")
     .select("learning_path_id")
     .eq("user_id", userId)
@@ -100,7 +105,7 @@ export async function recalculateAllPathsForUser(userId: string) {
 
   await Promise.all(
     enrollments.map((e) =>
-      calculateLearningPathProgress(userId, e.learning_path_id)
+      calculateLearningPathProgress(supabase, userId, e.learning_path_id)
     )
   );
 }
