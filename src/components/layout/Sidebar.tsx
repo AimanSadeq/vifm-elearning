@@ -41,7 +41,6 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
     case "learner":
       return [
         { icon: LayoutDashboard, label: t("dashboard.myCourses"), href: "/dashboard" },
-        { icon: BookOpen, label: t("dashboard.myCourses"), href: "/my-courses" },
         { icon: Route, label: "Learning Paths", href: "/my-learning-paths" },
         { icon: Award, label: t("dashboard.certificates"), href: "/certificates" },
         { icon: CreditCard, label: "Subscription", href: "/subscription" },

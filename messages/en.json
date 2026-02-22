@@ -106,7 +106,7 @@
   },
   "dashboard": {
     "welcome": "Welcome back, {name}",
-    "myCourses": "My Courses",
+    "myCourses": "Dashboard",
     "progress": "Your Progress",
     "certificates": "Certificates",
     "recommended": "Recommended for You",
