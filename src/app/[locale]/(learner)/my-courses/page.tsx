@@ -42,7 +42,10 @@ export default function MyCoursesPage() {
 
   useEffect(() => {
     async function fetchEnrollments() {
-      if (!user) return;
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
 
       const supabase = createClient();
       const { data } = await supabase
