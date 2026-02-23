@@ -283,6 +283,26 @@ export const userCreateSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
+export const bulkImportSchema = z.object({
+  users: z
+    .array(
+      z.object({
+        email: z.string().email(),
+        fullName: z.string().min(1),
+        phone: z.string().optional(),
+        jobTitle: z.string().optional(),
+        company: z.string().optional(),
+      })
+    )
+    .min(1)
+    .max(500),
+  courseIds: z.array(z.string().uuid()).min(1),
+  accessExpiresAt: z.string().datetime(),
+  voucherDescription: z.string().optional(),
+});
+
+export type BulkImportInput = z.infer<typeof bulkImportSchema>;
+
 export type UserFormInput = z.infer<typeof userFormSchema>;
 export type UserCreateInput = z.infer<typeof userCreateSchema>;
 

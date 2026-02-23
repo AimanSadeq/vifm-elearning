@@ -6,6 +6,7 @@ import {
   Users,
   Search,
   Plus,
+  Upload,
   Pencil,
   BookOpen,
   Ticket,
@@ -39,6 +40,7 @@ import { UserFormDialog } from "@/components/admin/UserFormDialog";
 import { AssignCourseDialog } from "@/components/admin/AssignCourseDialog";
 import { AssignVoucherDialog } from "@/components/admin/AssignVoucherDialog";
 import { SendEmailDialog } from "@/components/admin/SendEmailDialog";
+import { BulkImportDialog } from "@/components/admin/BulkImportDialog";
 import type { Profile, UserRole } from "@/types";
 
 type UserRow = Pick<
@@ -68,6 +70,7 @@ export default function AdminUsersPage() {
   const [showAssignVoucher, setShowAssignVoucher] = useState(false);
   const [showSendEmail, setShowSendEmail] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showBulkImport, setShowBulkImport] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserRow | null>(null);
 
   const fetchUsers = useCallback(async () => {
@@ -297,10 +300,16 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-bold">{t("manageUsers")}</h1>
-        <Button onClick={() => { setSelectedUser(null); setShowUserForm(true); }}>
-          <Plus className="me-2 h-4 w-4" />
-          Add User
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setShowBulkImport(true)}>
+            <Upload className="me-2 h-4 w-4" />
+            Bulk Import
+          </Button>
+          <Button onClick={() => { setSelectedUser(null); setShowUserForm(true); }}>
+            <Plus className="me-2 h-4 w-4" />
+            Add User
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -393,6 +402,13 @@ export default function AdminUsersPage() {
           userEmail={selectedUser.email}
         />
       )}
+
+      {/* Bulk Import Dialog */}
+      <BulkImportDialog
+        open={showBulkImport}
+        onOpenChange={setShowBulkImport}
+        onSuccess={fetchUsers}
+      />
 
       {/* Delete Confirmation */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
