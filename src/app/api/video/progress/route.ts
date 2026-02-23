@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     // Fetch existing progress for merging
     const { data: existing } = await supabase
       .from("lesson_progress")
-      .select("watched_segments, view_count, total_watch_time_delta_accumulated, first_viewed_at, max_progress_seconds, video_completed")
+      .select("watched_segments, view_count, total_watch_time_delta_accumulated, first_viewed_at, max_progress_seconds, video_completed, is_completed")
       .eq("user_id", userId as string)
       .eq("lesson_id", lessonId as string)
       .single();
@@ -137,6 +137,9 @@ export async function POST(request: NextRequest) {
     // Never regress video_completed
     const finalVideoCompleted = vCompleted || Boolean(existing?.video_completed);
 
+    // Never regress is_completed
+    const finalCompleted = completed || Boolean(existing?.is_completed);
+
     // Upsert lesson progress
     const { error: progressError } = await supabase
       .from("lesson_progress")
@@ -147,9 +150,9 @@ export async function POST(request: NextRequest) {
           course_id: courseId as string,
           progress_seconds: Math.floor(progress),
           max_progress_seconds: maxProgress,
-          is_completed: completed,
+          is_completed: finalCompleted,
           video_completed: finalVideoCompleted,
-          completed_at: completed ? new Date().toISOString() : null,
+          completed_at: finalCompleted ? new Date().toISOString() : null,
           last_accessed_at: new Date().toISOString(),
           first_viewed_at: existing?.first_viewed_at ?? new Date().toISOString(),
           view_count: newViewCount,

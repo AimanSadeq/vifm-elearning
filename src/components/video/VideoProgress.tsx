@@ -54,6 +54,19 @@ export function useVideoProgress({
       const isCompleted = duration > 0 && currentTime / duration >= 0.9;
 
       const supabase = createClient();
+
+      // Never regress is_completed from true to false
+      let finalCompleted = isCompleted;
+      if (!isCompleted) {
+        const { data: existing } = await supabase
+          .from("lesson_progress")
+          .select("is_completed")
+          .eq("user_id", userId)
+          .eq("lesson_id", lessonId)
+          .single();
+        if (existing?.is_completed) finalCompleted = true;
+      }
+
       const { error } = await supabase.from("lesson_progress").upsert(
         {
           user_id: userId,
@@ -61,8 +74,8 @@ export function useVideoProgress({
           course_id: courseId,
           progress_seconds: Math.floor(currentTime),
           max_progress_seconds: Math.floor(currentTime),
-          is_completed: isCompleted,
-          completed_at: isCompleted ? new Date().toISOString() : null,
+          is_completed: finalCompleted,
+          completed_at: finalCompleted ? new Date().toISOString() : null,
           last_accessed_at: new Date().toISOString(),
         },
         {

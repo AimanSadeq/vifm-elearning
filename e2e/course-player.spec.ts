@@ -152,6 +152,14 @@ test.describe.serial("Course Player — video, document, quiz flow", () => {
     // Verify lesson title is visible
     await expect(page.locator("h1")).toBeVisible();
 
+    // Mark video lesson as complete (video lessons auto-complete on
+    // playback end; we call the server API to avoid full playback)
+    const completeRes = await page.request.post(
+      `/api/lessons/${lessonIds.video}/complete`,
+      { data: { courseId } }
+    );
+    expect(completeRes.ok()).toBe(true);
+
     // ── 3. Navigate to document lesson ─────────────────────
     await page.goto(
       `/en/courses/${COURSE_SLUG}/learn/${lessonIds.document}`
@@ -177,6 +185,9 @@ test.describe.serial("Course Player — video, document, quiz flow", () => {
     // Wait for the button to disappear and "Completed" badge to show
     await expect(markCompleteBtn).not.toBeVisible({ timeout: 10_000 });
     await expect(page.getByText(/completed/i).first()).toBeVisible();
+
+    // Wait for network to settle (sendBeacon fires on navigation)
+    await page.waitForTimeout(1_000);
 
     // ── 4. Navigate to quiz lesson ─────────────────────────
     await page.goto(
