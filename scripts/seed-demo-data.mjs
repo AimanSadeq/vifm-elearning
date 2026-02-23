@@ -800,6 +800,571 @@ async function main() {
     console.log(`  ✓ Created ${regCount} webinar registrations`);
   }
 
+  // ── 10. Modules with Video, Quiz & Document per Course ─────────
+  console.log("\n📝 Seeding modules with video, quiz & document lessons...");
+
+  const SAMPLE_PDF_URL = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+  const VIDEO_POOL = [
+    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+  ];
+
+  // Per-course module definitions: 2 modules each with video, document, and quiz
+  const courseQuizData = [
+    // 0: Financial Statement Analysis Masterclass
+    [
+      { mTitle: "Foundations of Financial Reporting", mTitle_ar: "أسس التقارير المالية",
+        video: "Understanding Financial Statements", doc: "Financial Statements Reference Guide",
+        quizTitle: "Financial Reporting Quiz", quizTitle_ar: "اختبار التقارير المالية",
+        questions: [
+          { q: "Which of the following is NOT one of the three core financial statements?",
+            q_ar: "أي مما يلي ليس من القوائم المالية الأساسية الثلاث؟",
+            exp: "The three core statements are Income Statement, Balance Sheet, and Cash Flow Statement.",
+            opts: ["Income Statement", "Balance Sheet", "Budget Forecast", "Cash Flow Statement"], correct: 2 },
+          { q: "What does the balance sheet represent?",
+            q_ar: "ماذا تمثل الميزانية العمومية؟",
+            exp: "The balance sheet shows a company's assets, liabilities, and equity at a specific point in time.",
+            opts: ["Revenue over a period", "A snapshot of assets, liabilities, and equity", "Cash inflows and outflows", "Future earnings projections"], correct: 1 },
+          { q: "In the accounting equation, Assets equal:",
+            q_ar: "في المعادلة المحاسبية، الأصول تساوي:",
+            exp: "The fundamental accounting equation is Assets = Liabilities + Shareholders' Equity.",
+            opts: ["Revenue minus Expenses", "Liabilities plus Shareholders' Equity", "Cash plus Receivables", "Income minus Taxes"], correct: 1 },
+        ],
+      },
+      { mTitle: "Ratio Analysis and Interpretation", mTitle_ar: "تحليل النسب والتفسير",
+        video: "Key Financial Ratios Explained", doc: "Ratio Analysis Cheat Sheet",
+        quizTitle: "Ratio Analysis Quiz", quizTitle_ar: "اختبار تحليل النسب",
+        questions: [
+          { q: "The current ratio measures a company's ability to:",
+            q_ar: "نسبة التداول تقيس قدرة الشركة على:",
+            exp: "Current ratio = Current Assets / Current Liabilities. It measures short-term liquidity.",
+            opts: ["Generate long-term profits", "Pay short-term obligations", "Grow revenue year-over-year", "Manage inventory turnover"], correct: 1 },
+          { q: "A debt-to-equity ratio of 2.0 means:",
+            q_ar: "نسبة الدين إلى حقوق الملكية 2.0 تعني:",
+            exp: "D/E of 2.0 means the company has twice as much debt as equity financing.",
+            opts: ["The company has no debt", "Debt is twice the equity", "Equity is twice the debt", "The company is bankrupt"], correct: 1 },
+          { q: "Which ratio best measures profitability relative to sales?",
+            q_ar: "أي نسبة تقيس الربحية بالنسبة للمبيعات؟",
+            exp: "Net profit margin = Net Income / Revenue, showing profit earned per dollar of sales.",
+            opts: ["Current ratio", "Net profit margin", "Debt-to-equity ratio", "Price-to-earnings ratio"], correct: 1 },
+        ],
+      },
+    ],
+    // 1: Investment Banking Fundamentals
+    [
+      { mTitle: "Investment Banking Overview", mTitle_ar: "نظرة عامة على الخدمات المصرفية الاستثمارية",
+        video: "What Investment Banks Really Do", doc: "Investment Banking Industry Guide",
+        quizTitle: "Investment Banking Basics Quiz", quizTitle_ar: "اختبار أساسيات الخدمات المصرفية الاستثمارية",
+        questions: [
+          { q: "What is the primary function of an investment bank?",
+            q_ar: "ما هي الوظيفة الأساسية للبنك الاستثماري؟",
+            exp: "Investment banks primarily help companies raise capital and provide advisory services for M&A.",
+            opts: ["Accepting retail deposits", "Raising capital and M&A advisory", "Issuing credit cards", "Managing personal savings accounts"], correct: 1 },
+          { q: "What does IPO stand for?",
+            q_ar: "ماذا يعني الاكتتاب العام الأولي؟",
+            exp: "IPO stands for Initial Public Offering — the first sale of stock by a company to the public.",
+            opts: ["Internal Profit Optimization", "Initial Public Offering", "Investor Portfolio Option", "International Purchase Order"], correct: 1 },
+          { q: "In a DCF valuation, what is being discounted?",
+            q_ar: "في تقييم التدفقات النقدية المخصومة، ما الذي يتم خصمه؟",
+            exp: "DCF (Discounted Cash Flow) discounts projected future cash flows to their present value.",
+            opts: ["Past revenues", "Future cash flows", "Current stock price", "Historical dividends"], correct: 1 },
+        ],
+      },
+      { mTitle: "M&A and Deal Structuring", mTitle_ar: "الاندماج والاستحواذ وهيكلة الصفقات",
+        video: "Anatomy of an M&A Deal", doc: "M&A Term Sheet Template",
+        quizTitle: "M&A Knowledge Check", quizTitle_ar: "اختبار معرفة الاندماج والاستحواذ",
+        questions: [
+          { q: "Which valuation method uses data from similar publicly traded companies?",
+            q_ar: "أي طريقة تقييم تستخدم بيانات من شركات مماثلة مدرجة في البورصة؟",
+            exp: "Comparable Company Analysis (Comps) uses multiples from similar public companies.",
+            opts: ["DCF Analysis", "Comparable Company Analysis", "Asset-based valuation", "Book value method"], correct: 1 },
+          { q: "What is a 'buy-side' advisor in M&A?",
+            q_ar: "ما هو مستشار 'جانب المشتري' في الاندماج والاستحواذ؟",
+            exp: "A buy-side advisor represents the acquiring company in an M&A transaction.",
+            opts: ["Advisor to the selling company", "Advisor to the acquiring company", "A regulatory body", "An independent auditor"], correct: 1 },
+          { q: "What does EV/EBITDA measure?",
+            q_ar: "ماذا يقيس EV/EBITDA؟",
+            exp: "EV/EBITDA is an enterprise value multiple used to assess overall valuation relative to earnings.",
+            opts: ["Share price relative to earnings", "Enterprise value relative to operating earnings", "Revenue growth rate", "Cash flow per share"], correct: 1 },
+        ],
+      },
+    ],
+    // 2: Islamic Finance and Sukuk
+    [
+      { mTitle: "Principles of Islamic Finance", mTitle_ar: "مبادئ التمويل الإسلامي",
+        video: "Introduction to Shariah-Compliant Finance", doc: "Islamic Finance Key Concepts",
+        quizTitle: "Islamic Finance Principles Quiz", quizTitle_ar: "اختبار مبادئ التمويل الإسلامي",
+        questions: [
+          { q: "What does 'Riba' refer to in Islamic finance?",
+            q_ar: "ماذا يعني 'الربا' في التمويل الإسلامي؟",
+            exp: "Riba refers to interest or usury, which is prohibited under Islamic law.",
+            opts: ["Profit sharing", "Interest or usury", "Charitable giving", "Risk sharing"], correct: 1 },
+          { q: "Which of the following is a Shariah-compliant contract?",
+            q_ar: "أي من العقود التالية متوافق مع الشريعة؟",
+            exp: "Murabaha (cost-plus financing) is a widely used Shariah-compliant contract.",
+            opts: ["Conventional mortgage", "Murabaha (cost-plus financing)", "Interest-bearing bond", "Standard credit card debt"], correct: 1 },
+          { q: "What is 'Gharar' in Islamic finance?",
+            q_ar: "ما هو 'الغرر' في التمويل الإسلامي؟",
+            exp: "Gharar refers to excessive uncertainty or ambiguity in contracts, which is prohibited.",
+            opts: ["Profit sharing", "Asset backing", "Excessive uncertainty in contracts", "Tax on wealth"], correct: 2 },
+        ],
+      },
+      { mTitle: "Sukuk Structures and Markets", mTitle_ar: "هياكل الصكوك والأسواق",
+        video: "Understanding Sukuk Structures", doc: "Global Sukuk Market Report",
+        quizTitle: "Sukuk Knowledge Assessment", quizTitle_ar: "تقييم معرفة الصكوك",
+        questions: [
+          { q: "What is a Sukuk?",
+            q_ar: "ما هو الصكوك؟",
+            exp: "Sukuk are Islamic financial certificates similar to bonds but backed by tangible assets.",
+            opts: ["A conventional bond", "An Islamic financial certificate backed by assets", "A type of equity share", "A derivative instrument"], correct: 1 },
+          { q: "Sukuk al-Ijarah is based on which type of contract?",
+            q_ar: "صكوك الإجارة مبنية على أي نوع من العقود؟",
+            exp: "Sukuk al-Ijarah is based on a leasing contract where the issuer leases an asset to investors.",
+            opts: ["Sale contract", "Leasing contract", "Partnership contract", "Agency contract"], correct: 1 },
+          { q: "Which country is the largest issuer of Sukuk globally?",
+            q_ar: "أي دولة هي أكبر مُصدر للصكوك عالمياً؟",
+            exp: "Malaysia is the world's largest Sukuk issuer, followed by Saudi Arabia and Indonesia.",
+            opts: ["UAE", "Malaysia", "United Kingdom", "Turkey"], correct: 1 },
+        ],
+      },
+    ],
+    // 3: Python for Financial Analysis
+    [
+      { mTitle: "Python Programming Essentials", mTitle_ar: "أساسيات برمجة بايثون",
+        video: "Getting Started with Python for Finance", doc: "Python Quick Reference Card",
+        quizTitle: "Python Basics Quiz", quizTitle_ar: "اختبار أساسيات بايثون",
+        questions: [
+          { q: "Which Python library is most commonly used for data manipulation in finance?",
+            q_ar: "أي مكتبة بايثون تُستخدم بشكل شائع لمعالجة البيانات المالية؟",
+            exp: "Pandas is the standard library for data manipulation and analysis in financial applications.",
+            opts: ["Django", "Pandas", "Flask", "Tkinter"], correct: 1 },
+          { q: "What is a DataFrame in Pandas?",
+            q_ar: "ما هو DataFrame في مكتبة Pandas؟",
+            exp: "A DataFrame is a 2-dimensional labeled data structure with columns of potentially different types.",
+            opts: ["A single column of data", "A 2D labeled data structure", "A Python function", "A database connection"], correct: 1 },
+          { q: "Which function reads a CSV file into a Pandas DataFrame?",
+            q_ar: "أي دالة تقرأ ملف CSV إلى DataFrame في Pandas؟",
+            exp: "pd.read_csv() is used to read CSV files into a Pandas DataFrame.",
+            opts: ["pd.load_csv()", "pd.read_csv()", "pd.import_csv()", "pd.open_csv()"], correct: 1 },
+        ],
+      },
+      { mTitle: "Financial Data Analysis with Pandas", mTitle_ar: "تحليل البيانات المالية مع Pandas",
+        video: "Time Series Analysis in Python", doc: "Pandas Financial Analysis Cookbook",
+        quizTitle: "Financial Data Analysis Quiz", quizTitle_ar: "اختبار تحليل البيانات المالية",
+        questions: [
+          { q: "What does the .rolling() method in Pandas compute?",
+            q_ar: "ماذا تحسب طريقة .rolling() في Pandas؟",
+            exp: "The .rolling() method calculates moving/rolling window statistics like moving averages.",
+            opts: ["Data sorting", "Moving window calculations", "Data filtering", "Column renaming"], correct: 1 },
+          { q: "Which library is used for creating financial charts in Python?",
+            q_ar: "أي مكتبة تُستخدم لإنشاء الرسوم البيانية المالية في بايثون؟",
+            exp: "Matplotlib is the foundational plotting library, often used with Seaborn for financial visualizations.",
+            opts: ["NumPy", "Matplotlib", "SciPy", "Requests"], correct: 1 },
+          { q: "What does the Sharpe Ratio measure in portfolio analysis?",
+            q_ar: "ماذا تقيس نسبة شارب في تحليل المحفظة؟",
+            exp: "The Sharpe Ratio measures risk-adjusted return: (Return - Risk-Free Rate) / Standard Deviation.",
+            opts: ["Total return only", "Risk-adjusted return", "Maximum drawdown", "Trading volume"], correct: 1 },
+        ],
+      },
+    ],
+    // 4: Machine Learning in Banking
+    [
+      { mTitle: "ML Foundations for Financial Services", mTitle_ar: "أسس التعلم الآلي للخدمات المالية",
+        video: "Introduction to ML in Banking", doc: "ML Algorithms Overview for Finance",
+        quizTitle: "ML Foundations Quiz", quizTitle_ar: "اختبار أسس التعلم الآلي",
+        questions: [
+          { q: "Which type of machine learning is used for credit scoring?",
+            q_ar: "أي نوع من التعلم الآلي يُستخدم لتصنيف الائتمان؟",
+            exp: "Supervised learning is used for credit scoring because we have labeled historical data (good/bad loans).",
+            opts: ["Unsupervised learning", "Supervised learning", "Reinforcement learning", "Transfer learning"], correct: 1 },
+          { q: "What is a 'feature' in machine learning?",
+            q_ar: "ما هي 'الميزة' في التعلم الآلي؟",
+            exp: "A feature is an individual measurable property used as input to a machine learning model.",
+            opts: ["The model's prediction", "An input variable used for prediction", "The training algorithm", "The accuracy metric"], correct: 1 },
+          { q: "What is overfitting in a machine learning model?",
+            q_ar: "ما هو الإفراط في التخصيص في نموذج التعلم الآلي؟",
+            exp: "Overfitting occurs when a model learns noise in training data and performs poorly on new data.",
+            opts: ["Model is too simple", "Model memorizes training data but fails on new data", "Model has too few features", "Model trains too slowly"], correct: 1 },
+        ],
+      },
+      { mTitle: "Fraud Detection and Credit Risk", mTitle_ar: "كشف الاحتيال ومخاطر الائتمان",
+        video: "Building Fraud Detection Systems", doc: "Credit Risk Modeling Handbook",
+        quizTitle: "Fraud Detection & Credit Risk Quiz", quizTitle_ar: "اختبار كشف الاحتيال ومخاطر الائتمان",
+        questions: [
+          { q: "Which technique is commonly used for anomaly detection in fraud?",
+            q_ar: "أي تقنية تُستخدم عادةً لكشف الشذوذ في الاحتيال؟",
+            exp: "Isolation Forest is specifically designed for anomaly detection and works well for fraud detection.",
+            opts: ["Linear Regression", "Isolation Forest", "K-Means Clustering", "Principal Component Analysis"], correct: 1 },
+          { q: "What is the purpose of a confusion matrix?",
+            q_ar: "ما هو الغرض من مصفوفة الارتباك؟",
+            exp: "A confusion matrix shows true/false positives and negatives to evaluate classification performance.",
+            opts: ["To visualize data clusters", "To evaluate classification model performance", "To reduce dimensionality", "To normalize features"], correct: 1 },
+          { q: "In credit scoring, what does PD stand for?",
+            q_ar: "في تصنيف الائتمان، ماذا يعني PD؟",
+            exp: "PD stands for Probability of Default — the likelihood that a borrower will fail to repay.",
+            opts: ["Payment Duration", "Probability of Default", "Portfolio Diversification", "Predictive Data"], correct: 1 },
+        ],
+      },
+    ],
+    // 5: Data Visualization with Power BI
+    [
+      { mTitle: "Power BI Fundamentals", mTitle_ar: "أساسيات Power BI",
+        video: "Power BI Interface and Data Connections", doc: "Power BI Getting Started Guide",
+        quizTitle: "Power BI Basics Quiz", quizTitle_ar: "اختبار أساسيات Power BI",
+        questions: [
+          { q: "What is DAX in Power BI?",
+            q_ar: "ما هو DAX في Power BI؟",
+            exp: "DAX (Data Analysis Expressions) is the formula language used in Power BI for calculations.",
+            opts: ["A visualization type", "Data Analysis Expressions formula language", "A data connector", "A file format"], correct: 1 },
+          { q: "Which Power BI view is used to create relationships between tables?",
+            q_ar: "أي عرض في Power BI يُستخدم لإنشاء العلاقات بين الجداول؟",
+            exp: "The Model view in Power BI Desktop is used to create and manage table relationships.",
+            opts: ["Report view", "Model view", "Data view", "Dashboard view"], correct: 1 },
+          { q: "What type of visual best shows trends over time?",
+            q_ar: "أي نوع من التصورات يُظهر الاتجاهات بشكل أفضل بمرور الوقت؟",
+            exp: "Line charts are the standard visual for showing trends and changes over time periods.",
+            opts: ["Pie chart", "Line chart", "Card visual", "Tree map"], correct: 1 },
+        ],
+      },
+      { mTitle: "Financial Dashboards in Power BI", mTitle_ar: "لوحات المعلومات المالية في Power BI",
+        video: "Building Revenue and P&L Dashboards", doc: "Dashboard Design Best Practices",
+        quizTitle: "Financial Dashboards Quiz", quizTitle_ar: "اختبار لوحات المعلومات المالية",
+        questions: [
+          { q: "What is a KPI visual used for in financial dashboards?",
+            q_ar: "ما هو استخدام عنصر KPI في لوحات المعلومات المالية؟",
+            exp: "KPI visuals display a key metric against a target, showing progress toward financial goals.",
+            opts: ["Displaying raw data tables", "Showing a metric's progress against a target", "Creating data relationships", "Filtering dashboard data"], correct: 1 },
+          { q: "Which DAX function is used with date functions to create running totals?",
+            q_ar: "أي دالة DAX تُستخدم مع دوال التاريخ لإنشاء مجاميع تراكمية؟",
+            exp: "CALCULATE with date filter context is commonly used to create running totals (YTD, QTD).",
+            opts: ["SUM()", "CALCULATE()", "COUNT()", "AVERAGE()"], correct: 1 },
+          { q: "What is the purpose of row-level security (RLS) in Power BI?",
+            q_ar: "ما هو الغرض من أمان مستوى الصف (RLS) في Power BI؟",
+            exp: "RLS restricts data access so users only see data they are authorized to view.",
+            opts: ["To improve query speed", "To restrict data access per user role", "To create visualizations", "To connect to databases"], correct: 1 },
+        ],
+      },
+    ],
+    // 6: Strategic Leadership in Financial Services
+    [
+      { mTitle: "Leadership Foundations in Finance", mTitle_ar: "أسس القيادة في المالية",
+        video: "The Evolving Role of Financial Leaders", doc: "Leadership Competency Framework",
+        quizTitle: "Leadership Foundations Quiz", quizTitle_ar: "اختبار أسس القيادة",
+        questions: [
+          { q: "Which leadership style involves collaborative decision-making with the team?",
+            q_ar: "أي أسلوب قيادة يتضمن اتخاذ قرارات تعاونية مع الفريق؟",
+            exp: "Democratic/participative leadership involves team members in the decision-making process.",
+            opts: ["Autocratic", "Democratic/Participative", "Laissez-faire", "Transactional"], correct: 1 },
+          { q: "What is a key characteristic of transformational leadership?",
+            q_ar: "ما هي السمة الرئيسية للقيادة التحويلية؟",
+            exp: "Transformational leaders inspire and motivate followers to exceed expectations through vision.",
+            opts: ["Strict rule enforcement", "Inspiring others to achieve beyond expectations", "Minimal team interaction", "Focus solely on financial metrics"], correct: 1 },
+          { q: "In change management, what does the 'burning platform' concept refer to?",
+            q_ar: "في إدارة التغيير، ماذا يعني مفهوم 'المنصة المشتعلة'؟",
+            exp: "The burning platform creates urgency for change by highlighting the risks of maintaining the status quo.",
+            opts: ["A failed IT project", "Creating urgency by showing risks of not changing", "A physical workspace redesign", "A type of agile methodology"], correct: 1 },
+        ],
+      },
+      { mTitle: "Strategic Execution and Team Building", mTitle_ar: "التنفيذ الاستراتيجي وبناء الفريق",
+        video: "Building High-Performing Financial Teams", doc: "Strategic Planning Toolkit",
+        quizTitle: "Strategic Execution Quiz", quizTitle_ar: "اختبار التنفيذ الاستراتيجي",
+        questions: [
+          { q: "What is a Balanced Scorecard used for?",
+            q_ar: "ما هو استخدام بطاقة الأداء المتوازن؟",
+            exp: "A Balanced Scorecard measures performance across financial, customer, process, and learning perspectives.",
+            opts: ["Only tracking financial metrics", "Measuring performance across multiple perspectives", "Managing employee attendance", "Auditing financial statements"], correct: 1 },
+          { q: "Which framework is commonly used for strategic analysis?",
+            q_ar: "أي إطار يُستخدم عادةً للتحليل الاستراتيجي؟",
+            exp: "SWOT Analysis examines Strengths, Weaknesses, Opportunities, and Threats for strategic planning.",
+            opts: ["FIFO method", "SWOT Analysis", "GAAP framework", "Basel III"], correct: 1 },
+          { q: "What does 'stakeholder management' primarily involve?",
+            q_ar: "ماذا تتضمن 'إدارة أصحاب المصلحة' بشكل أساسي؟",
+            exp: "Stakeholder management involves identifying, analyzing, and engaging people affected by decisions.",
+            opts: ["Managing financial investments", "Identifying and engaging with affected parties", "Processing payroll", "Conducting IT audits"], correct: 1 },
+        ],
+      },
+    ],
+    // 7: Enterprise Risk Management Framework
+    [
+      { mTitle: "ERM Framework Essentials", mTitle_ar: "أساسيات إطار إدارة المخاطر المؤسسية",
+        video: "Introduction to Enterprise Risk Management", doc: "ERM Framework Reference Guide",
+        quizTitle: "ERM Essentials Quiz", quizTitle_ar: "اختبار أساسيات إدارة المخاطر",
+        questions: [
+          { q: "What are the three lines of defense in risk management?",
+            q_ar: "ما هي خطوط الدفاع الثلاثة في إدارة المخاطر؟",
+            exp: "The three lines are: 1) Business operations, 2) Risk management & compliance, 3) Internal audit.",
+            opts: ["IT, HR, Finance", "Operations, Risk/Compliance, Internal Audit", "Board, CEO, CFO", "Sales, Marketing, Legal"], correct: 1 },
+          { q: "What does VaR (Value at Risk) measure?",
+            q_ar: "ماذا يقيس القيمة المعرضة للخطر (VaR)؟",
+            exp: "VaR estimates the maximum potential loss over a specific time period at a given confidence level.",
+            opts: ["Average daily profit", "Maximum potential loss at a confidence level", "Total assets under management", "Annual revenue growth"], correct: 1 },
+          { q: "What is 'risk appetite' in the context of ERM?",
+            q_ar: "ما هي 'الرغبة في المخاطرة' في سياق إدارة المخاطر؟",
+            exp: "Risk appetite is the level of risk an organization is willing to accept in pursuit of its objectives.",
+            opts: ["Avoiding all risks", "The level of risk an org is willing to accept", "The maximum loss ever incurred", "A regulatory requirement only"], correct: 1 },
+        ],
+      },
+      { mTitle: "Market and Operational Risk", mTitle_ar: "مخاطر السوق والمخاطر التشغيلية",
+        video: "VaR Modeling and Stress Testing", doc: "Basel III Capital Requirements Summary",
+        quizTitle: "Market & Operational Risk Quiz", quizTitle_ar: "اختبار مخاطر السوق والتشغيلية",
+        questions: [
+          { q: "Which Basel accord primarily addresses operational risk?",
+            q_ar: "أي اتفاقية بازل تعالج بشكل أساسي المخاطر التشغيلية؟",
+            exp: "Basel II introduced a formal framework for operational risk capital requirements.",
+            opts: ["Basel I", "Basel II", "Dodd-Frank Act", "Sarbanes-Oxley"], correct: 1 },
+          { q: "What is a stress test in risk management?",
+            q_ar: "ما هو اختبار الإجهاد في إدارة المخاطر؟",
+            exp: "A stress test simulates extreme market conditions to assess the resilience of financial institutions.",
+            opts: ["A routine audit", "Simulating extreme conditions to test resilience", "A customer satisfaction survey", "A compliance checklist"], correct: 1 },
+          { q: "What does operational risk include?",
+            q_ar: "ماذا تتضمن المخاطر التشغيلية؟",
+            exp: "Operational risk includes losses from failed processes, people, systems, or external events.",
+            opts: ["Only market price fluctuations", "Losses from failed processes, people, or systems", "Only credit defaults", "Only regulatory fines"], correct: 1 },
+        ],
+      },
+    ],
+    // 8: Digital Transformation in Banking
+    [
+      { mTitle: "Digital Banking Landscape", mTitle_ar: "مشهد الخدمات المصرفية الرقمية",
+        video: "State of Digital Banking in 2026", doc: "Digital Transformation Roadmap Template",
+        quizTitle: "Digital Banking Quiz", quizTitle_ar: "اختبار الخدمات المصرفية الرقمية",
+        questions: [
+          { q: "What is 'Open Banking'?",
+            q_ar: "ما هي 'الخدمات المصرفية المفتوحة'؟",
+            exp: "Open Banking allows third-party developers to access bank data through APIs with customer consent.",
+            opts: ["Banks with no physical branches", "API-based sharing of financial data with third parties", "Free banking services", "Government-owned banks"], correct: 1 },
+          { q: "What does API stand for in the context of banking technology?",
+            q_ar: "ماذا يعني API في سياق تكنولوجيا الخدمات المصرفية؟",
+            exp: "API stands for Application Programming Interface, enabling different software systems to communicate.",
+            opts: ["Automated Payment Integration", "Application Programming Interface", "Annual Performance Index", "Account Processing Infrastructure"], correct: 1 },
+          { q: "Which technology enables real-time, tamper-proof transaction records?",
+            q_ar: "أي تقنية تمكّن من سجلات معاملات فورية ومقاومة للتلاعب؟",
+            exp: "Blockchain provides distributed, immutable ledger technology for tamper-proof transaction records.",
+            opts: ["Cloud computing", "Blockchain", "Machine learning", "Virtual reality"], correct: 1 },
+        ],
+      },
+      { mTitle: "Fintech Innovation and AI", mTitle_ar: "ابتكار التكنولوجيا المالية والذكاء الاصطناعي",
+        video: "AI and Chatbots in Customer Service", doc: "Fintech Partnership Evaluation Guide",
+        quizTitle: "Fintech & AI Quiz", quizTitle_ar: "اختبار التكنولوجيا المالية والذكاء الاصطناعي",
+        questions: [
+          { q: "What is a neobank?",
+            q_ar: "ما هو البنك الرقمي (نيوبنك)؟",
+            exp: "A neobank is a digital-only bank with no physical branches, operating entirely through mobile/web.",
+            opts: ["A traditional bank with new management", "A digital-only bank with no branches", "A central bank", "A bank specializing in loans"], correct: 1 },
+          { q: "What is the primary benefit of AI chatbots in banking?",
+            q_ar: "ما هي الفائدة الرئيسية لروبوتات الدردشة بالذكاء الاصطناعي في الخدمات المصرفية؟",
+            exp: "AI chatbots provide 24/7 customer service, handling routine inquiries and reducing wait times.",
+            opts: ["Replacing all human staff", "Providing 24/7 automated customer support", "Generating investment advice", "Processing loan applications only"], correct: 1 },
+          { q: "What does CBDC stand for?",
+            q_ar: "ماذا يعني CBDC؟",
+            exp: "CBDC stands for Central Bank Digital Currency — a digital form of fiat money issued by central banks.",
+            opts: ["Corporate Banking Digital Contract", "Central Bank Digital Currency", "Cross-Border Digital Clearing", "Commercial Banking Data Center"], correct: 1 },
+        ],
+      },
+    ],
+    // 9: Anti-Money Laundering Compliance
+    [
+      { mTitle: "AML Regulatory Framework", mTitle_ar: "الإطار التنظيمي لمكافحة غسل الأموال",
+        video: "Understanding AML Regulations", doc: "FATF Recommendations Summary",
+        quizTitle: "AML Regulations Quiz", quizTitle_ar: "اختبار أنظمة مكافحة غسل الأموال",
+        questions: [
+          { q: "What are the three stages of money laundering?",
+            q_ar: "ما هي المراحل الثلاث لغسل الأموال؟",
+            exp: "Money laundering involves Placement (introducing funds), Layering (concealing origin), and Integration (using funds).",
+            opts: ["Opening, Moving, Closing", "Placement, Layering, Integration", "Deposit, Transfer, Withdrawal", "Collection, Processing, Distribution"], correct: 1 },
+          { q: "What does KYC stand for?",
+            q_ar: "ماذا يعني KYC؟",
+            exp: "KYC stands for Know Your Customer — the process of verifying client identity and assessing risk.",
+            opts: ["Keep Your Cash", "Know Your Customer", "Key Yield Calculation", "Know Your Compliance"], correct: 1 },
+          { q: "What organization sets global AML standards?",
+            q_ar: "أي منظمة تضع معايير مكافحة غسل الأموال العالمية؟",
+            exp: "FATF (Financial Action Task Force) sets international standards for combating money laundering.",
+            opts: ["World Bank", "FATF (Financial Action Task Force)", "International Monetary Fund", "World Trade Organization"], correct: 1 },
+        ],
+      },
+      { mTitle: "KYC and Suspicious Activity Reporting", mTitle_ar: "اعرف عميلك والإبلاغ عن الأنشطة المشبوهة",
+        video: "CDD and Enhanced Due Diligence", doc: "SAR Filing Guide",
+        quizTitle: "KYC & SAR Quiz", quizTitle_ar: "اختبار اعرف عميلك والإبلاغ",
+        questions: [
+          { q: "What is Enhanced Due Diligence (EDD) required for?",
+            q_ar: "متى تكون العناية الواجبة المعززة (EDD) مطلوبة؟",
+            exp: "EDD is required for high-risk customers such as PEPs and customers from high-risk jurisdictions.",
+            opts: ["All customers equally", "High-risk customers and PEPs", "Only corporate clients", "Only international transfers"], correct: 1 },
+          { q: "What triggers the filing of a Suspicious Activity Report (SAR)?",
+            q_ar: "ما الذي يستدعي تقديم تقرير نشاط مشبوه (SAR)؟",
+            exp: "A SAR is filed when transactions appear unusual or potentially related to illegal activity.",
+            opts: ["Every transaction over $100", "Transactions that appear unusual or potentially illegal", "All international wire transfers", "Monthly account statements"], correct: 1 },
+          { q: "What is a Politically Exposed Person (PEP)?",
+            q_ar: "ما هو الشخص المعرض سياسياً (PEP)؟",
+            exp: "A PEP is someone entrusted with a prominent public function, posing higher risk for corruption.",
+            opts: ["Any government employee", "A person with a prominent public function posing higher risk", "A bank executive", "A foreign tourist"], correct: 1 },
+        ],
+      },
+    ],
+  ];
+
+  let seedModules = 0, seedLessons = 0, seedQuizzes = 0, seedQuestions = 0;
+
+  if (courseIds.length > 0) {
+    // ── Clean existing modules/lessons/quizzes ──
+    const { data: existingQuizzes } = await admin.from("quizzes").select("id").in("course_id", courseIds);
+    const quizIdsToDelete = (existingQuizzes || []).map(q => q.id);
+
+    if (quizIdsToDelete.length > 0) {
+      const { data: existingQs } = await admin.from("quiz_questions").select("id").in("quiz_id", quizIdsToDelete);
+      const questionIdsToDelete = (existingQs || []).map(q => q.id);
+      if (questionIdsToDelete.length > 0) {
+        await admin.from("quiz_options").delete().in("question_id", questionIdsToDelete);
+      }
+      await admin.from("quiz_questions").delete().in("quiz_id", quizIdsToDelete);
+      await admin.from("quiz_attempts").delete().in("quiz_id", quizIdsToDelete);
+    }
+    await admin.from("quizzes").delete().in("course_id", courseIds);
+    await admin.from("watch_statistics").delete().in("course_id", courseIds);
+    await admin.from("lesson_bookmarks").delete().in("course_id", courseIds);
+    await admin.from("lesson_progress").delete().in("course_id", courseIds);
+    for (const cid of courseIds) {
+      await admin.from("enrollments").update({ last_lesson_id: null }).eq("course_id", cid);
+    }
+    await admin.from("forum_posts").delete().in("course_id", courseIds).not("parent_id", "is", null);
+    await admin.from("forum_posts").delete().in("course_id", courseIds);
+    await admin.from("lessons").delete().in("course_id", courseIds);
+    await admin.from("modules").delete().in("course_id", courseIds);
+    console.log("  Cleaned existing modules/lessons/quizzes");
+
+    // ── Create modules, lessons, quizzes ──
+    for (let ci = 0; ci < courseIds.length; ci++) {
+      const courseId = courseIds[ci];
+      const moduleDefs = courseQuizData[ci];
+      if (!moduleDefs) continue;
+
+      for (let mi = 0; mi < moduleDefs.length; mi++) {
+        const mod = moduleDefs[mi];
+
+        // Insert module
+        const { data: moduleData, error: modErr } = await admin.from("modules").insert({
+          course_id: courseId,
+          title: mod.mTitle,
+          title_ar: mod.mTitle_ar || null,
+          sort_order: mi,
+          is_preview: mi === 0,
+          duration_minutes: 35,
+        }).select("id").single();
+
+        if (modErr || !moduleData) {
+          console.error(`    Module error [${ci}/${mi}]:`, modErr?.message);
+          continue;
+        }
+        seedModules++;
+
+        const videoUrl = VIDEO_POOL[(ci + mi) % VIDEO_POOL.length];
+
+        // Video lesson (sort_order 0)
+        await admin.from("lessons").insert({
+          module_id: moduleData.id,
+          course_id: courseId,
+          title: mod.video,
+          content_type: "video",
+          video_url: videoUrl,
+          video_duration_seconds: 600 + ci * 30 + mi * 120,
+          video_thumbnail_url: THUMBNAILS[ci % THUMBNAILS.length],
+          duration_minutes: 15,
+          sort_order: 0,
+          is_preview: mi === 0,
+          is_mandatory: true,
+          description: `Watch this video lesson on ${mod.video.toLowerCase()}.`,
+        });
+        seedLessons++;
+
+        // Document lesson (sort_order 1)
+        await admin.from("lessons").insert({
+          module_id: moduleData.id,
+          course_id: courseId,
+          title: mod.doc,
+          content_type: "document",
+          document_url: SAMPLE_PDF_URL,
+          document_type: "pdf",
+          duration_minutes: 10,
+          sort_order: 1,
+          is_preview: false,
+          is_mandatory: false,
+          description: `Read through the ${mod.doc.toLowerCase()} to reinforce your understanding.`,
+        });
+        seedLessons++;
+
+        // Quiz lesson (sort_order 2)
+        const { data: quizLesson, error: qlErr } = await admin.from("lessons").insert({
+          module_id: moduleData.id,
+          course_id: courseId,
+          title: mod.quizTitle,
+          content_type: "quiz",
+          duration_minutes: 10,
+          sort_order: 2,
+          is_preview: false,
+          is_mandatory: true,
+          description: "Test your knowledge with this multiple-choice quiz.",
+        }).select("id").single();
+        seedLessons++;
+
+        if (qlErr || !quizLesson) continue;
+
+        // Create quiz record
+        const { data: quiz, error: quizErr } = await admin.from("quizzes").insert({
+          lesson_id: quizLesson.id,
+          course_id: courseId,
+          title: mod.quizTitle,
+          title_ar: mod.quizTitle_ar || null,
+          description: `Assessment for ${mod.mTitle}`,
+          passing_score: 70,
+          max_attempts: 3,
+          time_limit_minutes: 15,
+          shuffle_questions: true,
+          show_correct_answers: true,
+          is_published: true,
+          is_final_exam: mi === moduleDefs.length - 1,
+          sort_order: mi,
+        }).select("id").single();
+
+        if (quizErr || !quiz) {
+          console.error(`    Quiz error [${ci}/${mi}]:`, quizErr?.message);
+          continue;
+        }
+        seedQuizzes++;
+
+        // Create questions and options
+        for (let qi = 0; qi < mod.questions.length; qi++) {
+          const qDef = mod.questions[qi];
+
+          const { data: question, error: qErr } = await admin.from("quiz_questions").insert({
+            quiz_id: quiz.id,
+            question_text: qDef.q,
+            question_text_ar: qDef.q_ar || null,
+            question_type: "multiple_choice",
+            points: 1,
+            explanation: qDef.exp || null,
+            sort_order: qi,
+          }).select("id").single();
+
+          if (qErr || !question) continue;
+          seedQuestions++;
+
+          await admin.from("quiz_options").insert(
+            qDef.opts.map((optText, oi) => ({
+              question_id: question.id,
+              option_text: optText,
+              is_correct: oi === qDef.correct,
+              sort_order: oi,
+            }))
+          );
+        }
+      }
+    }
+
+    console.log(`  ✓ ${seedModules} modules, ${seedLessons} lessons, ${seedQuizzes} quizzes, ${seedQuestions} questions`);
+  }
+
   // ── Summary ──────────────────────────────────────────────────────
   console.log("\n" + "═".repeat(50));
   console.log("✅ Seed complete!");
@@ -807,6 +1372,7 @@ async function main() {
   console.log(`   Users: ${userIds.length}`);
   console.log(`   Certificate Templates: ${certTemplateIds.length} new`);
   console.log(`   Courses: ${courseIds.length}`);
+  console.log(`   Modules: ${seedModules} (${seedLessons} lessons, ${seedQuizzes} quizzes, ${seedQuestions} questions)`);
   console.log(`   Webinars: ${webinars.length}`);
   console.log(`   Enrollments: ${enrollCount}`);
   console.log(`   Reviews: ${reviewCount}`);
