@@ -7,6 +7,7 @@ import {
   type QuestionData,
 } from "@/lib/services/quiz-scoring";
 import { issueCertificate } from "@/lib/services/certificate-service";
+import { recalculateAllPathsForUser } from "@/lib/services/learning-path-service";
 
 interface RouteParams {
   params: Promise<{ quizId: string }>;
@@ -109,11 +110,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         quiz_id: quizId,
         user_id: user.id,
         score: result.score,
-        max_score: result.maxScore,
+        total_points: result.maxScore,
         percentage: result.percentage,
         passed,
         answers: parsed.data.answers,
-        time_spent_seconds: parsed.data.timeSpentSeconds,
+        time_taken_seconds: parsed.data.timeSpentSeconds,
         attempt_number: attemptNumber,
         started_at: new Date().toISOString(),
         completed_at: new Date().toISOString(),
@@ -126,6 +127,72 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         { error: attemptError.message },
         { status: 500 }
       );
+
+    // Mark quiz lesson as completed on pass
+    if (passed && quiz.lesson_id) {
+      const supabase = await createServerSupabase();
+
+      // Upsert lesson_progress
+      await supabaseAdmin
+        .from("lesson_progress")
+        .upsert(
+          {
+            user_id: user.id,
+            lesson_id: quiz.lesson_id,
+            course_id: quiz.course_id,
+            is_completed: true,
+            completed_at: new Date().toISOString(),
+            last_accessed_at: new Date().toISOString(),
+          },
+          { onConflict: "user_id,lesson_id" }
+        );
+
+      // Update enrollment completed_lesson_ids and progress
+      const { data: enrollmentData } = await supabaseAdmin
+        .from("enrollments")
+        .select("id, completed_lesson_ids, total_lesson_items")
+        .eq("user_id", user.id)
+        .eq("course_id", quiz.course_id)
+        .single();
+
+      if (enrollmentData) {
+        const completedIds: string[] =
+          (enrollmentData.completed_lesson_ids as string[]) ?? [];
+        const lid = quiz.lesson_id as string;
+
+        if (!completedIds.includes(lid)) {
+          completedIds.push(lid);
+        }
+
+        const totalItems = enrollmentData.total_lesson_items ?? 0;
+        const completedItems = completedIds.length;
+        const progressPct =
+          totalItems > 0
+            ? Math.round((completedItems / totalItems) * 100)
+            : 0;
+        const courseCompleted =
+          totalItems > 0 && completedItems >= totalItems;
+
+        await supabaseAdmin
+          .from("enrollments")
+          .update({
+            completed_lesson_ids: completedIds,
+            completed_lesson_items: completedItems,
+            progress_percentage: progressPct,
+            ...(courseCompleted
+              ? {
+                  status: "completed",
+                  completed_at: new Date().toISOString(),
+                }
+              : {}),
+          })
+          .eq("id", enrollmentData.id);
+
+        if (courseCompleted) {
+          recalculateAllPathsForUser(supabase, user.id).catch(() => {});
+        }
+      }
+    }
 
     // If final exam and passed, issue certificate
     let certificate = null;

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Trophy,
   XCircle,
@@ -41,6 +42,7 @@ interface QuizResultsProps {
 }
 
 export function QuizResults({ result, quiz, onRetry }: QuizResultsProps) {
+  const tq = useTranslations("quiz");
   const data = result as unknown as QuizResultData;
   const percentage = data.percentage ?? 0;
   const passed = data.passed ?? false;
@@ -57,13 +59,13 @@ export function QuizResults({ result, quiz, onRetry }: QuizResultsProps) {
           )}
 
           <h2 className="text-3xl font-bold">
-            {passed ? "Congratulations!" : "Keep Trying!"}
+            {passed ? tq("congratulations") : tq("keepTrying")}
           </h2>
 
           <p className="text-muted-foreground">
             {passed
-              ? "You passed the quiz!"
-              : `You need ${quiz.passing_score}% to pass.`}
+              ? tq("youPassed")
+              : tq("needToPass", { score: quiz.passing_score })}
           </p>
 
           {/* Score display */}
@@ -84,7 +86,7 @@ export function QuizResults({ result, quiz, onRetry }: QuizResultsProps) {
               className="h-3 max-w-xs mx-auto"
             />
             <p className="text-sm text-muted-foreground">
-              {data.score} / {data.maxScore} points
+              {data.score} / {data.maxScore} {tq("points")}
             </p>
           </div>
 
@@ -92,7 +94,7 @@ export function QuizResults({ result, quiz, onRetry }: QuizResultsProps) {
           {data.certificate && (
             <div className="rounded-lg border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950 p-4 mt-4">
               <Award className="mx-auto h-8 w-8 text-green-600 dark:text-green-400 mb-2" />
-              <p className="font-semibold">Certificate Issued!</p>
+              <p className="font-semibold">{tq("certificateIssued")}</p>
               <p className="text-sm text-muted-foreground">
                 Certificate #{data.certificate.certificateNumber}
               </p>
@@ -104,7 +106,7 @@ export function QuizResults({ result, quiz, onRetry }: QuizResultsProps) {
                 >
                   <Button variant="outline" size="sm" className="mt-2">
                     <Download className="h-4 w-4 me-1" />
-                    Download Certificate
+                    {tq("downloadCertificate")}
                   </Button>
                 </a>
               )}
@@ -115,7 +117,7 @@ export function QuizResults({ result, quiz, onRetry }: QuizResultsProps) {
           <div className="flex justify-center gap-3 pt-4">
             <Button variant="outline" onClick={onRetry}>
               <RotateCcw className="h-4 w-4 me-1" />
-              {passed ? "View Quiz" : "Retry"}
+              {passed ? tq("viewQuiz") : tq("retryQuiz")}
             </Button>
           </div>
         </CardContent>
@@ -125,7 +127,7 @@ export function QuizResults({ result, quiz, onRetry }: QuizResultsProps) {
       {data.questionResults && data.questionResults.length > 0 && (
         <Card>
           <CardContent className="p-6">
-            <h3 className="font-semibold mb-4">Question Results</h3>
+            <h3 className="font-semibold mb-4">{tq("questionResults")}</h3>
             <div className="space-y-2">
               {data.questionResults.map((qr, idx) => (
                 <div
@@ -138,7 +140,7 @@ export function QuizResults({ result, quiz, onRetry }: QuizResultsProps) {
                     ) : (
                       <XCircle className="h-4 w-4 text-red-500" />
                     )}
-                    <span className="text-sm">Question {idx + 1}</span>
+                    <span className="text-sm">{tq("question")} {idx + 1}</span>
                   </div>
                   <span className="text-sm text-muted-foreground">
                     {qr.pointsEarned} / {qr.maxPoints}

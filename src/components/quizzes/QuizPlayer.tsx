@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   ChevronLeft,
   ChevronRight,
@@ -23,6 +23,7 @@ interface QuizPlayerProps {
 
 export function QuizPlayer({ quiz, questions, onComplete }: QuizPlayerProps) {
   const locale = useLocale();
+  const tq = useTranslations("quiz");
   const startTimeRef = useRef(Date.now());
 
   const {
@@ -119,7 +120,7 @@ export function QuizPlayer({ quiz, questions, onComplete }: QuizPlayerProps) {
       {/* Header: progress + timer */}
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground">
-          Question {currentQuestionIndex + 1} of {questions.length}
+          {tq("question")} {currentQuestionIndex + 1} {tq("of")} {questions.length}
         </span>
         {timeRemaining !== null && (
           <div
@@ -183,7 +184,7 @@ export function QuizPlayer({ quiz, questions, onComplete }: QuizPlayerProps) {
           {currentQuestion.question_type === "multi_select" && (
             <div className="space-y-2">
               <p className="text-xs text-muted-foreground">
-                Select all that apply
+                {tq("selectAll")}
               </p>
               {(currentQuestion.options ?? []).map((opt) => {
                 const optText =
@@ -221,7 +222,7 @@ export function QuizPlayer({ quiz, questions, onComplete }: QuizPlayerProps) {
 
           {currentQuestion.question_type === "short_answer" && (
             <Input
-              placeholder="Type your answer..."
+              placeholder={tq("typeAnswer")}
               value={currentAnswer?.textAnswer ?? ""}
               onChange={(e) =>
                 setAnswer(currentQuestion.id, { textAnswer: e.target.value })
@@ -239,11 +240,11 @@ export function QuizPlayer({ quiz, questions, onComplete }: QuizPlayerProps) {
           disabled={currentQuestionIndex === 0}
         >
           <ChevronLeft className="h-4 w-4 me-1 rtl:rotate-180" />
-          Previous
+          {tq("previous")}
         </Button>
 
         {/* Question dots */}
-        <div className="hidden sm:flex gap-1">
+        <div className="flex flex-wrap gap-1">
           {questions.map((q, idx) => (
             <button
               key={q.id}
@@ -263,13 +264,13 @@ export function QuizPlayer({ quiz, questions, onComplete }: QuizPlayerProps) {
         {currentQuestionIndex === questions.length - 1 ? (
           <Button onClick={handleSubmit} disabled={isSubmitting}>
             <Send className="h-4 w-4 me-1" />
-            {isSubmitting ? "Submitting..." : "Submit"}
+            {isSubmitting ? tq("submitting") : tq("submitQuiz")}
           </Button>
         ) : (
           <Button
             onClick={() => setCurrentQuestion(currentQuestionIndex + 1)}
           >
-            Next
+            {tq("next")}
             <ChevronRight className="h-4 w-4 ms-1 rtl:rotate-180" />
           </Button>
         )}

@@ -32,30 +32,18 @@ interface ContentSidebarProps {
   onClose: () => void;
 }
 
-const contentTypeBadge: Record<
-  string,
-  { label: string; className: string }
-> = {
-  video: {
-    label: "Video",
-    className:
-      "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
-  },
-  document: {
-    label: "Doc",
-    className:
-      "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300",
-  },
-  quiz: {
-    label: "Quiz",
-    className:
-      "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
-  },
-  assignment: {
-    label: "Task",
-    className:
-      "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
-  },
+const contentTypeBadgeClass: Record<string, string> = {
+  video: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  document: "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300",
+  quiz: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
+  assignment: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
+};
+
+const contentTypeLabelKey: Record<string, string> = {
+  video: "typeVideo",
+  document: "typeDoc",
+  quiz: "typeQuiz",
+  assignment: "typeTask",
 };
 
 export function ContentSidebar({
@@ -157,7 +145,7 @@ export function ContentSidebar({
               const completedLessons = modules
                 .flatMap((m) => m.lessons ?? [])
                 .filter((l) => progressMap[l.id]?.is_completed).length;
-              return `${completedLessons} of ${totalLessons} completed`;
+              return t("progressCount", { completed: completedLessons, total: totalLessons });
             })()}
           </span>
           <span className="font-medium">{Math.round(overallProgress)}%</span>
@@ -306,7 +294,8 @@ export function ContentSidebar({
                       locale === "ar" && lesson.title_ar
                         ? lesson.title_ar
                         : lesson.title;
-                    const badge = contentTypeBadge[lesson.content_type];
+                    const badgeClass = contentTypeBadgeClass[lesson.content_type];
+                    const badgeLabelKey = contentTypeLabelKey[lesson.content_type];
 
                     return (
                       <Link
@@ -355,17 +344,17 @@ export function ContentSidebar({
                             {lessonTitle}
                           </p>
                           <div className="mt-1 flex items-center gap-2">
-                            {badge && (
+                            {badgeClass && badgeLabelKey && (
                               <span
                                 className={cn(
                                   "inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-                                  badge.className
+                                  badgeClass
                                 )}
                               >
                                 {lesson.content_type === "video" && (
                                   <Play className="h-2.5 w-2.5" />
                                 )}
-                                {badge.label}
+                                {t(badgeLabelKey)}
                               </span>
                             )}
                             {lesson.duration_minutes > 0 && (

@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { ChevronLeft, ChevronRight, MessageSquare, Bookmark, Lock, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, MessageSquare, Bookmark, Lock, Play, CheckCircle } from "lucide-react";
 import DOMPurify from "dompurify";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
@@ -19,6 +19,7 @@ import { BookmarksPanel } from "@/components/video/BookmarksPanel";
 import { WatchStatsBadge } from "@/components/video/WatchStatsBadge";
 import { QuizGate } from "@/components/quizzes/QuizGate";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -58,6 +59,7 @@ export default function LessonPage() {
   const [showLockAlert, setShowLockAlert] = useState(false);
   const [videoCurrentTime, setVideoCurrentTime] = useState(0);
   const [videoConfig, setVideoConfig] = useState<VideoConfig | null>(null);
+  const [markingComplete, setMarkingComplete] = useState(false);
 
   const seekToRef = useRef<((seconds: number) => void) | null>(null);
   const timeValidatorRef = useRef(createTimeValidator());
@@ -509,15 +511,96 @@ export default function LessonPage() {
               </>
             )}
 
-            {currentLesson.content_type === "document" &&
-              currentLesson.content_html && (
-                <div
-                  className="prose prose-brand max-w-none dark:prose-invert"
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(currentLesson.content_html),
-                  }}
-                />
-              )}
+            {currentLesson.content_type === "document" && (
+              <div className="space-y-4">
+                {/* PDF viewer */}
+                {currentLesson.document_url && (
+                  <div className="space-y-2">
+                    <iframe
+                      src={currentLesson.document_url}
+                      className="w-full rounded-lg border"
+                      style={{ minHeight: "70vh" }}
+                      title={tp("documentViewer")}
+                    />
+                    <div className="flex justify-end">
+                      <a
+                        href={currentLesson.document_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline"
+                      >
+                        {tp("openInNewTab")} ↗
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {/* HTML content */}
+                {currentLesson.content_html && (
+                  <div
+                    className="prose prose-brand max-w-none dark:prose-invert"
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(currentLesson.content_html),
+                    }}
+                  />
+                )}
+
+                {/* Empty state */}
+                {!currentLesson.document_url && !currentLesson.content_html && (
+                  <div className="flex min-h-[30vh] items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/50">
+                    <p className="text-muted-foreground">{tp("noContent")}</p>
+                  </div>
+                )}
+
+                {/* Mark as Complete button */}
+                {!progressMap[lessonId]?.is_completed && (
+                  <div className="flex justify-center pt-2">
+                    <Button
+                      size="lg"
+                      disabled={markingComplete}
+                      onClick={async () => {
+                        if (!course) return;
+                        setMarkingComplete(true);
+                        try {
+                          const res = await fetch(
+                            `/api/lessons/${lessonId}/complete`,
+                            {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ courseId: course.id }),
+                            }
+                          );
+                          if (res.ok) {
+                            setProgressMap((prev) => ({
+                              ...prev,
+                              [lessonId]: {
+                                ...prev[lessonId],
+                                is_completed: true,
+                                completed_at: new Date().toISOString(),
+                              } as LessonProgress,
+                            }));
+                          }
+                        } finally {
+                          setMarkingComplete(false);
+                        }
+                      }}
+                    >
+                      <CheckCircle className="h-4 w-4 me-2" />
+                      {markingComplete ? tp("markingComplete") : tp("markComplete")}
+                    </Button>
+                  </div>
+                )}
+
+                {progressMap[lessonId]?.is_completed && (
+                  <div className="flex justify-center pt-2">
+                    <Badge variant="success" className="text-sm py-1 px-3">
+                      <CheckCircle className="h-4 w-4 me-1" />
+                      {tp("completed")}
+                    </Badge>
+                  </div>
+                )}
+              </div>
+            )}
 
             {currentLesson.content_type === "quiz" && course && (
               <QuizGate lessonId={lessonId} courseId={course.id} />
@@ -541,7 +624,7 @@ export default function LessonPage() {
             >
               <Button variant="outline" size="sm">
                 <ChevronLeft className="h-4 w-4 me-1 rtl:rotate-180" />
-                {t("overview") === "Overview" ? "Previous" : "السابق"}
+                {tp("previousLesson")}
               </Button>
             </Link>
           ) : (
@@ -551,7 +634,7 @@ export default function LessonPage() {
           {nextLesson ? (
             isLocked(nextLesson.id) ? (
               <Button size="sm" onClick={() => setShowLockAlert(true)}>
-                {t("overview") === "Overview" ? "Next Lesson" : "الدرس التالي"}
+                {tp("nextLesson")}
                 <Lock className="h-4 w-4 ms-1" />
               </Button>
             ) : (
@@ -559,7 +642,7 @@ export default function LessonPage() {
                 href={`/${locale}/courses/${slug}/learn/${nextLesson.id}`}
               >
                 <Button size="sm">
-                  {t("overview") === "Overview" ? "Next Lesson" : "الدرس التالي"}
+                  {tp("nextLesson")}
                   <ChevronRight className="h-4 w-4 ms-1 rtl:rotate-180" />
                 </Button>
               </Link>
@@ -598,17 +681,15 @@ export default function LessonPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {locale === "ar" ? "الدرس مقفل" : "Lesson Locked"}
+              {tp("lessonLocked")}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {locale === "ar"
-                ? "يجب إكمال هذا الدرس قبل الانتقال إلى الدرس التالي."
-                : "Must complete this lesson before moving on to the next lesson."}
+              {tp("completePrevious")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction>
-              {locale === "ar" ? "حسناً" : "OK"}
+              {tp("ok")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

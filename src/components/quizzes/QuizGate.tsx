@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   ClipboardCheck,
   Clock,
@@ -23,6 +23,7 @@ interface QuizGateProps {
 
 export function QuizGate({ lessonId, courseId }: QuizGateProps) {
   const locale = useLocale();
+  const tq = useTranslations("quiz");
 
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -85,7 +86,7 @@ export function QuizGate({ lessonId, courseId }: QuizGateProps) {
   if (!quiz) {
     return (
       <div className="flex min-h-[30vh] items-center justify-center">
-        <p className="text-muted-foreground">No quiz found for this lesson.</p>
+        <p className="text-muted-foreground">{tq("noQuizFound")}</p>
       </div>
     );
   }
@@ -149,35 +150,35 @@ export function QuizGate({ lessonId, courseId }: QuizGateProps) {
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
             <div className="flex items-center gap-1">
               <ClipboardCheck className="h-4 w-4" />
-              <span>{questions.length} questions</span>
+              <span>{questions.length} {tq("questions")}</span>
             </div>
             {quiz.time_limit_minutes && (
               <div className="flex items-center gap-1">
                 <Clock className="h-4 w-4" />
-                <span>{quiz.time_limit_minutes} min</span>
+                <span>{quiz.time_limit_minutes} {tq("minutes")}</span>
               </div>
             )}
             <div className="flex items-center gap-1">
               <Trophy className="h-4 w-4" />
-              <span>Pass: {quiz.passing_score}%</span>
+              <span>{tq("pass")}: {quiz.passing_score}%</span>
             </div>
           </div>
 
           {quiz.is_final_exam && (
-            <Badge variant="warning">Final Exam — Certificate on Pass</Badge>
+            <Badge variant="warning">{tq("finalExam")} — {tq("certificateOnPass")}</Badge>
           )}
 
           {/* Previous attempts */}
           {attempts.length > 0 && (
             <div className="mt-4 space-y-2 text-sm">
-              <p className="font-medium">Previous Attempts</p>
+              <p className="font-medium">{tq("previousAttempts")}</p>
               <div className="space-y-1">
                 {attempts.slice(0, 5).map((a) => (
                   <div
                     key={a.id}
                     className="flex items-center justify-between rounded-md border px-3 py-2"
                   >
-                    <span>Attempt #{a.attempt_number ?? attempts.indexOf(a) + 1}</span>
+                    <span>{tq("attempt")} #{a.attempt_number ?? attempts.indexOf(a) + 1}</span>
                     <span
                       className={
                         a.passed
@@ -186,14 +187,14 @@ export function QuizGate({ lessonId, courseId }: QuizGateProps) {
                       }
                     >
                       {a.percentage?.toFixed(0)}% —{" "}
-                      {a.passed ? "Passed" : "Failed"}
+                      {a.passed ? tq("passed") : tq("failed")}
                     </span>
                   </div>
                 ))}
               </div>
               {bestAttempt && (
                 <p className="text-muted-foreground">
-                  Best: {bestAttempt.percentage?.toFixed(0)}%
+                  {tq("best")}: {bestAttempt.percentage?.toFixed(0)}%
                 </p>
               )}
             </div>
@@ -202,19 +203,19 @@ export function QuizGate({ lessonId, courseId }: QuizGateProps) {
           {/* Attempt limit info */}
           {quiz.max_attempts && (
             <p className="text-sm text-muted-foreground">
-              Attempts: {attemptsUsed} / {quiz.max_attempts}
+              {tq("attemptsUsed")}: {attemptsUsed} / {quiz.max_attempts}
             </p>
           )}
 
           {canAttempt ? (
             <Button size="lg" onClick={() => setIsStarted(true)}>
-              {attempts.length > 0 ? "Retry Quiz" : "Start Quiz"}
+              {attempts.length > 0 ? tq("retryQuiz") : tq("startQuiz")}
             </Button>
           ) : (
             <div className="flex flex-col items-center gap-2">
               <AlertTriangle className="h-8 w-8 text-warning" />
               <p className="text-muted-foreground">
-                Maximum attempts reached
+                {tq("noAttemptsLeft")}
               </p>
             </div>
           )}
