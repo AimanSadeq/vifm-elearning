@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils/cn";
 import { formatDuration } from "@/lib/utils/formatters";
 import type { Course, Module, LessonProgress } from "@/types";

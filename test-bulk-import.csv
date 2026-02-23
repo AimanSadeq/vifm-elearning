@@ -1,0 +1,7 @@
+email,first_name,last_name,phone,job_title,company
+bulktest1@example.com,Alice,Johnson,+971501111111,Analyst,TestCorp
+bulktest2@example.com,Bob,Smith,+971502222222,Manager,TestCorp
+bulktest3@example.com,Carol,Williams,+971503333333,Director,TestCorp
+bulktest4@example.com,Dave,Brown,+971504444444,Associate,TestCorp
+not-an-email,Invalid,User,+971505555555,Intern,TestCorp
+,Missing,Email,+971506666666,Trainee,TestCorp

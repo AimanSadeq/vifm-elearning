@@ -38,23 +38,37 @@ export function AddModuleDialog({
 
     try {
       const supabase = createClient()
-      const { error } = await supabase.from('modules').insert({
-        course_id: courseId,
-        title: formData.title.trim(),
-        title_ar: formData.title_ar.trim() || null,
-        description: formData.description.trim() || null,
-        description_ar: formData.description_ar.trim() || null,
-        sort_order: existingModuleCount,
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (!session?.access_token) {
+        throw new Error('Not authenticated. Please log out and log back in.')
+      }
+
+      const res = await fetch('/api/admin/modules', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          course_id: courseId,
+          title: formData.title,
+          title_ar: formData.title_ar,
+          description: formData.description,
+          description_ar: formData.description_ar,
+          sort_order: existingModuleCount,
+        }),
       })
 
-      if (error) throw error
+      const result = await res.json()
+      if (!res.ok) throw new Error(result.error || 'Failed to create module')
 
       toast.success('Module created successfully')
       onSuccess()
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating module:', error)
       toast.error('Failed to create module', {
-        description: error.message || 'Please try again.'
+        description: error instanceof Error ? error.message : 'Please try again.'
       })
     } finally {
       setIsSubmitting(false)
