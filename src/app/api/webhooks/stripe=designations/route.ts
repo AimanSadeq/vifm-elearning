@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
 
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-  } catch (err: any) {
-    console.error("Webhook signature verification failed:", err.message);
+  } catch (err: unknown) {
+    console.error("Webhook signature verification failed:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
@@ -35,9 +35,9 @@ export async function POST(request: NextRequest) {
     }
 
     const holderId = metadata.holder_id;
-    const designationId = metadata.designation_id;
+    const _designationId = metadata.designation_id;
     const userId = metadata.user_id;
-    const baseFee = parseFloat(metadata.base_fee || "0");
+    const _baseFee = parseFloat(metadata.base_fee || "0");
     const lateFee = parseFloat(metadata.late_fee || "0");
     const totalAmount = parseFloat(metadata.total_amount || "0");
 
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
       }
 
       console.log(`Renewal completed for holder ${holderId}`);
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
       console.error("Database error processing renewal:", dbError);
       return NextResponse.json({ error: "Database error" }, { status: 500 });
     }

@@ -93,7 +93,19 @@ export default function DesignationVerifyPage() {
       if (!holder) {
         setNotFound(true);
       } else {
-        const h = holder as any;
+        const h = holder as {
+          member_number: string;
+          certified_at: string;
+          status: string;
+          registry_company: string | null;
+          registry_company_ar: string | null;
+          registry_title: string | null;
+          registry_title_ar: string | null;
+          show_in_registry: boolean;
+          tier?: { name: string; name_ar: string | null; slug: string };
+          designation?: { name: string; name_ar: string | null; abbreviation: string; slug: string };
+          profile?: { full_name: string };
+        };
         setData({
           fullName: h.profile?.full_name ?? "—",
           memberNumber: h.member_number,

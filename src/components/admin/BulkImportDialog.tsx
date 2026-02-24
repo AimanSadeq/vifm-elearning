@@ -12,7 +12,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Mail,
-  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -20,7 +19,6 @@ import {
   parseFile,
   generateTemplateCSV,
   type ParseResult,
-  type ParsedUserRow,
 } from "@/lib/utils/csv-parse";
 import {
   Dialog,

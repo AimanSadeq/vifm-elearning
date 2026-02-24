@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Settings, LayoutDashboard, User, LogOut } from "lucide-react";
+import { LayoutDashboard, User, LogOut } from "lucide-react";
 import type { Profile } from "@/types";
 
 interface MobileNavProps {

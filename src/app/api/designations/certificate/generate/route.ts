@@ -200,10 +200,11 @@ export async function POST(request: NextRequest) {
         "Content-Length": pdfBuffer.length.toString(),
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Certificate generation error:", error);
+    const message = error instanceof Error ? error.message : "Failed to generate certificate";
     return NextResponse.json(
-      { error: error.message || "Failed to generate certificate" },
+      { error: message },
       { status: 500 }
     );
   }

@@ -49,7 +49,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Holder not found" }, { status: 404 });
     }
 
-    const h = holder as any;
+    const h = holder as {
+      status: string;
+      member_number: string;
+      tier?: { slug: string; renewal_fee: number };
+      designation?: {
+        id: string;
+        name: string;
+        abbreviation: string;
+        renewal_fee: number;
+        founding_fee: number;
+        late_fee: number;
+        currency: string;
+      };
+    };
 
     // Validate status allows renewal
     if (!["active", "grace_period", "suspended"].includes(h.status)) {
@@ -154,10 +167,11 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Renewal checkout error:", error);
+    const message = error instanceof Error ? error.message : "Internal server error";
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: message },
       { status: 500 }
     );
   }

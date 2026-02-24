@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { MessageSquare, Pin, CheckCircle, Plus, ThumbsUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -31,7 +31,7 @@ export function ThreadList({ courseId, lessonId }: ThreadListProps) {
   const [selectedThread, setSelectedThread] = useState<string | null>(null);
   const [showNewPost, setShowNewPost] = useState(false);
 
-  const fetchThreads = async () => {
+  const fetchThreads = useCallback(async () => {
     setIsLoading(true);
     const supabase = createClient();
 
@@ -52,11 +52,12 @@ export function ThreadList({ courseId, lessonId }: ThreadListProps) {
     const { data } = await query;
     setThreads((data as ForumPost[]) ?? []);
     setIsLoading(false);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId, activeFilter]);
 
   useEffect(() => {
     fetchThreads();
-  }, [courseId, activeFilter]);
+  }, [fetchThreads]);
 
   if (selectedThread) {
     return (

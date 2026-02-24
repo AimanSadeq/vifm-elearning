@@ -69,7 +69,13 @@ export default function CertificatePage() {
         .single();
 
       if (data) {
-        const h = data as any;
+        const h = data as {
+          member_number: string;
+          certified_at: string;
+          tier?: { name: string; name_ar: string | null; slug: string };
+          designation?: { name: string; name_ar: string | null; abbreviation: string; slug: string };
+          profile?: { full_name: string };
+        };
         const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
         setCertData({

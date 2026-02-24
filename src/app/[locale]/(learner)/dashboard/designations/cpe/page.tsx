@@ -226,8 +226,8 @@ export default function CPETrackerPage() {
       setShowForm(false);
       setFormData({ cpe_category_id: "", title: "", description: "", hours_claimed: "", activity_date: "", provider: "" });
       setEvidenceFile(null);
-    } catch (err: any) {
-      setFormError(err.message);
+    } catch (err: unknown) {
+      setFormError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setFormLoading(false);
     }

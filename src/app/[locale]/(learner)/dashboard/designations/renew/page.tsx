@@ -65,7 +65,14 @@ export default function RenewalPage() {
         .single();
 
       if (data) {
-        const holder = data as any;
+        const holder = data as {
+          id: string;
+          status: string;
+          member_number: string;
+          current_period_end: string | null;
+          tier?: { name: string; name_ar: string | null; slug: string };
+          designation?: { name: string; name_ar: string | null; abbreviation: string; renewal_fee: number; founding_fee: number; late_fee: number; currency: string };
+        };
         const isGrace = holder.status === "grace_period";
         const isFounding = holder.tier?.slug === "founding-member";
         const baseFee = isFounding
@@ -121,8 +128,8 @@ export default function RenewalPage() {
       if (result.url) {
         window.location.href = result.url;
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An error occurred");
       setIsProcessing(false);
     }
   }

@@ -11,8 +11,6 @@ import {
   Save,
   Edit,
   Loader2,
-  Video,
-  FileText,
   ClipboardList,
   Plus,
   Trash2,
@@ -21,7 +19,6 @@ import {
   ChevronDown,
   ChevronRight,
   Star,
-  Eye,
 } from 'lucide-react'
 import {
   DndContext,
@@ -54,7 +51,7 @@ import { AddModuleDialog } from './AddModuleDialog'
 import { AddContentDialog } from './AddContentDialog'
 import { EditContentDialog } from './EditContentDialog'
 import { VideoPreview } from './VideoPreview'
-import type { Course, Module, Lesson, ContentType, Category, DifficultyLevel } from '@/types'
+import type { Course, Module, Lesson, Category, DifficultyLevel } from '@/types'
 
 interface CourseEditorProps {
   course: Course
@@ -67,9 +64,9 @@ type TabType = 'details' | 'content' | 'quizzes'
 
 export function CourseEditor({ course, modules: initialModules, categories, instructors }: CourseEditorProps) {
   const router = useRouter()
-  const params = useParams()
+  const _params = useParams()
   const locale = useLocale()
-  const t = useTranslations('admin')
+  const _t = useTranslations('admin')
   const [activeTab, setActiveTab] = useState<TabType>('content')
   const [isEditing, setIsEditing] = useState(false)
   const [showAddContent, setShowAddContent] = useState<string | null>(null) // moduleId

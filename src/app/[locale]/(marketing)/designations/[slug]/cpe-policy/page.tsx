@@ -20,7 +20,7 @@ interface DesignationInfo {
   renewal_month: number;
   renewal_day: number;
   grace_period_months: number;
-  metadata: Record<string, any> | null;
+  metadata: Record<string, unknown> | null;
 }
 
 interface CPECategory {

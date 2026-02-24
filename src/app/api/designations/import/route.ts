@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
         const email = row.email.trim().toLowerCase();
 
         // Check if profile already exists
-        let { data: existingProfile } = await adminSupabase
+        const { data: existingProfile } = await adminSupabase
           .from("profiles")
           .select("id")
           .eq("email", email)
@@ -202,11 +202,11 @@ export async function POST(request: NextRequest) {
         });
 
         results.created++;
-      } catch (err: any) {
+      } catch (err: unknown) {
         results.errors.push({
           row: i + 1,
           email: row.email,
-          error: err.message,
+          error: err instanceof Error ? err.message : "Unknown error",
         });
         results.skipped++;
       }
@@ -216,10 +216,11 @@ export async function POST(request: NextRequest) {
       success: true,
       results,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Bulk import error:", error);
+    const message = error instanceof Error ? error.message : "Internal server error";
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: message },
       { status: 500 }
     );
   }

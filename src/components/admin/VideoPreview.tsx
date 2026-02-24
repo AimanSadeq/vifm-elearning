@@ -52,12 +52,12 @@ export function VideoPreview({ src }: VideoPreviewProps) {
     return () => document.removeEventListener('fullscreenchange', h)
   }, [])
 
-  const togglePlay = () => { if (videoRef.current) { isPlaying ? videoRef.current.pause() : videoRef.current.play() } }
+  const togglePlay = () => { if (videoRef.current) { if (isPlaying) { videoRef.current.pause() } else { videoRef.current.play() } } }
   const toggleMute = () => { if (videoRef.current) { videoRef.current.muted = !isMuted; setIsMuted(!isMuted) } }
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => { const t = parseFloat(e.target.value); if (videoRef.current) { videoRef.current.currentTime = t; setCurrentTime(t) } }
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => { const v = parseFloat(e.target.value); setVolume(v); if (videoRef.current) { videoRef.current.volume = v; setIsMuted(v === 0) } }
   const handleSpeedChange = (speed: number) => { setPlaybackSpeed(speed); if (videoRef.current) videoRef.current.playbackRate = speed; setShowSpeedMenu(false) }
-  const toggleFullscreen = () => { if (containerRef.current) { document.fullscreenElement ? document.exitFullscreen() : containerRef.current.requestFullscreen() } }
+  const toggleFullscreen = () => { if (containerRef.current) { if (document.fullscreenElement) { document.exitFullscreen() } else { containerRef.current.requestFullscreen() } } }
   const formatTime = (s: number) => { if (isNaN(s)) return '0:00'; return `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2, '0')}` }
 
   return (

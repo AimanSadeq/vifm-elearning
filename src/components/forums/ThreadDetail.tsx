@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { MessageSquare, Pin, CheckCircle, Shield } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -29,7 +29,7 @@ export function ThreadDetail({ postId, courseId, onBack }: ThreadDetailProps) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchThread = async () => {
+  const fetchThread = useCallback(async () => {
     const supabase = createClient();
 
     const [postRes, repliesRes] = await Promise.all([
@@ -48,11 +48,12 @@ export function ThreadDetail({ postId, courseId, onBack }: ThreadDetailProps) {
     setPost(postRes.data as ForumPost | null);
     setReplies((repliesRes.data as ForumPost[]) ?? []);
     setIsLoading(false);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [postId]);
 
   useEffect(() => {
     fetchThread();
-  }, [postId]);
+  }, [fetchThread]);
 
   if (isLoading || !post) {
     return null;
