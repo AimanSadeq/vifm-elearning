@@ -1,10 +1,10 @@
 FROM node:20-alpine AS base
 
-# Dependencies
+# Dependencies (install all deps including devDependencies for the build step)
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 # Builder
 FROM base AS builder

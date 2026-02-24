@@ -29,7 +29,8 @@ const TEST_EMAILS = [
 ];
 
 test.describe("Bulk Import Wizard", () => {
-  let adminClient: ReturnType<typeof createClient>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let adminClient: any;
 
   // This test needs more time for the import process
   test.setTimeout(90_000);

@@ -24,7 +24,7 @@ const COURSE_SLUG = "financial-statement-analysis-masterclass";
 
 test.describe.serial("Course Player — video, document, quiz flow", () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let adminClient: ReturnType<typeof createClient>;
+  let adminClient: any;
   let courseId: string;
   let lessonIds: { video: string; document: string; quiz: string };
 
@@ -76,9 +76,9 @@ test.describe.serial("Course Player — video, document, quiz flow", () => {
     if (!lessons || lessons.length < 3) throw new Error("Lessons not found");
 
     lessonIds = {
-      video: lessons.find((l) => l.content_type === "video")!.id,
-      document: lessons.find((l) => l.content_type === "document")!.id,
-      quiz: lessons.find((l) => l.content_type === "quiz")!.id,
+      video: lessons.find((l: any) => l.content_type === "video")!.id,
+      document: lessons.find((l: any) => l.content_type === "document")!.id,
+      quiz: lessons.find((l: any) => l.content_type === "quiz")!.id,
     };
 
     // Ensure enrollment exists and set total_lesson_items
