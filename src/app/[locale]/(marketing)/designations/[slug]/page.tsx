@@ -379,13 +379,13 @@ export default function DesignationLandingPage() {
               </Button>
             </Link>
             <Link href={`/${locale}/designations/${slug}/registry`}>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/40 text-white hover:bg-white/10">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto bg-transparent border-white/40 text-white hover:bg-white/10">
                 <Users className="mr-2 h-5 w-5" />
                 {locale === "ar" ? "عرض السجل" : "View Registry"}
               </Button>
             </Link>
             <Link href={`/${locale}/dashboard/designations/renew`}>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/40 text-white hover:bg-white/10">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto bg-transparent border-white/40 text-white hover:bg-white/10">
                 <RefreshCw className="mr-2 h-5 w-5" />
                 {locale === "ar" ? "تجديد" : "Renew"}
               </Button>
@@ -609,7 +609,7 @@ export default function DesignationLandingPage() {
             </Button>
           </Link>
           <Link href={`/${locale}/designations/${slug}/registry`}>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/40 text-white hover:bg-white/10">
+            <Button size="lg" variant="outline" className="w-full sm:w-auto bg-transparent border-white/40 text-white hover:bg-white/10">
               {locale === "ar" ? "تصفح السجل" : "Browse the Registry"}
             </Button>
           </Link>

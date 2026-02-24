@@ -57,7 +57,7 @@ export default function CertificatePage() {
             name, name_ar, slug
           ),
           designation:designations!designation_holders_designation_id_fkey(
-            name, name_ar, abbreviation
+            name, name_ar, abbreviation, slug
           ),
           profile:profiles!designation_holders_user_id_fkey(
             full_name
@@ -86,7 +86,7 @@ export default function CertificatePage() {
               ? h.tier.name_ar
               : h.tier?.name,
           tierSlug: h.tier?.slug,
-          verifyUrl: `${baseUrl}/${locale}/designations/cdip/verify/${h.member_number}`,
+          verifyUrl: `${baseUrl}/${locale}/designations/${h.designation?.slug ?? "cdip"}/verify/${h.member_number}`,
         });
       }
 
@@ -180,8 +180,8 @@ export default function CertificatePage() {
         </h2>
         <p className="mt-2 text-muted-foreground">
           {locale === "ar"
-            ? "يجب أن تكون حاملاً نشطاً لـ CDIP لعرض شهادتك."
-            : "You must be an active CDIP holder to view your certificate."}
+            ? "يجب أن تكون حاملاً نشطاً لشهادة مهنية لعرض شهادتك."
+            : "You must be an active designation holder to view your certificate."}
         </p>
       </div>
     );

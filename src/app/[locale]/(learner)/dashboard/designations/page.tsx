@@ -186,9 +186,9 @@ export default function DesignationDashboardPage() {
             ? "لم يتم العثور على شهادة مرتبطة بحسابك. إذا كنت تعتقد أن هذا خطأ، يرجى التواصل مع VIFM."
             : "No designation is associated with your account. If you believe this is an error, please contact VIFM."}
         </p>
-        <Link href={`/${locale}/designations/cdip`}>
+        <Link href={`/${locale}/designations`}>
           <Button className="mt-6">
-            {locale === "ar" ? "تعرف على CDIP" : "Learn About CDIP"}
+            {locale === "ar" ? "تصفح الشهادات المهنية" : "Browse Designations"}
           </Button>
         </Link>
       </div>
