@@ -113,7 +113,9 @@ export default function AdminCoursesPage() {
       header: "Course",
       render: (item) => (
         <div className="max-w-xs">
-          <p className="font-medium truncate">{item.title}</p>
+          <Link href={`/${locale}/admin/courses/${item.id}/edit`} className="font-medium truncate hover:text-primary hover:underline block">
+            {item.title}
+          </Link>
           <p className="text-xs text-muted-foreground truncate">
             {(item.category as unknown as { name: string })?.name ?? "—"}
           </p>
