@@ -41,5 +41,11 @@ public/sw.js
 # supabase temp files
 supabase/.temp/
 
+# environment variables (secrets)
+.env
+.env.local
+.env.production
+.env.*.local
+
 # claude code local settings
 .claude/settings.local.json
