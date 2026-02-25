@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createServerSupabase } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 interface ImportRow {
   full_name: string;
@@ -17,7 +17,7 @@ interface ImportRow {
 export async function POST(request: NextRequest) {
   try {
     // Auth check — must be super_admin
-    const supabase = await createClient();
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No rows provided" }, { status: 400 });
     }
 
-    const adminSupabase = createAdminClient();
+    const adminSupabase = supabaseAdmin;
 
     // Get designation and tier
     const { data: designation } = await adminSupabase

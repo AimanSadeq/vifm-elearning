@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createServerSupabase } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -35,23 +35,8 @@ export async function POST(request: NextRequest) {
       doc_id: documentId,
     });
 
-    // Fallback if RPC doesn't exist — use raw update
     if (error) {
-      await supabase
-        .from("designation_documents")
-        .update({
-          download_count: supabase.rpc ? undefined : 0, // fallback
-        })
-        .eq("id", documentId);
-
-      // Simple increment via SQL
-      const { error: updateError } = await supabase.rpc("exec_sql", {
-        sql: `UPDATE designation_documents SET download_count = COALESCE(download_count, 0) + 1 WHERE id = '${documentId}'`,
-      });
-
-      if (updateError) {
-        console.error("Download count increment failed:", updateError);
-      }
+      console.error("Download count increment failed:", error);
     }
 
     return NextResponse.json({ success: true });

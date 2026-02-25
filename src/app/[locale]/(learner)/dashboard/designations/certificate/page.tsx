@@ -69,30 +69,33 @@ export default function CertificatePage() {
         .single();
 
       if (data) {
-        const h = data as {
+        const h = data as unknown as {
           member_number: string;
           certified_at: string;
-          tier?: { name: string; name_ar: string | null; slug: string };
-          designation?: { name: string; name_ar: string | null; abbreviation: string; slug: string };
-          profile?: { full_name: string };
+          tier: { name: string; name_ar: string | null; slug: string }[];
+          designation: { name: string; name_ar: string | null; abbreviation: string; slug: string }[];
+          profile: { full_name: string }[];
         };
+        const tier = h.tier?.[0];
+        const designation = h.designation?.[0];
+        const profile = h.profile?.[0];
         const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
         setCertData({
-          fullName: h.profile?.full_name ?? "",
+          fullName: profile?.full_name ?? "",
           memberNumber: h.member_number,
           certifiedAt: h.certified_at,
           designationName:
-            locale === "ar" && h.designation?.name_ar
-              ? h.designation.name_ar
-              : h.designation?.name,
-          abbreviation: h.designation?.abbreviation,
+            locale === "ar" && designation?.name_ar
+              ? designation.name_ar
+              : designation?.name,
+          abbreviation: designation?.abbreviation,
           tierName:
-            locale === "ar" && h.tier?.name_ar
-              ? h.tier.name_ar
-              : h.tier?.name,
-          tierSlug: h.tier?.slug,
-          verifyUrl: `${baseUrl}/${locale}/designations/${h.designation?.slug ?? "cdip"}/verify/${h.member_number}`,
+            locale === "ar" && tier?.name_ar
+              ? tier.name_ar
+              : tier?.name,
+          tierSlug: tier?.slug,
+          verifyUrl: `${baseUrl}/${locale}/designations/${designation?.slug ?? "cdip"}/verify/${h.member_number}`,
         });
       }
 

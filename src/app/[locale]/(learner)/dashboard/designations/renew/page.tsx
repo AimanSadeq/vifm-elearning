@@ -15,7 +15,7 @@ interface RenewalData {
   holderId: string;
   status: string;
   memberNumber: string;
-  currentPeriodEnd: string;
+  currentPeriodEnd: string | null;
   tierName: string;
   tierSlug: string;
   designationName: string;
@@ -65,33 +65,35 @@ export default function RenewalPage() {
         .single();
 
       if (data) {
-        const holder = data as {
+        const holder = data as unknown as {
           id: string;
           status: string;
           member_number: string;
           current_period_end: string | null;
-          tier?: { name: string; name_ar: string | null; slug: string };
-          designation?: { name: string; name_ar: string | null; abbreviation: string; renewal_fee: number; founding_fee: number; late_fee: number; currency: string };
+          tier: { name: string; name_ar: string | null; slug: string }[];
+          designation: { name: string; name_ar: string | null; abbreviation: string; renewal_fee: number; founding_fee: number; late_fee: number; currency: string }[];
         };
+        const tier = holder.tier?.[0];
+        const designation = holder.designation?.[0];
         const isGrace = holder.status === "grace_period";
-        const isFounding = holder.tier?.slug === "founding-member";
+        const isFounding = tier?.slug === "founding-member";
         const baseFee = isFounding
-          ? (holder.designation?.founding_fee ?? 50)
-          : (holder.designation?.renewal_fee ?? 70);
-        const lateFee = isGrace ? (holder.designation?.late_fee ?? 30) : 0;
+          ? (designation?.founding_fee ?? 50)
+          : (designation?.renewal_fee ?? 70);
+        const lateFee = isGrace ? (designation?.late_fee ?? 30) : 0;
 
         setRenewalData({
           holderId: holder.id,
           status: holder.status,
           memberNumber: holder.member_number,
           currentPeriodEnd: holder.current_period_end,
-          tierName: locale === "ar" && holder.tier?.name_ar ? holder.tier.name_ar : holder.tier?.name,
-          tierSlug: holder.tier?.slug,
-          designationName: locale === "ar" && holder.designation?.name_ar ? holder.designation.name_ar : holder.designation?.name,
-          abbreviation: holder.designation?.abbreviation,
+          tierName: locale === "ar" && tier?.name_ar ? tier.name_ar : tier?.name,
+          tierSlug: tier?.slug,
+          designationName: locale === "ar" && designation?.name_ar ? designation.name_ar : designation?.name,
+          abbreviation: designation?.abbreviation,
           renewalFee: baseFee,
           lateFee,
-          currency: holder.designation?.currency ?? "USD",
+          currency: designation?.currency ?? "USD",
           isGracePeriod: isGrace,
           totalDue: baseFee + lateFee,
         });

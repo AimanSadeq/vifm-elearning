@@ -134,11 +134,12 @@ function buildFAQ(d: DesignationData, cpeCategories: CPECategory[]): FAQItem[] {
   const meta = d.metadata ?? {};
   const examType = meta.exam_type === "simulation" ? "simulation-based" : "multiple-choice";
   const examTypeAr = meta.exam_type === "simulation" ? "قائم على المحاكاة" : "اختيار من متعدد";
-  const passRate = meta.pass_rate ?? 65;
-  const freeAttempts = meta.free_attempts ?? 2;
-  const prerequisites: string[] = meta.prerequisites ?? [];
-  const cpeHours = meta.cpe_cycle_hours ?? d.annual_cpe_required * (meta.cpe_cycle_years ?? 1);
-  const cpeCycleYears = meta.cpe_cycle_years ?? 1;
+  const passRate = Number(meta.pass_rate) || 65;
+  const freeAttempts = Number(meta.free_attempts) || 2;
+  const prerequisites: string[] = Array.isArray(meta.prerequisites) ? meta.prerequisites : [];
+  const cycleYears = Number(meta.cpe_cycle_years) || 1;
+  const cpeHours = Number(meta.cpe_cycle_hours) || d.annual_cpe_required * cycleYears;
+  const cpeCycleYears = cycleYears;
 
   const faqs: FAQItem[] = [
     {
@@ -312,9 +313,10 @@ export default function DesignationLandingPage() {
   const meta = d.metadata ?? {};
   const name = locale === "ar" && d.name_ar ? d.name_ar : d.name;
   const desc = locale === "ar" && d.description_ar ? d.description_ar : d.description;
-  const cpeHours = meta.cpe_cycle_hours ?? d.annual_cpe_required * (meta.cpe_cycle_years ?? 1);
-  const cpeCycleYears = meta.cpe_cycle_years ?? 1;
-  const prerequisites: string[] = meta.prerequisites ?? [];
+  const renderCycleYears = Number(meta.cpe_cycle_years) || 1;
+  const cpeHours = Number(meta.cpe_cycle_hours) || d.annual_cpe_required * renderCycleYears;
+  const cpeCycleYears = renderCycleYears;
+  const prerequisites: string[] = Array.isArray(meta.prerequisites) ? meta.prerequisites : [];
   const certificationSteps = getCertificationSteps(d.abbreviation);
   const faqItems = buildFAQ(d, cpeCategories);
 

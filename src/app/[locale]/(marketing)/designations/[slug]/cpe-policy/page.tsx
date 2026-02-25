@@ -104,8 +104,9 @@ export default function DesignationCPEPolicyPage() {
 
   const d = designation;
   const meta = d.metadata ?? {};
-  const cpeHours = meta.cpe_cycle_hours ?? d.annual_cpe_required * (meta.cpe_cycle_years ?? 1);
-  const cpeCycleYears = meta.cpe_cycle_years ?? 1;
+  const cycleYears = Number(meta.cpe_cycle_years) || 1;
+  const cpeHours = Number(meta.cpe_cycle_hours) || d.annual_cpe_required * cycleYears;
+  const cpeCycleYears = cycleYears;
 
   // Grace period end month
   const graceEndMonth = ((d.renewal_month - 1 + d.grace_period_months) % 12) + 1;

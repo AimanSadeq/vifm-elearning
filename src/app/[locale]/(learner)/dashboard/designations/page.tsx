@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { formatDate } from "@/lib/utils/formatters";
 
-interface HolderData {
+interface HolderDataRaw {
   id: string;
   status: string;
   member_number: string;
@@ -42,7 +42,7 @@ interface HolderData {
     name_ar: string | null;
     slug: string;
     badge_url: string | null;
-  } | null;
+  }[];
   designation: {
     name: string;
     name_ar: string | null;
@@ -51,7 +51,12 @@ interface HolderData {
     renewal_fee: number;
     late_fee: number;
     currency: string;
-  } | null;
+  }[];
+}
+
+interface HolderData extends Omit<HolderDataRaw, 'tier' | 'designation'> {
+  tier: HolderDataRaw['tier'][number] | null;
+  designation: HolderDataRaw['designation'][number] | null;
 }
 
 interface CPESubmission {
@@ -120,7 +125,12 @@ export default function DesignationDashboardPage() {
         .single();
 
       if (holderData) {
-        const h = holderData as unknown as HolderData;
+        const raw = holderData as unknown as HolderDataRaw;
+        const h: HolderData = {
+          ...raw,
+          tier: raw.tier?.[0] ?? null,
+          designation: raw.designation?.[0] ?? null,
+        };
         setHolder(h);
 
         // Fetch recent CPE submissions

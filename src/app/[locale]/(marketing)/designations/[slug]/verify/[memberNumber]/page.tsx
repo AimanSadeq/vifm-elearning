@@ -93,7 +93,7 @@ export default function DesignationVerifyPage() {
       if (!holder) {
         setNotFound(true);
       } else {
-        const h = holder as {
+        const h = holder as unknown as {
           member_number: string;
           certified_at: string;
           status: string;
@@ -102,22 +102,25 @@ export default function DesignationVerifyPage() {
           registry_title: string | null;
           registry_title_ar: string | null;
           show_in_registry: boolean;
-          tier?: { name: string; name_ar: string | null; slug: string };
-          designation?: { name: string; name_ar: string | null; abbreviation: string; slug: string };
-          profile?: { full_name: string };
+          tier: { name: string; name_ar: string | null; slug: string }[];
+          designation: { name: string; name_ar: string | null; abbreviation: string; slug: string }[];
+          profile: { full_name: string }[];
         };
+        const tier = h.tier?.[0];
+        const designation = h.designation?.[0];
+        const profile = h.profile?.[0];
         setData({
-          fullName: h.profile?.full_name ?? "—",
+          fullName: profile?.full_name ?? "—",
           memberNumber: h.member_number,
           certifiedAt: h.certified_at,
           status: h.status,
           company: locale === "ar" && h.registry_company_ar ? h.registry_company_ar : h.registry_company,
           jobTitle: locale === "ar" && h.registry_title_ar ? h.registry_title_ar : h.registry_title,
-          tierName: locale === "ar" && h.tier?.name_ar ? h.tier.name_ar : h.tier?.name,
-          tierSlug: h.tier?.slug,
-          designationName: locale === "ar" && h.designation?.name_ar ? h.designation.name_ar : h.designation?.name,
-          abbreviation: h.designation?.abbreviation,
-          designationSlug: h.designation?.slug,
+          tierName: locale === "ar" && tier?.name_ar ? tier.name_ar : tier?.name,
+          tierSlug: tier?.slug,
+          designationName: locale === "ar" && designation?.name_ar ? designation.name_ar : designation?.name,
+          abbreviation: designation?.abbreviation,
+          designationSlug: designation?.slug,
         });
       }
 

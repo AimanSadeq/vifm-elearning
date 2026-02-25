@@ -18,7 +18,7 @@ interface DesignationInfo {
   slug: string;
 }
 
-interface RegistryHolder {
+interface RegistryHolderRaw {
   id: string;
   member_number: string;
   certified_at: string;
@@ -32,10 +32,15 @@ interface RegistryHolder {
     name_ar: string | null;
     slug: string;
     badge_url: string | null;
-  } | null;
+  }[];
   profile: {
     full_name: string;
-  } | null;
+  }[];
+}
+
+interface RegistryHolder extends Omit<RegistryHolderRaw, 'tier' | 'profile'> {
+  tier: RegistryHolderRaw['tier'][number] | null;
+  profile: RegistryHolderRaw['profile'][number] | null;
 }
 
 export default function DesignationRegistryPage() {
@@ -99,7 +104,14 @@ export default function DesignationRegistryPage() {
         .eq("show_in_registry", true)
         .order("certified_at", { ascending: true });
 
-      const holderList = (data ?? []) as unknown as RegistryHolder[];
+      const holderList = (data ?? []).map((item: unknown) => {
+        const raw = item as RegistryHolderRaw;
+        return {
+          ...raw,
+          tier: raw.tier?.[0] ?? null,
+          profile: raw.profile?.[0] ?? null,
+        } as RegistryHolder;
+      });
       setHolders(holderList);
       setFilteredHolders(holderList);
       setTotalCount(count ?? 0);

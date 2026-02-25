@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-06-20",
-});
+import { createServerSupabase } from "@/lib/supabase/server";
+import { getStripe } from "@/lib/services/stripe";
+import type Stripe from "stripe";
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -49,11 +46,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Holder not found" }, { status: 404 });
     }
 
-    const h = holder as {
+    const h = holder as unknown as {
       status: string;
       member_number: string;
-      tier?: { slug: string; renewal_fee: number };
-      designation?: {
+      tier: { slug: string; renewal_fee: number }[];
+      designation: {
         id: string;
         name: string;
         abbreviation: string;
@@ -61,8 +58,10 @@ export async function POST(request: NextRequest) {
         founding_fee: number;
         late_fee: number;
         currency: string;
-      };
+      }[];
     };
+    const tier = h.tier?.[0];
+    const designation = h.designation?.[0];
 
     // Validate status allows renewal
     if (!["active", "grace_period", "suspended"].includes(h.status)) {
@@ -73,17 +72,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate fees
-    const isFounding = h.tier?.slug === "founding-member";
+    const isFounding = tier?.slug === "founding-member";
     const isGrace = h.status === "grace_period";
     const isSuspended = h.status === "suspended";
 
     const baseFee = isFounding
-      ? (h.designation?.founding_fee ?? 50)
-      : (h.tier?.renewal_fee ?? h.designation?.renewal_fee ?? 70);
+      ? (designation?.founding_fee ?? 50)
+      : (tier?.renewal_fee ?? designation?.renewal_fee ?? 70);
 
-    const lateFee = isGrace || isSuspended ? (h.designation?.late_fee ?? 30) : 0;
+    const lateFee = isGrace || isSuspended ? (designation?.late_fee ?? 30) : 0;
     const totalAmount = baseFee + lateFee;
-    const currency = (h.designation?.currency ?? "USD").toLowerCase();
+    const currency = (designation?.currency ?? "USD").toLowerCase();
 
     // Build line items
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
@@ -91,8 +90,8 @@ export async function POST(request: NextRequest) {
         price_data: {
           currency,
           product_data: {
-            name: `${h.designation?.abbreviation ?? "CDIP"} Annual Renewal`,
-            description: `${h.designation?.name ?? "Designation"} — ${isFounding ? "Founding Member" : "Standard"} tier`,
+            name: `${designation?.abbreviation ?? "CDIP"} Annual Renewal`,
+            description: `${designation?.name ?? "Designation"} — ${isFounding ? "Founding Member" : "Standard"} tier`,
           },
           unit_amount: Math.round(baseFee * 100),
         },
@@ -135,7 +134,7 @@ export async function POST(request: NextRequest) {
     let customerId = existingSub?.stripe_customer_id;
 
     if (!customerId) {
-      const customer = await stripe.customers.create({
+      const customer = await getStripe().customers.create({
         email: profile?.email ?? user.email,
         name: profile?.full_name ?? undefined,
         metadata: {
@@ -148,7 +147,7 @@ export async function POST(request: NextRequest) {
     // Create Stripe Checkout Session
     const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL;
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       customer: customerId,
       mode: "payment",
       line_items: lineItems,
@@ -157,7 +156,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         type: "designation_renewal",
         holder_id: holder.id,
-        designation_id: h.designation?.id,
+        designation_id: designation?.id,
         user_id: user.id,
         member_number: h.member_number,
         base_fee: baseFee.toString(),

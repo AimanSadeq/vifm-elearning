@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
-import { createAdminClient } from "@/lib/supabase/admin";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-06-20",
-});
-
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_DESIGNATIONS!;
+import type Stripe from "stripe";
+import { getStripe } from "@/lib/services/stripe";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -19,7 +14,8 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_DESIGNATIONS!;
+    event = getStripe().webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err: unknown) {
     console.error("Webhook signature verification failed:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
@@ -42,7 +38,7 @@ export async function POST(request: NextRequest) {
     const totalAmount = parseFloat(metadata.total_amount || "0");
 
     try {
-      const supabase = createAdminClient();
+      const supabase = supabaseAdmin;
 
       // 1. Fetch current holder to determine new period
       const { data: holder } = await supabase
