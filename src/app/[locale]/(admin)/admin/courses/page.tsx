@@ -112,24 +112,14 @@ export default function AdminCoursesPage() {
       key: "title",
       header: "Course",
       render: (item) => (
-        <div className="max-w-xs">
-          <Link href={`/${locale}/admin/courses/${item.id}/edit`} className="font-medium truncate hover:text-primary hover:underline block">
+        <div>
+          <Link href={`/${locale}/admin/courses/${item.id}/edit`} className="font-medium hover:text-primary hover:underline line-clamp-1">
             {item.title}
           </Link>
-          <p className="text-xs text-muted-foreground truncate">
+          <p className="text-xs text-muted-foreground line-clamp-1">
             {(item.category as unknown as { name: string })?.name ?? "—"}
           </p>
         </div>
-      ),
-    },
-    {
-      key: "instructor",
-      header: "Instructor",
-      render: (item) => (
-        <span className="text-sm">
-          {(item.instructor as unknown as { full_name: string })?.full_name ??
-            "—"}
-        </span>
       ),
     },
     {
@@ -141,42 +131,33 @@ export default function AdminCoursesPage() {
       key: "price",
       header: "Price",
       render: (item) => (
-        <span>
+        <span className="whitespace-nowrap">
           {item.is_free ? "Free" : formatCurrency(item.price, item.currency)}
         </span>
       ),
     },
     {
       key: "enrollments",
-      header: "Enrollments",
+      header: "Students",
       render: (item) => <span>{item.enrollment_count}</span>,
     },
     {
-      key: "updated",
-      header: "Updated",
-      render: (item) => (
-        <span className="text-xs text-muted-foreground">
-          {formatRelativeDate(item.updated_at)}
-        </span>
-      ),
-    },
-    {
       key: "actions",
-      header: "",
-      className: "w-40",
+      header: "Actions",
+      className: "whitespace-nowrap",
       render: (item) => (
         <div className="flex items-center gap-1">
-          <Link href={`/${locale}/courses/${item.slug}`}>
+          <Link href={`/${locale}/courses/${item.slug}`} title="View">
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
               <Eye className="h-4 w-4" />
             </Button>
           </Link>
-          <Link href={`/${locale}/admin/courses/${item.id}/edit`}>
+          <Link href={`/${locale}/admin/courses/${item.id}/edit`} title="Edit">
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
               <Pencil className="h-4 w-4" />
             </Button>
           </Link>
-          <Link href={`/${locale}/admin/courses/${item.id}/quizzes`}>
+          <Link href={`/${locale}/admin/courses/${item.id}/quizzes`} title="Quizzes">
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
               <ClipboardCheck className="h-4 w-4" />
             </Button>
@@ -186,6 +167,7 @@ export default function AdminCoursesPage() {
             size="sm"
             className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
             onClick={() => handleToggleStatus(item)}
+            title={item.status === "published" ? "Unpublish" : "Publish"}
           >
             <MoreHorizontal className="h-4 w-4" />
           </Button>
@@ -194,6 +176,7 @@ export default function AdminCoursesPage() {
             size="sm"
             className="h-8 w-8 p-0 text-error hover:text-error"
             onClick={() => handleDelete(item.id)}
+            title="Delete"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
