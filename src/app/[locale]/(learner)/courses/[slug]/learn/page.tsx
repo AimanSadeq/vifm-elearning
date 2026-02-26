@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
@@ -13,9 +13,12 @@ export default function CourseLearnPage() {
   const slug = params.slug as string;
   const locale = useLocale();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const hasRedirected = useRef(false);
 
   useEffect(() => {
+    if (isLoading || hasRedirected.current) return;
+
     async function redirect() {
       const supabase = createClient();
 
@@ -27,6 +30,7 @@ export default function CourseLearnPage() {
         .single();
 
       if (!course) {
+        hasRedirected.current = true;
         router.push(`/${locale}/courses/${slug}`);
         return;
       }
@@ -41,6 +45,7 @@ export default function CourseLearnPage() {
           .single();
 
         if (enrollment?.last_lesson_id) {
+          hasRedirected.current = true;
           router.push(
             `/${locale}/courses/${slug}/learn/${enrollment.last_lesson_id}`
           );
@@ -67,6 +72,7 @@ export default function CourseLearnPage() {
           .single();
 
         if (firstLesson) {
+          hasRedirected.current = true;
           router.push(
             `/${locale}/courses/${slug}/learn/${firstLesson.id}`
           );
@@ -75,11 +81,12 @@ export default function CourseLearnPage() {
       }
 
       // Fallback to course detail
+      hasRedirected.current = true;
       router.push(`/${locale}/courses/${slug}`);
     }
 
-    if (slug) redirect();
-  }, [slug, user, locale, router]);
+    redirect();
+  }, [slug, user, isLoading, locale, router]);
 
   return (
     <div className="flex min-h-[50vh] items-center justify-center">

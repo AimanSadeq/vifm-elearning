@@ -74,7 +74,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .select("*")
         .eq("id", userId)
         .single();
-      return data as Profile | null;
+
+      if (data) return data as Profile;
+
+      // Profile doesn't exist — auto-create it via server route
+      try {
+        const res = await fetch("/api/auth/ensure-profile", { method: "POST" });
+        if (res.ok) {
+          const { data: newProfile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", userId)
+            .single();
+          return newProfile as Profile | null;
+        }
+      } catch {
+        // Silently fail — user will see empty state
+      }
+
+      return null;
     },
     []
   );

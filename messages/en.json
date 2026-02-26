@@ -557,6 +557,8 @@
   },
   "learningPaths": {
     "title": "Learning Paths",
+    "all": "All",
+    "inProgress": "In Progress",
     "browsePaths": "Browse Learning Paths",
     "createPath": "Create Learning Path",
     "editPath": "Edit Learning Path",
@@ -571,6 +573,8 @@
     "required": "Required",
     "optional": "Optional",
     "noPaths": "No learning paths available yet.",
+    "noPathsDescription": "Explore our learning paths to find a structured program that fits your goals.",
+    "courses": "courses",
     "myPaths": "My Learning Paths",
     "noEnrollments": "You haven't enrolled in any learning paths yet.",
     "pathCompleted": "Learning Path Completed!",
