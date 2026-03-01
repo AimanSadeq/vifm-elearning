@@ -23,6 +23,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Route,
+  Shield,
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -99,6 +100,15 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
           children: [
             { label: "All Certificates", href: "/admin/certificates" },
             { label: "Templates", href: "/admin/certificates/templates" },
+          ],
+        },
+        {
+          icon: Shield,
+          label: t("admin.manageCertifications"),
+          href: "/admin/certifications",
+          children: [
+            { label: t("admin.allCertifications"), href: "/admin/certifications" },
+            { label: t("admin.createCertification"), href: "/admin/certifications/new" },
           ],
         },
         {

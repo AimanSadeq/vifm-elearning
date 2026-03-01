@@ -12,6 +12,7 @@ import {
   Users,
   Shield,
   Star,
+  ArrowLeft,
   ArrowRight,
   GraduationCap,
   FileText,
@@ -349,6 +350,14 @@ export default function DesignationLandingPage() {
 
   return (
     <div className="space-y-16 pb-16">
+      <Link
+        href={`/${locale}/designations`}
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        {locale === "ar" ? "العودة إلى الشهادات" : "Back to Certifications"}
+      </Link>
+
       {/* ── Hero Section ── */}
       <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 px-6 py-16 text-white sm:px-12 sm:py-24">
         <div className="absolute inset-0 opacity-10">

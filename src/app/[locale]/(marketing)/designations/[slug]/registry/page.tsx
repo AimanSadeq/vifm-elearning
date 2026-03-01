@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useLocale } from "next-intl";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Search, Award, Star, Users, Shield, ExternalLink, AlertTriangle } from "lucide-react";
+import { Search, Award, Star, Users, Shield, ExternalLink, AlertTriangle, ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -169,6 +169,14 @@ export default function DesignationRegistryPage() {
 
   return (
     <div className="space-y-8 pb-16">
+      <Link
+        href={`/${locale}/designations/${slug}`}
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        {locale === "ar" ? `العودة إلى ${designation.abbreviation}` : `Back to ${designation.abbreviation}`}
+      </Link>
+
       {/* Header */}
       <div className="text-center">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-brand-50 px-4 py-2 text-sm font-medium text-brand-700">

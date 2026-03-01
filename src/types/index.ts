@@ -586,6 +586,97 @@ export interface SubscriptionPlanConfig {
   updated_at: string;
 }
 
+// ---------------------------------------------------------------------------
+// Designations (Certifications)
+// ---------------------------------------------------------------------------
+export type DesignationTierLevel = "gateway" | "professional" | "executive";
+export type DesignationHolderStatus = "active" | "grace_period" | "suspended" | "lapsed" | "revoked";
+
+export interface Designation {
+  id: string;
+  name: string;
+  name_ar: string | null;
+  abbreviation: string;
+  slug: string;
+  description: string | null;
+  description_ar: string | null;
+  logo_url: string | null;
+  body_of_knowledge: string | null;
+  annual_cpe_required: number;
+  renewal_fee: number;
+  founding_fee: number;
+  late_fee: number;
+  reinstatement_fee: number;
+  currency: string;
+  renewal_month: number;
+  renewal_day: number;
+  grace_period_months: number;
+  is_active: boolean;
+  metadata: {
+    tier_level?: DesignationTierLevel;
+    exam_type?: string;
+    pass_rate?: number;
+    free_attempts?: number;
+    cpe_cycle_years?: number;
+    cpe_cycle_hours?: number;
+    prerequisites?: string[];
+  } | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DesignationTier {
+  id: string;
+  designation_id: string;
+  name: string;
+  name_ar: string | null;
+  description: string | null;
+  description_ar: string | null;
+  slug: string;
+  annual_max_hours: number | null;
+  hour_rate: number | null;
+  requires_approval: boolean;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CPECategory {
+  id: string;
+  designation_id: string;
+  name: string;
+  name_ar: string | null;
+  description: string | null;
+  description_ar: string | null;
+  annual_max_hours: number | null;
+  hour_rate: number | null;
+  requires_approval: boolean;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DesignationDocument {
+  id: string;
+  designation_id: string;
+  title: string;
+  title_ar: string | null;
+  description: string | null;
+  description_ar: string | null;
+  file_url: string | null;
+  file_type: string | null;
+  file_size_bytes: number | null;
+  access_level: string;
+  required_tier_id: string | null;
+  sort_order: number;
+  download_count: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Subscription {
   id: string;
   user_id: string;

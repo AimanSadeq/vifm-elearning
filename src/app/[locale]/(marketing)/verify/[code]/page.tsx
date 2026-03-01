@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { CheckCircle, XCircle, Award } from "lucide-react";
+import { CheckCircle, XCircle, Award, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
@@ -56,7 +57,16 @@ export default function VerifyCertificatePage() {
       : cert?.courseName;
 
   return (
-    <div className="min-h-[60vh] flex items-center justify-center px-4">
+    <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
+      <div className="w-full max-w-md mb-6">
+        <Link
+          href={`/${locale}/courses`}
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {locale === "ar" ? "العودة إلى الدورات" : "Back to Courses"}
+        </Link>
+      </div>
       <Card className="w-full max-w-md">
         <CardContent className="p-8 text-center space-y-4">
           {data?.valid ? (
