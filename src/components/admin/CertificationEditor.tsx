@@ -748,15 +748,17 @@ function DocumentsTab({
       const path = doc.file_url.replace("designation-documents/", "");
       const { data, error } = await supabase.storage
         .from("designation-documents")
-        .createSignedUrl(path, 60);
-      if (error || !data?.signedUrl) throw new Error("Failed to generate download link");
+        .download(path);
+      if (error || !data) throw new Error("Failed to download file");
+      const url = URL.createObjectURL(data);
       const link = document.createElement("a");
-      link.href = data.signedUrl;
+      link.href = url;
       link.download = `${doc.title}.${doc.file_type || "pdf"}`;
-      link.target = "_blank";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success("Download started");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Download failed");
     } finally {
