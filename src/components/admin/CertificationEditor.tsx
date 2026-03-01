@@ -753,6 +753,7 @@ function DocumentsTab({
       const link = document.createElement("a");
       link.href = data.signedUrl;
       link.download = `${doc.title}.${doc.file_type || "pdf"}`;
+      link.target = "_blank";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
