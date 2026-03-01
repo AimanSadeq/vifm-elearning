@@ -750,7 +750,12 @@ function DocumentsTab({
         .from("designation-documents")
         .createSignedUrl(path, 60);
       if (error || !data?.signedUrl) throw new Error("Failed to generate download link");
-      window.open(data.signedUrl, "_blank");
+      const link = document.createElement("a");
+      link.href = data.signedUrl;
+      link.download = `${doc.title}.${doc.file_type || "pdf"}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Download failed");
     } finally {
