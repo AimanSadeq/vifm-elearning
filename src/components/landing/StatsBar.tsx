@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Users, BookOpen, TrendingUp, Building2, type LucideIcon } from "lucide-react";
 
 interface Stat {
   value: number;
@@ -9,55 +10,74 @@ interface Stat {
   label: string;
 }
 
-function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
+const STAT_ICONS: LucideIcon[] = [Users, BookOpen, TrendingUp, Building2];
+const CYCLE_MS = 3000;
+
+export function StatsBar({ stats }: { stats: Stat[] }) {
+  const [active, setActive] = useState(0);
   const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
-    if (!isInView) return;
-    if (prefersReducedMotion) { setCount(value); return; }
-    const duration = 1800;
-    const start = performance.now();
-    function tick(t: number) {
-      const p = Math.min((t - start) / duration, 1);
-      setCount(Math.floor((1 - Math.pow(1 - p, 3)) * value));
-      if (p < 1) requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  }, [isInView, value, prefersReducedMotion]);
+    const id = setInterval(() => {
+      setActive((prev) => (prev + 1) % stats.length);
+    }, CYCLE_MS);
+    return () => clearInterval(id);
+  }, [stats.length]);
 
-  return <span ref={ref} className="tabular-nums">{count}{suffix}</span>;
-}
+  const Icon = STAT_ICONS[active] || Users;
+  const stat = stats[active];
 
-export function StatsBar({ stats }: { stats: Stat[] }) {
   return (
     <motion.div
-      className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl"
-      initial={{ opacity: 0, y: 30 }}
+      className="relative overflow-hidden rounded-full border border-white/10 bg-white/[0.05] backdrop-blur-xl"
+      initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, delay: 1.1, ease: "easeOut" }}
+      transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
     >
-      {/* Top gradient line */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-400/50 to-transparent" />
+      {/* Subtle shimmer line */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-400/40 to-transparent" />
 
-      <div className="grid grid-cols-2 gap-0 sm:grid-cols-4">
-        {stats.map((stat, i) => (
-          <div
-            key={i}
-            className={`flex flex-col items-center py-6 px-4 lg:py-8 ${
-              i < stats.length - 1 ? "border-r border-white/[0.06] rtl:border-r-0 rtl:border-l rtl:border-white/[0.06]" : ""
-            } ${i === 1 ? "max-sm:border-r-0 max-sm:rtl:border-l-0" : ""} ${i >= 2 ? "max-sm:border-t max-sm:border-white/[0.06]" : ""}`}
-          >
-            <span className="text-2xl font-bold text-white lg:text-3xl">
-              <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-            </span>
-            <span className="mt-1.5 text-xs text-brand-300/60 font-medium uppercase tracking-wider">
-              {stat.label}
-            </span>
-          </div>
-        ))}
+      <div className="flex items-center justify-center gap-3 px-6 py-3">
+        {/* Dot indicators */}
+        <div className="flex items-center gap-1.5">
+          {stats.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              className={`h-1.5 rounded-full transition-all duration-500 ${
+                i === active
+                  ? "w-5 bg-brand-400"
+                  : "w-1.5 bg-white/20 hover:bg-white/40"
+              }`}
+              aria-label={`Show stat ${i + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Divider */}
+        <div className="h-4 w-px bg-white/10" />
+
+        {/* Animated stat */}
+        <div className="relative h-6 flex items-center overflow-hidden min-w-[260px] justify-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active}
+              className="flex items-center gap-2.5"
+              initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: -16 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+            >
+              <Icon className="h-4 w-4 text-brand-400 shrink-0" />
+              <span className="text-sm font-bold text-white tabular-nums">
+                {stat.value}{stat.suffix}
+              </span>
+              <span className="text-sm text-brand-300/70 font-medium">
+                {stat.label}
+              </span>
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </motion.div>
   );

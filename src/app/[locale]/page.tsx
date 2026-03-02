@@ -64,7 +64,11 @@ export default async function HomePage({
         {/* Hero Section */}
         <section className="relative overflow-hidden bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 text-white min-h-[90vh] flex flex-col justify-center">
           <HeroBackground />
-          <div className="container relative z-10 mx-auto px-4 pt-16 pb-8 lg:pt-24 lg:pb-12">
+          {/* Stats ticker at top */}
+          <div className="container relative z-10 mx-auto px-4 pt-16 lg:pt-24 flex justify-center">
+            <StatsBar stats={stats} />
+          </div>
+          <div className="container relative z-10 mx-auto px-4 pt-8 pb-16 lg:pt-12 lg:pb-24">
             <HeroContent
               title={t("heroTitle")}
               subtitle={t("heroSubtitle")}
@@ -74,9 +78,6 @@ export default async function HomePage({
               getStartedHref={`/${locale}/register`}
               badgeText={t("heroBadge")}
             />
-          </div>
-          <div className="container relative z-10 mx-auto px-4 pb-16">
-            <StatsBar stats={stats} />
           </div>
         </section>
 
