@@ -537,7 +537,15 @@
     "corporateTraining": "تدريب مؤسسي",
     "corporateTrainingDesc": "حلول تدريبية مخصصة للمؤسسات",
     "readyToStart": "مستعد لبدء رحلتك التعليمية؟",
-    "joinLearners": "انضم إلى آلاف المهنيين الذين يتعلمون بالفعل مع VIFM"
+    "joinLearners": "انضم إلى آلاف المهنيين الذين يتعلمون بالفعل مع VIFM",
+    "statProfessionals": "متخصصون تم تدريبهم",
+    "statCourses": "دورة بقيادة خبراء",
+    "statSatisfaction": "نسبة الرضا",
+    "statPartners": "شريك مؤسسي",
+    "heroBadge": "منصة التعلم الإلكتروني الاحترافية",
+    "ourAdvantages": "مزايانا",
+    "socialProofLabel": "إثبات اجتماعي",
+    "recognizedBy": "معترف بها من قبل رواد الصناعة"
   },
   "certificateTemplates": {
     "title": "قوالب الشهادات",

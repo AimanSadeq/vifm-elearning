@@ -537,7 +537,15 @@
     "corporateTraining": "Corporate Training",
     "corporateTrainingDesc": "Custom training solutions for organizations",
     "readyToStart": "Ready to Start Your Learning Journey?",
-    "joinLearners": "Join thousands of professionals already learning with VIFM"
+    "joinLearners": "Join thousands of professionals already learning with VIFM",
+    "statProfessionals": "Professionals Trained",
+    "statCourses": "Expert-Led Courses",
+    "statSatisfaction": "Satisfaction Rate",
+    "statPartners": "Corporate Partners",
+    "heroBadge": "Professional E-Learning Platform",
+    "ourAdvantages": "Our Advantages",
+    "socialProofLabel": "Social Proof",
+    "recognizedBy": "Recognized by Industry Leaders"
   },
   "certificateTemplates": {
     "title": "Certificate Templates",
