@@ -234,7 +234,7 @@ export default function DesignationLandingPage() {
       <DesignationHero
         name={name}
         abbreviation={d.abbreviation}
-        description={desc}
+        description={desc ?? ""}
         prerequisites={prerequisites}
         locale={locale}
         slug={slug}
