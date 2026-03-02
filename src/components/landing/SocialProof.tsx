@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { AnimatedSection } from "./AnimatedSection";
 import { Users, BookOpen, TrendingUp, Building2 } from "lucide-react";
 
@@ -15,7 +15,11 @@ function Counter({ value, suffix }: { value: number; suffix: string }) {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
-  const prefersReducedMotion = useReducedMotion();
+
+  const prefersReducedMotion =
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : false;
 
   useEffect(() => {
     if (!isInView) return;
@@ -57,7 +61,16 @@ const containerVariants = {
 export function SocialProof({ sectionTitle, stats, sectionSubtitle, recognizedBy }: SocialProofProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
-  const prefersReducedMotion = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const prefersReducedMotion =
+    mounted && typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : true;
 
   return (
     <section className="relative overflow-hidden bg-brand-950 py-20 lg:py-28 text-white">

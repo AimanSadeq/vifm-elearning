@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { AnimatedSection } from "./AnimatedSection";
@@ -13,33 +14,40 @@ interface CTASectionProps {
 }
 
 export function CTASection({ title, subtitle, ctaText, ctaHref }: CTASectionProps) {
-  const prefersReducedMotion = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const prefersReducedMotion =
+    mounted && typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : true;
+
+  const animate = mounted && !prefersReducedMotion;
 
   return (
     <section className="relative overflow-hidden py-24 lg:py-32">
       {/* Animated gradient background */}
       <div
         className={`absolute inset-0 bg-gradient-to-br from-brand-800 via-brand-600 to-brand-400 ${
-          prefersReducedMotion ? "" : "animate-gradient-shift"
+          animate ? "animate-gradient-shift" : ""
         }`}
       />
 
       {/* Decorative elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {!prefersReducedMotion && (
-          <>
-            <motion.div
-              className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-white/10 blur-3xl"
-              animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.15, 0.1] }}
-              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-white/10 blur-3xl"
-              animate={{ scale: [1, 1.15, 1], opacity: [0.08, 0.12, 0.08] }}
-              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            />
-          </>
-        )}
+        <motion.div
+          className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-white/10 blur-3xl"
+          animate={animate ? { scale: [1, 1.2, 1], opacity: [0.1, 0.15, 0.1] } : undefined}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-white/10 blur-3xl"
+          animate={animate ? { scale: [1, 1.15, 1], opacity: [0.08, 0.12, 0.08] } : undefined}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
         {/* Dot pattern */}
         <div className="absolute inset-0 opacity-[0.05]" style={{
           backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",

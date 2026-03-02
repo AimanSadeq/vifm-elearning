@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Users, BookOpen, TrendingUp, Building2, type LucideIcon } from "lucide-react";
 
 interface Stat {
@@ -15,7 +15,16 @@ const CYCLE_MS = 3000;
 
 export function StatsBar({ stats }: { stats: Stat[] }) {
   const [active, setActive] = useState(0);
-  const prefersReducedMotion = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const prefersReducedMotion =
+    mounted && typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : true;
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -30,8 +39,8 @@ export function StatsBar({ stats }: { stats: Stat[] }) {
   return (
     <motion.div
       className="relative overflow-hidden rounded-full border border-white/10 bg-white/[0.05] backdrop-blur-xl"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={mounted && !prefersReducedMotion ? { opacity: 0, y: -20 } : false}
+      animate={mounted && !prefersReducedMotion ? { opacity: 1, y: 0 } : undefined}
       transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
     >
       {/* Subtle shimmer line */}

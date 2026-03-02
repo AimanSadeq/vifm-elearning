@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
 
@@ -11,17 +12,26 @@ interface GlowButtonProps {
 }
 
 export function GlowButton({ children, href, className }: GlowButtonProps) {
-  const prefersReducedMotion = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const prefersReducedMotion =
+    mounted && typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : true;
+
+  const animate = mounted && !prefersReducedMotion;
 
   return (
-    <motion.div className="relative inline-flex" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-      {!prefersReducedMotion && (
-        <motion.div
-          className="absolute inset-0 rounded-xl bg-brand-400/40 blur-xl"
-          animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.6, 0.4] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-        />
-      )}
+    <motion.div className="relative inline-flex" whileHover={animate ? { scale: 1.03 } : undefined} whileTap={animate ? { scale: 0.98 } : undefined}>
+      <motion.div
+        className="absolute inset-0 rounded-xl bg-brand-400/40 blur-xl"
+        animate={animate ? { scale: [1, 1.2, 1], opacity: [0.4, 0.6, 0.4] } : undefined}
+        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+      />
       <Link
         href={href}
         className={cn(

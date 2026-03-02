@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
 import { GraduationCap, Clock, Award, Building2, type LucideIcon } from "lucide-react";
 import { AnimatedSection } from "./AnimatedSection";
 import { cn } from "@/lib/utils/cn";
@@ -79,7 +79,16 @@ const containerVariants = {
 export function BentoFeatures({ features, sectionTitle, sectionSubtitle }: { features: Feature[]; sectionTitle: string; sectionSubtitle: string }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
-  const prefersReducedMotion = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const prefersReducedMotion =
+    mounted && typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : true;
 
   return (
     <div>
