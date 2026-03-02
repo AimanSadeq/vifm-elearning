@@ -16,6 +16,7 @@ import {
   Layers,
   Clock,
   Settings2,
+  BookMarked,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,6 +27,8 @@ import type {
   DesignationTier,
   CPECategory,
   DesignationDocument,
+  DesignationResource,
+  DesignationResourceType,
 } from "@/types";
 
 const inputClass =
@@ -39,19 +42,21 @@ interface CertificationEditorProps {
   initialTiers: DesignationTier[];
   initialCpeCategories: CPECategory[];
   initialDocuments: DesignationDocument[];
+  initialResources: DesignationResource[];
   holderCount: number;
 }
 
 // ---------------------------------------------------------------------------
 // Tabs
 // ---------------------------------------------------------------------------
-type TabId = "details" | "tiers" | "cpe" | "documents" | "holders";
+type TabId = "details" | "tiers" | "cpe" | "documents" | "resources" | "holders";
 
 const tabs: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: "details", label: "Details", icon: Settings2 },
   { id: "tiers", label: "Tiers", icon: Layers },
   { id: "cpe", label: "CPE Categories", icon: Clock },
   { id: "documents", label: "Documents", icon: FileText },
+  { id: "resources", label: "Course Website", icon: BookMarked },
   { id: "holders", label: "Holders", icon: Users },
 ];
 
@@ -63,6 +68,7 @@ export function CertificationEditor({
   initialTiers,
   initialCpeCategories,
   initialDocuments,
+  initialResources,
   holderCount,
 }: CertificationEditorProps) {
   const [activeTab, setActiveTab] = useState<TabId>("details");
@@ -111,6 +117,12 @@ export function CertificationEditor({
         <DocumentsTab
           designationId={designation.id}
           initialDocuments={initialDocuments}
+        />
+      )}
+      {activeTab === "resources" && (
+        <ResourcesTab
+          designationId={designation.id}
+          initialResources={initialResources}
         />
       )}
       {activeTab === "holders" && (
@@ -904,6 +916,259 @@ function DocumentsTab({
                   )}
                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => openEdit(doc)}><Pencil className="h-4 w-4" /></Button>
                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-error" onClick={() => handleDelete(doc.id)}><Trash2 className="h-4 w-4" /></Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===========================================================================
+// RESOURCES TAB (Course Website)
+// ===========================================================================
+type ResourceFilter = "all" | "presentation" | "exercise" | "workshop";
+
+function ResourcesTab({
+  designationId,
+  initialResources,
+}: {
+  designationId: string;
+  initialResources: DesignationResource[];
+}) {
+  const [resources, setResources] = useState<DesignationResource[]>(initialResources);
+  const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [filter, setFilter] = useState<ResourceFilter>("all");
+
+  const emptyForm: {
+    title: string;
+    title_ar: string;
+    description: string;
+    description_ar: string;
+    resource_type: DesignationResourceType;
+    file_url: string;
+    file_type: string;
+    sort_order: string;
+    is_active: boolean;
+  } = {
+    title: "",
+    title_ar: "",
+    description: "",
+    description_ar: "",
+    resource_type: "presentation",
+    file_url: "",
+    file_type: "pdf",
+    sort_order: "0",
+    is_active: true,
+  };
+  const [form, setForm] = useState(emptyForm);
+
+  const filteredResources = filter === "all" ? resources : resources.filter((r) => r.resource_type === filter);
+
+  const openEdit = (res: DesignationResource) => {
+    setForm({
+      title: res.title,
+      title_ar: res.title_ar ?? "",
+      description: res.description ?? "",
+      description_ar: res.description_ar ?? "",
+      resource_type: res.resource_type,
+      file_url: res.file_url ?? "",
+      file_type: res.file_type ?? "pdf",
+      sort_order: String(res.sort_order),
+      is_active: res.is_active,
+    });
+    setEditId(res.id);
+    setShowForm(true);
+  };
+
+  const openAdd = () => {
+    setForm(emptyForm);
+    setEditId(null);
+    setShowForm(true);
+  };
+
+  const handleSave = async () => {
+    if (!form.title.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const supabase = createClient();
+      const payload = {
+        designation_id: designationId,
+        title: form.title.trim(),
+        title_ar: form.title_ar.trim() || null,
+        description: form.description.trim() || null,
+        description_ar: form.description_ar.trim() || null,
+        resource_type: form.resource_type,
+        file_url: form.file_url.trim() || null,
+        file_type: form.file_type.trim() || null,
+        sort_order: parseInt(form.sort_order) || 0,
+        is_active: form.is_active,
+      };
+
+      if (editId) {
+        const { data, error } = await supabase.from("designation_resources").update(payload).eq("id", editId).select().single();
+        if (error) throw error;
+        setResources((prev) => prev.map((r) => (r.id === editId ? (data as DesignationResource) : r)));
+        toast.success("Resource updated");
+      } else {
+        const { data, error } = await supabase.from("designation_resources").insert(payload).select().single();
+        if (error) throw error;
+        setResources((prev) => [...prev, data as DesignationResource]);
+        toast.success("Resource added");
+      }
+      setShowForm(false);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to save resource");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete this resource?")) return;
+    const supabase = createClient();
+    const { error } = await supabase.from("designation_resources").delete().eq("id", id);
+    if (!error) {
+      setResources((prev) => prev.filter((r) => r.id !== id));
+      toast.success("Resource deleted");
+    }
+  };
+
+  const typeBadge = (type: string) => {
+    switch (type) {
+      case "presentation":
+        return <Badge variant="info">Presentation</Badge>;
+      case "exercise":
+        return <Badge variant="warning">Exercise</Badge>;
+      case "workshop":
+        return <Badge variant="success">Workshop</Badge>;
+      default:
+        return <Badge>{type}</Badge>;
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Course Website Resources</h2>
+        <Button size="sm" onClick={openAdd}>
+          <Plus className="h-4 w-4 me-1" /> Add Resource
+        </Button>
+      </div>
+
+      {/* Filter toggles */}
+      <div className="flex gap-1 rounded-lg border border-border bg-muted/30 p-1 w-fit">
+        {(["all", "presentation", "exercise", "workshop"] as ResourceFilter[]).map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={cn(
+              "rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors capitalize",
+              filter === f
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {f === "all" ? "All" : `${f}s`}
+          </button>
+        ))}
+      </div>
+
+      {showForm && (
+        <Card>
+          <CardContent className="p-4 space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium">Title *</label>
+                <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Title (Arabic)</label>
+                <input dir="rtl" value={form.title_ar} onChange={(e) => setForm({ ...form, title_ar: e.target.value })} className={inputClass} />
+              </div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium">Description (EN)</label>
+                <textarea rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Description (AR)</label>
+                <textarea rows={2} dir="rtl" value={form.description_ar} onChange={(e) => setForm({ ...form, description_ar: e.target.value })} className={inputClass} />
+              </div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div>
+                <label className="block text-sm font-medium">Resource Type</label>
+                <select value={form.resource_type} onChange={(e) => setForm({ ...form, resource_type: e.target.value as DesignationResourceType })} className={inputClass}>
+                  <option value="presentation">Presentation</option>
+                  <option value="exercise">Exercise</option>
+                  <option value="workshop">Workshop</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium">File URL</label>
+                <input value={form.file_url} onChange={(e) => setForm({ ...form, file_url: e.target.value })} placeholder="https://..." className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">File Type</label>
+                <input value={form.file_type} onChange={(e) => setForm({ ...form, file_type: e.target.value })} placeholder="pdf, pptx, xlsx" className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Sort Order</label>
+                <input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: e.target.value })} className={inputClass} />
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} className="h-4 w-4 rounded border-border text-primary" />
+                Active
+              </label>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" size="sm" onClick={() => setShowForm(false)}>Cancel</Button>
+              <Button size="sm" onClick={handleSave} disabled={isSaving}>
+                {isSaving ? <Loader2 className="h-4 w-4 animate-spin me-1" /> : <Save className="h-4 w-4 me-1" />}
+                {editId ? "Update" : "Add"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {filteredResources.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-8">
+          {filter === "all" ? "No resources. Add your first resource." : `No ${filter}s found.`}
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {filteredResources.map((res) => (
+            <Card key={res.id}>
+              <CardContent className="flex items-center justify-between p-4">
+                <div>
+                  <p className="font-medium">{res.title}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {typeBadge(res.resource_type)}
+                    <span className="text-xs text-muted-foreground">
+                      {res.file_type?.toUpperCase()} · Order: {res.sort_order}
+                    </span>
+                    {!res.is_active && <Badge variant="secondary">Inactive</Badge>}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => openEdit(res)}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-error" onClick={() => handleDelete(res.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>

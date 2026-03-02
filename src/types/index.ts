@@ -677,6 +677,25 @@ export interface DesignationDocument {
   updated_at: string;
 }
 
+export type DesignationResourceType = "presentation" | "exercise" | "workshop";
+
+export interface DesignationResource {
+  id: string;
+  designation_id: string;
+  title: string;
+  title_ar: string | null;
+  description: string | null;
+  description_ar: string | null;
+  resource_type: DesignationResourceType;
+  file_url: string | null;
+  file_type: string | null;
+  file_size_bytes: number | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Subscription {
   id: string;
   user_id: string;

@@ -11,6 +11,7 @@ import type {
   DesignationTier,
   CPECategory,
   DesignationDocument,
+  DesignationResource,
 } from "@/types";
 
 export default function EditCertificationPage() {
@@ -22,6 +23,7 @@ export default function EditCertificationPage() {
   const [tiers, setTiers] = useState<DesignationTier[]>([]);
   const [cpeCategories, setCpeCategories] = useState<CPECategory[]>([]);
   const [documents, setDocuments] = useState<DesignationDocument[]>([]);
+  const [resources, setResources] = useState<DesignationResource[]>([]);
   const [holderCount, setHolderCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,7 +31,7 @@ export default function EditCertificationPage() {
     async function fetchData() {
       const supabase = createClient();
 
-      const [desigRes, tiersRes, cpeRes, docsRes, holdersRes] =
+      const [desigRes, tiersRes, cpeRes, docsRes, resourcesRes, holdersRes] =
         await Promise.all([
           supabase.from("designations").select("*").eq("id", id).single(),
           supabase
@@ -48,6 +50,11 @@ export default function EditCertificationPage() {
             .eq("designation_id", id)
             .order("sort_order"),
           supabase
+            .from("designation_resources")
+            .select("*")
+            .eq("designation_id", id)
+            .order("sort_order"),
+          supabase
             .from("designation_holders")
             .select("id", { count: "exact" })
             .eq("designation_id", id)
@@ -58,6 +65,7 @@ export default function EditCertificationPage() {
       if (tiersRes.data) setTiers(tiersRes.data as DesignationTier[]);
       if (cpeRes.data) setCpeCategories(cpeRes.data as CPECategory[]);
       if (docsRes.data) setDocuments(docsRes.data as DesignationDocument[]);
+      if (resourcesRes.data) setResources(resourcesRes.data as DesignationResource[]);
       setHolderCount(holdersRes.count ?? 0);
       setIsLoading(false);
     }
@@ -91,6 +99,7 @@ export default function EditCertificationPage() {
         initialTiers={tiers}
         initialCpeCategories={cpeCategories}
         initialDocuments={documents}
+        initialResources={resources}
         holderCount={holderCount}
       />
     </div>
