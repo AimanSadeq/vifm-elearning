@@ -78,6 +78,15 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
             { label: "Learning Paths", href: "/admin/learning-paths" },
           ],
         },
+        {
+          icon: Shield,
+          label: t("admin.manageCertifications"),
+          href: "/admin/certifications",
+          children: [
+            { label: t("admin.allCertifications"), href: "/admin/certifications" },
+            { label: t("admin.createCertification"), href: "/admin/certifications/new" },
+          ],
+        },
         { icon: Video, label: t("admin.manageWebinars"), href: "/admin/webinars" },
         { icon: Users, label: t("admin.manageUsers"), href: "/admin/users" },
         { icon: Building2, label: t("admin.manageOrganizations"), href: "/admin/organizations" },
@@ -100,15 +109,6 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
           children: [
             { label: "All Certificates", href: "/admin/certificates" },
             { label: "Templates", href: "/admin/certificates/templates" },
-          ],
-        },
-        {
-          icon: Shield,
-          label: t("admin.manageCertifications"),
-          href: "/admin/certifications",
-          children: [
-            { label: t("admin.allCertifications"), href: "/admin/certifications" },
-            { label: t("admin.createCertification"), href: "/admin/certifications/new" },
           ],
         },
         {
@@ -261,18 +261,7 @@ export function Sidebar({ role, collapsed, onToggle }: SidebarProps) {
         collapsed ? "w-sidebar-collapsed" : "w-sidebar"
       )}
     >
-      <nav className={cn("flex flex-col gap-1", collapsed ? "p-2" : "p-4")}>
-        {navItems.map((item) => (
-          <SidebarItem
-            key={item.href}
-            item={item}
-            locale={locale}
-            collapsed={collapsed}
-          />
-        ))}
-      </nav>
-
-      <div className={cn("mt-auto border-t", collapsed ? "p-2" : "p-4")}>
+      <div className={cn("border-b", collapsed ? "p-2" : "p-4 pb-2")}>
         <button
           onClick={onToggle}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -291,6 +280,17 @@ export function Sidebar({ role, collapsed, onToggle }: SidebarProps) {
           )}
         </button>
       </div>
+
+      <nav className={cn("flex flex-col gap-1 flex-1", collapsed ? "p-2" : "p-4")}>
+        {navItems.map((item) => (
+          <SidebarItem
+            key={item.href}
+            item={item}
+            locale={locale}
+            collapsed={collapsed}
+          />
+        ))}
+      </nav>
     </aside>
   );
 }
