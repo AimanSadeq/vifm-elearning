@@ -5,6 +5,7 @@ import { useLocale } from "next-intl";
 import { useParams, useSearchParams } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import type { DesignationResource } from "@/types";
 
@@ -133,6 +134,7 @@ export default function DesignationLandingPage() {
   const locale = useLocale();
   const params = useParams();
   const searchParams = useSearchParams();
+  const { user, isLoading: authLoading } = useAuth();
   const slug = params.slug as string;
   const tabParam = searchParams.get("tab");
 
@@ -140,6 +142,7 @@ export default function DesignationLandingPage() {
   const [documents, setDocuments] = useState<DesignationDocument[]>([]);
   const [cpeCategories, setCpeCategories] = useState<CPECategory[]>([]);
   const [resources, setResources] = useState<DesignationResource[]>([]);
+  const [hasAccess, setHasAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [activeTab, setActiveTab] = useState<"overview" | "courseWebsite">(
@@ -167,7 +170,7 @@ export default function DesignationLandingPage() {
       setDesignation(desig as DesignationData);
 
       // Fetch documents, CPE categories, and resources in parallel
-      const [docsRes, catsRes, resourcesRes] = await Promise.all([
+      const promises: Promise<unknown>[] = [
         supabase
           .from("designation_documents")
           .select("id, title, title_ar, description, sort_order")
@@ -184,11 +187,34 @@ export default function DesignationLandingPage() {
           .eq("designation_id", desig.id)
           .eq("is_active", true)
           .order("sort_order"),
-      ]);
+      ];
+
+      // Check if logged-in user holds this designation
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        promises.push(
+          supabase
+            .from("designation_holders")
+            .select("id")
+            .eq("designation_id", desig.id)
+            .eq("user_id", authUser.id)
+            .in("status", ["active", "grace_period"])
+            .limit(1)
+        );
+      }
+
+      const results = await Promise.all(promises);
+      const [docsRes, catsRes, resourcesRes, holderRes] = results as {
+        data: unknown[] | null;
+      }[];
 
       setDocuments((docsRes.data ?? []) as DesignationDocument[]);
       setCpeCategories((catsRes.data ?? []) as CPECategory[]);
       setResources((resourcesRes.data ?? []) as DesignationResource[]);
+      setHasAccess(
+        authUser?.app_metadata?.role === "super_admin" ||
+        (holderRes?.data ?? []).length > 0
+      );
       setIsLoading(false);
     }
 
@@ -309,6 +335,9 @@ export default function DesignationLandingPage() {
               resources={resources}
               locale={locale}
               abbreviation={d.abbreviation}
+              hasAccess={hasAccess}
+              isLoggedIn={!!user && !authLoading}
+              slug={slug}
             />
           </div>
         </div>
