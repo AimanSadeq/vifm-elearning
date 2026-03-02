@@ -222,7 +222,7 @@ export default function DesignationLandingPage() {
   const d = designation;
   const meta = d.metadata ?? {};
   const name = locale === "ar" && d.name_ar ? d.name_ar : d.name;
-  const desc = locale === "ar" && d.description_ar ? d.description_ar : d.description;
+  const desc = (locale === "ar" && d.description_ar ? d.description_ar : d.description) ?? "";
   const renderCycleYears = Number(meta.cpe_cycle_years) || 1;
   const cpeHours = Number(meta.cpe_cycle_hours) || d.annual_cpe_required * renderCycleYears;
   const prerequisites: string[] = Array.isArray(meta.prerequisites) ? meta.prerequisites : [];
@@ -234,7 +234,7 @@ export default function DesignationLandingPage() {
       <DesignationHero
         name={name}
         abbreviation={d.abbreviation}
-        description={desc ?? ""}
+        description={desc}
         prerequisites={prerequisites}
         locale={locale}
         slug={slug}
