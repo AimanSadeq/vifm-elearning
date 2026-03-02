@@ -17,6 +17,7 @@ interface CoursePlayerProps {
   progressMap: Record<string, LessonProgress>;
   overallProgress: number;
   lockedLessonIds?: Set<string>;
+  designationSlug?: string | null;
   children: React.ReactNode;
 }
 
@@ -27,6 +28,7 @@ export function CoursePlayer({
   progressMap,
   overallProgress,
   lockedLessonIds = new Set(),
+  designationSlug,
   children,
 }: CoursePlayerProps) {
   const {
@@ -88,6 +90,7 @@ export function CoursePlayer({
               searchQuery={sidebarSearchQuery}
               onSearchChange={setSidebarSearchQuery}
               onClose={() => setSidebarOpen(false)}
+              designationSlug={designationSlug}
             />
           )}
         </aside>
@@ -129,6 +132,7 @@ export function CoursePlayer({
                   searchQuery={sidebarSearchQuery}
                   onSearchChange={setSidebarSearchQuery}
                   onClose={() => setSidebarOpen(false)}
+                  designationSlug={designationSlug}
                 />
               </motion.aside>
             </>

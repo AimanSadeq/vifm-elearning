@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
@@ -132,7 +132,9 @@ function buildFAQ(d: DesignationData, cpeCategories: CPECategory[]): FAQItem[] {
 export default function DesignationLandingPage() {
   const locale = useLocale();
   const params = useParams();
+  const searchParams = useSearchParams();
   const slug = params.slug as string;
+  const tabParam = searchParams.get("tab");
 
   const [designation, setDesignation] = useState<DesignationData | null>(null);
   const [documents, setDocuments] = useState<DesignationDocument[]>([]);
@@ -140,7 +142,9 @@ export default function DesignationLandingPage() {
   const [resources, setResources] = useState<DesignationResource[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const [activeTab, setActiveTab] = useState<"overview" | "courseWebsite">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "courseWebsite">(
+    tabParam === "courseWebsite" ? "courseWebsite" : "overview"
+  );
 
   useEffect(() => {
     async function fetchData() {

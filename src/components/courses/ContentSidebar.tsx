@@ -8,6 +8,8 @@ import {
   ChevronDown,
   ChevronLeft,
   Clock,
+  ExternalLink,
+  Globe,
   Search,
   X,
   Lock,
@@ -29,6 +31,7 @@ interface ContentSidebarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   onClose: () => void;
+  designationSlug?: string | null;
 }
 
 const contentTypeBadgeClass: Record<string, string> = {
@@ -55,6 +58,7 @@ export function ContentSidebar({
   searchQuery,
   onSearchChange,
   onClose,
+  designationSlug,
 }: ContentSidebarProps) {
   const locale = useLocale();
   const t = useTranslations("player");
@@ -158,6 +162,27 @@ export function ContentSidebar({
           />
         </div>
       </div>
+
+      {/* Course Website Link */}
+      {designationSlug && (
+        <div className="border-b px-4 py-2.5">
+          <Link
+            href={`/${locale}/designations/${designationSlug}?tab=courseWebsite`}
+            className="flex items-center gap-3 rounded-lg bg-brand-50 px-3 py-2.5 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-100 dark:bg-brand-950/30 dark:text-brand-300 dark:hover:bg-brand-950/50"
+          >
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-900/50">
+              <Globe className="h-4 w-4 text-brand-600 dark:text-brand-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="truncate">{t("courseWebsite")}</p>
+              <p className="truncate text-[11px] font-normal text-brand-500 dark:text-brand-400/70">
+                {t("courseWebsiteDesc")}
+              </p>
+            </div>
+            <ExternalLink className="h-3.5 w-3.5 shrink-0 text-brand-400" />
+          </Link>
+        </div>
+      )}
 
       {/* Search */}
       <div className="border-b">

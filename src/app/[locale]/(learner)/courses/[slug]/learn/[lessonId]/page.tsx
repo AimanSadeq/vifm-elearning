@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { ChevronLeft, ChevronRight, MessageSquare, Bookmark, Lock, Play, CheckCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Globe, ExternalLink, MessageSquare, Bookmark, Lock, Play, CheckCircle } from "lucide-react";
 import DOMPurify from "dompurify";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
@@ -60,6 +60,7 @@ export default function LessonPage() {
   const [videoCurrentTime, setVideoCurrentTime] = useState(0);
   const [videoConfig, setVideoConfig] = useState<VideoConfig | null>(null);
   const [markingComplete, setMarkingComplete] = useState(false);
+  const [designationSlug, setDesignationSlug] = useState<string | null>(null);
 
   const seekToRef = useRef<((seconds: number) => void) | null>(null);
   const timeValidatorRef = useRef(createTimeValidator());
@@ -258,6 +259,17 @@ export default function LessonPage() {
       }
       setCourse(courseData as Course);
 
+      // Fetch designation slug if course is linked to a designation
+      if (courseData.designation_id) {
+        const { data: desig } = await supabase
+          .from("designations")
+          .select("slug")
+          .eq("id", courseData.designation_id)
+          .eq("is_active", true)
+          .single();
+        if (desig) setDesignationSlug(desig.slug);
+      }
+
       const { data: modulesData } = await supabase
         .from("modules")
         .select("*, lessons(*)")
@@ -375,6 +387,7 @@ export default function LessonPage() {
       progressMap={progressMap}
       overallProgress={overallProgress}
       lockedLessonIds={lockedLessonIds}
+      designationSlug={designationSlug}
     >
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Locked state */}
@@ -606,6 +619,27 @@ export default function LessonPage() {
               <QuizGate lessonId={lessonId} courseId={course.id} />
             )}
           </>
+        )}
+
+        {/* Course Website link (inline for quick access) */}
+        {designationSlug && (
+          <Link
+            href={`/${locale}/designations/${designationSlug}?tab=courseWebsite`}
+            className="flex items-center gap-3 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 transition-colors hover:bg-brand-100 dark:border-brand-900 dark:bg-brand-950/30 dark:hover:bg-brand-950/50"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-900/50">
+              <Globe className="h-5 w-5 text-brand-600 dark:text-brand-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-brand-700 dark:text-brand-300">
+                {tp("courseWebsite")}
+              </p>
+              <p className="text-xs text-brand-500 dark:text-brand-400/70">
+                {tp("courseWebsiteDesc")}
+              </p>
+            </div>
+            <ExternalLink className="h-4 w-4 shrink-0 text-brand-400" />
+          </Link>
         )}
 
         {/* Lesson info */}

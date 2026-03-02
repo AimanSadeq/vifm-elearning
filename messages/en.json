@@ -519,7 +519,9 @@
     "openInNewTab": "Open in new tab",
     "markComplete": "Mark as Complete",
     "noContent": "No content available for this lesson.",
-    "markingComplete": "Marking..."
+    "markingComplete": "Marking...",
+    "courseWebsite": "Course Website",
+    "courseWebsiteDesc": "Presentations, exercises & workshops"
   },
   "landing": {
     "heroTitle": "Advance Your Career with World-Class Professional E-Learning",

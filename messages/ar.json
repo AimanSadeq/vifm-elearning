@@ -519,7 +519,9 @@
     "openInNewTab": "فتح في تبويب جديد",
     "markComplete": "تحديد كمكتمل",
     "noContent": "لا يوجد محتوى متاح لهذا الدرس.",
-    "markingComplete": "جارٍ التحديد..."
+    "markingComplete": "جارٍ التحديد...",
+    "courseWebsite": "موقع الدورة",
+    "courseWebsiteDesc": "العروض التقديمية والتمارين وورش العمل"
   },
   "landing": {
     "heroTitle": "طوّر مسيرتك المهنية مع تدريب احترافي عالمي المستوى",

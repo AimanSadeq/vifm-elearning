@@ -119,6 +119,7 @@ export interface Course {
   completion_rate: number;
   certificate_enabled: boolean;
   certificate_template_id?: string | null;
+  designation_id?: string | null;
   sequential_locking_enabled: boolean;
   passing_score: number;
   metadata: Record<string, unknown>;
