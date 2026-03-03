@@ -170,7 +170,7 @@ export default function DesignationLandingPage() {
       setDesignation(desig as DesignationData);
 
       // Fetch documents, CPE categories, and resources in parallel
-      const promises: Promise<unknown>[] = [
+      const promises: PromiseLike<unknown>[] = [
         supabase
           .from("designation_documents")
           .select("id, title, title_ar, description, sort_order")
