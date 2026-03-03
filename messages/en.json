@@ -547,7 +547,13 @@
     "heroBadge": "Professional E-Learning Platform",
     "ourAdvantages": "Our Advantages",
     "socialProofLabel": "Social Proof",
-    "recognizedBy": "Recognized by Industry Leaders"
+    "recognizedBy": "Recognized by Industry Leaders",
+    "featuredCoursesTitle": "Featured Courses",
+    "featuredCoursesSubtitle": "Popular Right Now",
+    "viewAllCourses": "View All Courses",
+    "certificationProgramsTitle": "Professional Certifications",
+    "certificationProgramsSubtitle": "Advance Your Career",
+    "viewAllCertifications": "View All Certifications"
   },
   "certificateTemplates": {
     "title": "Certificate Templates",

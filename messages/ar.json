@@ -547,7 +547,13 @@
     "heroBadge": "منصة التعلم الإلكتروني الاحترافية",
     "ourAdvantages": "مزايانا",
     "socialProofLabel": "إثبات اجتماعي",
-    "recognizedBy": "معترف بها من قبل رواد الصناعة"
+    "recognizedBy": "معترف بها من قبل رواد الصناعة",
+    "featuredCoursesTitle": "الدورات المميزة",
+    "featuredCoursesSubtitle": "الأكثر رواجاً الآن",
+    "viewAllCourses": "عرض جميع الدورات",
+    "certificationProgramsTitle": "الشهادات المهنية",
+    "certificationProgramsSubtitle": "طوّر مسيرتك المهنية",
+    "viewAllCertifications": "عرض جميع الشهادات"
   },
   "certificateTemplates": {
     "title": "قوالب الشهادات",

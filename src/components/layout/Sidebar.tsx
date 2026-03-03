@@ -123,6 +123,7 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
           ],
         },
         { icon: Trophy, label: t("admin.badges"), href: "/admin/badges" },
+        { icon: MessageSquare, label: "Testimonials", href: "/admin/testimonials" },
         { icon: Bell, label: t("admin.notifications"), href: "/admin/notifications" },
         { icon: Settings, label: t("admin.settings"), href: "/admin/settings" },
       ];

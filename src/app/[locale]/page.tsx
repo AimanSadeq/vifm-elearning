@@ -2,12 +2,16 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CATEGORIES } from "@/lib/utils/constants";
+import { createServerSupabase } from "@/lib/supabase/server";
 import { HeroBackground } from "@/components/landing/HeroBackground";
 import { HeroContent } from "@/components/landing/HeroContent";
 import { StatsBar } from "@/components/landing/StatsBar";
 import { CategoriesGrid } from "@/components/landing/CategoriesGrid";
 import { BentoFeatures } from "@/components/landing/BentoFeatures";
 import { SocialProof } from "@/components/landing/SocialProof";
+import { TestimonialsCarousel } from "@/components/landing/TestimonialsCarousel";
+import { FeaturedCoursesSection } from "@/components/landing/FeaturedCoursesSection";
+import { CertificationProgramsSection } from "@/components/landing/CertificationProgramsSection";
 import { CTASection } from "@/components/landing/CTASection";
 
 export default async function HomePage({
@@ -57,6 +61,36 @@ export default async function HomePage({
     { value: 20, suffix: "+", label: t("statPartners") },
   ];
 
+  // Fetch active testimonials
+  const supabase = await createServerSupabase();
+  const { data: testimonials } = await supabase
+    .from("testimonials")
+    .select("*")
+    .eq("is_active", true)
+    .order("sort_order");
+
+  // Fetch active designations
+  const { data: designations } = await supabase
+    .from("designations")
+    .select(
+      "id, name, name_ar, slug, abbreviation, description, description_ar, founding_fee, currency, annual_cpe_required, metadata"
+    )
+    .eq("is_active", true)
+    .order("name");
+
+  // Fetch featured courses
+  const { data: featuredCourses } = await supabase
+    .from("courses")
+    .select(`
+      *,
+      category:categories(id, name, name_ar, slug, color),
+      instructor:profiles!courses_instructor_id_fkey(full_name, full_name_ar, avatar_url)
+    `)
+    .eq("status", "published")
+    .eq("is_featured", true)
+    .order("created_at", { ascending: false })
+    .limit(9);
+
   return (
     <>
       <Header />
@@ -92,6 +126,18 @@ export default async function HomePage({
           </div>
         </section>
 
+        {/* Featured Courses */}
+        {featuredCourses && featuredCourses.length > 0 && (
+          <FeaturedCoursesSection
+            courses={featuredCourses}
+            locale={locale}
+            sectionTitle={t("featuredCoursesTitle")}
+            sectionSubtitle={t("featuredCoursesSubtitle")}
+            viewAllText={t("viewAllCourses")}
+            viewAllHref={`/${locale}/courses`}
+          />
+        )}
+
         {/* Features - Bento Grid */}
         <section className="bg-secondary/30 py-16 lg:py-24">
           <div className="container mx-auto px-4">
@@ -101,6 +147,23 @@ export default async function HomePage({
 
         {/* Social Proof */}
         <SocialProof sectionTitle={t("trustedBy")} stats={stats} sectionSubtitle={t("socialProofLabel")} recognizedBy={t("recognizedBy")} />
+
+        {/* Certification Programs */}
+        {designations && designations.length > 0 && (
+          <CertificationProgramsSection
+            designations={designations}
+            locale={locale}
+            sectionTitle={t("certificationProgramsTitle")}
+            sectionSubtitle={t("certificationProgramsSubtitle")}
+            viewAllText={t("viewAllCertifications")}
+            viewAllHref={`/${locale}/designations`}
+          />
+        )}
+
+        {/* Testimonials */}
+        {testimonials && testimonials.length > 0 && (
+          <TestimonialsCarousel testimonials={testimonials} locale={locale} />
+        )}
 
         {/* CTA */}
         <CTASection
