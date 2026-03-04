@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { AnimatedSection } from "./AnimatedSection";
-import { Users, BookOpen, TrendingUp, Building2 } from "lucide-react";
+import { Users, BookOpen, TrendingUp, Building2, Globe } from "lucide-react";
 
 interface Stat {
   value: number;
@@ -37,15 +37,12 @@ function Counter({ value, suffix }: { value: number; suffix: string }) {
   return <span ref={ref} className="tabular-nums">{count}{suffix}</span>;
 }
 
-const STAT_ICONS = [Users, BookOpen, TrendingUp, Building2];
-
-const PARTNERS = ["CFA Institute", "CISI", "CAIA", "GARP", "IFQ", "BIBF"];
+const STAT_ICONS = [Users, BookOpen, TrendingUp, Building2, Globe];
 
 interface SocialProofProps {
   sectionTitle: string;
   stats: Stat[];
   sectionSubtitle: string;
-  recognizedBy: string;
 }
 
 const cardVariants = {
@@ -58,7 +55,7 @@ const containerVariants = {
   visible: { transition: { staggerChildren: 0.1 } },
 };
 
-export function SocialProof({ sectionTitle, stats, sectionSubtitle, recognizedBy }: SocialProofProps) {
+export function SocialProof({ sectionTitle, stats, sectionSubtitle }: SocialProofProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
   const [mounted, setMounted] = useState(false);
@@ -73,12 +70,7 @@ export function SocialProof({ sectionTitle, stats, sectionSubtitle, recognizedBy
       : true;
 
   return (
-    <section className="relative overflow-hidden bg-brand-950 py-20 lg:py-28 text-white">
-      {/* Background decoration */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{
-        backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.5) 1px, transparent 0)",
-        backgroundSize: "40px 40px",
-      }} />
+    <section className="relative overflow-hidden bg-secondary/30 py-20 lg:py-28">
 
       <div className="container relative mx-auto px-4">
         <AnimatedSection>
@@ -95,7 +87,7 @@ export function SocialProof({ sectionTitle, stats, sectionSubtitle, recognizedBy
         {/* Stats grid */}
         <motion.div
           ref={ref}
-          className="mt-14 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6"
+          className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 lg:gap-6"
           variants={prefersReducedMotion ? undefined : containerVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
@@ -105,43 +97,25 @@ export function SocialProof({ sectionTitle, stats, sectionSubtitle, recognizedBy
             return (
               <motion.div
                 key={i}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 lg:p-8 backdrop-blur-sm transition-colors hover:bg-white/[0.06]"
+                className="group relative overflow-hidden rounded-2xl border border-border/50 bg-background p-6 lg:p-8 shadow-sm transition-colors hover:shadow-md"
                 variants={cardVariants}
                 whileHover={{ y: -4 }}
               >
                 {/* Accent corner glow */}
-                <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-brand-400/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-brand-400/5 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                 <div className="relative">
                   <Icon className="h-6 w-6 text-brand-400 mb-4" />
-                  <div className="text-4xl font-bold text-white lg:text-5xl">
+                  <div className="text-5xl font-bold text-foreground lg:text-6xl">
                     <Counter value={stat.value} suffix={stat.suffix} />
                   </div>
-                  <p className="mt-2 text-sm text-brand-300/70">{stat.label}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{stat.label}</p>
                 </div>
               </motion.div>
             );
           })}
         </motion.div>
 
-        {/* Partner logos */}
-        <AnimatedSection delay={0.3}>
-          <div className="mt-16">
-            <p className="text-center text-xs font-medium uppercase tracking-widest text-brand-400/50 mb-8">
-              {recognizedBy}
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-6 lg:gap-10">
-              {PARTNERS.map((name) => (
-                <div
-                  key={name}
-                  className="rounded-full border border-white/[0.06] bg-white/[0.02] px-6 py-2.5 text-sm font-medium text-brand-300/40 transition-colors hover:text-brand-300/70 hover:border-white/10"
-                >
-                  {name}
-                </div>
-              ))}
-            </div>
-          </div>
-        </AnimatedSection>
       </div>
     </section>
   );
