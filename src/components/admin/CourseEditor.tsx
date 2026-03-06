@@ -15,6 +15,8 @@ import {
   Plus,
   Trash2,
   Upload,
+  ImagePlus,
+  X,
   Clock,
   ChevronDown,
   ChevronRight,
@@ -45,6 +47,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import { DraggableLessonCard } from './DraggableLessonCard'
 import { AddModuleDialog } from './AddModuleDialog'
@@ -78,6 +81,8 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
   const [isReordering, setIsReordering] = useState(false)
   const [collapsedModules, setCollapsedModules] = useState<Set<string>>(new Set())
   const [isSaving, setIsSaving] = useState(false)
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(course.thumbnail_url || null)
+  const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false)
 
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     id: string
@@ -197,6 +202,95 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
       toast.error('Failed to save changes')
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  // Upload course thumbnail
+  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be less than 5MB')
+      return
+    }
+
+    setIsUploadingThumbnail(true)
+    try {
+      const supabase = createClient()
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+      const filePath = `courses/${course.id}/thumbnail.${fileExt}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('course-assets')
+        .upload(filePath, file, { upsert: true, contentType: file.type })
+
+      if (uploadError) throw uploadError
+
+      const { data: urlData } = supabase.storage
+        .from('course-assets')
+        .getPublicUrl(filePath)
+
+      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`
+
+      const { error: updateError } = await supabase
+        .from('courses')
+        .update({ thumbnail_url: urlData.publicUrl })
+        .eq('id', course.id)
+
+      if (updateError) throw updateError
+
+      setThumbnailUrl(publicUrl)
+      toast.success('Thumbnail uploaded successfully')
+      router.refresh()
+    } catch (error) {
+      console.error('Error uploading thumbnail:', error)
+      toast.error('Failed to upload thumbnail')
+    } finally {
+      setIsUploadingThumbnail(false)
+      e.target.value = ''
+    }
+  }
+
+  // Remove course thumbnail
+  const handleThumbnailRemove = async () => {
+    setIsUploadingThumbnail(true)
+    try {
+      const supabase = createClient()
+
+      // Try to delete from storage (ignore errors if file doesn't exist)
+      const { data: files } = await supabase.storage
+        .from('course-assets')
+        .list(`courses/${course.id}`)
+
+      if (files) {
+        const thumbnailFiles = files.filter((f) => f.name.startsWith('thumbnail'))
+        if (thumbnailFiles.length > 0) {
+          await supabase.storage
+            .from('course-assets')
+            .remove(thumbnailFiles.map((f) => `courses/${course.id}/${f.name}`))
+        }
+      }
+
+      const { error } = await supabase
+        .from('courses')
+        .update({ thumbnail_url: null })
+        .eq('id', course.id)
+
+      if (error) throw error
+
+      setThumbnailUrl(null)
+      toast.success('Thumbnail removed')
+      router.refresh()
+    } catch (error) {
+      console.error('Error removing thumbnail:', error)
+      toast.error('Failed to remove thumbnail')
+    } finally {
+      setIsUploadingThumbnail(false)
     }
   }
 
@@ -420,6 +514,68 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
       {/* ==================== DETAILS TAB ==================== */}
       {activeTab === 'details' && (
         <section className="space-y-6">
+          {/* Course Thumbnail */}
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h2 className="mb-4 text-lg font-semibold text-foreground">Course Thumbnail</h2>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+              {/* Preview */}
+              <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border bg-muted sm:w-64">
+                {thumbnailUrl ? (
+                  <Image
+                    src={thumbnailUrl}
+                    alt={course.title}
+                    fill
+                    className="object-cover"
+                    sizes="256px"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-muted-foreground">
+                    <div className="text-center">
+                      <ImagePlus className="mx-auto h-10 w-10" />
+                      <p className="mt-2 text-sm">No thumbnail</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {/* Actions */}
+              <div className="flex flex-col gap-2">
+                <label
+                  className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted ${
+                    isUploadingThumbnail ? 'pointer-events-none opacity-50' : ''
+                  }`}
+                >
+                  {isUploadingThumbnail ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4" />
+                  )}
+                  {isUploadingThumbnail ? 'Uploading...' : 'Upload Image'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleThumbnailUpload}
+                    className="hidden"
+                    disabled={isUploadingThumbnail}
+                  />
+                </label>
+                {thumbnailUrl && (
+                  <button
+                    onClick={handleThumbnailRemove}
+                    disabled={isUploadingThumbnail}
+                    className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
+                  >
+                    <X className="h-4 w-4" />
+                    Remove
+                  </button>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Recommended: 16:9 ratio, max 5MB. JPG, PNG, or WebP.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="rounded-lg border border-border bg-card p-6">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground">Course Information</h2>
