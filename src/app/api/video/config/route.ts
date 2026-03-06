@@ -48,8 +48,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Verify enrollment unless this is a preview lesson
-    if (!lesson.is_preview) {
+    // Admins can access all video configs without enrollment
+    const isAdmin = user.app_metadata?.role === "super_admin";
+
+    // Verify enrollment unless this is a preview lesson or user is admin
+    if (!lesson.is_preview && !isAdmin) {
       const courseId = (lesson.module as unknown as { course_id: string })?.course_id;
       if (courseId) {
         const { data: enrollment } = await supabase

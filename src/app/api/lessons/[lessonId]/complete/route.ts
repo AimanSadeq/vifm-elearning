@@ -36,6 +36,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         { status: 400 }
       );
 
+    // Admins can complete lessons without enrollment
+    const isAdmin = user.app_metadata?.role === "super_admin";
+
     // Verify enrollment
     const { data: enrollment } = await supabaseAdmin
       .from("enrollments")
@@ -45,7 +48,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .in("status", ["active", "completed"])
       .single();
 
-    if (!enrollment)
+    if (!enrollment && !isAdmin)
       return NextResponse.json(
         { error: "Not enrolled in this course" },
         { status: 403 }
@@ -72,36 +75,38 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         { status: 500 }
       );
 
-    // Update enrollment completed_lesson_ids and progress
-    const completedIds: string[] =
-      (enrollment.completed_lesson_ids as string[]) ?? [];
+    // Update enrollment completed_lesson_ids and progress (skip if admin without enrollment)
+    if (enrollment) {
+      const completedIds: string[] =
+        (enrollment.completed_lesson_ids as string[]) ?? [];
 
-    if (!completedIds.includes(lessonId)) {
-      completedIds.push(lessonId);
-    }
+      if (!completedIds.includes(lessonId)) {
+        completedIds.push(lessonId);
+      }
 
-    const totalItems = enrollment.total_lesson_items ?? 0;
-    const completedItems = completedIds.length;
-    const progressPct =
-      totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
-    const courseCompleted = totalItems > 0 && completedItems >= totalItems;
+      const totalItems = enrollment.total_lesson_items ?? 0;
+      const completedItems = completedIds.length;
+      const progressPct =
+        totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+      const courseCompleted = totalItems > 0 && completedItems >= totalItems;
 
-    await supabaseAdmin
-      .from("enrollments")
-      .update({
-        last_lesson_id: lessonId,
-        last_accessed_at: new Date().toISOString(),
-        completed_lesson_ids: completedIds,
-        completed_lesson_items: completedItems,
-        progress_percentage: progressPct,
-        ...(courseCompleted
-          ? { status: "completed", completed_at: new Date().toISOString() }
-          : {}),
-      })
-      .eq("id", enrollment.id);
+      await supabaseAdmin
+        .from("enrollments")
+        .update({
+          last_lesson_id: lessonId,
+          last_accessed_at: new Date().toISOString(),
+          completed_lesson_ids: completedIds,
+          completed_lesson_items: completedItems,
+          progress_percentage: progressPct,
+          ...(courseCompleted
+            ? { status: "completed", completed_at: new Date().toISOString() }
+            : {}),
+        })
+        .eq("id", enrollment.id);
 
-    if (courseCompleted) {
-      recalculateAllPathsForUser(supabase, user.id).catch(() => {});
+      if (courseCompleted) {
+        recalculateAllPathsForUser(supabase, user.id).catch(() => {});
+      }
     }
 
     return NextResponse.json({ success: true });

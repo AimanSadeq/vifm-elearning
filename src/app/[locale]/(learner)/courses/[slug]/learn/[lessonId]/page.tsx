@@ -61,6 +61,7 @@ export default function LessonPage() {
   const [videoConfig, setVideoConfig] = useState<VideoConfig | null>(null);
   const [markingComplete, setMarkingComplete] = useState(false);
   const [designationSlug, setDesignationSlug] = useState<string | null>(null);
+  const [signedVideoUrl, setSignedVideoUrl] = useState<string | null>(null);
 
   const seekToRef = useRef<((seconds: number) => void) | null>(null);
   const timeValidatorRef = useRef(createTimeValidator());
@@ -149,6 +150,28 @@ export default function LessonPage() {
       }
     }
     fetchConfig();
+  }, [lessonId]);
+
+  // Fetch signed video URL when lesson changes
+  useEffect(() => {
+    if (!lessonId) return;
+    setSignedVideoUrl(null);
+    async function fetchSignedUrl() {
+      try {
+        const res = await fetch("/api/video/signed-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lessonId }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.url) setSignedVideoUrl(data.url);
+        }
+      } catch {
+        // Signed URL fetch failed — video will not play
+      }
+    }
+    fetchSignedUrl();
   }, [lessonId]);
 
   // Load existing progress including watched segments
@@ -441,7 +464,7 @@ export default function LessonPage() {
                 )}
 
                 <VideoPlayer
-                  src={currentLesson.video_url ?? ""}
+                  src={signedVideoUrl ?? ""}
                   hlsSrc={currentLesson.video_hls_url}
                   poster={currentLesson.video_thumbnail_url}
                   initialTime={initialTime}

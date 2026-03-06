@@ -40,8 +40,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // If not preview, verify enrollment
-    if (!lesson.is_preview) {
+    // Admins can access all videos without enrollment
+    const isAdmin = user.app_metadata?.role === "super_admin";
+
+    // If not preview and not admin, verify enrollment
+    if (!lesson.is_preview && !isAdmin) {
       const { data: enrollment } = await supabase
         .from("enrollments")
         .select("id")

@@ -4,8 +4,20 @@
     {
       "name": "dev",
       "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
-      "runtimeArgs": ["node_modules/next/dist/bin/next", "dev", "--port", "3005"],
+      "runtimeArgs": ["C:\\Users\\AimanSadeq\\OneDrive - Virginia Institute of Finance\\VIFM eLearning Portal\\vifm-elearning\\node_modules\\next\\dist\\bin\\next", "dev", "--port", "3005"],
       "port": 3005
+    },
+    {
+      "name": "viewer",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8888", "--directory", "C:\\Projects\\elearning courses pptx\\caifl"],
+      "port": 8888
+    },
+    {
+      "name": "reviewer",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "runtimeArgs": ["scripts/lesson-generator/reviewer/server.mjs"],
+      "port": 8899
     }
   ]
 }

@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIFM Slide Reviewer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #060e0d; --dark: #0d1f1d; --green: #1d4340; --mid: #2a5f5a;
+    --light: #3a8078; --blue: #4a9e96; --blue2: #72c4bc;
+    --white: #F5F0E8; --gray: #8A9E9B; --card: rgba(13,31,29,0.68);
+    --nav-bg: #0a1a18;
+  }
+
+  body { background: #080808; color: var(--white); font-family: Arial, sans-serif; }
+
+  /* NAV BAR */
+  .nav {
+    display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+    background: var(--nav-bg); border-bottom: 1px solid var(--green);
+    flex-wrap: wrap;
+  }
+  .nav select {
+    background: var(--dark); color: var(--white); border: 1px solid var(--green);
+    padding: 6px 10px; border-radius: 4px; font-size: 13px; cursor: pointer;
+  }
+  .nav select:focus { outline: none; border-color: var(--blue); }
+  .nav .counter { color: var(--gray); font-size: 13px; margin-left: auto; }
+  .nav button {
+    background: var(--green); color: var(--white); border: none;
+    width: 32px; height: 32px; border-radius: 4px; cursor: pointer;
+    font-size: 16px; display: flex; align-items: center; justify-content: center;
+  }
+  .nav button:hover { background: var(--mid); }
+  .nav button:disabled { opacity: 0.3; cursor: default; }
+  .slide-type-badge {
+    background: var(--mid); color: var(--blue2); font-size: 11px;
+    padding: 3px 8px; border-radius: 10px; font-family: monospace;
+  }
+
+  /* SLIDE CONTAINER */
+  .slide-wrapper {
+    display: flex; justify-content: center; padding: 20px;
+    background: #050505;
+  }
+  .slide {
+    width: 960px; height: 540px;
+    background: var(--bg); border-radius: 4px; overflow: hidden;
+    position: relative; font-family: Arial, sans-serif;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  }
+
+  /* NARRATION PANEL */
+  .narration-panel {
+    padding: 12px 16px; background: var(--nav-bg);
+    border-top: 1px solid var(--green); max-height: 120px; overflow-y: auto;
+  }
+  .narration-panel h4 { color: var(--blue); font-size: 11px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+  .narration-panel p { color: var(--gray); font-size: 12px; line-height: 1.5; }
+
+  /* THUMBNAIL STRIP */
+  .thumbs {
+    display: flex; gap: 6px; padding: 10px 16px; background: #050505;
+    overflow-x: auto; border-top: 1px solid var(--green);
+  }
+  .thumb {
+    min-width: 80px; height: 45px; background: var(--dark);
+    border: 2px solid transparent; border-radius: 3px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: var(--gray); flex-shrink: 0; text-align: center;
+  }
+  .thumb:hover { border-color: var(--mid); }
+  .thumb.active { border-color: var(--blue); background: var(--green); }
+
+  .loading { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--gray); }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <select id="selCourse"><option value="">Loading...</option></select>
+  <select id="selModule"><option value="">Module</option></select>
+  <select id="selLesson"><option value="">Lesson</option></select>
+  <span class="slide-type-badge" id="slideType"></span>
+  <span class="counter" id="counter"></span>
+  <button id="btnPrev" title="Previous (Left Arrow)">&#9664;</button>
+  <button id="btnNext" title="Next (Right Arrow)">&#9654;</button>
+</div>
+
+<div class="slide-wrapper">
+  <div class="slide" id="slideContainer"></div>
+</div>
+
+<div class="narration-panel">
+  <h4>Speaker Notes</h4>
+  <p id="narrationText"></p>
+</div>
+
+<div class="thumbs" id="thumbStrip"></div>
+
+<script>
+// NOTE: This reviewer renders trusted, self-authored JSON content only.
+// The data source is local module JSON files created by the lesson generator.
+// No user-supplied or external content is rendered.
+
+// STATE
+let modules = [];
+let currentModuleIdx = 0;
+let currentLessonIdx = 0;
+let currentSlideIdx = 0;
+
+const $ = (id) => document.getElementById(id);
+const selCourse = $('selCourse');
+const selModule = $('selModule');
+const selLesson = $('selLesson');
+const slideContainer = $('slideContainer');
+const narrationText = $('narrationText');
+const thumbStrip = $('thumbStrip');
+const counterEl = $('counter');
+const slideTypeBadge = $('slideType');
+const btnPrev = $('btnPrev');
+const btnNext = $('btnNext');
+
+// INIT
+async function init() {
+  const res = await fetch('/api/courses');
+  const courses = await res.json();
+  selCourse.textContent = '';
+  const defaultOpt = document.createElement('option');
+  defaultOpt.value = '';
+  defaultOpt.textContent = '-- Select Course --';
+  selCourse.appendChild(defaultOpt);
+  courses.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c.toUpperCase();
+    selCourse.appendChild(opt);
+  });
+  if (courses.includes('capa')) {
+    selCourse.value = 'capa';
+    loadCourse('capa');
+  }
+}
+
+selCourse.addEventListener('change', () => { if (selCourse.value) loadCourse(selCourse.value); });
+selModule.addEventListener('change', () => { currentModuleIdx = +selModule.value; populateLessons(); });
+selLesson.addEventListener('change', () => { currentLessonIdx = +selLesson.value; currentSlideIdx = 0; renderCurrentSlide(); });
+btnPrev.addEventListener('click', () => navigate(-1));
+btnNext.addEventListener('click', () => navigate(1));
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') navigate(-1);
+  if (e.key === 'ArrowRight') navigate(1);
+});
+
+async function loadCourse(slug) {
+  const res = await fetch('/api/course/' + encodeURIComponent(slug));
+  modules = await res.json();
+  currentModuleIdx = 0; currentLessonIdx = 0; currentSlideIdx = 0;
+  populateModules();
+}
+
+function populateModules() {
+  selModule.textContent = '';
+  modules.forEach((m, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = 'M' + m.sort_order + ': ' + m.title;
+    selModule.appendChild(opt);
+  });
+  selModule.value = currentModuleIdx;
+  populateLessons();
+}
+
+function populateLessons() {
+  selLesson.textContent = '';
+  const mod = modules[currentModuleIdx];
+  if (!mod) return;
+  mod.lessons.forEach((l, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = 'L' + (i+1) + ': ' + l.title;
+    selLesson.appendChild(opt);
+  });
+  currentLessonIdx = 0;
+  selLesson.value = 0;
+  currentSlideIdx = 0;
+  renderCurrentSlide();
+}
+
+function getSlides() {
+  const mod = modules[currentModuleIdx];
+  if (!mod) return [];
+  const lesson = mod.lessons[currentLessonIdx];
+  if (!lesson) return [];
+  return lesson.slides || [];
+}
+
+function navigate(dir) {
+  const slides = getSlides();
+  const next = currentSlideIdx + dir;
+  if (next >= 0 && next < slides.length) {
+    currentSlideIdx = next;
+    renderCurrentSlide();
+  }
+}
+
+function goSlide(i) { currentSlideIdx = i; renderCurrentSlide(); }
+
+function renderCurrentSlide() {
+  const slides = getSlides();
+  if (!slides.length) {
+    slideContainer.textContent = 'No slides';
+    return;
+  }
+  const slide = slides[currentSlideIdx];
+  counterEl.textContent = 'Slide ' + (currentSlideIdx + 1) + ' / ' + slides.length;
+  slideTypeBadge.textContent = slide.type || '?';
+  narrationText.textContent = slide.narration || '';
+
+  // Clear and render
+  while (slideContainer.firstChild) slideContainer.removeChild(slideContainer.firstChild);
+  const content = buildSlide(slide);
+  slideContainer.appendChild(content);
+
+  // Thumbnails
+  while (thumbStrip.firstChild) thumbStrip.removeChild(thumbStrip.firstChild);
+  slides.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'thumb' + (i === currentSlideIdx ? ' active' : '');
+    div.textContent = (i+1) + ' ' + s.type;
+    div.addEventListener('click', () => goSlide(i));
+    thumbStrip.appendChild(div);
+  });
+
+  btnPrev.disabled = currentSlideIdx === 0;
+  btnNext.disabled = currentSlideIdx === slides.length - 1;
+}
+
+// HELPERS
+function el(tag, styles, children, textContent) {
+  const e = document.createElement(tag);
+  if (styles) Object.assign(e.style, styles);
+  if (textContent !== undefined) e.textContent = textContent;
+  if (children) children.forEach(c => { if (c) e.appendChild(c); });
+  return e;
+}
+
+function txt(tag, text, styles) {
+  const e = document.createElement(tag);
+  e.textContent = text || '';
+  if (styles) Object.assign(e.style, styles);
+  return e;
+}
+
+function addChrome(container, slide) {
+  if (slide.breadcrumb) {
+    const bc = txt('div', slide.breadcrumb, {
+      position: 'absolute', top: '8px', left: '24px',
+      fontSize: '9px', color: 'var(--gray)', letterSpacing: '0.5px'
+    });
+    container.appendChild(bc);
+  }
+  if (slide.progress) {
+    const prog = el('div', { position: 'absolute', top: '10px', right: '24px', display: 'flex', gap: '6px' });
+    slide.progress.forEach(p => {
+      const dot = el('div', {
+        width: '6px', height: '6px', borderRadius: '50%',
+        background: p ? 'var(--blue)' : 'var(--green)'
+      });
+      prog.appendChild(dot);
+    });
+    container.appendChild(prog);
+  }
+  const logo = txt('div', 'VIFM', {
+    position: 'absolute', bottom: '12px', left: '24px',
+    fontSize: '10px', fontWeight: 'bold', color: 'var(--blue)',
+    background: 'var(--dark)', padding: '2px 8px', borderRadius: '2px'
+  });
+  container.appendChild(logo);
+  const bar = el('div', {
+    position: 'absolute', bottom: '0', left: '0', right: '0',
+    height: '3px', background: 'var(--blue)'
+  });
+  container.appendChild(bar);
+}
+
+function titleColumn(slide) {
+  const col = el('div', { position: 'absolute', left: '48px', top: '72px', width: '240px' });
+  if (slide.label) {
+    col.appendChild(txt('div', slide.label, {
+      fontSize: '9px', color: 'var(--blue)', textTransform: 'uppercase',
+      letterSpacing: '1.5px', marginBottom: '8px'
+    }));
+  }
+  const titleEl = txt('div', '', {
+    fontSize: '22px', fontWeight: 'bold', color: 'var(--white)', lineHeight: '1.2'
+  });
+  titleEl.textContent = slide.title || '';
+  if (slide.title_accent && slide.title) {
+    const t = slide.title;
+    const a = slide.title_accent;
+    const idx = t.toLowerCase().indexOf(a.toLowerCase());
+    if (idx !== -1) {
+      titleEl.textContent = '';
+      titleEl.appendChild(document.createTextNode(t.slice(0, idx)));
+      const span = txt('span', t.slice(idx, idx + a.length), { color: 'var(--blue)' });
+      titleEl.appendChild(span);
+      titleEl.appendChild(document.createTextNode(t.slice(idx + a.length)));
+    }
+  }
+  col.appendChild(titleEl);
+  return col;
+}
+
+function contentColumn() {
+  return el('div', {
+    position: 'absolute', left: '320px', top: '72px', right: '48px', bottom: '48px',
+    overflow: 'hidden'
+  });
+}
+
+function card(titleText, descText) {
+  const c = el('div', {
+    background: 'var(--dark)', borderRadius: '6px', padding: '10px 12px', marginBottom: '6px'
+  });
+  if (titleText) c.appendChild(txt('div', titleText, { fontSize: '11px', fontWeight: 'bold', color: 'var(--blue)', marginBottom: '3px' }));
+  if (descText) c.appendChild(txt('div', descText, { fontSize: '9px', color: 'var(--gray)', lineHeight: '1.4' }));
+  return c;
+}
+
+function centeredLayout() {
+  return el('div', {
+    display: 'flex', flexDirection: 'column', alignItems: 'center',
+    justifyContent: 'center', height: '100%', textAlign: 'center',
+    padding: '40px 80px'
+  });
+}
+
+// SLIDE BUILDERS
+function buildSlide(slide) {
+  const container = el('div', { position: 'relative', width: '100%', height: '100%' });
+  const builder = BUILDERS[slide.type];
+  if (builder) {
+    builder(container, slide);
+  } else {
+    const c = centeredLayout();
+    c.appendChild(txt('div', 'Unknown: ' + (slide.type || '?'), { fontSize: '14px', color: 'var(--gray)' }));
+    container.appendChild(c);
+  }
+  return container;
+}
+
+const BUILDERS = {
+
+  // CORE
+  'intro': (c, s) => {
+    const center = centeredLayout();
+    center.appendChild(txt('div', s.course_code, { fontSize: '12px', color: 'var(--blue)', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '12px' }));
+    center.appendChild(txt('div', s.course_title, { fontSize: '32px', fontWeight: 'bold', color: 'var(--white)', lineHeight: '1.2', marginBottom: '12px' }));
+    if (s.subtitle) center.appendChild(txt('div', s.subtitle, { fontSize: '14px', color: 'var(--gray)', marginBottom: '8px' }));
+    if (s.lesson_number) center.appendChild(txt('div', s.lesson_number, { fontSize: '11px', color: 'var(--mid)', marginTop: '16px' }));
+    c.appendChild(center);
+    c.appendChild(el('div', { position: 'absolute', bottom: '0', left: '0', right: '0', height: '3px', background: 'var(--blue)' }));
+  },
+
+  'module-title': (c, s) => {
+    addChrome(c, s);
+    const center = centeredLayout();
+    center.appendChild(txt('div', s.module_number, { fontSize: '48px', fontWeight: 'bold', color: 'var(--green)', marginBottom: '8px' }));
+    center.appendChild(txt('div', s.module_title, { fontSize: '32px', fontWeight: 'bold', color: 'var(--white)', lineHeight: '1.2', marginBottom: '12px' }));
+    center.appendChild(txt('div', s.topic_title, { fontSize: '14px', color: 'var(--gray)' }));
+    c.appendChild(center);
+  },
+
+  'outro': (c, s) => {
+    const center = centeredLayout();
+    center.appendChild(txt('div', 'UP NEXT', { fontSize: '12px', color: 'var(--blue)', letterSpacing: '3px', marginBottom: '12px' }));
+    center.appendChild(txt('div', s.next_lesson_title || 'End of Module', { fontSize: '32px', fontWeight: 'bold', color: 'var(--white)', lineHeight: '1.2' }));
+    c.appendChild(center);
+    c.appendChild(el('div', { position: 'absolute', bottom: '0', left: '0', right: '0', height: '3px', background: 'var(--blue)' }));
+  },
+
+  // CONTENT
+  'key-points': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    (s.points || []).forEach(p => {
+      col.appendChild(card(p.icon + ' ' + p.title, p.description));
+    });
+    c.appendChild(col);
+  },
+
+  'kpi-stats': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    const grid = el('div', { display: 'flex', flexWrap: 'wrap', gap: '8px' });
+    (s.stats || []).forEach(st => {
+      const box = el('div', {
+        background: 'var(--dark)', borderRadius: '6px', padding: '10px',
+        textAlign: 'center', flex: '1', minWidth: '45%'
+      });
+      box.appendChild(txt('div', st.value, { fontSize: '24px', fontWeight: 'bold', color: 'var(--blue)' }));
+      box.appendChild(txt('div', st.label, { fontSize: '9px', color: 'var(--gray)', marginTop: '4px' }));
+      if (st.source) box.appendChild(txt('div', st.source, { fontSize: '7px', color: 'var(--mid)', marginTop: '2px' }));
+      grid.appendChild(box);
+    });
+    col.appendChild(grid);
+    c.appendChild(col);
+  },
+
+  'icon-grid': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    const grid = el('div', { display: 'flex', flexWrap: 'wrap', gap: '8px' });
+    (s.items || []).forEach(it => {
+      const box = el('div', { background: 'var(--dark)', borderRadius: '6px', padding: '10px', flex: '1', minWidth: '45%' });
+      box.appendChild(txt('div', it.icon, { fontSize: '18px', marginBottom: '4px' }));
+      box.appendChild(txt('div', it.title, { fontSize: '10px', fontWeight: 'bold', color: 'var(--blue)' }));
+      box.appendChild(txt('div', it.description, { fontSize: '8px', color: 'var(--gray)', marginTop: '3px' }));
+      grid.appendChild(box);
+    });
+    col.appendChild(grid);
+    c.appendChild(col);
+  },
+
+  'case-study': (c, s) => {
+    addChrome(c, s);
+    const titleCol = el('div', { position: 'absolute', left: '48px', top: '72px', width: '240px' });
+    titleCol.appendChild(txt('div', 'Case Study', { fontSize: '9px', color: 'var(--blue)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px' }));
+    const tt = txt('div', s.company || '', { fontSize: '22px', fontWeight: 'bold', color: 'var(--white)', lineHeight: '1.2' });
+    titleCol.appendChild(tt);
+    c.appendChild(titleCol);
+    const col = contentColumn();
+    col.appendChild(card('Background', s.background));
+    col.appendChild(card('Challenge', s.challenge));
+    const resultsCard = el('div', { background: 'var(--dark)', borderRadius: '6px', padding: '10px 12px', marginBottom: '6px' });
+    resultsCard.appendChild(txt('div', 'Results', { fontSize: '11px', fontWeight: 'bold', color: 'var(--blue)', marginBottom: '3px' }));
+    (s.results || []).forEach(r => {
+      const row = el('div', { display: 'flex', gap: '8px', marginBottom: '4px' });
+      row.appendChild(txt('span', r.value, { fontSize: '14px', fontWeight: 'bold', color: 'var(--blue)', minWidth: '60px' }));
+      row.appendChild(txt('span', r.description, { fontSize: '9px', color: 'var(--gray)' }));
+      resultsCard.appendChild(row);
+    });
+    col.appendChild(resultsCard);
+    if (s.source) col.appendChild(txt('div', 'Source: ' + s.source, { fontSize: '7px', color: 'var(--mid)', marginTop: '4px' }));
+    c.appendChild(col);
+  },
+
+  'deep-dive': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    (s.sections || []).forEach(sec => {
+      col.appendChild(card(sec.title, sec.content));
+    });
+    c.appendChild(col);
+  },
+
+  // TEXT
+  'big-statement': (c, s) => {
+    addChrome(c, s);
+    const center = centeredLayout();
+    if (s.label) center.appendChild(txt('div', s.label, { fontSize: '12px', color: 'var(--blue)', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '12px' }));
+    const mainT = txt('div', '', { fontSize: '28px', fontWeight: 'bold', color: 'var(--white)', lineHeight: '1.3' });
+    if (s.statement_accent && s.statement) {
+      const t = s.statement, a = s.statement_accent;
+      const idx = t.toLowerCase().indexOf(a.toLowerCase());
+      if (idx !== -1) {
+        mainT.appendChild(document.createTextNode(t.slice(0, idx)));
+        mainT.appendChild(txt('span', t.slice(idx, idx + a.length), { color: 'var(--blue)' }));
+        mainT.appendChild(document.createTextNode(t.slice(idx + a.length)));
+      } else {
+        mainT.textContent = t;
+      }
+    } else {
+      mainT.textContent = s.statement || '';
+    }
+    center.appendChild(mainT);
+    if (s.sub_text) center.appendChild(txt('div', s.sub_text, { fontSize: '14px', color: 'var(--gray)', marginTop: '12px' }));
+    c.appendChild(center);
+  },
+
+  'numbered-list': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    (s.items || []).forEach((it, i) => {
+      const row = el('div', { display: 'flex', gap: '10px', marginBottom: '8px' });
+      row.appendChild(txt('div', String(i+1).padStart(2, '0'), { fontSize: '16px', fontWeight: 'bold', color: 'var(--blue)', minWidth: '24px' }));
+      const inner = el('div');
+      inner.appendChild(txt('div', it.text, { fontSize: '11px', fontWeight: 'bold', color: 'var(--white)' }));
+      if (it.detail) inner.appendChild(txt('div', it.detail, { fontSize: '8px', color: 'var(--gray)', marginTop: '2px' }));
+      row.appendChild(inner);
+      col.appendChild(row);
+    });
+    c.appendChild(col);
+  },
+
+  'two-column': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    const flex = el('div', { display: 'flex', gap: '12px' });
+    const leftDiv = el('div', { flex: '1' });
+    leftDiv.appendChild(txt('div', s.left_title, { fontSize: '10px', fontWeight: 'bold', color: 'var(--blue)', marginBottom: '8px' }));
+    (s.left_items || []).forEach(it => {
+      leftDiv.appendChild(txt('div', it, { fontSize: '9px', color: 'var(--gray)', marginBottom: '4px', paddingLeft: '8px', borderLeft: '2px solid var(--blue)' }));
+    });
+    const rightDiv = el('div', { flex: '1' });
+    rightDiv.appendChild(txt('div', s.right_title, { fontSize: '10px', fontWeight: 'bold', color: 'var(--blue2)', marginBottom: '8px' }));
+    (s.right_items || []).forEach(it => {
+      rightDiv.appendChild(txt('div', it, { fontSize: '9px', color: 'var(--gray)', marginBottom: '4px', paddingLeft: '8px', borderLeft: '2px solid var(--mid)' }));
+    });
+    flex.appendChild(leftDiv);
+    flex.appendChild(rightDiv);
+    col.appendChild(flex);
+    c.appendChild(col);
+  },
+
+  'term-cards': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    const grid = el('div', { display: 'flex', flexWrap: 'wrap', gap: '6px' });
+    (s.terms || []).forEach(t => {
+      const box = el('div', { background: 'var(--dark)', borderRadius: '6px', padding: '8px 10px', flex: '1', minWidth: '45%', marginBottom: '6px' });
+      box.appendChild(txt('div', t.term, { fontSize: '10px', fontWeight: 'bold', color: 'var(--blue)' }));
+      box.appendChild(txt('div', t.definition, { fontSize: '8px', color: 'var(--gray)', marginTop: '3px' }));
+      grid.appendChild(box);
+    });
+    col.appendChild(grid);
+    c.appendChild(col);
+  },
+
+  'do-dont': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    const flex = el('div', { display: 'flex', gap: '12px' });
+    // DO column
+    const doCol = el('div', { flex: '1', background: 'var(--dark)', borderRadius: '6px', padding: '10px', borderTop: '3px solid #4a9e96' });
+    doCol.appendChild(txt('div', '\u2714 DO', { fontSize: '10px', fontWeight: 'bold', color: '#4a9e96', marginBottom: '8px' }));
+    (s.dos || []).forEach(d => {
+      const text = typeof d === 'string' ? d : d.text;
+      doCol.appendChild(txt('div', '\u2714 ' + text, { fontSize: '9px', color: 'var(--gray)', marginBottom: '4px' }));
+    });
+    // DONT column
+    const dontCol = el('div', { flex: '1', background: 'var(--dark)', borderRadius: '6px', padding: '10px', borderTop: '3px solid #e06060' });
+    dontCol.appendChild(txt('div', '\u2718 DON\'T', { fontSize: '10px', fontWeight: 'bold', color: '#e06060', marginBottom: '8px' }));
+    (s.donts || []).forEach(d => {
+      const text = typeof d === 'string' ? d : d.text;
+      dontCol.appendChild(txt('div', '\u2718 ' + text, { fontSize: '9px', color: 'var(--gray)', marginBottom: '4px' }));
+    });
+    flex.appendChild(doCol);
+    flex.appendChild(dontCol);
+    col.appendChild(flex);
+    c.appendChild(col);
+  },
+
+  'recap': (c, s) => {
+    addChrome(c, s);
+    const titleCol = el('div', { position: 'absolute', left: '48px', top: '72px', width: '240px' });
+    titleCol.appendChild(txt('div', 'Recap', { fontSize: '9px', color: 'var(--blue)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px' }));
+    titleCol.appendChild(txt('div', s.title || 'Key Takeaways', { fontSize: '22px', fontWeight: 'bold', color: 'var(--white)', lineHeight: '1.2' }));
+    c.appendChild(titleCol);
+    const col = contentColumn();
+    (s.points || []).forEach(p => {
+      const text = typeof p === 'string' ? p : p.text;
+      const icon = typeof p === 'object' && p.icon ? p.icon : '\u2713';
+      const cardEl = el('div', { background: 'var(--dark)', borderRadius: '6px', padding: '10px 12px', marginBottom: '6px' });
+      const desc = el('div', { fontSize: '9px', color: 'var(--gray)', lineHeight: '1.4' });
+      desc.appendChild(txt('span', icon + ' ', { color: 'var(--blue)', marginRight: '6px' }));
+      desc.appendChild(document.createTextNode(text));
+      cardEl.appendChild(desc);
+      col.appendChild(cardEl);
+    });
+    c.appendChild(col);
+  },
+
+  'step-detail': (c, s) => {
+    addChrome(c, s);
+    const titleCol = el('div', { position: 'absolute', left: '48px', top: '72px', width: '240px' });
+    titleCol.appendChild(txt('div', s.step_number, { fontSize: '36px', fontWeight: 'bold', color: 'var(--green)', marginBottom: '8px' }));
+    titleCol.appendChild(txt('div', s.step_title, { fontSize: '18px', fontWeight: 'bold', color: 'var(--white)', lineHeight: '1.2' }));
+    c.appendChild(titleCol);
+    const col = contentColumn();
+    col.appendChild(card(null, s.description));
+    if (s.sub_steps && s.sub_steps.length) {
+      s.sub_steps.forEach((ss, i) => {
+        const parts = ss.split(': ');
+        const heading = parts.length > 1 ? parts[0] : null;
+        const body = parts.length > 1 ? parts.slice(1).join(': ') : ss;
+        const row = el('div', {
+          background: 'var(--dark)', borderRadius: '6px', padding: '8px 12px',
+          marginBottom: '4px', display: 'flex', gap: '10px', alignItems: 'flex-start'
+        });
+        row.appendChild(txt('div', String(i+1), {
+          fontSize: '12px', fontWeight: 'bold', color: 'var(--blue)',
+          minWidth: '18px', textAlign: 'center', lineHeight: '1.4'
+        }));
+        const textWrap = el('div', { flex: '1' });
+        if (heading) textWrap.appendChild(txt('div', heading, { fontSize: '10px', fontWeight: 'bold', color: 'var(--blue2)', marginBottom: '2px' }));
+        textWrap.appendChild(txt('div', body, { fontSize: '9px', color: 'var(--gray)', lineHeight: '1.3' }));
+        row.appendChild(textWrap);
+        col.appendChild(row);
+      });
+    }
+    c.appendChild(col);
+  },
+
+  'qna': (c, s) => {
+    addChrome(c, s);
+    const titleCol = el('div', { position: 'absolute', left: '48px', top: '72px', width: '240px' });
+    if (s.label) titleCol.appendChild(txt('div', s.label, { fontSize: '9px', color: 'var(--blue)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px' }));
+    titleCol.appendChild(txt('div', s.question, { fontSize: '18px', fontWeight: 'bold', color: 'var(--blue2)', lineHeight: '1.3' }));
+    c.appendChild(titleCol);
+    const col = contentColumn();
+    col.appendChild(card(null, s.answer));
+    c.appendChild(col);
+  },
+
+  // VISUAL
+  'timeline': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    (s.events || []).forEach(e => {
+      const row = el('div', { display: 'flex', gap: '10px', marginBottom: '10px' });
+      row.appendChild(txt('div', e.year, { minWidth: '50px', fontSize: '10px', fontWeight: 'bold', color: 'var(--blue)', textAlign: 'right' }));
+      row.appendChild(el('div', { width: '2px', background: 'var(--blue)', flexShrink: '0', minHeight: '20px' }));
+      const inner = el('div');
+      inner.appendChild(txt('div', e.title, { fontSize: '10px', fontWeight: 'bold', color: 'var(--white)' }));
+      inner.appendChild(txt('div', e.description, { fontSize: '8px', color: 'var(--gray)' }));
+      row.appendChild(inner);
+      col.appendChild(row);
+    });
+    c.appendChild(col);
+  },
+
+  'comparison': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    // Header
+    const header = el('div', { display: 'flex', gap: '2px', marginBottom: '4px' });
+    header.appendChild(txt('div', '', { flex: '1', padding: '4px' }));
+    header.appendChild(txt('div', s.left_label, { flex: '1', fontSize: '9px', fontWeight: 'bold', color: 'var(--blue)', padding: '4px', textAlign: 'center' }));
+    header.appendChild(txt('div', s.right_label, { flex: '1', fontSize: '9px', fontWeight: 'bold', color: 'var(--blue2)', padding: '4px', textAlign: 'center' }));
+    col.appendChild(header);
+    // Rows
+    (s.rows || []).forEach(r => {
+      const row = el('div', { display: 'flex', gap: '2px', marginBottom: '2px' });
+      row.appendChild(txt('div', r.aspect, { flex: '1', fontSize: '8px', fontWeight: 'bold', color: 'var(--white)', padding: '6px', background: 'var(--dark)', borderRadius: '3px' }));
+      row.appendChild(txt('div', r.left, { flex: '1', fontSize: '8px', color: 'var(--gray)', padding: '6px', background: 'var(--dark)', borderRadius: '3px', textAlign: 'center' }));
+      row.appendChild(txt('div', r.right, { flex: '1', fontSize: '8px', color: 'var(--gray)', padding: '6px', background: 'var(--dark)', borderRadius: '3px', textAlign: 'center' }));
+      col.appendChild(row);
+    });
+    if (s.verdict) col.appendChild(txt('div', s.verdict, { marginTop: '8px', fontSize: '9px', color: 'var(--blue)', fontStyle: 'italic' }));
+    c.appendChild(col);
+  },
+
+  'quote': (c, s) => {
+    addChrome(c, s);
+    const center = centeredLayout();
+    const q = txt('div', '\u201C' + (s.quote_text || '') + '\u201D', { fontSize: '20px', color: 'var(--white)', lineHeight: '1.4', fontStyle: 'italic', maxWidth: '600px' });
+    center.appendChild(q);
+    center.appendChild(txt('div', s.attribution, { fontSize: '11px', color: 'var(--blue)', marginTop: '16px' }));
+    if (s.attribution_role) center.appendChild(txt('div', s.attribution_role, { fontSize: '9px', color: 'var(--gray)' }));
+    c.appendChild(center);
+  },
+
+  // DIAGRAMS
+  'v-timeline': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    const events = s.events || [];
+    events.forEach((e, i) => {
+      const row = el('div', { display: 'flex', gap: '10px', marginBottom: '8px' });
+      const dotCol = el('div', { display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '16px' });
+      dotCol.appendChild(el('div', { width: '10px', height: '10px', borderRadius: '50%', background: 'var(--blue)', flexShrink: '0' }));
+      if (i < events.length - 1) dotCol.appendChild(el('div', { width: '2px', flex: '1', background: 'var(--green)' }));
+      row.appendChild(dotCol);
+      const inner = el('div', { flex: '1', background: 'var(--dark)', borderRadius: '6px', padding: '8px' });
+      inner.appendChild(txt('div', e.label, { fontSize: '8px', color: 'var(--blue)', fontWeight: 'bold' }));
+      inner.appendChild(txt('div', e.title, { fontSize: '10px', color: 'var(--white)', fontWeight: 'bold' }));
+      inner.appendChild(txt('div', e.description, { fontSize: '8px', color: 'var(--gray)' }));
+      row.appendChild(inner);
+      col.appendChild(row);
+    });
+    c.appendChild(col);
+  },
+
+  'roadmap': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    const flex = el('div', { display: 'flex', gap: '6px' });
+    (s.phases || []).forEach(p => {
+      const box = el('div', { flex: '1', background: 'var(--dark)', borderRadius: '6px', padding: '8px', minWidth: '0' });
+      box.appendChild(txt('div', p.phase, { fontSize: '8px', color: 'var(--blue)', fontWeight: 'bold' }));
+      box.appendChild(txt('div', p.title, { fontSize: '10px', color: 'var(--white)', fontWeight: 'bold', margin: '3px 0' }));
+      (p.items || []).forEach(it => {
+        box.appendChild(txt('div', '\u2022 ' + it, { fontSize: '7px', color: 'var(--gray)', marginBottom: '2px' }));
+      });
+      flex.appendChild(box);
+    });
+    col.appendChild(flex);
+    c.appendChild(col);
+  },
+
+  'circular': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    col.style.display = 'flex';
+    col.style.alignItems = 'center';
+    col.style.justifyContent = 'center';
+    const steps = s.steps || [];
+    const n = steps.length;
+    const sz = 280;
+    const cx = sz/2, cy = sz/2, radius = 110;
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('width', sz);
+    svg.setAttribute('height', sz);
+    svg.setAttribute('viewBox', '0 0 ' + sz + ' ' + sz);
+    // Center
+    const cc = document.createElementNS(ns, 'circle');
+    cc.setAttribute('cx', cx); cc.setAttribute('cy', cy); cc.setAttribute('r', 36);
+    cc.setAttribute('fill', '#0d1f1d'); cc.setAttribute('stroke', '#4a9e96'); cc.setAttribute('stroke-width', '1.5');
+    svg.appendChild(cc);
+    const ct = document.createElementNS(ns, 'text');
+    ct.setAttribute('x', cx); ct.setAttribute('y', cy);
+    ct.setAttribute('text-anchor', 'middle'); ct.setAttribute('dominant-baseline', 'central');
+    ct.setAttribute('fill', '#4a9e96'); ct.setAttribute('font-size', '8'); ct.setAttribute('font-weight', 'bold');
+    ct.textContent = s.center_label || '';
+    svg.appendChild(ct);
+    steps.forEach((step, i) => {
+      const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+      const x = cx + radius * Math.cos(angle);
+      const y = cy + radius * Math.sin(angle);
+      const line = document.createElementNS(ns, 'line');
+      line.setAttribute('x1', cx + 45 * Math.cos(angle)); line.setAttribute('y1', cy + 45 * Math.sin(angle));
+      line.setAttribute('x2', cx + (radius - 32) * Math.cos(angle)); line.setAttribute('y2', cy + (radius - 32) * Math.sin(angle));
+      line.setAttribute('stroke', '#1d4340'); line.setAttribute('stroke-width', '1');
+      svg.appendChild(line);
+      const circ = document.createElementNS(ns, 'circle');
+      circ.setAttribute('cx', x); circ.setAttribute('cy', y); circ.setAttribute('r', 28);
+      circ.setAttribute('fill', '#0d1f1d'); circ.setAttribute('stroke', '#4a9e96'); circ.setAttribute('stroke-width', '1');
+      svg.appendChild(circ);
+      const text = document.createElementNS(ns, 'text');
+      text.setAttribute('x', x); text.setAttribute('y', y);
+      text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'central');
+      text.setAttribute('fill', '#F5F0E8'); text.setAttribute('font-size', '7'); text.setAttribute('font-weight', 'bold');
+      text.textContent = step.title;
+      svg.appendChild(text);
+    });
+    col.appendChild(svg);
+    c.appendChild(col);
+  },
+
+  'funnel': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    const stages = s.stages || [];
+    stages.forEach((st, i) => {
+      const w = 100 - (i * (60 / Math.max(stages.length - 1, 1)));
+      const box = el('div', {
+        width: w + '%', margin: '0 auto 4px', background: 'var(--dark)',
+        borderRadius: '4px', padding: '8px', textAlign: 'center'
+      });
+      box.appendChild(txt('div', st.label, { fontSize: '10px', fontWeight: 'bold', color: 'var(--blue)' }));
+      if (st.value) box.appendChild(txt('div', st.value, { fontSize: '8px', color: 'var(--blue2)' }));
+      box.appendChild(txt('div', st.description, { fontSize: '8px', color: 'var(--gray)' }));
+      col.appendChild(box);
+    });
+    c.appendChild(col);
+  },
+
+  'pyramid': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    const levels = s.levels || [];
+    levels.forEach((lv, i) => {
+      const w = 30 + (i * (70 / Math.max(levels.length - 1, 1)));
+      const box = el('div', {
+        width: w + '%', margin: '0 auto 4px', background: 'var(--dark)',
+        borderRadius: '4px', padding: '6px 10px', textAlign: 'center'
+      });
+      box.appendChild(txt('div', lv.label, { fontSize: '9px', fontWeight: 'bold', color: 'var(--blue)' }));
+      box.appendChild(txt('div', lv.description, { fontSize: '7px', color: 'var(--gray)' }));
+      col.appendChild(box);
+    });
+    c.appendChild(col);
+  },
+
+  // ADVANCED DIAGRAMS
+  'flowchart': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    col.style.display = 'flex';
+    col.style.flexWrap = 'wrap';
+    col.style.alignItems = 'center';
+    col.style.justifyContent = 'center';
+    col.style.gap = '4px';
+    const nodeColors = {
+      start: { bg: '#4a9e96', color: '#060e0d', radius: '50%' },
+      end: { bg: '#2a5f5a', color: '#F5F0E8', radius: '50%' },
+      decision: { bg: '#0d1f1d', color: '#F5F0E8', radius: '4px', border: '1.5px solid #4a9e96' },
+      process: { bg: '#0d1f1d', color: '#F5F0E8', radius: '4px', border: '1px solid #1d4340' },
+    };
+    (s.nodes || []).forEach((n, i) => {
+      if (i > 0) {
+        col.appendChild(txt('span', '\u2192', { color: 'var(--blue)', fontSize: '14px' }));
+      }
+      const style = nodeColors[n.type] || nodeColors.process;
+      const box = el('div', {
+        display: 'inline-block', padding: '8px 14px', fontSize: '9px', fontWeight: 'bold',
+        color: style.color, textAlign: 'center', borderRadius: style.radius,
+        background: style.bg, border: style.border || 'none'
+      });
+      box.textContent = n.label;
+      col.appendChild(box);
+    });
+    c.appendChild(col);
+  },
+
+  'hub-spoke': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    col.style.display = 'flex';
+    col.style.alignItems = 'center';
+    col.style.justifyContent = 'center';
+    const hub = s.hub || {};
+    const spokes = s.spokes || [];
+    const n = spokes.length;
+    const sz = 300;
+    const cxp = sz/2, cyp = sz/2, radius = 115;
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('width', sz);
+    svg.setAttribute('height', sz);
+    svg.setAttribute('viewBox', '0 0 ' + sz + ' ' + sz);
+    // Hub circle
+    const hc = document.createElementNS(ns, 'circle');
+    hc.setAttribute('cx', cxp); hc.setAttribute('cy', cyp); hc.setAttribute('r', 40);
+    hc.setAttribute('fill', '#0d1f1d'); hc.setAttribute('stroke', '#4a9e96'); hc.setAttribute('stroke-width', '2');
+    svg.appendChild(hc);
+    const ht = document.createElementNS(ns, 'text');
+    ht.setAttribute('x', cxp); ht.setAttribute('y', cyp);
+    ht.setAttribute('text-anchor', 'middle'); ht.setAttribute('dominant-baseline', 'central');
+    ht.setAttribute('fill', '#4a9e96'); ht.setAttribute('font-size', '9'); ht.setAttribute('font-weight', 'bold');
+    ht.textContent = hub.title || '';
+    svg.appendChild(ht);
+    spokes.forEach((sp, i) => {
+      const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+      const x = cxp + radius * Math.cos(angle);
+      const y = cyp + radius * Math.sin(angle);
+      const line = document.createElementNS(ns, 'line');
+      line.setAttribute('x1', cxp + 42 * Math.cos(angle)); line.setAttribute('y1', cyp + 42 * Math.sin(angle));
+      line.setAttribute('x2', x - 28 * Math.cos(angle)); line.setAttribute('y2', y - 28 * Math.sin(angle));
+      line.setAttribute('stroke', '#1d4340'); line.setAttribute('stroke-width', '1');
+      svg.appendChild(line);
+      const sc = document.createElementNS(ns, 'circle');
+      sc.setAttribute('cx', x); sc.setAttribute('cy', y); sc.setAttribute('r', 28);
+      sc.setAttribute('fill', '#0d1f1d'); sc.setAttribute('stroke', '#2a5f5a'); sc.setAttribute('stroke-width', '1');
+      svg.appendChild(sc);
+      const st = document.createElementNS(ns, 'text');
+      st.setAttribute('x', x); st.setAttribute('y', y - (sp.subtitle ? 4 : 0));
+      st.setAttribute('text-anchor', 'middle'); st.setAttribute('dominant-baseline', 'central');
+      st.setAttribute('fill', '#F5F0E8'); st.setAttribute('font-size', '7'); st.setAttribute('font-weight', 'bold');
+      st.textContent = sp.title;
+      svg.appendChild(st);
+      if (sp.subtitle) {
+        const sub = document.createElementNS(ns, 'text');
+        sub.setAttribute('x', x); sub.setAttribute('y', y + 8);
+        sub.setAttribute('text-anchor', 'middle'); sub.setAttribute('dominant-baseline', 'central');
+        sub.setAttribute('fill', '#8A9E9B'); sub.setAttribute('font-size', '5.5');
+        sub.textContent = sp.subtitle;
+        svg.appendChild(sub);
+      }
+    });
+    col.appendChild(svg);
+    c.appendChild(col);
+  },
+
+  'matrix-2x2': (c, s) => {
+    addChrome(c, s);
+    c.appendChild(titleColumn(s));
+    const col = contentColumn();
+    if (s.y_axis) col.appendChild(txt('div', s.y_axis, { fontSize: '8px', color: 'var(--gray)', marginBottom: '4px', textAlign: 'center' }));
+    const grid = el('div', { display: 'flex', flexWrap: 'wrap', gap: '6px' });
+    (s.quadrants || []).forEach(q => {
+      const bg = q.highlight ? 'var(--green)' : 'var(--dark)';
+      const box = el('div', { flex: '1', background: bg, borderRadius: '6px', padding: '8px', minWidth: '45%' });
+      box.appendChild(txt('div', q.label, { fontSize: '9px', fontWeight: 'bold', color: 'var(--blue)', marginBottom: '4px' }));
+      (q.items || []).forEach(it => {
+        box.appendChild(txt('div', '\u2022 ' + it, { fontSize: '7px', color: 'var(--gray)', marginBottom: '2px' }));
+      });
+      grid.appendChild(box);
+    });
+    col.appendChild(grid);
+    if (s.x_axis) col.appendChild(txt('div', s.x_axis, { fontSize: '8px', color: 'var(--gray)', marginTop: '4px', textAlign: 'center' }));
+    c.appendChild(col);
+  },
+
+};
+
+// BOOT
+init();
+</script>
+</body>
+</html>

@@ -35,8 +35,11 @@ export function CoursePricing({ course, enrollment }: CoursePricingProps) {
       return;
     }
 
-    if (course.is_free) {
-      // Enroll directly in free course
+    // Admins bypass checkout and enroll directly
+    const isAdmin = user.role === "super_admin";
+
+    if (course.is_free || isAdmin) {
+      // Enroll directly (free course or admin bypass)
       setIsEnrolling(true);
       try {
         const res = await fetch("/api/enrollments", {

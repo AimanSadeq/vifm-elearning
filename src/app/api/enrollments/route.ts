@@ -30,13 +30,16 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
 
-    if (!course.is_free)
+    // Admins can enroll in any course without payment
+    const isAdmin = user.app_metadata?.role === "super_admin";
+
+    if (!course.is_free && !isAdmin)
       return NextResponse.json(
         { error: "This course requires payment" },
         { status: 400 }
       );
 
-    if (course.status !== "published")
+    if (course.status !== "published" && !isAdmin)
       return NextResponse.json(
         { error: "Course is not available" },
         { status: 400 }

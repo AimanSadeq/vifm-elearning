@@ -14,7 +14,6 @@ import {
   Key,
   Receipt,
   MessageSquare,
-  Video,
   Building2,
   CreditCard,
   Trophy,
@@ -23,7 +22,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Route,
-  Shield,
+  Package,
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -68,26 +67,17 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
       return [
         { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
         {
-          icon: BookOpen,
-          label: t("admin.manageCourses"),
+          icon: Package,
+          label: t("admin.catalog"),
           href: "/admin/courses",
           children: [
-            { label: "All Courses", href: "/admin/courses" },
-            { label: "Create New", href: "/admin/courses/new" },
+            { label: t("admin.manageCourses"), href: "/admin/courses" },
+            { label: t("admin.manageCertifications"), href: "/admin/certifications" },
+            { label: t("admin.manageWebinars"), href: "/admin/webinars" },
             { label: "Categories", href: "/admin/categories" },
             { label: "Learning Paths", href: "/admin/learning-paths" },
           ],
         },
-        {
-          icon: Shield,
-          label: t("admin.manageCertifications"),
-          href: "/admin/certifications",
-          children: [
-            { label: t("admin.allCertifications"), href: "/admin/certifications" },
-            { label: t("admin.createCertification"), href: "/admin/certifications/new" },
-          ],
-        },
-        { icon: Video, label: t("admin.manageWebinars"), href: "/admin/webinars" },
         { icon: Users, label: t("admin.manageUsers"), href: "/admin/users" },
         { icon: Building2, label: t("admin.manageOrganizations"), href: "/admin/organizations" },
         {
@@ -142,12 +132,12 @@ function SidebarItem({
   collapsed: boolean;
 }) {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
   const fullHref = `/${locale}${item.href}`;
   const isActive =
     pathname === fullHref ||
     (item.children &&
-      item.children.some((c) => pathname === `/${locale}${c.href}`));
+      item.children.some((c) => pathname.startsWith(`/${locale}${c.href}`)));
+  const [open, setOpen] = useState(!!isActive);
 
   if (item.children) {
     if (collapsed) {
