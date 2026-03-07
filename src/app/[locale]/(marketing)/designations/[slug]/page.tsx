@@ -17,6 +17,7 @@ import { DesignationFoundingMember } from "@/components/designation/DesignationF
 import { DesignationSteps } from "@/components/designation/DesignationSteps";
 import { DesignationCPE } from "@/components/designation/DesignationCPE";
 import { DesignationResources } from "@/components/designation/DesignationResources";
+import { DesignationCourseContent } from "@/components/designation/DesignationCourseContent";
 import { DesignationFAQ } from "@/components/designation/DesignationFAQ";
 import { DesignationCTA } from "@/components/designation/DesignationCTA";
 
@@ -329,7 +330,10 @@ export default function DesignationLandingPage() {
           />
         </div>
       ) : (
-        <div className="py-16">
+        <div className="space-y-16 py-16">
+          <div className="container mx-auto px-4">
+            <DesignationCourseContent slug={slug} locale={locale} />
+          </div>
           <div className="container mx-auto px-4">
             <DesignationResources
               resources={resources}
