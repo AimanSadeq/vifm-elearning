@@ -4,7 +4,7 @@
     {
       "name": "dev",
       "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
-      "runtimeArgs": ["C:\\Users\\AimanSadeq\\OneDrive - Virginia Institute of Finance\\VIFM eLearning Portal\\vifm-elearning\\node_modules\\next\\dist\\bin\\next", "dev", "--port", "3005"],
+      "runtimeArgs": ["C:\\Users\\asade\\OneDrive - Virginia Institute of Finance\\VIFM eLearning Portal\\vifm-elearning\\node_modules\\next\\dist\\bin\\next", "dev", "--port", "3005"],
       "port": 3005
     },
     {

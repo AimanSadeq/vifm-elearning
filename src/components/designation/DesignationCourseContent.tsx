@@ -93,8 +93,6 @@ function ModuleAccordion({
   const palette = moduleColors[index % moduleColors.length];
   const title = locale === "ar" ? mod.title.ar : mod.title.en;
   const videoCount = mod.videos.length;
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-40px" });
 
   return (
     <div className="overflow-hidden rounded-2xl border bg-card shadow-sm">
@@ -148,11 +146,10 @@ function ModuleAccordion({
           >
             <div className="border-t px-5 pb-5 pt-4">
               <motion.div
-                ref={ref}
                 className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
                 variants={prefersReducedMotion ? undefined : containerVariants}
                 initial="hidden"
-                animate={isInView ? "visible" : "hidden"}
+                animate="visible"
               >
                 {mod.videos.map((video) => {
                   const vTitle =

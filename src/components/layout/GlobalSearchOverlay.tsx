@@ -69,55 +69,68 @@ export function GlobalSearchOverlay({
       }
 
       setIsSearching(true);
-      const supabase = createClient();
-      const searchTerm = `%${q}%`;
 
-      const [coursesRes, designationsRes] = await Promise.all([
-        supabase
-          .from("courses")
-          .select("id, title, title_ar, slug, short_description, short_description_ar")
-          .eq("status", "published")
-          .or(`title.ilike.${searchTerm},title_ar.ilike.${searchTerm}`)
-          .limit(5),
-        supabase
-          .from("designations")
-          .select("id, name, name_ar, slug, abbreviation")
-          .eq("is_active", true)
-          .or(`name.ilike.${searchTerm},name_ar.ilike.${searchTerm},abbreviation.ilike.${searchTerm}`)
-          .limit(5),
-      ]);
+      try {
+        const supabase = createClient();
+        // Escape special PostgREST characters in search term
+        const escaped = q.replace(/[%_\\]/g, "\\$&");
+        const searchTerm = `%${escaped}%`;
 
-      const items: SearchResult[] = [];
+        const [coursesRes, designationsRes] = await Promise.all([
+          supabase
+            .from("courses")
+            .select(
+              "id, title, title_ar, slug, short_description, short_description_ar"
+            )
+            .eq("status", "published")
+            .or(`title.ilike.${searchTerm},title_ar.ilike.${searchTerm}`)
+            .limit(5),
+          supabase
+            .from("designations")
+            .select("id, name, name_ar, slug, abbreviation")
+            .eq("is_active", true)
+            .or(
+              `name.ilike.${searchTerm},name_ar.ilike.${searchTerm},abbreviation.ilike.${searchTerm}`
+            )
+            .limit(5),
+        ]);
 
-      if (coursesRes.data) {
-        for (const c of coursesRes.data) {
-          items.push({
-            id: c.id,
-            title: locale === "ar" && c.title_ar ? c.title_ar : c.title,
-            subtitle:
-              locale === "ar" && c.short_description_ar
-                ? c.short_description_ar
-                : c.short_description ?? undefined,
-            href: `/${locale}/courses/${c.slug}`,
-            type: "course",
-          });
+        const items: SearchResult[] = [];
+
+        if (coursesRes.data) {
+          for (const c of coursesRes.data) {
+            items.push({
+              id: c.id,
+              title: locale === "ar" && c.title_ar ? c.title_ar : c.title,
+              subtitle:
+                locale === "ar" && c.short_description_ar
+                  ? c.short_description_ar
+                  : c.short_description ?? undefined,
+              href: `/${locale}/courses/${c.slug}`,
+              type: "course",
+            });
+          }
         }
-      }
 
-      if (designationsRes.data) {
-        for (const d of designationsRes.data) {
-          items.push({
-            id: d.id,
-            title: locale === "ar" && d.name_ar ? d.name_ar : d.name,
-            subtitle: d.abbreviation,
-            href: `/${locale}/designations/${d.slug}`,
-            type: "certification",
-          });
+        if (designationsRes.data) {
+          for (const d of designationsRes.data) {
+            items.push({
+              id: d.id,
+              title: locale === "ar" && d.name_ar ? d.name_ar : d.name,
+              subtitle: d.abbreviation,
+              href: `/${locale}/designations/${d.slug}`,
+              type: "certification",
+            });
+          }
         }
-      }
 
-      setResults(items);
-      setIsSearching(false);
+        setResults(items);
+      } catch (err) {
+        console.error("[Search] query failed:", err);
+        setResults([]);
+      } finally {
+        setIsSearching(false);
+      }
     },
     [locale]
   );

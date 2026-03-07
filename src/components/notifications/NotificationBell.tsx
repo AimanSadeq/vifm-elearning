@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Bell } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
@@ -10,57 +10,94 @@ import type { Notification } from "@/types";
 
 export function NotificationBell() {
   const { user } = useAuth();
-  const { unreadCount, setUnreadCount } = useNotificationStore();
+  // Use individual selectors to prevent re-renders when unrelated store values change
+  const unreadCount = useNotificationStore((s) => s.unreadCount);
+  const setUnreadCount = useNotificationStore((s) => s.setUnreadCount);
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const fetchingRef = useRef(false);
+  const mountedRef = useRef(true);
+
+  // Stable userId primitive — avoids re-creating callbacks when user object reference changes
+  const userId = user?.id;
 
   const fetchNotifications = useCallback(async () => {
-    if (!user) return;
+    if (!userId || fetchingRef.current) return;
+    fetchingRef.current = true;
 
-    const supabase = createClient();
+    try {
+      const supabase = createClient();
 
-    // Fetch unread count
-    const { count } = await supabase
-      .from("notifications")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .is("read_at", null);
+      // Fetch unread count
+      const { count, error: countError } = await supabase
+        .from("notifications")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .is("read_at", null);
 
-    setUnreadCount(count ?? 0);
+      if (!mountedRef.current) return;
 
-    // Fetch latest 5 unread
-    const { data } = await supabase
-      .from("notifications")
-      .select("*")
-      .eq("user_id", user.id)
-      .is("read_at", null)
-      .order("created_at", { ascending: false })
-      .limit(5);
+      if (countError) {
+        console.error("[Notifications] count query failed:", countError.message);
+        return;
+      }
 
-    setNotifications((data as Notification[]) ?? []);
-  }, [user, setUnreadCount]);
+      setUnreadCount(count ?? 0);
 
+      // Fetch latest 5 unread
+      const { data, error: listError } = await supabase
+        .from("notifications")
+        .select("*")
+        .eq("user_id", userId)
+        .is("read_at", null)
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      if (!mountedRef.current) return;
+
+      if (listError) {
+        console.error("[Notifications] list query failed:", listError.message);
+        return;
+      }
+
+      setNotifications((data as Notification[]) ?? []);
+    } catch (err) {
+      console.error("[Notifications] fetch failed:", err);
+    } finally {
+      fetchingRef.current = false;
+    }
+  }, [userId, setUnreadCount]);
+
+  // Fetch once on mount / when userId changes
   useEffect(() => {
+    mountedRef.current = true;
     fetchNotifications();
+    return () => {
+      mountedRef.current = false;
+    };
   }, [fetchNotifications]);
 
-  // Realtime subscription
+  // Realtime subscription — separate from fetchNotifications to avoid dep cycle.
+  // We read fetchNotifications via a ref so this effect only re-runs when userId changes.
+  const fetchRef = useRef(fetchNotifications);
+  fetchRef.current = fetchNotifications;
+
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
 
     const supabase = createClient();
     const channel = supabase
-      .channel(`notifications:${user.id}`)
+      .channel(`notifications:${userId}`)
       .on(
         "postgres_changes",
         {
           event: "INSERT",
           schema: "public",
           table: "notifications",
-          filter: `user_id=eq.${user.id}`,
+          filter: `user_id=eq.${userId}`,
         },
         () => {
-          fetchNotifications();
+          fetchRef.current();
         }
       )
       .subscribe();
@@ -68,23 +105,28 @@ export function NotificationBell() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, fetchNotifications]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   const handleMarkAllRead = async () => {
-    if (!user) return;
+    if (!userId) return;
 
-    const supabase = createClient();
-    await supabase
-      .from("notifications")
-      .update({ read_at: new Date().toISOString() })
-      .eq("user_id", user.id)
-      .is("read_at", null);
+    try {
+      const supabase = createClient();
+      await supabase
+        .from("notifications")
+        .update({ read_at: new Date().toISOString() })
+        .eq("user_id", userId)
+        .is("read_at", null);
 
-    setUnreadCount(0);
-    setNotifications([]);
+      setUnreadCount(0);
+      setNotifications([]);
+    } catch (err) {
+      console.error("[Notifications] mark all read failed:", err);
+    }
   };
 
-  if (!user) return null;
+  if (!userId) return null;
 
   return (
     <div className="relative">
