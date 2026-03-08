@@ -1,8 +1,9 @@
 'use client'
 
+import { useRef, useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, Video, FileText, ClipboardList, Play, Edit, Trash2, Eye, Clock, Star } from 'lucide-react'
+import { GripVertical, Video, FileText, ClipboardList, Play, Edit, Trash2, Eye, Clock, Star, Upload, Loader2, CheckCircle2 } from 'lucide-react'
 import type { Lesson, ContentType } from '@/types'
 
 interface DraggableLessonCardProps {
@@ -11,6 +12,8 @@ interface DraggableLessonCardProps {
   onPreview: (lesson: Lesson) => void
   onEdit: (lesson: Lesson) => void
   onDelete: (id: string, title: string, type: string) => void
+  onVideoUploaded?: () => void
+  courseId: string
   isDeleting: boolean
 }
 
@@ -32,14 +35,29 @@ function getContentColor(type: ContentType) {
   }
 }
 
+function getVideoDuration(file: File): Promise<number | null> {
+  return new Promise((resolve) => {
+    const video = document.createElement('video')
+    video.preload = 'metadata'
+    video.onloadedmetadata = () => { URL.revokeObjectURL(video.src); resolve(video.duration) }
+    video.onerror = () => { URL.revokeObjectURL(video.src); resolve(null) }
+    video.src = URL.createObjectURL(file)
+  })
+}
+
 export function DraggableLessonCard({
   lesson,
   index,
   onPreview,
   onEdit,
   onDelete,
+  onVideoUploaded,
+  courseId,
   isDeleting,
 }: DraggableLessonCardProps) {
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const {
     attributes,
     listeners,
@@ -48,6 +66,37 @@ export function DraggableLessonCard({
     transition,
     isDragging,
   } = useSortable({ id: lesson.id })
+
+  const handleFileUpload = async (file: File) => {
+    setIsUploading(true)
+    try {
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) return
+
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('courseId', courseId)
+      formData.append('lessonId', lesson.id)
+
+      const duration = await getVideoDuration(file)
+      if (duration) formData.append('duration', String(Math.round(duration)))
+
+      const res = await fetch('/api/video/upload', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}` },
+        body: formData,
+      })
+
+      if (!res.ok) throw new Error('Upload failed')
+      onVideoUploaded?.()
+    } catch (err) {
+      console.error('Video upload failed:', err)
+    } finally {
+      setIsUploading(false)
+    }
+  }
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -128,6 +177,39 @@ export function DraggableLessonCard({
               >
                 <Play className="h-4 w-4" />
               </button>
+            )}
+            {lesson.content_type === 'video' && (
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) handleFileUpload(file)
+                    e.target.value = ''
+                  }}
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className={`rounded-lg p-2 transition-colors ${
+                    lesson.video_url
+                      ? 'text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950'
+                      : 'text-muted-foreground hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950'
+                  }`}
+                  title={lesson.video_url ? 'Replace video' : 'Upload video'}
+                >
+                  {isUploading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : lesson.video_url ? (
+                    <CheckCircle2 className="h-4 w-4" />
+                  ) : (
+                    <Upload className="h-4 w-4" />
+                  )}
+                </button>
+              </>
             )}
             <button
               onClick={() => onEdit(lesson)}

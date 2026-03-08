@@ -463,45 +463,48 @@ export default function LessonPage() {
                   </div>
                 )}
 
-                <VideoPlayer
-                  src={signedVideoUrl ?? ""}
-                  hlsSrc={currentLesson.video_hls_url}
-                  poster={currentLesson.video_thumbnail_url}
-                  initialTime={initialTime}
-                  onProgress={saveProgress}
-                  onComplete={markComplete}
-                  captionsEnUrl={currentLesson.captions_en_url}
-                  captionsArUrl={currentLesson.captions_ar_url}
-                  bookmarks={bookmarks}
-                  onSeekTo={seekToRef}
-                  restrictSpeed={!(videoConfig?.allowSpeedControl ?? true)}
-                  isTheaterMode={isTheaterMode}
-                  onTheaterToggle={toggleTheaterMode}
-                  nextLesson={
-                    nextLesson
-                      ? {
-                          title:
-                            locale === "ar" && nextLesson.title_ar
-                              ? nextLesson.title_ar
-                              : nextLesson.title,
-                          onPlay: navigateToNext,
-                        }
-                      : null
-                  }
-                  onTimeUpdate={setVideoCurrentTime}
-                  // Watched segments integration
-                  watchedSegments={getSegments()}
-                  onSegmentUpdate={markSegment}
-                  // Per-lesson config
-                  allowSkipping={videoConfig?.allowSkipping ?? true}
-                  isFirstWatch={videoConfig?.isFirstWatch ?? false}
-                  minimumWatchPercentage={videoConfig?.minimumWatchPercentage}
-                  autoSaveIntervalSeconds={videoConfig?.autoSaveIntervalSeconds}
-                  // Watch statistics callbacks
-                  onPlay={handlePlay}
-                  onPause={handlePause}
-                  onSeek={trackSeek}
-                />
+                {signedVideoUrl ? (
+                  <VideoPlayer
+                    src={signedVideoUrl}
+                    hlsSrc={currentLesson.video_hls_url}
+                    poster={currentLesson.video_thumbnail_url}
+                    initialTime={initialTime}
+                    onProgress={saveProgress}
+                    onComplete={markComplete}
+                    captionsEnUrl={currentLesson.captions_en_url}
+                    captionsArUrl={currentLesson.captions_ar_url}
+                    bookmarks={bookmarks}
+                    onSeekTo={seekToRef}
+                    restrictSpeed={!(videoConfig?.allowSpeedControl ?? true)}
+                    isTheaterMode={isTheaterMode}
+                    onTheaterToggle={toggleTheaterMode}
+                    nextLesson={
+                      nextLesson
+                        ? {
+                            title:
+                              locale === "ar" && nextLesson.title_ar
+                                ? nextLesson.title_ar
+                                : nextLesson.title,
+                            onPlay: navigateToNext,
+                          }
+                        : null
+                    }
+                    onTimeUpdate={setVideoCurrentTime}
+                    watchedSegments={getSegments()}
+                    onSegmentUpdate={markSegment}
+                    allowSkipping={videoConfig?.allowSkipping ?? true}
+                    isFirstWatch={videoConfig?.isFirstWatch ?? false}
+                    minimumWatchPercentage={videoConfig?.minimumWatchPercentage}
+                    autoSaveIntervalSeconds={videoConfig?.autoSaveIntervalSeconds}
+                    onPlay={handlePlay}
+                    onPause={handlePause}
+                    onSeek={trackSeek}
+                  />
+                ) : (
+                  <div className="aspect-video flex items-center justify-center rounded-lg bg-black">
+                    <LoadingSpinner />
+                  </div>
+                )}
 
                 {/* Stats and bookmarks toggle row */}
                 <div className="flex items-center justify-between">

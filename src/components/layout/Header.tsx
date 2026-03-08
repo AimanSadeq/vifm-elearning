@@ -9,7 +9,7 @@ import {
   Landmark, BrainCircuit, Target, ShieldCheck, ArrowRight,
   GraduationCap, Briefcase, Crown, Sparkles, Clock, Video,
 } from "lucide-react";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, Fragment } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { CATEGORIES } from "@/lib/utils/constants";
 import { cn } from "@/lib/utils/cn";
@@ -83,7 +83,7 @@ export function Header() {
   };
 
   return (
-    <>
+    <Fragment>
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
@@ -452,7 +452,7 @@ export function Header() {
 
     {/* Global Search Overlay — rendered outside header to avoid backdrop-blur stacking context clipping */}
     <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
-    </>
+    </Fragment>
   );
 }
 

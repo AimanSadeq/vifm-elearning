@@ -69,6 +69,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // External URLs (http/https) — return directly, no signed URL needed
+    if (videoPath.startsWith("http://") || videoPath.startsWith("https://")) {
+      return NextResponse.json({ url: videoPath });
+    }
+
     // Try course-videos bucket first (new), fall back to legacy videos bucket
     const { url: courseVideoUrl } = await createCourseVideoSignedUrl(
       videoPath,

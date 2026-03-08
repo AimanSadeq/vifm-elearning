@@ -1553,4 +1553,593 @@ export const courseContentRegistry: CourseContentRegistry = {
       },
     ],
   },
+
+  /* ------------------------------------------------------------------ */
+  /*  CASP — Certified AI Strategy Professional                          */
+  /* ------------------------------------------------------------------ */
+
+  casp: {
+    objectivesTitle: { en: "Course Objectives", ar: "أهداف الدورة" },
+    objectivesIntro: { en: "By completing this course, participants will be able to:", ar: "بعد إتمام هذه الدورة، سيتمكن المشاركون من:" },
+    objectives: [
+      { title: { en: "AI Landscape Analysis", ar: "تحليل مشهد الذكاء الاصطناعي" }, desc: { en: "Analyze the current landscape of AI technologies and their business implications.", ar: "تحليل المشهد الحالي لتقنيات الذكاء الاصطناعي وتأثيراتها على الأعمال." } },
+      { title: { en: "Strategic AI Formulation", ar: "صياغة استراتيجية الذكاء الاصطناعي" }, desc: { en: "Formulate comprehensive AI strategies aligned with organizational goals.", ar: "صياغة استراتيجيات شاملة للذكاء الاصطناعي تتوافق مع أهداف المؤسسة." } },
+      { title: { en: "Ethical AI Governance", ar: "الحوكمة الأخلاقية للذكاء الاصطناعي" }, desc: { en: "Evaluate ethical considerations and governance frameworks for AI implementation.", ar: "تقييم الاعتبارات الأخلاقية وأطر الحوكمة لتطبيق الذكاء الاصطناعي." } },
+      { title: { en: "AI Innovation Leadership", ar: "قيادة الابتكار بالذكاء الاصطناعي" }, desc: { en: "Lead cross-functional teams in AI-driven innovation projects.", ar: "قيادة فرق متعددة التخصصات في مشاريع الابتكار المدعومة بالذكاء الاصطناعي." } },
+      { title: { en: "Change Management for AI", ar: "إدارة التغيير للذكاء الاصطناعي" }, desc: { en: "Design effective change management strategies for AI adoption.", ar: "تصميم استراتيجيات فعّالة لإدارة التغيير لتبني الذكاء الاصطناعي." } },
+      { title: { en: "Operational AI Opportunities", ar: "فرص الذكاء الاصطناعي التشغيلية" }, desc: { en: "Identify opportunities for AI to enhance operational efficiency and create new value.", ar: "تحديد فرص الذكاء الاصطناعي لتعزيز الكفاءة التشغيلية وخلق قيمة جديدة." } },
+      { title: { en: "AI Integration Roadmap", ar: "خارطة طريق دمج الذكاء الاصطناعي" }, desc: { en: "Develop a strategic roadmap for integrating AI into their own organization.", ar: "تطوير خارطة طريق استراتيجية لدمج الذكاء الاصطناعي في مؤسساتهم." } },
+    ],
+    audienceTitle: { en: "Target Audience", ar: "الفئة المستهدفة" },
+    audienceDesc: { en: "Diverse group of professionals keen to leverage AI for strategic advantage: mid-to-senior level managers, business leaders for digital transformation, consultants advising on AI adoption, project managers overseeing AI projects, entrepreneurs integrating AI into ventures.", ar: "مجموعة متنوعة من المهنيين الحريصين على الاستفادة من الذكاء الاصطناعي لتحقيق ميزة استراتيجية: المدراء من المستوى المتوسط إلى الأعلى، وقادة الأعمال في التحول الرقمي، والمستشارون في تبني الذكاء الاصطناعي، ومدراء المشاريع المشرفون على مشاريع الذكاء الاصطناعي، ورواد الأعمال الذين يدمجون الذكاء الاصطناعي في مشاريعهم." },
+    competenciesTitle: { en: "Target Competencies", ar: "الكفاءات المستهدفة" },
+    competencies: [
+      { text: { en: "Strategic Foresight", ar: "الاستشراف الاستراتيجي" } },
+      { text: { en: "AI Literacy", ar: "الإلمام بالذكاء الاصطناعي" } },
+      { text: { en: "Ethical Governance", ar: "الحوكمة الأخلاقية" } },
+      { text: { en: "Innovation Leadership", ar: "قيادة الابتكار" } },
+      { text: { en: "Organizational Transformation", ar: "التحول المؤسسي" } },
+    ],
+    contentTitle: { en: "Course Content", ar: "محتوى الدورة" },
+    contentSubtitle: { en: "5 Modules • 25 Video Lessons • 5 Days of Training", ar: "5 وحدات • 25 درس فيديو • 5 أيام تدريب" },
+    modules: [
+      {
+        id: 1,
+        title: { en: "Foundations of AI Strategy", ar: "أسس استراتيجية الذكاء الاصطناعي" },
+        videos: [
+          { num: "1.1", title: { en: "Understanding the AI Landscape", ar: "فهم مشهد الذكاء الاصطناعي" }, desc: { en: "Explore the current state of AI technologies and their evolution across industries.", ar: "استكشاف الوضع الحالي لتقنيات الذكاء الاصطناعي وتطورها عبر الصناعات." }, duration: "25 min" },
+          { num: "1.2", title: { en: "Strategic Opportunities & Threats", ar: "الفرص والتهديدات الاستراتيجية" }, desc: { en: "Identify strategic opportunities and threats presented by AI in the business landscape.", ar: "تحديد الفرص والتهديدات الاستراتيجية التي يقدمها الذكاء الاصطناعي في بيئة الأعمال." }, duration: "25 min" },
+          { num: "1.3", title: { en: "Aligning AI with Business Objectives", ar: "مواءمة الذكاء الاصطناعي مع أهداف الأعمال" }, desc: { en: "Learn frameworks for aligning AI initiatives with core business objectives.", ar: "تعلم أطر مواءمة مبادرات الذكاء الاصطناعي مع أهداف الأعمال الأساسية." }, duration: "25 min" },
+          { num: "1.4", title: { en: "Case Studies in AI Strategy", ar: "دراسات حالة في استراتيجية الذكاء الاصطناعي" }, desc: { en: "Examine real-world case studies of successful AI strategy implementation.", ar: "دراسة حالات واقعية لتطبيق ناجح لاستراتيجية الذكاء الاصطناعي." }, duration: "25 min" },
+          { num: "1.5", title: { en: "Developing an AI-Ready Mindset", ar: "تطوير عقلية جاهزة للذكاء الاصطناعي" }, desc: { en: "Cultivate the mindset and organizational culture needed for AI readiness.", ar: "تنمية العقلية والثقافة المؤسسية اللازمة للاستعداد للذكاء الاصطناعي." }, duration: "25 min" },
+        ],
+      },
+      {
+        id: 2,
+        title: { en: "AI Technologies and Business Applications", ar: "تقنيات الذكاء الاصطناعي وتطبيقات الأعمال" },
+        videos: [
+          { num: "2.1", title: { en: "Demystifying Key AI Technologies", ar: "تبسيط تقنيات الذكاء الاصطناعي الرئيسية" }, desc: { en: "Break down key AI technologies including machine learning, NLP, and computer vision.", ar: "تبسيط تقنيات الذكاء الاصطناعي الرئيسية بما في ذلك التعلم الآلي ومعالجة اللغة الطبيعية والرؤية الحاسوبية." }, duration: "25 min" },
+          { num: "2.2", title: { en: "Capabilities & Limitations of AI", ar: "قدرات وقيود الذكاء الاصطناعي" }, desc: { en: "Understand the realistic capabilities and current limitations of AI technologies.", ar: "فهم القدرات الواقعية والقيود الحالية لتقنيات الذكاء الاصطناعي." }, duration: "25 min" },
+          { num: "2.3", title: { en: "Practical AI Applications Across Industries", ar: "تطبيقات الذكاء الاصطناعي العملية عبر الصناعات" }, desc: { en: "Explore practical AI applications across healthcare, finance, manufacturing, and more.", ar: "استكشاف تطبيقات الذكاء الاصطناعي العملية عبر الرعاية الصحية والمالية والتصنيع وغيرها." }, duration: "25 min" },
+          { num: "2.4", title: { en: "Evaluating AI Solutions for Strategic Fit", ar: "تقييم حلول الذكاء الاصطناعي للملاءمة الاستراتيجية" }, desc: { en: "Develop criteria for evaluating AI solutions and their strategic fit within organizations.", ar: "تطوير معايير لتقييم حلول الذكاء الاصطناعي وملاءمتها الاستراتيجية داخل المؤسسات." }, duration: "25 min" },
+          { num: "2.5", title: { en: "Bridging Technical & Business Objectives", ar: "الربط بين الأهداف التقنية والتجارية" }, desc: { en: "Learn to bridge the gap between technical AI capabilities and business objectives.", ar: "تعلم سد الفجوة بين القدرات التقنية للذكاء الاصطناعي وأهداف الأعمال." }, duration: "25 min" },
+        ],
+      },
+      {
+        id: 3,
+        title: { en: "Ethical AI and Governance", ar: "أخلاقيات الذكاء الاصطناعي والحوكمة" },
+        videos: [
+          { num: "3.1", title: { en: "Ethical Considerations in AI", ar: "الاعتبارات الأخلاقية في الذكاء الاصطناعي" }, desc: { en: "Examine the key ethical considerations surrounding AI deployment in organizations.", ar: "دراسة الاعتبارات الأخلاقية الرئيسية المحيطة بنشر الذكاء الاصطناعي في المؤسسات." }, duration: "25 min" },
+          { num: "3.2", title: { en: "Establishing AI Governance Frameworks", ar: "إنشاء أطر حوكمة الذكاء الاصطناعي" }, desc: { en: "Design and implement comprehensive AI governance frameworks for responsible use.", ar: "تصميم وتنفيذ أطر حوكمة شاملة للذكاء الاصطناعي للاستخدام المسؤول." }, duration: "25 min" },
+          { num: "3.3", title: { en: "Managing Societal Impact of AI", ar: "إدارة التأثير المجتمعي للذكاء الاصطناعي" }, desc: { en: "Understand and manage the broader societal impact of AI deployment.", ar: "فهم وإدارة التأثير المجتمعي الأوسع لنشر الذكاء الاصطناعي." }, duration: "25 min" },
+          { num: "3.4", title: { en: "Developing Trust in AI Systems", ar: "بناء الثقة في أنظمة الذكاء الاصطناعي" }, desc: { en: "Build trust and transparency in AI systems through explainability and accountability.", ar: "بناء الثقة والشفافية في أنظمة الذكاء الاصطناعي من خلال قابلية التفسير والمساءلة." }, duration: "25 min" },
+          { num: "3.5", title: { en: "Legal & Regulatory Landscape", ar: "المشهد القانوني والتنظيمي" }, desc: { en: "Navigate the evolving legal and regulatory landscape governing AI technologies.", ar: "التعامل مع المشهد القانوني والتنظيمي المتطور الذي يحكم تقنيات الذكاء الاصطناعي." }, duration: "25 min" },
+        ],
+      },
+      {
+        id: 4,
+        title: { en: "Leading AI Innovation and Transformation", ar: "قيادة الابتكار والتحول بالذكاء الاصطناعي" },
+        videos: [
+          { num: "4.1", title: { en: "Fostering AI Innovation Culture", ar: "تعزيز ثقافة الابتكار بالذكاء الاصطناعي" }, desc: { en: "Create an organizational culture that fosters AI innovation and experimentation.", ar: "خلق ثقافة مؤسسية تعزز الابتكار والتجريب بالذكاء الاصطناعي." }, duration: "25 min" },
+          { num: "4.2", title: { en: "Leading AI Projects Effectively", ar: "قيادة مشاريع الذكاء الاصطناعي بفعالية" }, desc: { en: "Master leadership skills specific to managing AI projects and cross-functional teams.", ar: "إتقان مهارات القيادة الخاصة بإدارة مشاريع الذكاء الاصطناعي والفرق متعددة التخصصات." }, duration: "25 min" },
+          { num: "4.3", title: { en: "Building AI-Ready Talent & Teams", ar: "بناء المواهب والفرق الجاهزة للذكاء الاصطناعي" }, desc: { en: "Develop strategies for building AI-ready talent pools and high-performing teams.", ar: "تطوير استراتيجيات لبناء مجموعات مواهب جاهزة للذكاء الاصطناعي وفرق عالية الأداء." }, duration: "25 min" },
+          { num: "4.4", title: { en: "Driving Organizational Change for AI", ar: "قيادة التغيير المؤسسي للذكاء الاصطناعي" }, desc: { en: "Drive organizational change required for successful AI adoption and transformation.", ar: "قيادة التغيير المؤسسي المطلوب لتبني الذكاء الاصطناعي والتحول بنجاح." }, duration: "25 min" },
+          { num: "4.5", title: { en: "Measuring AI Impact & ROI", ar: "قياس تأثير الذكاء الاصطناعي والعائد على الاستثمار" }, desc: { en: "Establish metrics and frameworks for measuring AI impact and return on investment.", ar: "وضع مقاييس وأطر لقياس تأثير الذكاء الاصطناعي والعائد على الاستثمار." }, duration: "25 min" },
+        ],
+      },
+      {
+        id: 5,
+        title: { en: "Implementing and Sustaining AI Strategy", ar: "تنفيذ واستدامة استراتيجية الذكاء الاصطناعي" },
+        videos: [
+          { num: "5.1", title: { en: "Developing an AI Implementation Roadmap", ar: "تطوير خارطة طريق تنفيذ الذكاء الاصطناعي" }, desc: { en: "Create a detailed implementation roadmap for AI strategy execution.", ar: "إنشاء خارطة طريق تفصيلية لتنفيذ استراتيجية الذكاء الاصطناعي." }, duration: "30 min" },
+          { num: "5.2", title: { en: "Managing Transition to AI-Powered Enterprise", ar: "إدارة الانتقال إلى مؤسسة مدعومة بالذكاء الاصطناعي" }, desc: { en: "Manage the organizational transition towards becoming an AI-powered enterprise.", ar: "إدارة الانتقال المؤسسي نحو التحول إلى مؤسسة مدعومة بالذكاء الاصطناعي." }, duration: "30 min" },
+          { num: "5.3", title: { en: "Sustaining AI Value & Improvement", ar: "استدامة قيمة الذكاء الاصطناعي والتحسين" }, desc: { en: "Develop practices for sustaining AI value creation and continuous improvement.", ar: "تطوير ممارسات لاستدامة خلق القيمة من الذكاء الاصطناعي والتحسين المستمر." }, duration: "30 min" },
+          { num: "5.4", title: { en: "Building Strategic AI Partnerships", ar: "بناء شراكات استراتيجية في الذكاء الاصطناعي" }, desc: { en: "Identify and build strategic partnerships to accelerate AI initiatives.", ar: "تحديد وبناء شراكات استراتيجية لتسريع مبادرات الذكاء الاصطناعي." }, duration: "30 min" },
+          { num: "5.5", title: { en: "Project Presentation & Peer Feedback", ar: "عرض المشروع وتقييم الأقران" }, desc: { en: "Present AI strategy projects and receive structured peer feedback for refinement.", ar: "عرض مشاريع استراتيجية الذكاء الاصطناعي وتلقي تقييم منظم من الأقران للتحسين." }, duration: "30 min" },
+        ],
+      },
+    ],
+  },
+
+  /* ------------------------------------------------------------------ */
+  /*  CHRS — Certified AI - Human Resources Dynamics Strategist          */
+  /* ------------------------------------------------------------------ */
+
+  chrs: {
+    objectivesTitle: { en: "Course Objectives", ar: "أهداف الدورة" },
+    objectivesIntro: { en: "By completing this course, participants will be able to:", ar: "بعد إتمام هذه الدورة، سيتمكن المشاركون من:" },
+    objectives: [
+      { title: { en: "AI in Human Capital Management", ar: "الذكاء الاصطناعي في إدارة رأس المال البشري" }, desc: { en: "Evaluate the strategic role of AI in human capital management.", ar: "تقييم الدور الاستراتيجي للذكاء الاصطناعي في إدارة رأس المال البشري." } },
+      { title: { en: "AI Tools for Workforce Planning", ar: "أدوات الذكاء الاصطناعي لتخطيط القوى العاملة" }, desc: { en: "Integrate AI tools into workforce planning and talent analytics.", ar: "دمج أدوات الذكاء الاصطناعي في تخطيط القوى العاملة وتحليلات المواهب." } },
+      { title: { en: "Data-Driven HR Insights", ar: "رؤى الموارد البشرية المبنية على البيانات" }, desc: { en: "Interpret data-driven insights to inform HR decision-making.", ar: "تفسير الرؤى المبنية على البيانات لتوجيه قرارات الموارد البشرية." } },
+      { title: { en: "Ethical AI Governance for HR", ar: "حوكمة الذكاء الاصطناعي الأخلاقية للموارد البشرية" }, desc: { en: "Design ethical AI governance frameworks for HR practices.", ar: "تصميم أطر حوكمة أخلاقية للذكاء الاصطناعي في ممارسات الموارد البشرية." } },
+      { title: { en: "Change Through Automation", ar: "التغيير من خلال الأتمتة" }, desc: { en: "Lead organizational change through intelligent automation.", ar: "قيادة التغيير المؤسسي من خلال الأتمتة الذكية." } },
+      { title: { en: "AI-Aligned Workforce Models", ar: "نماذج القوى العاملة المتوافقة مع الذكاء الاصطناعي" }, desc: { en: "Align AI strategies with human-centered workforce models.", ar: "مواءمة استراتيجيات الذكاء الاصطناعي مع نماذج القوى العاملة المتمحورة حول الإنسان." } },
+      { title: { en: "Predictive Employee Engagement", ar: "التفاعل التنبؤي للموظفين" }, desc: { en: "Enhance employee experience through predictive engagement tools.", ar: "تعزيز تجربة الموظف من خلال أدوات التفاعل التنبؤية." } },
+      { title: { en: "Future-Ready HR Capabilities", ar: "قدرات الموارد البشرية المستقبلية" }, desc: { en: "Transform HR capabilities for future-readiness and agility.", ar: "تحويل قدرات الموارد البشرية للجاهزية المستقبلية والمرونة." } },
+    ],
+    audienceTitle: { en: "Target Audience", ar: "الفئة المستهدفة" },
+    audienceDesc: { en: "Mid-level HR professionals, senior HR associates, HR business partners, human capital strategists and OD consultants, talent management leaders and employee engagement experts.", ar: "متخصصو الموارد البشرية من المستوى المتوسط، وكبار مسؤولي الموارد البشرية، وشركاء أعمال الموارد البشرية، واستراتيجيو رأس المال البشري ومستشارو التطوير المؤسسي، وقادة إدارة المواهب وخبراء تفاعل الموظفين." },
+    competenciesTitle: { en: "Target Competencies", ar: "الكفاءات المستهدفة" },
+    competencies: [
+      { text: { en: "Strategic Foresight", ar: "الاستشراف الاستراتيجي" } },
+      { text: { en: "AI Integration", ar: "تكامل الذكاء الاصطناعي" } },
+      { text: { en: "Workforce Intelligence", ar: "ذكاء القوى العاملة" } },
+      { text: { en: "Change Enablement", ar: "تمكين التغيير" } },
+      { text: { en: "Data Fluency", ar: "الطلاقة في البيانات" } },
+      { text: { en: "Ethical Governance", ar: "الحوكمة الأخلاقية" } },
+      { text: { en: "Human-AI Collaboration", ar: "التعاون بين الإنسان والذكاء الاصطناعي" } },
+    ],
+    contentTitle: { en: "Course Content", ar: "محتوى الدورة" },
+    contentSubtitle: { en: "7 Modules • 35 Video Lessons • 5 Days of Training", ar: "7 وحدات • 35 درس فيديو • 5 أيام تدريب" },
+    modules: [
+      {
+        id: 1,
+        title: { en: "Strategic Foresight", ar: "الاستشراف الاستراتيجي" },
+        videos: [
+          { num: "1.1", title: { en: "Future of Work Trends", ar: "اتجاهات مستقبل العمل" }, desc: { en: "Explore emerging trends shaping the future of work and their HR implications.", ar: "استكشاف الاتجاهات الناشئة التي تشكل مستقبل العمل وتأثيراتها على الموارد البشرية." }, duration: "20 min" },
+          { num: "1.2", title: { en: "Industry AI Transformations", ar: "تحولات الذكاء الاصطناعي في الصناعات" }, desc: { en: "Understand how AI is transforming industries and workforce dynamics.", ar: "فهم كيف يحوّل الذكاء الاصطناعي الصناعات وديناميكيات القوى العاملة." }, duration: "20 min" },
+          { num: "1.3", title: { en: "Mapping Talent Landscapes", ar: "رسم خرائط المواهب" }, desc: { en: "Map current and future talent landscapes to anticipate workforce needs.", ar: "رسم خرائط المواهب الحالية والمستقبلية لاستباق احتياجات القوى العاملة." }, duration: "20 min" },
+          { num: "1.4", title: { en: "Future-Ready HR Structures", ar: "هياكل الموارد البشرية المستقبلية" }, desc: { en: "Design HR structures that are resilient and adaptable for the future.", ar: "تصميم هياكل موارد بشرية مرنة وقابلة للتكيف مع المستقبل." }, duration: "20 min" },
+          { num: "1.5", title: { en: "Building Foresight into HR Strategy", ar: "دمج الاستشراف في استراتيجية الموارد البشرية" }, desc: { en: "Integrate strategic foresight methodologies into HR planning processes.", ar: "دمج منهجيات الاستشراف الاستراتيجي في عمليات تخطيط الموارد البشرية." }, duration: "20 min" },
+        ],
+      },
+      {
+        id: 2,
+        title: { en: "AI Integration", ar: "تكامل الذكاء الاصطناعي" },
+        videos: [
+          { num: "2.1", title: { en: "AI Technologies in HR", ar: "تقنيات الذكاء الاصطناعي في الموارد البشرية" }, desc: { en: "Overview of AI technologies applicable to HR functions and processes.", ar: "نظرة عامة على تقنيات الذكاء الاصطناعي القابلة للتطبيق في وظائف وعمليات الموارد البشرية." }, duration: "20 min" },
+          { num: "2.2", title: { en: "Automating Recruitment Processes", ar: "أتمتة عمليات التوظيف" }, desc: { en: "Leverage AI to automate and enhance recruitment and candidate screening.", ar: "الاستفادة من الذكاء الاصطناعي لأتمتة وتحسين التوظيف وفحص المرشحين." }, duration: "20 min" },
+          { num: "2.3", title: { en: "Enhancing Performance Management", ar: "تعزيز إدارة الأداء" }, desc: { en: "Apply AI tools to improve performance management and feedback cycles.", ar: "تطبيق أدوات الذكاء الاصطناعي لتحسين إدارة الأداء ودورات التقييم." }, duration: "20 min" },
+          { num: "2.4", title: { en: "AI for Learning & Development", ar: "الذكاء الاصطناعي للتعلم والتطوير" }, desc: { en: "Use AI to personalize learning pathways and accelerate employee development.", ar: "استخدام الذكاء الاصطناعي لتخصيص مسارات التعلم وتسريع تطوير الموظفين." }, duration: "20 min" },
+          { num: "2.5", title: { en: "AI in HR Operations", ar: "الذكاء الاصطناعي في عمليات الموارد البشرية" }, desc: { en: "Streamline day-to-day HR operations using AI-powered automation.", ar: "تبسيط عمليات الموارد البشرية اليومية باستخدام الأتمتة المدعومة بالذكاء الاصطناعي." }, duration: "20 min" },
+        ],
+      },
+      {
+        id: 3,
+        title: { en: "Workforce Intelligence", ar: "ذكاء القوى العاملة" },
+        videos: [
+          { num: "3.1", title: { en: "Interpreting Talent Analytics", ar: "تفسير تحليلات المواهب" }, desc: { en: "Interpret talent analytics data to derive actionable workforce insights.", ar: "تفسير بيانات تحليلات المواهب لاستخلاص رؤى قابلة للتنفيذ حول القوى العاملة." }, duration: "20 min" },
+          { num: "3.2", title: { en: "Linking Analytics to HR Strategy", ar: "ربط التحليلات باستراتيجية الموارد البشرية" }, desc: { en: "Connect workforce analytics outputs to strategic HR decision-making.", ar: "ربط مخرجات تحليلات القوى العاملة باتخاذ القرارات الاستراتيجية للموارد البشرية." }, duration: "20 min" },
+          { num: "3.3", title: { en: "Real-Time People Analytics", ar: "تحليلات الأشخاص في الوقت الفعلي" }, desc: { en: "Implement real-time people analytics for dynamic workforce monitoring.", ar: "تنفيذ تحليلات الأشخاص في الوقت الفعلي لمراقبة القوى العاملة الديناميكية." }, duration: "20 min" },
+          { num: "3.4", title: { en: "AI-Powered Succession Planning", ar: "تخطيط التعاقب المدعوم بالذكاء الاصطناعي" }, desc: { en: "Use AI to enhance succession planning and leadership pipeline development.", ar: "استخدام الذكاء الاصطناعي لتعزيز تخطيط التعاقب وتطوير خط القيادة." }, duration: "20 min" },
+          { num: "3.5", title: { en: "Metrics That Matter in Modern HR", ar: "المقاييس المهمة في الموارد البشرية الحديثة" }, desc: { en: "Identify and track the HR metrics that drive organizational performance.", ar: "تحديد وتتبع مقاييس الموارد البشرية التي تدفع الأداء المؤسسي." }, duration: "20 min" },
+        ],
+      },
+      {
+        id: 4,
+        title: { en: "Change Enablement", ar: "تمكين التغيير" },
+        videos: [
+          { num: "4.1", title: { en: "Human Side of Transformation", ar: "الجانب الإنساني للتحول" }, desc: { en: "Understand the human factors that drive or resist organizational transformation.", ar: "فهم العوامل الإنسانية التي تدفع أو تقاوم التحول المؤسسي." }, duration: "20 min" },
+          { num: "4.2", title: { en: "Communicating Change with Impact", ar: "التواصل حول التغيير بتأثير" }, desc: { en: "Develop impactful communication strategies for change initiatives.", ar: "تطوير استراتيجيات تواصل مؤثرة لمبادرات التغيير." }, duration: "20 min" },
+          { num: "4.3", title: { en: "Change Readiness Assessments", ar: "تقييمات الاستعداد للتغيير" }, desc: { en: "Conduct readiness assessments to gauge organizational preparedness for change.", ar: "إجراء تقييمات الاستعداد لقياس جاهزية المؤسسة للتغيير." }, duration: "20 min" },
+          { num: "4.4", title: { en: "Embedding Change Through Culture", ar: "ترسيخ التغيير من خلال الثقافة" }, desc: { en: "Embed sustainable change through cultural transformation initiatives.", ar: "ترسيخ التغيير المستدام من خلال مبادرات التحول الثقافي." }, duration: "20 min" },
+          { num: "4.5", title: { en: "Driving AI Adoption in HR", ar: "دفع تبني الذكاء الاصطناعي في الموارد البشرية" }, desc: { en: "Accelerate AI adoption within HR through structured change enablement.", ar: "تسريع تبني الذكاء الاصطناعي في الموارد البشرية من خلال تمكين التغيير المنظم." }, duration: "20 min" },
+        ],
+      },
+      {
+        id: 5,
+        title: { en: "Data Fluency", ar: "الطلاقة في البيانات" },
+        videos: [
+          { num: "5.1", title: { en: "Developing HR Data Literacy", ar: "تطوير الإلمام بالبيانات في الموارد البشرية" }, desc: { en: "Build foundational data literacy skills for HR professionals.", ar: "بناء مهارات الإلمام بالبيانات الأساسية لمتخصصي الموارد البشرية." }, duration: "20 min" },
+          { num: "5.2", title: { en: "Building Effective Dashboards", ar: "بناء لوحات معلومات فعّالة" }, desc: { en: "Design and build effective HR dashboards for data visualization.", ar: "تصميم وبناء لوحات معلومات فعّالة للموارد البشرية لتصور البيانات." }, duration: "20 min" },
+          { num: "5.3", title: { en: "Data Privacy & Compliance", ar: "خصوصية البيانات والامتثال" }, desc: { en: "Ensure data privacy and regulatory compliance in HR data management.", ar: "ضمان خصوصية البيانات والامتثال التنظيمي في إدارة بيانات الموارد البشرية." }, duration: "20 min" },
+          { num: "5.4", title: { en: "Managing Large Datasets", ar: "إدارة مجموعات البيانات الكبيرة" }, desc: { en: "Handle and process large HR datasets efficiently and accurately.", ar: "التعامل مع مجموعات بيانات الموارد البشرية الكبيرة ومعالجتها بكفاءة ودقة." }, duration: "20 min" },
+          { num: "5.5", title: { en: "Aligning Data to Decisions", ar: "مواءمة البيانات مع القرارات" }, desc: { en: "Translate data insights into strategic HR decisions and actions.", ar: "ترجمة رؤى البيانات إلى قرارات وإجراءات استراتيجية للموارد البشرية." }, duration: "20 min" },
+        ],
+      },
+      {
+        id: 6,
+        title: { en: "Ethical Governance", ar: "الحوكمة الأخلاقية" },
+        videos: [
+          { num: "6.1", title: { en: "AI Ethics in HR", ar: "أخلاقيات الذكاء الاصطناعي في الموارد البشرية" }, desc: { en: "Explore ethical principles governing AI use in human resources.", ar: "استكشاف المبادئ الأخلاقية التي تحكم استخدام الذكاء الاصطناعي في الموارد البشرية." }, duration: "20 min" },
+          { num: "6.2", title: { en: "Establishing Ethical HR Frameworks", ar: "إنشاء أطر أخلاقية للموارد البشرية" }, desc: { en: "Build ethical frameworks that guide responsible AI deployment in HR.", ar: "بناء أطر أخلاقية توجه النشر المسؤول للذكاء الاصطناعي في الموارد البشرية." }, duration: "20 min" },
+          { num: "6.3", title: { en: "Creating Responsible AI Policies", ar: "إنشاء سياسات ذكاء اصطناعي مسؤولة" }, desc: { en: "Develop comprehensive responsible AI policies for HR operations.", ar: "تطوير سياسات شاملة للذكاء الاصطناعي المسؤول لعمليات الموارد البشرية." }, duration: "20 min" },
+          { num: "6.4", title: { en: "Navigating Legal Implications", ar: "التعامل مع الآثار القانونية" }, desc: { en: "Navigate the legal implications of AI use in employment and HR.", ar: "التعامل مع الآثار القانونية لاستخدام الذكاء الاصطناعي في التوظيف والموارد البشرية." }, duration: "20 min" },
+          { num: "6.5", title: { en: "Building Trust in AI-Driven HR", ar: "بناء الثقة في الموارد البشرية المدعومة بالذكاء الاصطناعي" }, desc: { en: "Establish trust among employees and stakeholders in AI-driven HR systems.", ar: "بناء الثقة بين الموظفين وأصحاب المصلحة في أنظمة الموارد البشرية المدعومة بالذكاء الاصطناعي." }, duration: "20 min" },
+        ],
+      },
+      {
+        id: 7,
+        title: { en: "Human-AI Collaboration", ar: "التعاون بين الإنسان والذكاء الاصطناعي" },
+        videos: [
+          { num: "7.1", title: { en: "Balancing Tech & Human Judgment", ar: "الموازنة بين التكنولوجيا والحكم البشري" }, desc: { en: "Find the right balance between AI automation and human judgment in HR.", ar: "إيجاد التوازن الصحيح بين أتمتة الذكاء الاصطناعي والحكم البشري في الموارد البشرية." }, duration: "20 min" },
+          { num: "7.2", title: { en: "Designing Collaborative Workflows", ar: "تصميم مسارات عمل تعاونية" }, desc: { en: "Design workflows that optimize collaboration between humans and AI systems.", ar: "تصميم مسارات عمل تحسّن التعاون بين البشر وأنظمة الذكاء الاصطناعي." }, duration: "20 min" },
+          { num: "7.3", title: { en: "Empowering Employees with AI", ar: "تمكين الموظفين بالذكاء الاصطناعي" }, desc: { en: "Empower employees to effectively leverage AI tools in their daily work.", ar: "تمكين الموظفين من الاستفادة الفعّالة من أدوات الذكاء الاصطناعي في عملهم اليومي." }, duration: "20 min" },
+          { num: "7.4", title: { en: "AI & Leadership Decision-Making", ar: "الذكاء الاصطناعي واتخاذ القرارات القيادية" }, desc: { en: "Integrate AI insights into leadership decision-making processes.", ar: "دمج رؤى الذكاء الاصطناعي في عمليات اتخاذ القرارات القيادية." }, duration: "20 min" },
+          { num: "7.5", title: { en: "Humanizing Digital Transformation", ar: "أنسنة التحول الرقمي" }, desc: { en: "Ensure digital transformation remains human-centered and employee-focused.", ar: "ضمان أن يظل التحول الرقمي متمحوراً حول الإنسان ومركزاً على الموظف." }, duration: "20 min" },
+        ],
+      },
+    ],
+  },
+
+  /* ------------------------------------------------------------------ */
+  /*  CAIQLP — Certified AI Quality Leadership Professional              */
+  /* ------------------------------------------------------------------ */
+
+  caiqlp: {
+    objectivesTitle: { en: "Course Objectives", ar: "أهداف الدورة" },
+    objectivesIntro: { en: "By completing this course, participants will be able to:", ar: "بعد إتمام هذه الدورة، سيتمكن المشاركون من:" },
+    objectives: [
+      { title: { en: "AI Integration in Quality", ar: "دمج الذكاء الاصطناعي في الجودة" }, desc: { en: "Integrate AI tools into routine quality activities without weakening controls.", ar: "دمج أدوات الذكاء الاصطناعي في أنشطة الجودة الروتينية دون إضعاف الضوابط." } },
+      { title: { en: "AI Pilot Planning", ar: "التخطيط التجريبي للذكاء الاصطناعي" }, desc: { en: "Plan small pilot uses of AI for documentation, reporting, and basic analysis.", ar: "التخطيط لاستخدامات تجريبية صغيرة للذكاء الاصطناعي في التوثيق والتقارير والتحليل الأساسي." } },
+      { title: { en: "AI Oversight & Risk Management", ar: "الرقابة وإدارة المخاطر في الذكاء الاصطناعي" }, desc: { en: "Establish oversight for data privacy, hallucinations, bias, and intellectual property.", ar: "إنشاء رقابة على خصوصية البيانات والهلوسات والتحيز والملكية الفكرية." } },
+      { title: { en: "AI Team Direction", ar: "توجيه فرق الذكاء الاصطناعي" }, desc: { en: "Direct teams using clear roles, RACI, and simple SOPs for AI-supported tasks.", ar: "توجيه الفرق باستخدام أدوار واضحة ومصفوفة RACI وإجراءات تشغيل بسيطة للمهام المدعومة بالذكاء الاصطناعي." } },
+      { title: { en: "AI Output Validation", ar: "التحقق من مخرجات الذكاء الاصطناعي" }, desc: { en: "Validate AI outputs against ISO/standards with structured reviews and evidence logs.", ar: "التحقق من مخرجات الذكاء الاصطناعي مقابل معايير ISO بمراجعات منظمة وسجلات الأدلة." } },
+      { title: { en: "AI in PDCA Cycles", ar: "الذكاء الاصطناعي في دورات PDCA" }, desc: { en: "Embed AI activities into PDCA cycles to sustain improvement.", ar: "تضمين أنشطة الذكاء الاصطناعي في دورات PDCA لاستدامة التحسين." } },
+      { title: { en: "Audit-Ready Communication", ar: "التواصل الجاهز للتدقيق" }, desc: { en: "Communicate outcomes with audit-ready evidence for management review.", ar: "إيصال النتائج بأدلة جاهزة للتدقيق لمراجعة الإدارة." } },
+    ],
+    audienceTitle: { en: "Target Audience", ar: "الفئة المستهدفة" },
+    audienceDesc: { en: "Supervisors, team leaders, and managers who want to guide teams in responsibly applying AI within quality systems while maintaining compliance and control.", ar: "المشرفون وقادة الفرق والمدراء الذين يرغبون في توجيه فرقهم لتطبيق الذكاء الاصطناعي بمسؤولية ضمن أنظمة الجودة مع الحفاظ على الامتثال والرقابة." },
+    competenciesTitle: { en: "Target Competencies", ar: "الكفاءات المستهدفة" },
+    competencies: [
+      { text: { en: "AI Quality Governance", ar: "حوكمة جودة الذكاء الاصطناعي" } },
+      { text: { en: "Strategic AI Risk Management", ar: "إدارة المخاطر الاستراتيجية للذكاء الاصطناعي" } },
+      { text: { en: "Compliance Integration Plan", ar: "خطة تكامل الامتثال" } },
+      { text: { en: "Performance Measurement Design", ar: "تصميم قياس الأداء" } },
+      { text: { en: "Organizational AI Adoption", ar: "تبني الذكاء الاصطناعي المؤسسي" } },
+    ],
+    contentTitle: { en: "Course Content", ar: "محتوى الدورة" },
+    contentSubtitle: { en: "5 Modules • 20 Video Lessons • 5 Days of Training", ar: "5 وحدات • 20 درس فيديو • 5 أيام تدريب" },
+    modules: [
+      {
+        id: 1,
+        title: { en: "AI & Quality Leadership Basics", ar: "أساسيات الذكاء الاصطناعي وقيادة الجودة" },
+        videos: [
+          { num: "1.1", title: { en: "Why Leaders Must Understand AI", ar: "لماذا يجب على القادة فهم الذكاء الاصطناعي" }, desc: { en: "Understand why quality leaders must develop AI literacy in the modern landscape.", ar: "فهم لماذا يجب على قادة الجودة تطوير الإلمام بالذكاء الاصطناعي في المشهد الحديث." }, duration: "30 min" },
+          { num: "1.2", title: { en: "Role of AI in Customer Focus & Compliance", ar: "دور الذكاء الاصطناعي في التركيز على العملاء والامتثال" }, desc: { en: "Explore how AI supports customer focus and regulatory compliance in quality.", ar: "استكشاف كيف يدعم الذكاء الاصطناعي التركيز على العملاء والامتثال التنظيمي في الجودة." }, duration: "30 min" },
+          { num: "1.3", title: { en: "Assistive vs. Autonomous AI Use", ar: "الاستخدام المساعد مقابل المستقل للذكاء الاصطناعي" }, desc: { en: "Distinguish between assistive and autonomous AI use cases in quality systems.", ar: "التمييز بين حالات الاستخدام المساعد والمستقل للذكاء الاصطناعي في أنظمة الجودة." }, duration: "30 min" },
+          { num: "1.4", title: { en: "Traceability & Guardrails", ar: "التتبع والضوابط الوقائية" }, desc: { en: "Establish traceability mechanisms and guardrails for AI-assisted quality processes.", ar: "إنشاء آليات التتبع والضوابط الوقائية لعمليات الجودة المدعومة بالذكاء الاصطناعي." }, duration: "30 min" },
+        ],
+      },
+      {
+        id: 2,
+        title: { en: "Planning AI Use in Quality", ar: "تخطيط استخدام الذكاء الاصطناعي في الجودة" },
+        videos: [
+          { num: "2.1", title: { en: "Choosing Safe Starter Areas", ar: "اختيار المجالات الأولية الآمنة" }, desc: { en: "Identify safe and appropriate starting areas for AI deployment in quality.", ar: "تحديد المجالات الأولية الآمنة والمناسبة لنشر الذكاء الاصطناعي في الجودة." }, duration: "30 min" },
+          { num: "2.2", title: { en: "Identifying AI Risks", ar: "تحديد مخاطر الذكاء الاصطناعي" }, desc: { en: "Assess and identify risks associated with AI use in quality management.", ar: "تقييم وتحديد المخاطر المرتبطة باستخدام الذكاء الاصطناعي في إدارة الجودة." }, duration: "30 min" },
+          { num: "2.3", title: { en: "Oversight Design & Audit Trails", ar: "تصميم الرقابة ومسارات التدقيق" }, desc: { en: "Design oversight structures and maintain audit trails for AI activities.", ar: "تصميم هياكل الرقابة والحفاظ على مسارات التدقيق لأنشطة الذكاء الاصطناعي." }, duration: "30 min" },
+          { num: "2.4", title: { en: "Pilot Scoping & Success Criteria", ar: "تحديد نطاق التجربة ومعايير النجاح" }, desc: { en: "Define pilot scope, objectives, and measurable success criteria.", ar: "تحديد نطاق التجربة والأهداف ومعايير النجاح القابلة للقياس." }, duration: "30 min" },
+        ],
+      },
+      {
+        id: 3,
+        title: { en: "Leading AI-Supported Teams", ar: "قيادة الفرق المدعومة بالذكاء الاصطناعي" },
+        videos: [
+          { num: "3.1", title: { en: "Assigning Tasks with AI Support", ar: "توزيع المهام بدعم الذكاء الاصطناعي" }, desc: { en: "Assign and delegate tasks effectively with AI support and clear role definitions.", ar: "توزيع وتفويض المهام بفعالية مع دعم الذكاء الاصطناعي وتعريف واضح للأدوار." }, duration: "30 min" },
+          { num: "3.2", title: { en: "Checking Outputs for ISO Compliance", ar: "فحص المخرجات للامتثال لمعايير ISO" }, desc: { en: "Review and validate AI outputs to ensure ISO standard compliance.", ar: "مراجعة والتحقق من مخرجات الذكاء الاصطناعي لضمان الامتثال لمعايير ISO." }, duration: "30 min" },
+          { num: "3.3", title: { en: "Evidence for Audits", ar: "الأدلة للتدقيق" }, desc: { en: "Prepare and organize evidence documentation for quality audits.", ar: "إعداد وتنظيم وثائق الأدلة لتدقيقات الجودة." }, duration: "30 min" },
+          { num: "3.4", title: { en: "Workflow Integration with AI", ar: "تكامل سير العمل مع الذكاء الاصطناعي" }, desc: { en: "Integrate AI tools into existing quality management workflows seamlessly.", ar: "دمج أدوات الذكاء الاصطناعي في مسارات إدارة الجودة الحالية بسلاسة." }, duration: "30 min" },
+        ],
+      },
+      {
+        id: 4,
+        title: { en: "Building a Culture of AI-Enabled Quality", ar: "بناء ثقافة الجودة المدعومة بالذكاء الاصطناعي" },
+        videos: [
+          { num: "4.1", title: { en: "Encouraging Safe Experimentation", ar: "تشجيع التجريب الآمن" }, desc: { en: "Foster a culture of safe experimentation with AI in quality processes.", ar: "تعزيز ثقافة التجريب الآمن مع الذكاء الاصطناعي في عمليات الجودة." }, duration: "30 min" },
+          { num: "4.2", title: { en: "AI in PDCA Cycles", ar: "الذكاء الاصطناعي في دورات PDCA" }, desc: { en: "Embed AI activities within Plan-Do-Check-Act cycles for continuous improvement.", ar: "تضمين أنشطة الذكاء الاصطناعي ضمن دورات التخطيط-التنفيذ-التحقق-التصحيح للتحسين المستمر." }, duration: "30 min" },
+          { num: "4.3", title: { en: "Adoption & Communication Cadence", ar: "إيقاع التبني والتواصل" }, desc: { en: "Establish regular communication cadence for AI adoption progress and updates.", ar: "إنشاء إيقاع تواصل منتظم لتقدم تبني الذكاء الاصطناعي والتحديثات." }, duration: "30 min" },
+          { num: "4.4", title: { en: "Stop/Scale Decisions for Pilots", ar: "قرارات الإيقاف أو التوسع للتجارب" }, desc: { en: "Make informed stop or scale decisions for AI pilot programs based on evidence.", ar: "اتخاذ قرارات مدروسة بالإيقاف أو التوسع للبرامج التجريبية للذكاء الاصطناعي بناءً على الأدلة." }, duration: "30 min" },
+        ],
+      },
+      {
+        id: 5,
+        title: { en: "Measurement, Reporting & Audit Readiness", ar: "القياس والتقارير والاستعداد للتدقيق" },
+        videos: [
+          { num: "5.1", title: { en: "Leading & Lagging Indicators", ar: "المؤشرات القائدة والمتأخرة" }, desc: { en: "Define and track leading and lagging indicators for AI quality initiatives.", ar: "تحديد وتتبع المؤشرات القائدة والمتأخرة لمبادرات جودة الذكاء الاصطناعي." }, duration: "30 min" },
+          { num: "5.2", title: { en: "Packaging Evidence for Reviews", ar: "تجهيز الأدلة للمراجعات" }, desc: { en: "Package and present evidence effectively for management reviews.", ar: "تجهيز وتقديم الأدلة بفعالية لمراجعات الإدارة." }, duration: "30 min" },
+          { num: "5.3", title: { en: "Supplier/Customer Assurance", ar: "ضمان الموردين والعملاء" }, desc: { en: "Provide assurance to suppliers and customers on AI-quality processes.", ar: "تقديم الضمانات للموردين والعملاء حول عمليات جودة الذكاء الاصطناعي." }, duration: "30 min" },
+          { num: "5.4", title: { en: "Final Pilot Consolidation", ar: "التوحيد النهائي للتجربة" }, desc: { en: "Consolidate pilot learnings and prepare for full-scale AI quality deployment.", ar: "توحيد الدروس المستفادة من التجربة والاستعداد لنشر جودة الذكاء الاصطناعي على نطاق واسع." }, duration: "30 min" },
+        ],
+      },
+    ],
+  },
+
+  /* ------------------------------------------------------------------ */
+  /*  CAPA — Certified AI Powered Accountant                             */
+  /* ------------------------------------------------------------------ */
+
+  capa: {
+    objectivesTitle: { en: "Course Objectives", ar: "أهداف الدورة" },
+    objectivesIntro: { en: "By completing this course, participants will be able to:", ar: "بعد إتمام هذه الدورة، سيتمكن المشاركون من:" },
+    objectives: [
+      { title: { en: "AI Fundamentals in Accounting", ar: "أساسيات الذكاء الاصطناعي في المحاسبة" }, desc: { en: "Apply AI fundamentals to accounting workflows.", ar: "تطبيق أساسيات الذكاء الاصطناعي في مسارات العمل المحاسبية." } },
+      { title: { en: "Automated Bookkeeping", ar: "مسك الدفاتر الآلي" }, desc: { en: "Automate bookkeeping and transaction recording using AI tools.", ar: "أتمتة مسك الدفاتر وتسجيل المعاملات باستخدام أدوات الذكاء الاصطناعي." } },
+      { title: { en: "AI Financial Reporting", ar: "التقارير المالية بالذكاء الاصطناعي" }, desc: { en: "Streamline financial reporting and analysis with AI-driven processes.", ar: "تبسيط التقارير المالية والتحليل من خلال العمليات المدعومة بالذكاء الاصطناعي." } },
+      { title: { en: "AI-Assisted Excel", ar: "إكسل المدعوم بالذكاء الاصطناعي" }, desc: { en: "Utilize AI-assisted Excel formulas and functions for reporting.", ar: "استخدام صيغ ووظائف إكسل المدعومة بالذكاء الاصطناعي لإعداد التقارير." } },
+      { title: { en: "Enhanced Accuracy", ar: "تعزيز الدقة" }, desc: { en: "Enhance accuracy and reduce errors in accounting tasks.", ar: "تعزيز الدقة وتقليل الأخطاء في المهام المحاسبية." } },
+      { title: { en: "AI-Driven Insights", ar: "رؤى مدعومة بالذكاء الاصطناعي" }, desc: { en: "Extract actionable insights from accounting data using AI.", ar: "استخلاص رؤى قابلة للتنفيذ من البيانات المحاسبية باستخدام الذكاء الاصطناعي." } },
+      { title: { en: "AI Tool Integration", ar: "تكامل أدوات الذكاء الاصطناعي" }, desc: { en: "Integrate AI tools to improve efficiency and decision-making.", ar: "دمج أدوات الذكاء الاصطناعي لتحسين الكفاءة واتخاذ القرار." } },
+    ],
+    audienceTitle: { en: "Target Audience", ar: "الفئة المستهدفة" },
+    audienceDesc: { en: "Accountants, auditors, and finance managers seeking to leverage AI tools for automation, reporting efficiency, accurate bookkeeping, and smarter decision-making.", ar: "المحاسبون والمدققون ومدراء المالية الذين يسعون للاستفادة من أدوات الذكاء الاصطناعي للأتمتة وكفاءة التقارير ودقة مسك الدفاتر واتخاذ قرارات أذكى." },
+    competenciesTitle: { en: "Target Competencies", ar: "الكفاءات المستهدفة" },
+    competencies: [
+      { text: { en: "Bookkeeping Automation", ar: "أتمتة مسك الدفاتر" } },
+      { text: { en: "Financial Reporting", ar: "التقارير المالية" } },
+      { text: { en: "Excel Optimization", ar: "تحسين إكسل" } },
+      { text: { en: "Data Analysis", ar: "تحليل البيانات" } },
+      { text: { en: "Process Efficiency", ar: "كفاءة العمليات" } },
+      { text: { en: "Error Reduction", ar: "تقليل الأخطاء" } },
+      { text: { en: "Accounting Insights", ar: "رؤى محاسبية" } },
+    ],
+    contentTitle: { en: "Course Content", ar: "محتوى الدورة" },
+    contentSubtitle: { en: "5 Modules • 14 Video Lessons • 5 Days of Training", ar: "5 وحدات • 14 درس فيديو • 5 أيام تدريب" },
+    modules: [
+      {
+        id: 1,
+        title: { en: "Foundations of AI in Accounting", ar: "أسس الذكاء الاصطناعي في المحاسبة" },
+        videos: [
+          { num: "1.1", title: { en: "Introduction to AI & ML & NLP", ar: "مقدمة في الذكاء الاصطناعي والتعلم الآلي ومعالجة اللغة الطبيعية" }, desc: { en: "Understand the fundamentals of AI, machine learning, and natural language processing.", ar: "فهم أساسيات الذكاء الاصطناعي والتعلم الآلي ومعالجة اللغة الطبيعية." }, duration: "30 min" },
+          { num: "1.2", title: { en: "AI Applications in Accounting Workflows", ar: "تطبيقات الذكاء الاصطناعي في مسارات العمل المحاسبية" }, desc: { en: "Explore how AI is applied across various accounting workflows and processes.", ar: "استكشاف كيفية تطبيق الذكاء الاصطناعي عبر مسارات العمل والعمليات المحاسبية المختلفة." }, duration: "30 min" },
+          { num: "1.3", title: { en: "AI Capabilities for Automation", ar: "قدرات الذكاء الاصطناعي للأتمتة" }, desc: { en: "Assess AI capabilities and their potential for automating accounting tasks.", ar: "تقييم قدرات الذكاء الاصطناعي وإمكاناته لأتمتة المهام المحاسبية." }, duration: "30 min" },
+        ],
+      },
+      {
+        id: 2,
+        title: { en: "AI-Powered Bookkeeping", ar: "مسك الدفاتر المدعوم بالذكاء الاصطناعي" },
+        videos: [
+          { num: "2.1", title: { en: "Automating Transaction Recording", ar: "أتمتة تسجيل المعاملات" }, desc: { en: "Automate transaction recording processes using AI-powered tools.", ar: "أتمتة عمليات تسجيل المعاملات باستخدام أدوات مدعومة بالذكاء الاصطناعي." }, duration: "30 min" },
+          { num: "2.2", title: { en: "AI for Error Detection & Anomaly ID", ar: "الذكاء الاصطناعي لاكتشاف الأخطاء وتحديد الشذوذ" }, desc: { en: "Use AI to detect errors and identify anomalies in financial records.", ar: "استخدام الذكاء الاصطناعي لاكتشاف الأخطاء وتحديد الشذوذ في السجلات المالية." }, duration: "30 min" },
+          { num: "2.3", title: { en: "Hands-On AI Bookkeeping Tools", ar: "أدوات مسك الدفاتر بالذكاء الاصطناعي - تطبيق عملي" }, desc: { en: "Practice with hands-on AI bookkeeping tools in real-world scenarios.", ar: "التدريب العملي على أدوات مسك الدفاتر بالذكاء الاصطناعي في سيناريوهات واقعية." }, duration: "30 min" },
+        ],
+      },
+      {
+        id: 3,
+        title: { en: "Automating Financial Reporting with AI", ar: "أتمتة التقارير المالية بالذكاء الاصطناعي" },
+        videos: [
+          { num: "3.1", title: { en: "AI-Driven Report Generation", ar: "إنشاء التقارير المدعوم بالذكاء الاصطناعي" }, desc: { en: "Generate financial reports automatically using AI-driven processes.", ar: "إنشاء التقارير المالية تلقائياً باستخدام العمليات المدعومة بالذكاء الاصطناعي." }, duration: "30 min" },
+          { num: "3.2", title: { en: "Streamlining Financial Statements & KPIs", ar: "تبسيط القوائم المالية ومؤشرات الأداء" }, desc: { en: "Streamline financial statement preparation and KPI tracking with AI.", ar: "تبسيط إعداد القوائم المالية وتتبع مؤشرات الأداء بالذكاء الاصطناعي." }, duration: "30 min" },
+          { num: "3.3", title: { en: "Scenario-Based Reporting Exercises", ar: "تمارين التقارير القائمة على السيناريوهات" }, desc: { en: "Apply AI reporting skills through scenario-based practical exercises.", ar: "تطبيق مهارات التقارير بالذكاء الاصطناعي من خلال تمارين عملية قائمة على السيناريوهات." }, duration: "30 min" },
+        ],
+      },
+      {
+        id: 4,
+        title: { en: "Excel Formulas Using AI", ar: "صيغ إكسل باستخدام الذكاء الاصطناعي" },
+        videos: [
+          { num: "4.1", title: { en: "AI-Assisted Formulas & Functions", ar: "الصيغ والوظائف المدعومة بالذكاء الاصطناعي" }, desc: { en: "Leverage AI to create and optimize Excel formulas and functions.", ar: "الاستفادة من الذكاء الاصطناعي لإنشاء وتحسين صيغ ووظائف إكسل." }, duration: "30 min" },
+          { num: "4.2", title: { en: "Automating Data Processing in Excel", ar: "أتمتة معالجة البيانات في إكسل" }, desc: { en: "Automate data processing tasks in Excel using AI capabilities.", ar: "أتمتة مهام معالجة البيانات في إكسل باستخدام قدرات الذكاء الاصطناعي." }, duration: "30 min" },
+          { num: "4.3", title: { en: "Integrating AI into Excel Workflows", ar: "دمج الذكاء الاصطناعي في مسارات عمل إكسل" }, desc: { en: "Integrate AI tools seamlessly into existing Excel workflows.", ar: "دمج أدوات الذكاء الاصطناعي بسلاسة في مسارات عمل إكسل الحالية." }, duration: "30 min" },
+        ],
+      },
+      {
+        id: 5,
+        title: { en: "Integrated AI Applications in Accounting", ar: "تطبيقات الذكاء الاصطناعي المتكاملة في المحاسبة" },
+        videos: [
+          { num: "5.1", title: { en: "AI in Bookkeeping Reporting & Excel Combined", ar: "الذكاء الاصطناعي في مسك الدفاتر والتقارير وإكسل مجتمعة" }, desc: { en: "Combine AI bookkeeping, reporting, and Excel skills in integrated workflows.", ar: "الجمع بين مهارات مسك الدفاتر والتقارير وإكسل بالذكاء الاصطناعي في مسارات عمل متكاملة." }, duration: "30 min" },
+          { num: "5.2", title: { en: "End-to-End Accounting Automation Exercises", ar: "تمارين الأتمتة المحاسبية الشاملة" }, desc: { en: "Complete end-to-end accounting automation exercises using AI tools.", ar: "إتمام تمارين الأتمتة المحاسبية الشاملة باستخدام أدوات الذكاء الاصطناعي." }, duration: "30 min" },
+        ],
+      },
+    ],
+  },
+
+  /* ------------------------------------------------------------------ */
+  /*  CCTP — Certified Cost Transformation Practitioner                  */
+  /* ------------------------------------------------------------------ */
+
+  cctp: {
+    objectivesTitle: { en: "Course Objectives", ar: "أهداف الدورة" },
+    objectivesIntro: { en: "By completing this course, participants will be able to:", ar: "بعد إتمام هذه الدورة، سيتمكن المشاركون من:" },
+    objectives: [
+      { title: { en: "Cost Structure Analysis", ar: "تحليل هيكل التكاليف" }, desc: { en: "Examine existing cost structures and identify inefficiencies.", ar: "فحص هياكل التكاليف الحالية وتحديد أوجه القصور." } },
+      { title: { en: "Transformation Frameworks", ar: "أطر التحول" }, desc: { en: "Apply structured frameworks for cost transformation.", ar: "تطبيق أطر منظمة لتحويل التكاليف." } },
+      { title: { en: "Analytical Tools Proficiency", ar: "إتقان الأدوات التحليلية" }, desc: { en: "Use Excel, Power BI, and Copilot to analyze and report cost performance.", ar: "استخدام إكسل وباور بي آي وكوبايلوت لتحليل أداء التكاليف وإعداد التقارير." } },
+      { title: { en: "Data-Driven Decision Making", ar: "اتخاذ القرارات المبنية على البيانات" }, desc: { en: "Link financial and operational data for smarter decisions.", ar: "ربط البيانات المالية والتشغيلية لاتخاذ قرارات أذكى." } },
+      { title: { en: "Practical Transformation Delivery", ar: "تنفيذ التحول العملي" }, desc: { en: "Deliver practical transformation initiatives that drive measurable value.", ar: "تنفيذ مبادرات تحول عملية تحقق قيمة قابلة للقياس." } },
+    ],
+    audienceTitle: { en: "Target Audience", ar: "الفئة المستهدفة" },
+    audienceDesc: { en: "Finance and cost professionals, FP&A and budgeting teams, business transformation specialists, strategy and performance analysts.", ar: "متخصصو المالية والتكاليف، وفرق التخطيط والتحليل المالي والميزانية، ومتخصصو تحول الأعمال، ومحللو الاستراتيجية والأداء." },
+    competenciesTitle: { en: "Target Competencies", ar: "الكفاءات المستهدفة" },
+    competencies: [
+      { text: { en: "Strategic Cost Awareness", ar: "الوعي الاستراتيجي بالتكاليف" } },
+      { text: { en: "Cost Structure Mapping in Excel", ar: "رسم خرائط هيكل التكاليف في إكسل" } },
+      { text: { en: "Transformation Frameworks and Phases", ar: "أطر ومراحل التحول" } },
+      { text: { en: "Copilot for Cost Insights", ar: "كوبايلوت لرؤى التكاليف" } },
+      { text: { en: "Performance Metrics and Dashboards", ar: "مقاييس الأداء ولوحات المعلومات" } },
+      { text: { en: "Efficiency and Process Improvement", ar: "الكفاءة وتحسين العمليات" } },
+      { text: { en: "Cost Forecasting and Scenario Modeling", ar: "التنبؤ بالتكاليف ونمذجة السيناريوهات" } },
+      { text: { en: "Implementation and Change Readiness", ar: "التنفيذ والاستعداد للتغيير" } },
+      { text: { en: "Capstone Project", ar: "المشروع التطبيقي" } },
+    ],
+    contentTitle: { en: "Course Content", ar: "محتوى الدورة" },
+    contentSubtitle: { en: "9 Modules • 44 Video Lessons • 5 Days of Training", ar: "9 وحدات • 44 درس فيديو • 5 أيام تدريب" },
+    modules: [
+      {
+        id: 1,
+        title: { en: "Strategic Cost Awareness", ar: "الوعي الاستراتيجي بالتكاليف" },
+        videos: [
+          { num: "1.1", title: { en: "Concept of Cost Transformation", ar: "مفهوم تحول التكاليف" }, desc: { en: "Understand the core concept and principles of cost transformation.", ar: "فهم المفهوم الأساسي ومبادئ تحول التكاليف." }, duration: "20 min" },
+          { num: "1.2", title: { en: "Cost Efficiency & Strategy Link", ar: "كفاءة التكاليف والارتباط بالاستراتيجية" }, desc: { en: "Link cost efficiency initiatives to broader organizational strategy.", ar: "ربط مبادرات كفاءة التكاليف بالاستراتيجية المؤسسية الأوسع." }, duration: "20 min" },
+          { num: "1.3", title: { en: "Cost Categories Overview", ar: "نظرة عامة على فئات التكاليف" }, desc: { en: "Classify and understand different cost categories and their behavior.", ar: "تصنيف وفهم فئات التكاليف المختلفة وسلوكها." }, duration: "20 min" },
+          { num: "1.4", title: { en: "Organizational Readiness", ar: "الاستعداد المؤسسي" }, desc: { en: "Assess organizational readiness for cost transformation initiatives.", ar: "تقييم الاستعداد المؤسسي لمبادرات تحول التكاليف." }, duration: "20 min" },
+          { num: "1.5", title: { en: "Drivers of Financial Sustainability", ar: "محركات الاستدامة المالية" }, desc: { en: "Identify key drivers that support long-term financial sustainability.", ar: "تحديد المحركات الرئيسية التي تدعم الاستدامة المالية طويلة المدى." }, duration: "20 min" },
+        ],
+      },
+      {
+        id: 2,
+        title: { en: "Cost Structure Mapping in Excel", ar: "رسم خرائط هيكل التكاليف في إكسل" },
+        videos: [
+          { num: "2.1", title: { en: "Visualization of Cost Elements", ar: "تصور عناصر التكاليف" }, desc: { en: "Visualize cost elements using Excel charts and formatting tools.", ar: "تصور عناصر التكاليف باستخدام مخططات إكسل وأدوات التنسيق." }, duration: "20 min" },
+          { num: "2.2", title: { en: "Functional & Departmental Cost View", ar: "عرض التكاليف الوظيفية والإدارية" }, desc: { en: "Map costs by function and department for comprehensive analysis.", ar: "رسم خرائط التكاليف حسب الوظيفة والإدارة للتحليل الشامل." }, duration: "20 min" },
+          { num: "2.3", title: { en: "Identification of Cost Drivers", ar: "تحديد محركات التكاليف" }, desc: { en: "Identify and analyze the key drivers behind cost variations.", ar: "تحديد وتحليل المحركات الرئيسية وراء تغيرات التكاليف." }, duration: "20 min" },
+          { num: "2.4", title: { en: "Benchmark Comparison Templates", ar: "قوالب المقارنة المعيارية" }, desc: { en: "Build Excel templates for benchmarking cost performance against industry standards.", ar: "بناء قوالب إكسل للمقارنة المعيارية لأداء التكاليف مقابل معايير الصناعة." }, duration: "20 min" },
+          { num: "2.5", title: { en: "Diagnostic Summary & Insights", ar: "الملخص التشخيصي والرؤى" }, desc: { en: "Create diagnostic summaries that deliver actionable cost insights.", ar: "إنشاء ملخصات تشخيصية تقدم رؤى تكاليف قابلة للتنفيذ." }, duration: "20 min" },
+        ],
+      },
+      {
+        id: 3,
+        title: { en: "Transformation Frameworks and Phases", ar: "أطر ومراحل التحول" },
+        videos: [
+          { num: "3.1", title: { en: "Core Phases of Cost Transformation", ar: "المراحل الأساسية لتحول التكاليف" }, desc: { en: "Understand the core phases of a cost transformation journey.", ar: "فهم المراحل الأساسية لرحلة تحول التكاليف." }, duration: "20 min" },
+          { num: "3.2", title: { en: "Key Enablers & Stakeholders", ar: "الممكنات الرئيسية وأصحاب المصلحة" }, desc: { en: "Identify key enablers and engage stakeholders for successful transformation.", ar: "تحديد الممكنات الرئيسية وإشراك أصحاب المصلحة لتحقيق تحول ناجح." }, duration: "20 min" },
+          { num: "3.3", title: { en: "Progress Tracking & Accountability", ar: "تتبع التقدم والمساءلة" }, desc: { en: "Establish progress tracking mechanisms and accountability structures.", ar: "إنشاء آليات تتبع التقدم وهياكل المساءلة." }, duration: "20 min" },
+          { num: "3.4", title: { en: "Financial Checkpoints", ar: "نقاط التحقق المالية" }, desc: { en: "Design financial checkpoints throughout the transformation process.", ar: "تصميم نقاط التحقق المالية خلال عملية التحول." }, duration: "20 min" },
+          { num: "3.5", title: { en: "Common Transformation Challenges", ar: "تحديات التحول الشائعة" }, desc: { en: "Recognize and overcome common challenges in cost transformation.", ar: "التعرف على التحديات الشائعة في تحول التكاليف والتغلب عليها." }, duration: "20 min" },
+        ],
+      },
+      {
+        id: 4,
+        title: { en: "Copilot for Cost Insights", ar: "كوبايلوت لرؤى التكاليف" },
+        videos: [
+          { num: "4.1", title: { en: "Copilot Overview for Finance", ar: "نظرة عامة على كوبايلوت للمالية" }, desc: { en: "Overview of Microsoft Copilot capabilities for finance professionals.", ar: "نظرة عامة على قدرات مايكروسوفت كوبايلوت لمتخصصي المالية." }, duration: "20 min" },
+          { num: "4.2", title: { en: "Cost Summary from Excel Files", ar: "ملخص التكاليف من ملفات إكسل" }, desc: { en: "Use Copilot to generate cost summaries from Excel files quickly.", ar: "استخدام كوبايلوت لإنشاء ملخصات التكاليف من ملفات إكسل بسرعة." }, duration: "20 min" },
+          { num: "4.3", title: { en: "Quick Variance Insights", ar: "رؤى سريعة حول الانحرافات" }, desc: { en: "Generate quick variance insights and explanations using Copilot.", ar: "إنشاء رؤى وتفسيرات سريعة حول الانحرافات باستخدام كوبايلوت." }, duration: "20 min" },
+          { num: "4.4", title: { en: "Scenario Commentary Support", ar: "دعم التعليق على السيناريوهات" }, desc: { en: "Leverage Copilot for scenario commentary and narrative reporting.", ar: "الاستفادة من كوبايلوت للتعليق على السيناريوهات وإعداد التقارير السردية." }, duration: "20 min" },
+          { num: "4.5", title: { en: "Professional AI Tool Utilization", ar: "الاستخدام المهني لأدوات الذكاء الاصطناعي" }, desc: { en: "Master professional use of AI tools for cost analysis and reporting.", ar: "إتقان الاستخدام المهني لأدوات الذكاء الاصطناعي لتحليل التكاليف وإعداد التقارير." }, duration: "20 min" },
+        ],
+      },
+      {
+        id: 5,
+        title: { en: "Performance Metrics and Dashboards", ar: "مقاييس الأداء ولوحات المعلومات" },
+        videos: [
+          { num: "5.1", title: { en: "Key Cost KPIs & Ratios", ar: "مؤشرات الأداء والنسب الرئيسية للتكاليف" }, desc: { en: "Define and calculate key cost KPIs and financial ratios.", ar: "تحديد وحساب مؤشرات الأداء الرئيسية والنسب المالية للتكاليف." }, duration: "20 min" },
+          { num: "5.2", title: { en: "Building Visuals in Power BI", ar: "بناء التصورات في باور بي آي" }, desc: { en: "Build compelling cost performance visuals using Power BI.", ar: "بناء تصورات مقنعة لأداء التكاليف باستخدام باور بي آي." }, duration: "20 min" },
+          { num: "5.3", title: { en: "Linking Cost to Performance", ar: "ربط التكاليف بالأداء" }, desc: { en: "Connect cost metrics to overall organizational performance indicators.", ar: "ربط مقاييس التكاليف بمؤشرات الأداء المؤسسي الشامل." }, duration: "20 min" },
+          { num: "5.4", title: { en: "Variance Display & Interpretation", ar: "عرض وتفسير الانحرافات" }, desc: { en: "Display and interpret cost variances effectively in dashboards.", ar: "عرض وتفسير انحرافات التكاليف بفعالية في لوحات المعلومات." }, duration: "20 min" },
+          { num: "5.5", title: { en: "Executive Summary Dashboards", ar: "لوحات معلومات الملخص التنفيذي" }, desc: { en: "Design executive summary dashboards for senior management reporting.", ar: "تصميم لوحات معلومات الملخص التنفيذي لتقارير الإدارة العليا." }, duration: "20 min" },
+        ],
+      },
+      {
+        id: 6,
+        title: { en: "Efficiency and Process Improvement", ar: "الكفاءة وتحسين العمليات" },
+        videos: [
+          { num: "6.1", title: { en: "Common Cost Inefficiencies", ar: "أوجه القصور الشائعة في التكاليف" }, desc: { en: "Identify and analyze common cost inefficiencies across organizations.", ar: "تحديد وتحليل أوجه القصور الشائعة في التكاليف عبر المؤسسات." }, duration: "20 min" },
+          { num: "6.2", title: { en: "Lean-Based Improvement Ideas", ar: "أفكار التحسين القائمة على اللين" }, desc: { en: "Apply lean-based improvement methodologies to reduce waste and cost.", ar: "تطبيق منهجيات التحسين القائمة على اللين لتقليل الهدر والتكاليف." }, duration: "20 min" },
+          { num: "6.3", title: { en: "Tracking Efficiency Results", ar: "تتبع نتائج الكفاءة" }, desc: { en: "Track and measure efficiency improvement results over time.", ar: "تتبع وقياس نتائج تحسين الكفاءة بمرور الوقت." }, duration: "20 min" },
+          { num: "6.4", title: { en: "Real Transformation Examples", ar: "أمثلة واقعية للتحول" }, desc: { en: "Study real-world cost transformation examples and lessons learned.", ar: "دراسة أمثلة واقعية لتحول التكاليف والدروس المستفادة." }, duration: "20 min" },
+        ],
+      },
+      {
+        id: 7,
+        title: { en: "Cost Forecasting and Scenario Modeling", ar: "التنبؤ بالتكاليف ونمذجة السيناريوهات" },
+        videos: [
+          { num: "7.1", title: { en: "Forecasting Templates in Excel", ar: "قوالب التنبؤ في إكسل" }, desc: { en: "Build forecasting templates in Excel for cost projection and planning.", ar: "بناء قوالب التنبؤ في إكسل لتوقع التكاليف والتخطيط." }, duration: "20 min" },
+          { num: "7.2", title: { en: "What-If & Sensitivity Analysis", ar: "تحليل ماذا لو وتحليل الحساسية" }, desc: { en: "Perform what-if and sensitivity analysis for cost scenario evaluation.", ar: "إجراء تحليل ماذا لو وتحليل الحساسية لتقييم سيناريوهات التكاليف." }, duration: "20 min" },
+          { num: "7.3", title: { en: "Scenario Summary Tables", ar: "جداول ملخص السيناريوهات" }, desc: { en: "Create scenario summary tables for comparative cost analysis.", ar: "إنشاء جداول ملخص السيناريوهات للتحليل المقارن للتكاليف." }, duration: "20 min" },
+          { num: "7.4", title: { en: "Power BI Trend Visualization", ar: "تصور الاتجاهات في باور بي آي" }, desc: { en: "Visualize cost trends and patterns using Power BI dashboards.", ar: "تصور اتجاهات وأنماط التكاليف باستخدام لوحات معلومات باور بي آي." }, duration: "20 min" },
+          { num: "7.5", title: { en: "Insight Review for Decisions", ar: "مراجعة الرؤى لاتخاذ القرارات" }, desc: { en: "Review analytical insights to support strategic cost decisions.", ar: "مراجعة الرؤى التحليلية لدعم قرارات التكاليف الاستراتيجية." }, duration: "20 min" },
+        ],
+      },
+      {
+        id: 8,
+        title: { en: "Implementation and Change Readiness", ar: "التنفيذ والاستعداد للتغيير" },
+        videos: [
+          { num: "8.1", title: { en: "Steps to Implement Transformation", ar: "خطوات تنفيذ التحول" }, desc: { en: "Follow structured steps to implement cost transformation initiatives.", ar: "اتباع خطوات منظمة لتنفيذ مبادرات تحول التكاليف." }, duration: "20 min" },
+          { num: "8.2", title: { en: "Stakeholder Alignment & Follow-Up", ar: "مواءمة أصحاب المصلحة والمتابعة" }, desc: { en: "Align stakeholders and establish follow-up mechanisms for accountability.", ar: "مواءمة أصحاب المصلحة وإنشاء آليات متابعة للمساءلة." }, duration: "20 min" },
+          { num: "8.3", title: { en: "Monitoring with Excel Trackers", ar: "المراقبة بأدوات التتبع في إكسل" }, desc: { en: "Monitor transformation progress using Excel-based tracking tools.", ar: "مراقبة تقدم التحول باستخدام أدوات التتبع في إكسل." }, duration: "20 min" },
+          { num: "8.4", title: { en: "Sustaining Benefits Over Time", ar: "استدامة الفوائد بمرور الوقت" }, desc: { en: "Develop strategies for sustaining transformation benefits over time.", ar: "تطوير استراتيجيات لاستدامة فوائد التحول بمرور الوقت." }, duration: "20 min" },
+          { num: "8.5", title: { en: "Review of Success Factors", ar: "مراجعة عوامل النجاح" }, desc: { en: "Review critical success factors for cost transformation programs.", ar: "مراجعة عوامل النجاح الحاسمة لبرامج تحول التكاليف." }, duration: "20 min" },
+        ],
+      },
+      {
+        id: 9,
+        title: { en: "Capstone Project", ar: "المشروع التطبيقي" },
+        videos: [
+          { num: "9.1", title: { en: "Realistic Cost Scenario", ar: "سيناريو تكاليف واقعي" }, desc: { en: "Analyze a realistic cost scenario using all learned frameworks and tools.", ar: "تحليل سيناريو تكاليف واقعي باستخدام جميع الأطر والأدوات المكتسبة." }, duration: "20 min" },
+          { num: "9.2", title: { en: "Group Simulation & Analysis", ar: "المحاكاة والتحليل الجماعي" }, desc: { en: "Participate in group simulation exercises for collaborative cost analysis.", ar: "المشاركة في تمارين المحاكاة الجماعية للتحليل التعاوني للتكاليف." }, duration: "20 min" },
+          { num: "9.3", title: { en: "Presenting Recommendations", ar: "عرض التوصيات" }, desc: { en: "Present cost transformation recommendations to stakeholders.", ar: "عرض توصيات تحول التكاليف على أصحاب المصلحة." }, duration: "20 min" },
+          { num: "9.4", title: { en: "Instructor Feedback & Review", ar: "تقييم ومراجعة المدرب" }, desc: { en: "Receive instructor feedback and review of capstone project deliverables.", ar: "تلقي تقييم المدرب ومراجعة مخرجات المشروع التطبيقي." }, duration: "20 min" },
+          { num: "9.5", title: { en: "Certification Completion", ar: "إتمام الشهادة" }, desc: { en: "Complete certification requirements and final assessment.", ar: "إتمام متطلبات الشهادة والتقييم النهائي." }, duration: "20 min" },
+        ],
+      },
+    ],
+  },
+
+  /* ------------------------------------------------------------------ */
+  /*  CDA — Certificate in Data Analysis & Business Reporting            */
+  /* ------------------------------------------------------------------ */
+
+  cda: {
+    objectivesTitle: { en: "Course Objectives", ar: "أهداف الدورة" },
+    objectivesIntro: { en: "By completing this course, participants will be able to:", ar: "بعد إتمام هذه الدورة، سيتمكن المشاركون من:" },
+    objectives: [
+      { title: { en: "Data Massaging & Normalization", ar: "معالجة وتطبيع البيانات" }, desc: { en: "Massage and normalize unstructured data for analysis-ready formats.", ar: "معالجة وتطبيع البيانات غير المهيكلة لتحويلها إلى صيغ جاهزة للتحليل." } },
+      { title: { en: "Pivot Table Reporting", ar: "التقارير باستخدام جداول البيفوت" }, desc: { en: "Perform reporting and analysis using Pivot Tables and Power Pivot.", ar: "إجراء التقارير والتحليلات باستخدام جداول البيفوت وباور بيفوت." } },
+      { title: { en: "Dynamic Reporting Models", ar: "نماذج التقارير الديناميكية" }, desc: { en: "Design dynamic reporting models using different modelling techniques.", ar: "تصميم نماذج تقارير ديناميكية باستخدام تقنيات نمذجة مختلفة." } },
+      { title: { en: "Data Integration", ar: "تكامل البيانات" }, desc: { en: "Integrate Excel with many different file types (Access, web, text, SQL).", ar: "دمج إكسل مع أنواع ملفات متعددة (Access، ويب، نصوص، SQL)." } },
+      { title: { en: "Macro Automation", ar: "الأتمتة بالماكرو" }, desc: { en: "Perform repetitive tasks efficiently using macros.", ar: "تنفيذ المهام المتكررة بكفاءة باستخدام الماكرو." } },
+    ],
+    audienceTitle: { en: "Target Audience", ar: "الفئة المستهدفة" },
+    audienceDesc: { en: "Business Unit Managers, finance and accounting professionals, senior and junior accountants, business analysts, research professionals, marketing and sales professionals, administrative staff, supervisors, general business professionals.", ar: "مدراء وحدات الأعمال، ومتخصصو المالية والمحاسبة، والمحاسبون الأول والمبتدئون، ومحللو الأعمال، ومتخصصو البحث، ومتخصصو التسويق والمبيعات، والموظفون الإداريون، والمشرفون، والمهنيون العامون في الأعمال." },
+    competenciesTitle: { en: "Target Competencies", ar: "الكفاءات المستهدفة" },
+    competencies: [
+      { text: { en: "Massaging and Normalizing Data", ar: "معالجة وتطبيع البيانات" } },
+      { text: { en: "Pivot Tables Reporting", ar: "التقارير بجداول البيفوت" } },
+      { text: { en: "Modeling Techniques", ar: "تقنيات النمذجة" } },
+      { text: { en: "Integration and Linking", ar: "التكامل والربط" } },
+      { text: { en: "PowerQuery and Power Pivot", ar: "باور كويري وباور بيفوت" } },
+      { text: { en: "Macros and Automation", ar: "الماكرو والأتمتة" } },
+    ],
+    contentTitle: { en: "Course Content", ar: "محتوى الدورة" },
+    contentSubtitle: { en: "6 Modules • 30 Video Lessons • 5 Days of Hands-On Training", ar: "6 وحدات • 30 درس فيديو • 5 أيام تدريب عملي" },
+    prerequisiteNote: { en: "This course requires a laptop with Microsoft Excel 2019 or higher installed.", ar: "تتطلب هذه الدورة جهاز لابتوب مثبت عليه Microsoft Excel 2019 أو أعلى." },
+    modules: [
+      {
+        id: 1,
+        title: { en: "Data Massaging Tools & Techniques", ar: "أدوات وتقنيات معالجة البيانات" },
+        videos: [
+          { num: "1.1", title: { en: "Merge & Consolidate Data", ar: "دمج وتوحيد البيانات" }, desc: { en: "Learn techniques for merging and consolidating data from multiple sources.", ar: "تعلم تقنيات دمج وتوحيد البيانات من مصادر متعددة." }, duration: "25 min" },
+          { num: "1.2", title: { en: "Data Validation Techniques", ar: "تقنيات التحقق من البيانات" }, desc: { en: "Apply data validation techniques to ensure data accuracy and consistency.", ar: "تطبيق تقنيات التحقق من البيانات لضمان الدقة والاتساق." }, duration: "25 min" },
+          { num: "1.3", title: { en: "Surgeon Functions (LEFT RIGHT MID)", ar: "دوال الجراحة (LEFT RIGHT MID)" }, desc: { en: "Master text functions like LEFT, RIGHT, and MID for data extraction.", ar: "إتقان الدوال النصية مثل LEFT وRIGHT وMID لاستخراج البيانات." }, duration: "25 min" },
+          { num: "1.4", title: { en: "Naming & Managing Ranges", ar: "تسمية وإدارة النطاقات" }, desc: { en: "Create and manage named ranges for efficient data organization.", ar: "إنشاء وإدارة النطاقات المسماة لتنظيم البيانات بكفاءة." }, duration: "25 min" },
+          { num: "1.5", title: { en: "SUM SUMIF COUNTIF & Lookups", ar: "دوال SUM وSUMIF وCOUNTIF والبحث" }, desc: { en: "Apply SUM, SUMIF, COUNTIF, and lookup functions for data analysis.", ar: "تطبيق دوال SUM وSUMIF وCOUNTIF ودوال البحث لتحليل البيانات." }, duration: "25 min" },
+        ],
+      },
+      {
+        id: 2,
+        title: { en: "Pivot Tables: The One and Only", ar: "جداول البيفوت: الأداة الفريدة" },
+        videos: [
+          { num: "2.1", title: { en: "The 19 Rules & Design", ar: "القواعد الـ 19 والتصميم" }, desc: { en: "Learn the 19 fundamental rules for designing effective Pivot Tables.", ar: "تعلم القواعد الـ 19 الأساسية لتصميم جداول بيفوت فعّالة." }, duration: "25 min" },
+          { num: "2.2", title: { en: "Number Formatting & Report Layout", ar: "تنسيق الأرقام وتخطيط التقارير" }, desc: { en: "Apply number formatting and customize report layouts in Pivot Tables.", ar: "تطبيق تنسيق الأرقام وتخصيص تخطيطات التقارير في جداول البيفوت." }, duration: "25 min" },
+          { num: "2.3", title: { en: "Filtering Sorting & Navigation", ar: "التصفية والفرز والتنقل" }, desc: { en: "Master filtering, sorting, and navigation techniques in Pivot Tables.", ar: "إتقان تقنيات التصفية والفرز والتنقل في جداول البيفوت." }, duration: "25 min" },
+          { num: "2.4", title: { en: "Summarizing Values & Percentages", ar: "تلخيص القيم والنسب المئوية" }, desc: { en: "Summarize values and calculate percentages within Pivot Tables.", ar: "تلخيص القيم وحساب النسب المئوية داخل جداول البيفوت." }, duration: "25 min" },
+          { num: "2.5", title: { en: "Pivot Charts & Dynamic Labeling", ar: "مخططات البيفوت والتسميات الديناميكية" }, desc: { en: "Create pivot charts with dynamic labeling for interactive reporting.", ar: "إنشاء مخططات البيفوت مع تسميات ديناميكية للتقارير التفاعلية." }, duration: "25 min" },
+        ],
+      },
+      {
+        id: 3,
+        title: { en: "Data Modeling", ar: "نمذجة البيانات" },
+        videos: [
+          { num: "3.1", title: { en: "Spinner Restrictions & Types", ar: "قيود المؤشرات الدوارة وأنواعها" }, desc: { en: "Use spinner controls with restrictions and types for dynamic models.", ar: "استخدام عناصر التحكم الدوارة مع القيود والأنواع للنماذج الديناميكية." }, duration: "25 min" },
+          { num: "3.2", title: { en: "Check Box & Option Box Modeling", ar: "نمذجة مربعات الاختيار وأزرار الخيارات" }, desc: { en: "Build models using check boxes and option boxes for interactive reports.", ar: "بناء نماذج باستخدام مربعات الاختيار وأزرار الخيارات للتقارير التفاعلية." }, duration: "25 min" },
+          { num: "3.3", title: { en: "List Box Modeling with CHOOSE", ar: "نمذجة مربع القائمة مع دالة CHOOSE" }, desc: { en: "Create list box models using the CHOOSE function for dynamic selection.", ar: "إنشاء نماذج مربع القائمة باستخدام دالة CHOOSE للاختيار الديناميكي." }, duration: "25 min" },
+          { num: "3.4", title: { en: "What-If Analysis & Goal Seek", ar: "تحليل ماذا لو والبحث عن الهدف" }, desc: { en: "Perform what-if analysis and use Goal Seek for target-based modeling.", ar: "إجراء تحليل ماذا لو واستخدام البحث عن الهدف للنمذجة القائمة على الأهداف." }, duration: "25 min" },
+          { num: "3.5", title: { en: "Scenario Manager & Data Tables", ar: "مدير السيناريوهات وجداول البيانات" }, desc: { en: "Utilize Scenario Manager and data tables for multi-scenario analysis.", ar: "استخدام مدير السيناريوهات وجداول البيانات لتحليل السيناريوهات المتعددة." }, duration: "25 min" },
+        ],
+      },
+      {
+        id: 4,
+        title: { en: "Data Integration Using PowerQuery", ar: "تكامل البيانات باستخدام باور كويري" },
+        videos: [
+          { num: "4.1", title: { en: "Get Data from Text Files", ar: "استيراد البيانات من الملفات النصية" }, desc: { en: "Import and transform data from text and CSV files using PowerQuery.", ar: "استيراد وتحويل البيانات من الملفات النصية وCSV باستخدام باور كويري." }, duration: "25 min" },
+          { num: "4.2", title: { en: "Linking with Databases", ar: "الربط مع قواعد البيانات" }, desc: { en: "Connect and link Excel with Access and SQL databases via PowerQuery.", ar: "ربط إكسل مع قواعد بيانات Access وSQL عبر باور كويري." }, duration: "25 min" },
+          { num: "4.3", title: { en: "Linking with Multiple Excel Files", ar: "الربط مع ملفات إكسل متعددة" }, desc: { en: "Consolidate data from multiple Excel files using PowerQuery.", ar: "توحيد البيانات من ملفات إكسل متعددة باستخدام باور كويري." }, duration: "25 min" },
+          { num: "4.4", title: { en: "Data Transformation Techniques", ar: "تقنيات تحويل البيانات" }, desc: { en: "Apply advanced data transformation techniques in PowerQuery.", ar: "تطبيق تقنيات تحويل البيانات المتقدمة في باور كويري." }, duration: "25 min" },
+          { num: "4.5", title: { en: "Automatic Refresh of Data", ar: "التحديث التلقائي للبيانات" }, desc: { en: "Set up automatic data refresh schedules for connected data sources.", ar: "إعداد جداول التحديث التلقائي للبيانات لمصادر البيانات المتصلة." }, duration: "25 min" },
+        ],
+      },
+      {
+        id: 5,
+        title: { en: "Advanced Reporting Using Power Pivot", ar: "التقارير المتقدمة باستخدام باور بيفوت" },
+        videos: [
+          { num: "5.1", title: { en: "ETL Extract Load Transform", ar: "استخراج وتحميل وتحويل البيانات ETL" }, desc: { en: "Master the ETL process for extracting, loading, and transforming data.", ar: "إتقان عملية ETL لاستخراج وتحميل وتحويل البيانات." }, duration: "25 min" },
+          { num: "5.2", title: { en: "Data from Various Sources", ar: "البيانات من مصادر متنوعة" }, desc: { en: "Import data from various sources into Power Pivot data models.", ar: "استيراد البيانات من مصادر متنوعة إلى نماذج بيانات باور بيفوت." }, duration: "25 min" },
+          { num: "5.3", title: { en: "Transform Data Using PowerQuery", ar: "تحويل البيانات باستخدام باور كويري" }, desc: { en: "Transform and shape data using PowerQuery before loading into models.", ar: "تحويل وتشكيل البيانات باستخدام باور كويري قبل تحميلها في النماذج." }, duration: "25 min" },
+          { num: "5.4", title: { en: "Create & Manage Relationships", ar: "إنشاء وإدارة العلاقات" }, desc: { en: "Create and manage relationships between tables in Power Pivot.", ar: "إنشاء وإدارة العلاقات بين الجداول في باور بيفوت." }, duration: "25 min" },
+          { num: "5.5", title: { en: "Advanced PowerPivot Reporting", ar: "التقارير المتقدمة بباور بيفوت" }, desc: { en: "Build advanced reports using Power Pivot measures and calculated fields.", ar: "بناء تقارير متقدمة باستخدام مقاييس باور بيفوت والحقول المحسوبة." }, duration: "25 min" },
+        ],
+      },
+      {
+        id: 6,
+        title: { en: "Automation Using Macros", ar: "الأتمتة باستخدام الماكرو" },
+        videos: [
+          { num: "6.1", title: { en: "Macro Basics & Planning", ar: "أساسيات الماكرو والتخطيط" }, desc: { en: "Understand macro basics and plan automation strategies for repetitive tasks.", ar: "فهم أساسيات الماكرو والتخطيط لاستراتيجيات الأتمتة للمهام المتكررة." }, duration: "25 min" },
+          { num: "6.2", title: { en: "Recording a Macro", ar: "تسجيل ماكرو" }, desc: { en: "Record macros to automate common Excel operations and workflows.", ar: "تسجيل الماكرو لأتمتة عمليات ومسارات عمل إكسل الشائعة." }, duration: "25 min" },
+          { num: "6.3", title: { en: "Testing & Editing Macros", ar: "اختبار وتحرير الماكرو" }, desc: { en: "Test, debug, and edit recorded macros for optimal performance.", ar: "اختبار وتصحيح وتحرير الماكرو المسجلة للأداء الأمثل." }, duration: "25 min" },
+          { num: "6.4", title: { en: "Relative Reference Macros", ar: "ماكرو المرجع النسبي" }, desc: { en: "Create macros using relative references for flexible automation.", ar: "إنشاء ماكرو باستخدام المراجع النسبية للأتمتة المرنة." }, duration: "25 min" },
+          { num: "6.5", title: { en: "Advanced Filter with Macros", ar: "التصفية المتقدمة مع الماكرو" }, desc: { en: "Combine advanced filtering techniques with macros for powerful data extraction.", ar: "الجمع بين تقنيات التصفية المتقدمة والماكرو لاستخراج البيانات القوي." }, duration: "25 min" },
+        ],
+      },
+    ],
+  },
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   motion,
   AnimatePresence,
@@ -21,10 +21,12 @@ import {
 } from "lucide-react";
 import { AnimatedSection } from "@/components/landing/AnimatedSection";
 import { cn } from "@/lib/utils/cn";
+import { createClient } from "@/lib/supabase/client";
 import {
   courseContentRegistry,
   type CourseModule,
 } from "@/data/course-content";
+import type { Module, Lesson } from "@/types";
 
 /* ------------------------------------------------------------------ */
 /*  Props                                                              */
@@ -33,6 +35,7 @@ import {
 interface DesignationCourseContentProps {
   slug: string;
   locale: string;
+  designationId?: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -201,12 +204,48 @@ function ModuleAccordion({
 /*  Main Component                                                     */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Converts DB modules + lessons into the static CourseModule format
+ * so the same ModuleAccordion component can render both sources.
+ */
+function dbModulesToCourseModules(
+  modules: (Module & { lessons: Lesson[] })[]
+): CourseModule[] {
+  return modules.map((mod, i) => ({
+    id: i + 1,
+    title: {
+      en: mod.title,
+      ar: mod.title_ar || mod.title,
+    },
+    videos: mod.lessons
+      .filter((l) => l.content_type === "video")
+      .map((l, j) => ({
+        num: `${i + 1}.${j + 1}`,
+        title: {
+          en: l.title,
+          ar: l.title_ar || l.title,
+        },
+        desc: {
+          en: l.description || "",
+          ar: l.description_ar || l.description || "",
+        },
+        duration: l.video_duration_seconds
+          ? `${Math.floor(l.video_duration_seconds / 60)}:${String(
+              l.video_duration_seconds % 60
+            ).padStart(2, "0")}`
+          : `${l.duration_minutes} min`,
+      })),
+  }));
+}
+
 export function DesignationCourseContent({
   slug,
   locale,
+  designationId,
 }: DesignationCourseContentProps) {
   const data = courseContentRegistry[slug];
   const [openModule, setOpenModule] = useState<number | null>(0);
+  const [dbModules, setDbModules] = useState<CourseModule[] | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const objectivesRef = useRef(null);
   const objectivesInView = useInView(objectivesRef, {
@@ -219,10 +258,67 @@ export function DesignationCourseContent({
     margin: "-60px",
   });
 
+  // Fetch DB modules/lessons for the linked course (if any)
+  const fetchLinkedCourse = useCallback(async () => {
+    if (!designationId) return;
+
+    try {
+      const supabase = createClient();
+
+      // Find a published course linked to this designation
+      const { data: course } = await supabase
+        .from("courses")
+        .select("id")
+        .eq("designation_id", designationId)
+        .eq("status", "published")
+        .limit(1)
+        .single();
+
+      if (!course) return;
+
+      // Fetch modules with their lessons
+      const { data: modulesData } = await supabase
+        .from("modules")
+        .select("*, lessons(*)")
+        .eq("course_id", course.id)
+        .order("sort_order", { ascending: true });
+
+      if (modulesData && modulesData.length > 0) {
+        // Sort lessons within each module
+        const sorted = modulesData.map(
+          (m: Module & { lessons: Lesson[] }) => ({
+            ...m,
+            lessons: (m.lessons || []).sort(
+              (a: Lesson, b: Lesson) => a.sort_order - b.sort_order
+            ),
+          })
+        ) as (Module & { lessons: Lesson[] })[];
+
+        // Only use DB modules if they have at least one video lesson
+        const hasVideos = sorted.some((m) =>
+          m.lessons.some((l) => l.content_type === "video")
+        );
+
+        if (hasVideos) {
+          setDbModules(dbModulesToCourseModules(sorted));
+        }
+      }
+    } catch (err) {
+      console.error("[DesignationCourseContent] fetch failed:", err);
+    }
+  }, [designationId]);
+
+  useEffect(() => {
+    fetchLinkedCourse();
+  }, [fetchLinkedCourse]);
+
   if (!data) return null;
 
   const t = (bi: { en: string; ar: string }) =>
     locale === "ar" ? bi.ar : bi.en;
+
+  // Use DB modules if available, otherwise fall back to static registry
+  const modulesToRender = dbModules ?? data.modules;
 
   return (
     <div className="space-y-16">
@@ -345,7 +441,7 @@ export function DesignationCourseContent({
           )}
 
           <div className="mt-8 space-y-3">
-            {data.modules.map((mod, i) => (
+            {modulesToRender.map((mod, i) => (
               <ModuleAccordion
                 key={mod.id}
                 mod={mod}

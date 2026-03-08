@@ -332,7 +332,7 @@ export default function DesignationLandingPage() {
       ) : (
         <div className="space-y-16 py-16">
           <div className="container mx-auto px-4">
-            <DesignationCourseContent slug={slug} locale={locale} />
+            <DesignationCourseContent slug={slug} locale={locale} designationId={d.id} />
           </div>
           <div className="container mx-auto px-4">
             <DesignationResources

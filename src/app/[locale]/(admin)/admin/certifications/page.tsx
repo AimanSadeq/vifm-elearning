@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { Plus, Pencil, Trash2, Eye, ToggleLeft, ToggleRight } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, ToggleLeft, ToggleRight, BookOpen, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { escapeIlike } from "@/lib/utils/escape-search";
 import { Button } from "@/components/ui/button";
@@ -22,11 +23,13 @@ interface DesignationWithCount extends Designation {
 export default function AdminCertificationsPage() {
   const t = useTranslations("admin");
   const locale = useLocale();
+  const router = useRouter();
 
   const [designations, setDesignations] = useState<DesignationWithCount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [tierFilter, setTierFilter] = useState<string>("all");
+  const [managingCourseId, setManagingCourseId] = useState<string | null>(null);
   const debouncedSearch = useDebounce(search, 300);
 
   useEffect(() => {
@@ -106,6 +109,99 @@ export default function AdminCertificationsPage() {
     }
   };
 
+  const handleManageCourse = async (item: DesignationWithCount) => {
+    setManagingCourseId(item.id);
+    try {
+      const supabase = createClient();
+
+      // Check if a course already exists for this designation
+      const { data: existingCourse } = await supabase
+        .from("courses")
+        .select("id")
+        .eq("designation_id", item.id)
+        .limit(1)
+        .single();
+
+      if (existingCourse) {
+        // Scaffold modules/lessons if they don't exist yet (idempotent — skips if already done)
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.access_token) {
+            await fetch(`/api/admin/courses/${existingCourse.id}/scaffold`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({ slug: item.slug }),
+            });
+          }
+        } catch (scaffoldErr) {
+          console.error("Scaffold failed (non-blocking):", scaffoldErr);
+        }
+
+        router.push(`/${locale}/admin/courses/${existingCourse.id}/edit`);
+        return;
+      }
+
+      // Create a new course linked to this designation
+      const slug = `${item.slug}-course`;
+      const { data: newCourse, error } = await supabase
+        .from("courses")
+        .insert({
+          title: `${item.name} Course`,
+          title_ar: item.name_ar ? `دورة ${item.name_ar}` : null,
+          slug,
+          designation_id: item.id,
+          status: "draft",
+          price: 0,
+          currency: "USD",
+          is_free: true,
+          is_featured: false,
+          certificate_enabled: false,
+          passing_score: 70,
+          sequential_locking_enabled: false,
+          enrollment_count: 0,
+          average_rating: 0,
+          rating_count: 0,
+          completion_rate: 0,
+          category_id: (await supabase.from("categories").select("id").limit(1).single()).data?.id,
+        })
+        .select("id")
+        .single();
+
+      if (error) {
+        console.error("Failed to create course:", error);
+        return;
+      }
+
+      if (newCourse) {
+        // Auto-scaffold modules + lessons from the static course content registry
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.access_token) {
+            await fetch(`/api/admin/courses/${newCourse.id}/scaffold`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({ slug: item.slug }),
+            });
+          }
+        } catch (scaffoldErr) {
+          console.error("Scaffold failed (non-blocking):", scaffoldErr);
+        }
+
+        router.push(`/${locale}/admin/courses/${newCourse.id}/edit`);
+      }
+    } catch (err) {
+      console.error("Failed to manage course:", err);
+    } finally {
+      setManagingCourseId(null);
+    }
+  };
+
   const tierBadge = (level?: string) => {
     switch (level) {
       case "gateway":
@@ -172,6 +268,20 @@ export default function AdminCertificationsPage() {
       className: "whitespace-nowrap",
       render: (item) => (
         <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={() => handleManageCourse(item)}
+            title="Manage Course Content"
+            disabled={managingCourseId === item.id}
+          >
+            {managingCourseId === item.id ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <BookOpen className="h-4 w-4 text-brand-600" />
+            )}
+          </Button>
           <Link href={`/${locale}/designations/${item.slug}`} title="View public page">
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
               <Eye className="h-4 w-4" />

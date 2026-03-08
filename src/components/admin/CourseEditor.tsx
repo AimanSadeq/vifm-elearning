@@ -21,6 +21,8 @@ import {
   ChevronDown,
   ChevronRight,
   Star,
+  BookOpen,
+  Video,
 } from 'lucide-react'
 import {
   DndContext,
@@ -514,6 +516,25 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
       {/* ==================== DETAILS TAB ==================== */}
       {activeTab === 'details' && (
         <section className="space-y-6">
+          {/* Designation Link Badge */}
+          {course.designation_id && (
+            <div className="flex items-center gap-3 rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 dark:border-brand-800 dark:bg-brand-950">
+              <BookOpen className="h-5 w-5 shrink-0 text-brand-600" />
+              <p className="text-sm text-brand-700 dark:text-brand-300">
+                This course is linked to a certification/designation. Video and content changes here will appear on the designation&apos;s Course Website tab.
+              </p>
+            </div>
+          )}
+
+          {/* Manage Videos Button — available for all courses */}
+          <a
+            href={`/${locale}/admin/courses/${course.id}/videos`}
+            className="inline-flex items-center gap-1.5 rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700"
+          >
+            <Video className="h-4 w-4" />
+            Manage Videos
+          </a>
+
           {/* Course Thumbnail */}
           <div className="rounded-lg border border-border bg-card p-6">
             <h2 className="mb-4 text-lg font-semibold text-foreground">Course Thumbnail</h2>
@@ -823,9 +844,11 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                                   key={lesson.id}
                                   lesson={lesson}
                                   index={index}
+                                  courseId={course.id}
                                   onPreview={setPreviewLesson}
                                   onEdit={setEditingLesson}
                                   onDelete={(id, title, type) => setDeleteConfirmation({ id, title, type })}
+                                  onVideoUploaded={refreshModules}
                                   isDeleting={deletingLessonId === lesson.id}
                                 />
                               ))}
