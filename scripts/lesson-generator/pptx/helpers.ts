@@ -1,4 +1,5 @@
 import PptxGenJS from 'pptxgenjs';
+import { ShapeType } from 'pptxgenjs';
 import * as path from 'path';
 import { BREADCRUMB, PROGRESS, MARGIN, SLIDE, TITLE_COL, FONTS, type PptxColors } from './theme';
 
@@ -21,14 +22,14 @@ export function addBreadcrumb(slide: PptxGenJS.Slide, text: string, colors: Pptx
 }
 
 // ── Progress dots ────────────────────────────────────────────────────
-export function addProgress(slide: PptxGenJS.Slide, progress: number[], colors: PptxColors, pres: PptxGenJS): void {
+export function addProgress(slide: PptxGenJS.Slide, progress: number[], colors: PptxColors, _pres: PptxGenJS): void {
   if (!progress || progress.length === 0) return;
   const totalW = progress.length * PROGRESS.GAP;
   const startX = SLIDE.W - MARGIN.RIGHT - totalW;
 
   for (let i = 0; i < progress.length; i++) {
     const filled = progress[i] === 1;
-    slide.addShape(pres.shapes.OVAL, {
+    slide.addShape(ShapeType.ellipse, {
       x: startX + i * PROGRESS.GAP,
       y: PROGRESS.Y,
       w: PROGRESS.DOT_SIZE,
@@ -106,7 +107,7 @@ export function addIconCircle(
   title?: string
 ): void {
   // Circle background
-  slide.addShape(pres.shapes.OVAL, {
+  slide.addShape(ShapeType.ellipse, {
     x, y, w: size, h: size,
     fill: { color: colors.blue, transparency: 80 },
     line: { color: colors.blue, width: 0.75 },

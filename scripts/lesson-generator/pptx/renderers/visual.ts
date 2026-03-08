@@ -1,4 +1,5 @@
 import PptxGenJS from 'pptxgenjs';
+import { ShapeType } from 'pptxgenjs';
 import type { TimelineSlide, ComparisonSlide, QuoteSlide } from '../../types';
 import type { PptxColors } from '../theme';
 import { CONTENT_COL, FONTS, MARGIN, SLIDE } from '../theme';
@@ -19,14 +20,14 @@ export function renderTimeline(slide: PptxGenJS.Slide, pres: PptxGenJS, data: Ti
     // Timeline dot + line
     const dotX = CONTENT_COL.X + 0.15;
     const dotY = y + 0.15;
-    slide.addShape(pres.shapes.OVAL, {
+    slide.addShape(ShapeType.ellipse, {
       x: dotX, y: dotY, w: 0.14, h: 0.14,
       fill: { color: colors.blue },
     });
 
     // Connecting line (except last)
     if (i < data.events.length - 1) {
-      slide.addShape(pres.shapes.LINE, {
+      slide.addShape(ShapeType.line, {
         x: dotX + 0.07, y: dotY + 0.14,
         w: 0, h: eventH + gap - 0.14,
         line: { color: colors.dark, width: 1.5 },

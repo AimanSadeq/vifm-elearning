@@ -1,4 +1,5 @@
 import PptxGenJS from 'pptxgenjs';
+import { ShapeType } from 'pptxgenjs';
 import type { FlowchartSlide, HubSpokeSlide, Matrix2x2Slide } from '../../types';
 import type { PptxColors } from '../theme';
 import { CONTENT_COL, FONTS, MARGIN, SLIDE } from '../theme';
@@ -44,7 +45,7 @@ export function renderFlowchart(slide: PptxGenJS.Slide, pres: PptxGenJS, data: F
     const y2 = goingDown ? to.y : to.y + nodeH;
     const lineH = Math.abs(y2 - y1);
 
-    slide.addShape(pres.shapes.LINE, {
+    slide.addShape(ShapeType.line, {
       x: lineX,
       y: Math.min(y1, y2),
       w: 0,
@@ -70,13 +71,13 @@ export function renderFlowchart(slide: PptxGenJS.Slide, pres: PptxGenJS, data: F
 
     if (isDecision) {
       // Diamond shape (rotated rectangle approximation - use oval for simplicity)
-      slide.addShape(pres.shapes.OVAL, {
+      slide.addShape(ShapeType.ellipse, {
         x: pos.x + 0.2, y: pos.y, w: nodeW - 0.4, h: nodeH,
         fill: { color: colors.dark },
         line: { color: colors.blue, width: 1 },
       });
     } else {
-      const shape = isStartEnd ? pres.shapes.ROUNDED_RECTANGLE : pres.shapes.RECTANGLE;
+      const shape = isStartEnd ? ShapeType.roundRect : ShapeType.rect;
       slide.addShape(shape, {
         x: pos.x, y: pos.y, w: nodeW, h: nodeH,
         fill: { color: isStartEnd ? colors.blue : colors.dark },
@@ -116,7 +117,7 @@ export function renderHubSpoke(slide: PptxGenJS.Slide, pres: PptxGenJS, data: Hu
   const spokeCount = data.spokes.length;
 
   // Hub circle
-  slide.addShape(pres.shapes.OVAL, {
+  slide.addShape(ShapeType.ellipse, {
     x: centerX - hubR, y: centerY - hubR, w: hubR * 2, h: hubR * 2,
     fill: { color: colors.blue },
   });
@@ -148,7 +149,7 @@ export function renderHubSpoke(slide: PptxGenJS.Slide, pres: PptxGenJS, data: Hu
     const midY = (startY2 + endY2) / 2;
     const thickness = 0.015;
     const angleDeg = (angle * 180) / Math.PI;
-    slide.addShape(pres.shapes.RECTANGLE, {
+    slide.addShape(ShapeType.rect, {
       x: midX - lineLen / 2,
       y: midY - thickness / 2,
       w: lineLen,
@@ -159,7 +160,7 @@ export function renderHubSpoke(slide: PptxGenJS.Slide, pres: PptxGenJS, data: Hu
     });
 
     // Spoke circle
-    slide.addShape(pres.shapes.OVAL, {
+    slide.addShape(ShapeType.ellipse, {
       x: sx - spokeR, y: sy - spokeR, w: spokeR * 2, h: spokeR * 2,
       fill: { color: colors.card },
       line: { color: colors.blue, width: 0.75 },

@@ -1,4 +1,5 @@
 import PptxGenJS from 'pptxgenjs';
+import { ShapeType } from 'pptxgenjs';
 import type {
   BigStatementSlide, NumberedListSlide, TwoColumnSlide, TermCardsSlide,
   DoDontSlide, RecapSlide, StepDetailSlide, QnASlide
@@ -65,7 +66,7 @@ export function renderNumberedList(slide: PptxGenJS.Slide, pres: PptxGenJS, data
     // Number circle
     const circleSize = compact ? 0.24 : 0.32;
     const circleY = compact ? y + 0.06 : y + 0.1;
-    slide.addShape(pres.shapes.OVAL, {
+    slide.addShape(ShapeType.ellipse, {
       x: CONTENT_COL.X + 0.1, y: circleY, w: circleSize, h: circleSize,
       fill: { color: colors.blue },
     });
@@ -256,7 +257,7 @@ export function renderStepDetail(slide: PptxGenJS.Slide, pres: PptxGenJS, data: 
   addTitle(slide, { label: data.label, title: data.title, accent: data.title_accent }, colors);
 
   // Step number circle
-  slide.addShape(pres.shapes.OVAL, {
+  slide.addShape(ShapeType.ellipse, {
     x: MARGIN.LEFT + 0.3, y: 2.5, w: 0.6, h: 0.6,
     fill: { color: colors.blue },
   });
