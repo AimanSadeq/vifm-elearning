@@ -165,8 +165,6 @@ export default function DesignationRegistryPage() {
     );
   }
 
-  const desigName = locale === "ar" && designation.name_ar ? designation.name_ar : designation.name;
-
   return (
     <div className="space-y-8 pb-16">
       <Link

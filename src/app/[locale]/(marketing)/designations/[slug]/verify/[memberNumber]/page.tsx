@@ -5,7 +5,6 @@ import { useLocale } from "next-intl";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
-  Award,
   Star,
   CheckCircle2,
   AlertTriangle,

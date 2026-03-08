@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Bell, BookOpen, Award, Video, CheckCircle, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -33,7 +33,7 @@ export default function NotificationsPage() {
   const [hasMore, setHasMore] = useState(true);
   const pageSize = 20;
 
-  const fetchNotifications = async (pageNum: number = 0) => {
+  const fetchNotifications = useCallback(async (pageNum: number = 0) => {
     if (!user) return;
 
     const supabase = createClient();
@@ -54,11 +54,11 @@ export default function NotificationsPage() {
     }
     setHasMore((count ?? 0) > from + newItems.length);
     setIsLoading(false);
-  };
+  }, [user]);
 
   useEffect(() => {
     if (!authLoading && user) fetchNotifications(0);
-  }, [user, authLoading]);
+  }, [user, authLoading, fetchNotifications]);
 
   const handleMarkAllRead = async () => {
     if (!user) return;
