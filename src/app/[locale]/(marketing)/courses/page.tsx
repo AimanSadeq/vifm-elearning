@@ -27,10 +27,9 @@ export default function CourseCatalogPage() {
   const [page, setPage] = useState(1);
 
   const debouncedSearch = useDebounce(filters.search, 300);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedFilters = useMemo(
     () => ({ ...filters, search: debouncedSearch }),
-    [filters.category, filters.difficulty, filters.priceRange, filters.sortBy, debouncedSearch]
+    [filters, debouncedSearch]
   );
 
   const { courses, isLoading, totalCount, totalPages } = useCoursesCatalog({

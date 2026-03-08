@@ -31,9 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     const holderId = metadata.holder_id;
-    const _designationId = metadata.designation_id;
     const userId = metadata.user_id;
-    const _baseFee = parseFloat(metadata.base_fee || "0");
     const lateFee = parseFloat(metadata.late_fee || "0");
     const totalAmount = parseFloat(metadata.total_amount || "0");
 

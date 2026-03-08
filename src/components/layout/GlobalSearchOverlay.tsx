@@ -7,7 +7,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
-import { cn } from "@/lib/utils/cn";
 
 interface SearchResult {
   id: string;

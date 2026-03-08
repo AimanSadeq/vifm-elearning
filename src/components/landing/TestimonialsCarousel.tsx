@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import Image from "next/image";
 import { AnimatedSection } from "./AnimatedSection";
 import { cn } from "@/lib/utils/cn";
 
@@ -249,9 +250,11 @@ export function TestimonialsCarousel({
                     {/* Author */}
                     <div className="flex items-center gap-3">
                       {testimonial.avatar_url ? (
-                        <img
+                        <Image
                           src={testimonial.avatar_url}
                           alt={displayName}
+                          width={40}
+                          height={40}
                           className="h-10 w-10 rounded-full object-cover"
                         />
                       ) : (

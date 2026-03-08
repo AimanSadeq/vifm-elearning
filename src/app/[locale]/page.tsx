@@ -23,7 +23,6 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("landing");
-  const tc = await getTranslations("common");
 
   const CAT_DESCRIPTIONS: Record<string, string> = {
     "finance-banking": t("catFinanceDesc"),
@@ -59,9 +58,7 @@ export default async function HomePage({
   // Fetch active designations
   const { data: designations } = await supabase
     .from("designations")
-    .select(
-      "id, name, name_ar, slug, abbreviation, description, description_ar, founding_fee, currency, annual_cpe_required, metadata"
-    )
+    .select("*")
     .eq("is_active", true)
     .order("name");
 

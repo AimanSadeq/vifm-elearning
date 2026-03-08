@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useLocale, useTranslations } from 'next-intl'
+import { useLocale } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import {
@@ -69,9 +69,7 @@ type TabType = 'details' | 'content' | 'quizzes'
 
 export function CourseEditor({ course, modules: initialModules, categories, instructors }: CourseEditorProps) {
   const router = useRouter()
-  const _params = useParams()
   const locale = useLocale()
-  const _t = useTranslations('admin')
   const [activeTab, setActiveTab] = useState<TabType>('content')
   const [isEditing, setIsEditing] = useState(false)
   const [showAddContent, setShowAddContent] = useState<string | null>(null) // moduleId

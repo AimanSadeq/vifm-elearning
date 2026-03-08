@@ -1,4 +1,5 @@
 import PptxGenJS from 'pptxgenjs';
+import { ShapeType } from 'pptxgenjs';
 import type { VTimelineSlide, RoadmapSlide, CircularSlide, FunnelSlide, PyramidSlide } from '../../types';
 import type { PptxColors } from '../theme';
 import { CONTENT_COL, FONTS, MARGIN, SLIDE } from '../theme';
@@ -15,7 +16,7 @@ export function renderVTimeline(slide: PptxGenJS.Slide, pres: PptxGenJS, data: V
   const lineX = CONTENT_COL.X + 0.2;
 
   // Vertical line
-  slide.addShape(pres.shapes.LINE, {
+  slide.addShape(ShapeType.line, {
     x: lineX, y: startY,
     w: 0, h: data.events.length * (eventH + gap) - gap,
     line: { color: colors.dark, width: 2 },
@@ -25,7 +26,7 @@ export function renderVTimeline(slide: PptxGenJS.Slide, pres: PptxGenJS, data: V
     const y = startY + i * (eventH + gap);
 
     // Dot
-    slide.addShape(pres.shapes.OVAL, {
+    slide.addShape(ShapeType.ellipse, {
       x: lineX - 0.06, y: y + 0.12, w: 0.12, h: 0.12,
       fill: { color: colors.blue },
     });
@@ -100,7 +101,7 @@ export function renderCircular(slide: PptxGenJS.Slide, pres: PptxGenJS, data: Ci
   const stepCount = data.steps.length;
 
   // Center circle
-  slide.addShape(pres.shapes.OVAL, {
+  slide.addShape(ShapeType.ellipse, {
     x: centerX - 0.5, y: centerY - 0.5, w: 1.0, h: 1.0,
     fill: { color: colors.blue },
   });
@@ -118,7 +119,7 @@ export function renderCircular(slide: PptxGenJS.Slide, pres: PptxGenJS, data: Ci
     const circR = 0.35;
 
     // Step circle
-    slide.addShape(pres.shapes.OVAL, {
+    slide.addShape(ShapeType.ellipse, {
       x: sx - circR, y: sy - circR, w: circR * 2, h: circR * 2,
       fill: { color: colors.card },
       line: { color: colors.blue, width: 1 },

@@ -1,4 +1,5 @@
 import PptxGenJS from 'pptxgenjs';
+import { ShapeType } from 'pptxgenjs';
 import type { IntroSlide, ModuleTitleSlide, OutroSlide } from '../../types';
 import type { PptxColors } from '../theme';
 import { SLIDE, FONTS } from '../theme';
@@ -54,7 +55,7 @@ export function renderIntro(slide: PptxGenJS.Slide, pres: PptxGenJS, data: Intro
   }
 
   // Decorative line
-  slide.addShape(pres.shapes.LINE, {
+  slide.addShape(ShapeType.line, {
     x: 3.5, y: 3.2, w: 3, h: 0,
     line: { color: colors.blue, width: 1 },
   });
@@ -89,7 +90,7 @@ export function renderModuleTitle(slide: PptxGenJS.Slide, pres: PptxGenJS, data:
   });
 
   // Decorative line
-  slide.addShape(pres.shapes.LINE, {
+  slide.addShape(ShapeType.line, {
     x: 3.5, y: 2.8, w: 3, h: 0,
     line: { color: colors.blue, width: 1 },
   });
@@ -122,7 +123,7 @@ export function renderOutro(slide: PptxGenJS.Slide, pres: PptxGenJS, data: Outro
   });
 
   // Decorative line
-  slide.addShape(pres.shapes.LINE, {
+  slide.addShape(ShapeType.line, {
     x: 3.5, y: 2.5, w: 3, h: 0,
     line: { color: colors.blue, width: 1 },
   });

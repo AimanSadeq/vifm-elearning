@@ -21,10 +21,8 @@ export async function POST(request: NextRequest) {
       certifiedAt,
       designationName,
       abbreviation,
-      tierName,
       tierSlug,
       verifyUrl,
-      locale = "en",
     } = body;
 
     if (!fullName || !memberNumber || !certifiedAt || !abbreviation) {

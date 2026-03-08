@@ -4,7 +4,12 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { LocaleHtmlAttributes } from "./locale-html-attributes";
+import { routing } from "@/i18n/routing";
 import "@/app/globals.css";
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
 
 const openSans = Open_Sans({
   subsets: ["latin"],
