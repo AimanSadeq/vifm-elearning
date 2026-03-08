@@ -13,6 +13,8 @@ import {
   Search,
   X,
   Lock,
+  FileText,
+  HelpCircle,
   Play,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -412,10 +414,16 @@ export function ContentSidebar({
                             </div>
                           ) : isActive ? (
                             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
-                              <Play
-                                className="h-3 w-3 ms-0.5"
-                                fill="currentColor"
-                              />
+                              {lesson.content_type === "document" ? (
+                                <FileText className="h-3 w-3" />
+                              ) : lesson.content_type === "quiz" ? (
+                                <HelpCircle className="h-3 w-3" />
+                              ) : (
+                                <Play
+                                  className="h-3 w-3 ms-0.5"
+                                  fill="currentColor"
+                                />
+                              )}
                             </div>
                           ) : isCompleted ? (
                             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-white shadow-sm">

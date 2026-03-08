@@ -556,7 +556,11 @@ export default function LessonPage() {
                 {currentLesson.document_url && (
                   <div className="space-y-2">
                     <iframe
-                      src={currentLesson.document_url}
+                      src={
+                        currentLesson.document_url.startsWith("http")
+                          ? `https://docs.google.com/gview?url=${encodeURIComponent(currentLesson.document_url)}&embedded=true`
+                          : currentLesson.document_url
+                      }
                       className="w-full rounded-lg border"
                       style={{ minHeight: "70vh" }}
                       title={tp("documentViewer")}
