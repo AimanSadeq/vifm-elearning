@@ -195,8 +195,16 @@ export default function AdminCategoriesPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this category?")) return;
+
     const supabase = createClient();
-    await supabase.from("categories").delete().eq("id", id);
+    const { error } = await supabase.from("categories").delete().eq("id", id);
+
+    if (error) {
+      alert("Failed to delete category: " + error.message);
+      return;
+    }
+
     fetchCategories();
   };
 
@@ -282,7 +290,7 @@ export default function AdminCategoriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-bold">
-          {t("manageCourses")} — Categories
+          {t("manageCategories")}
         </h1>
         <Button
           size="sm"
@@ -301,7 +309,7 @@ export default function AdminCategoriesPage() {
           }}
         >
           <Plus className="h-4 w-4 me-1" />
-          Add Category
+          {t("addCategory")}
         </Button>
       </div>
 
@@ -310,7 +318,7 @@ export default function AdminCategoriesPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">
-              {editingId ? "Edit Category" : "New Category"}
+              {editingId ? t("editCategory") : t("newCategory")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -342,7 +350,7 @@ export default function AdminCategoriesPage() {
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="space-y-2">
-                <Label>Name (EN) *</Label>
+                <Label>{t("nameEn")} *</Label>
                 <Input
                   value={formData.name}
                   onChange={(e) => handleNameChange(e.target.value)}
@@ -350,7 +358,7 @@ export default function AdminCategoriesPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Name (AR) *</Label>
+                <Label>{t("nameAr")} *</Label>
                 <Input
                   value={formData.name_ar}
                   onChange={(e) =>
@@ -361,7 +369,7 @@ export default function AdminCategoriesPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Slug</Label>
+                <Label>{t("slug")}</Label>
                 <Input
                   value={formData.slug}
                   onChange={(e) =>
@@ -371,7 +379,7 @@ export default function AdminCategoriesPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Icon</Label>
+                <Label>{t("icon")}</Label>
                 <div className="flex gap-2">
                   <div
                     className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border bg-muted/50 text-lg"
@@ -390,7 +398,7 @@ export default function AdminCategoriesPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Color</Label>
+                <Label>{t("color")}</Label>
                 <div className="flex gap-2">
                   <div
                     className="h-10 w-10 shrink-0 rounded-md border"
@@ -408,7 +416,7 @@ export default function AdminCategoriesPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Sort Order</Label>
+                <Label>{t("sortOrder")}</Label>
                 <Input
                   type="number"
                   value={formData.sort_order}
@@ -434,13 +442,13 @@ export default function AdminCategoriesPage() {
                   setEditingId(null);
                 }}
               >
-                Cancel
+                {t("cancel")}
               </Button>
               <Button onClick={handleSave} disabled={isSaving || !formData.name}>
                 {isSaving && (
                   <Loader2 className="h-4 w-4 animate-spin me-2" />
                 )}
-                {editingId ? "Update" : "Create"}
+                {editingId ? t("update") : t("create")}
               </Button>
             </div>
           </CardContent>

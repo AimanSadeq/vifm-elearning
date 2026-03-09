@@ -65,9 +65,12 @@ export default function AdminWebinarsPage() {
     const supabase = createClient();
     const { error } = await supabase.from("webinars").delete().eq("id", webinarId);
 
-    if (!error) {
-      setWebinars((prev) => prev.filter((w) => w.id !== webinarId));
+    if (error) {
+      alert("Failed to delete webinar: " + error.message);
+      return;
     }
+
+    setWebinars((prev) => prev.filter((w) => w.id !== webinarId));
   };
 
   const statusBadge = (status: string) => {
@@ -164,7 +167,7 @@ export default function AdminWebinarsPage() {
         <Link href={`/${locale}/admin/webinars/new`}>
           <Button>
             <Plus className="h-4 w-4 me-2" />
-            Create Webinar
+            {t("createWebinar")}
           </Button>
         </Link>
       </div>

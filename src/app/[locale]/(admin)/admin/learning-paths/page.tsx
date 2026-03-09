@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ function slugify(text: string): string {
 }
 
 export default function AdminLearningPathsPage() {
+  const t = useTranslations("admin");
   const [paths, setPaths] = useState<LearningPathWithCourseCount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -116,16 +118,26 @@ export default function AdminLearningPathsPage() {
     let pathId = editingPath?.id;
 
     if (editingPath) {
-      await supabase
+      const { error } = await supabase
         .from("learning_paths")
         .update(dbData)
         .eq("id", editingPath.id);
+      if (error) {
+        alert("Failed to update learning path: " + error.message);
+        setIsSaving(false);
+        return;
+      }
     } else {
-      const { data: inserted } = await supabase
+      const { data: inserted, error } = await supabase
         .from("learning_paths")
         .insert(dbData)
         .select("id")
         .single();
+      if (error) {
+        alert("Failed to create learning path: " + error.message);
+        setIsSaving(false);
+        return;
+      }
       pathId = inserted?.id;
     }
 
@@ -162,16 +174,24 @@ export default function AdminLearningPathsPage() {
   async function handleDelete(id: string) {
     if (!confirm("Delete this learning path?")) return;
     const supabase = createClient();
-    await supabase.from("learning_paths").delete().eq("id", id);
+    const { error } = await supabase.from("learning_paths").delete().eq("id", id);
+    if (error) {
+      alert("Failed to delete learning path: " + error.message);
+      return;
+    }
     await fetchPaths();
   }
 
   async function handleTogglePublished(path: LearningPathWithCourseCount) {
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("learning_paths")
       .update({ is_published: !path.is_published })
       .eq("id", path.id);
+    if (error) {
+      alert("Failed to update learning path: " + error.message);
+      return;
+    }
     await fetchPaths();
   }
 
@@ -267,7 +287,7 @@ export default function AdminLearningPathsPage() {
             className="h-8 px-2 text-xs"
             onClick={() => handleTogglePublished(item)}
           >
-            {item.is_published ? "Unpublish" : "Publish"}
+            {item.is_published ? t("unpublish") : t("publish")}
           </Button>
           <Button
             variant="ghost"
@@ -285,7 +305,7 @@ export default function AdminLearningPathsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-heading text-2xl font-bold">Learning Paths</h1>
+        <h1 className="font-heading text-2xl font-bold">{t("manageLearningPaths")}</h1>
         <Button
           onClick={() => {
             setEditingPath(null);
@@ -294,7 +314,7 @@ export default function AdminLearningPathsPage() {
           }}
         >
           <Plus className="h-4 w-4 me-2" />
-          Create Learning Path
+          {t("createLearningPath")}
         </Button>
       </div>
 

@@ -291,28 +291,28 @@ export default function AdminDashboardPage() {
           className="flex items-center gap-2 rounded-lg border border-border px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <PlusCircle className="h-4 w-4" />
-          Add Course
+          {t("addCourse")}
         </Link>
         <Link
           href={`/${locale}/admin/users`}
           className="flex items-center gap-2 rounded-lg border border-border px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <Users className="h-4 w-4" />
-          Manage Users
+          {t("manageUsers")}
         </Link>
         <Link
           href={`/${locale}/admin/analytics`}
           className="flex items-center gap-2 rounded-lg border border-border px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <BarChart3 className="h-4 w-4" />
-          View Analytics
+          {t("viewAnalytics")}
         </Link>
         <Link
           href={`/${locale}/admin/webinars`}
           className="flex items-center gap-2 rounded-lg border border-border px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <Video className="h-4 w-4" />
-          Manage Webinars
+          {t("manageWebinars")}
         </Link>
       </div>
 

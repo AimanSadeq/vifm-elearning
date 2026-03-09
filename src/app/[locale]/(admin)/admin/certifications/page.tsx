@@ -88,9 +88,12 @@ export default function AdminCertificationsPage() {
     const supabase = createClient();
     const { error } = await supabase.from("designations").delete().eq("id", id);
 
-    if (!error) {
-      setDesignations((prev) => prev.filter((d) => d.id !== id));
+    if (error) {
+      alert("Failed to delete certification: " + error.message);
+      return;
     }
+
+    setDesignations((prev) => prev.filter((d) => d.id !== id));
   };
 
   const handleToggleActive = async (item: DesignationWithCount) => {
@@ -100,13 +103,16 @@ export default function AdminCertificationsPage() {
       .update({ is_active: !item.is_active })
       .eq("id", item.id);
 
-    if (!error) {
-      setDesignations((prev) =>
-        prev.map((d) =>
-          d.id === item.id ? { ...d, is_active: !d.is_active } : d
-        )
-      );
+    if (error) {
+      alert("Failed to update certification status: " + error.message);
+      return;
     }
+
+    setDesignations((prev) =>
+      prev.map((d) =>
+        d.id === item.id ? { ...d, is_active: !d.is_active } : d
+      )
+    );
   };
 
   const handleManageCourse = async (item: DesignationWithCount) => {
@@ -146,6 +152,14 @@ export default function AdminCertificationsPage() {
 
       // Create a new course linked to this designation
       const slug = `${item.slug}-course`;
+
+      // Pre-fetch a default category ID
+      const { data: defaultCategory } = await supabase
+        .from("categories")
+        .select("id")
+        .limit(1)
+        .single();
+
       const { data: newCourse, error } = await supabase
         .from("courses")
         .insert({
@@ -165,13 +179,13 @@ export default function AdminCertificationsPage() {
           average_rating: 0,
           rating_count: 0,
           completion_rate: 0,
-          category_id: (await supabase.from("categories").select("id").limit(1).single()).data?.id,
+          category_id: defaultCategory?.id ?? null,
         })
         .select("id")
         .single();
 
       if (error) {
-        console.error("Failed to create course:", error);
+        alert("Failed to create course: " + error.message);
         return;
       }
 

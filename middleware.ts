@@ -6,7 +6,9 @@ import { routing } from "@/i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
 
-const protectedRoutes = [
+const validLocales = routing.locales as readonly string[];
+
+const protectedPrefixes = [
   "/dashboard",
   "/my-courses",
   "/my-learning-paths",
@@ -21,25 +23,45 @@ const protectedRoutes = [
   "/corporate",
 ];
 
-// Dynamic route patterns that also require auth
 const protectedPatterns = [
   /^\/courses\/[^/]+\/learn/,
   /^\/courses\/[^/]+\/checkout/,
 ];
 
-const adminRoutes = ["/admin"];
-const instructorRoutes = ["/instructor"];
-const corporateRoutes = ["/corporate"];
+function stripLocale(pathname: string): string {
+  const segments = pathname.split("/");
+  if (segments.length > 1 && validLocales.includes(segments[1] as "en" | "ar")) {
+    return "/" + segments.slice(2).join("/") || "/";
+  }
+  return pathname;
+}
+
+function hasValidLocale(pathname: string): boolean {
+  const segments = pathname.split("/");
+  return segments.length > 1 && validLocales.includes(segments[1] as "en" | "ar");
+}
 
 function getLocale(pathname: string): string {
-  const segment = pathname.split("/")[1];
-  return (routing.locales as readonly string[]).includes(segment)
-    ? segment
-    : routing.defaultLocale;
+  const segments = pathname.split("/");
+  if (segments.length > 1 && validLocales.includes(segments[1] as "en" | "ar")) {
+    return segments[1];
+  }
+  return routing.defaultLocale;
 }
 
 export async function middleware(request: NextRequest) {
-  // --- 1. Refresh Supabase auth session (following official Supabase pattern) ---
+  const { pathname } = request.nextUrl;
+
+  // --- 1. Force valid locale prefix on ALL requests ---
+  // This MUST happen first to prevent "admin" being treated as a locale
+  if (!hasValidLocale(pathname) && pathname !== "/") {
+    const locale = routing.defaultLocale;
+    const redirectUrl = new URL(`/${locale}${pathname}`, request.url);
+    redirectUrl.search = request.nextUrl.search;
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // --- 2. Refresh Supabase auth session ---
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -65,7 +87,6 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Helper: copy Supabase auth cookies onto any response
   const withAuthCookies = (response: NextResponse) => {
     supabaseResponse.cookies.getAll().forEach((cookie) => {
       response.cookies.set(cookie);
@@ -73,21 +94,15 @@ export async function middleware(request: NextRequest) {
     return response;
   };
 
-  // --- 2. Check if route is protected ---
-  const { pathname } = request.nextUrl;
+  // --- 3. Check if route is protected ---
   const locale = getLocale(pathname);
-  const localePrefix = new RegExp(
-    `^\\/(${(routing.locales as readonly string[]).join("|")})`
-  );
-  const pathnameWithoutLocale = pathname.replace(localePrefix, "");
+  const cleanPath = stripLocale(pathname);
 
   const isProtected =
-    protectedRoutes.some((route) =>
-      pathnameWithoutLocale.startsWith(route)
-    ) ||
-    protectedPatterns.some((pattern) => pattern.test(pathnameWithoutLocale));
+    protectedPrefixes.some((prefix) => cleanPath.startsWith(prefix)) ||
+    protectedPatterns.some((pattern) => pattern.test(cleanPath));
 
-  // --- 3. If not protected, run intl middleware and return ---
+  // Not protected → run intl middleware and return
   if (!isProtected) return withAuthCookies(intlMiddleware(request));
 
   // --- 4. Authentication check ---
@@ -101,34 +116,29 @@ export async function middleware(request: NextRequest) {
     return withAuthCookies(NextResponse.redirect(loginUrl));
   }
 
-  // --- 5. Role from JWT app_metadata (synced via DB trigger, no query needed) ---
+  // --- 5. Role-based access control ---
   const role = (user.app_metadata?.role as string) ?? "learner";
-
-  // --- 6. Role-based access control ---
   const dashboardUrl = new URL(`/${locale}/dashboard`, request.url);
 
-  if (
-    adminRoutes.some((r) => pathnameWithoutLocale.startsWith(r)) &&
-    role !== "super_admin"
-  ) {
+  if (cleanPath.startsWith("/admin") && role !== "super_admin") {
     return withAuthCookies(NextResponse.redirect(dashboardUrl));
   }
 
   if (
-    instructorRoutes.some((r) => pathnameWithoutLocale.startsWith(r)) &&
+    cleanPath.startsWith("/instructor") &&
     !["super_admin", "instructor"].includes(role)
   ) {
     return withAuthCookies(NextResponse.redirect(dashboardUrl));
   }
 
   if (
-    corporateRoutes.some((r) => pathnameWithoutLocale.startsWith(r)) &&
+    cleanPath.startsWith("/corporate") &&
     !["super_admin", "corporate_admin"].includes(role)
   ) {
     return withAuthCookies(NextResponse.redirect(dashboardUrl));
   }
 
-  // --- 7. All checks passed, run intl middleware ---
+  // --- 6. All checks passed ---
   return withAuthCookies(intlMiddleware(request));
 }
 

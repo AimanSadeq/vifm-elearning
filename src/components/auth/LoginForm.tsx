@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,10 +13,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+const VALID_LOCALES = ["en", "ar"];
+
 export function LoginForm() {
   const t = useTranslations("auth");
-  const locale = useLocale();
-  const router = useRouter();
+  const rawLocale = useLocale();
+  const locale = VALID_LOCALES.includes(rawLocale) ? rawLocale : "en";
   const searchParams = useSearchParams();
   const rawRedirect = searchParams.get("redirect");
   const redirectTo =
@@ -69,8 +71,8 @@ export function LoginForm() {
       }
     }
 
-    router.replace(destination);
-    router.refresh();
+    // Full page navigation ensures server-side rendering gets the fresh auth cookies
+    window.location.href = destination;
   };
 
   return (

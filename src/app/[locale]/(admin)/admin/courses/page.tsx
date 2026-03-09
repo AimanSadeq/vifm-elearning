@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { Plus, MoreHorizontal, Eye, Pencil, Trash2, ClipboardCheck } from "lucide-react";
+import { Plus, Eye, Pencil, Trash2, ClipboardCheck, ToggleLeft, ToggleRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { escapeIlike } from "@/lib/utils/escape-search";
 import { Button } from "@/components/ui/button";
@@ -66,9 +66,12 @@ export default function AdminCoursesPage() {
     const supabase = createClient();
     const { error } = await supabase.from("courses").delete().eq("id", courseId);
 
-    if (!error) {
-      setCourses((prev) => prev.filter((c) => c.id !== courseId));
+    if (error) {
+      alert("Failed to delete course: " + error.message);
+      return;
     }
+
+    setCourses((prev) => prev.filter((c) => c.id !== courseId));
   };
 
   const handleToggleStatus = async (course: Course) => {
@@ -85,13 +88,16 @@ export default function AdminCoursesPage() {
       .update(updateData)
       .eq("id", course.id);
 
-    if (!error) {
-      setCourses((prev) =>
-        prev.map((c) =>
-          c.id === course.id ? { ...c, status: newStatus } : c
-        )
-      );
+    if (error) {
+      alert("Failed to update course status: " + error.message);
+      return;
     }
+
+    setCourses((prev) =>
+      prev.map((c) =>
+        c.id === course.id ? { ...c, status: newStatus } : c
+      )
+    );
   };
 
   const statusBadge = (status: string) => {
@@ -147,7 +153,7 @@ export default function AdminCoursesPage() {
       className: "whitespace-nowrap",
       render: (item) => (
         <div className="flex items-center gap-1">
-          <Link href={`/${locale}/courses/${item.slug}`} title="View">
+          <Link href={`/${locale}/courses/${item.slug}`} title="View public page">
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
               <Eye className="h-4 w-4" />
             </Button>
@@ -157,7 +163,7 @@ export default function AdminCoursesPage() {
               <Pencil className="h-4 w-4" />
             </Button>
           </Link>
-          <Link href={`/${locale}/admin/courses/${item.id}/quizzes`} title="Quizzes">
+          <Link href={`/${locale}/admin/courses/${item.id}/quizzes`} title="Manage Quizzes">
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
               <ClipboardCheck className="h-4 w-4" />
             </Button>
@@ -165,11 +171,15 @@ export default function AdminCoursesPage() {
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+            className="h-8 w-8 p-0"
             onClick={() => handleToggleStatus(item)}
             title={item.status === "published" ? "Unpublish" : "Publish"}
           >
-            <MoreHorizontal className="h-4 w-4" />
+            {item.status === "published" ? (
+              <ToggleRight className="h-4 w-4 text-success" />
+            ) : (
+              <ToggleLeft className="h-4 w-4 text-muted-foreground" />
+            )}
           </Button>
           <Button
             variant="ghost"

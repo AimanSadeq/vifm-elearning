@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { CourseDetail } from "@/components/courses/CourseDetail";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import type { Course, Module } from "@/types";
@@ -12,18 +13,21 @@ export default function CourseDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
   const t = useTranslations("common");
+  const { user } = useAuth();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  const isAdmin = user?.role === "super_admin";
+
   useEffect(() => {
     async function fetchCourseDetail() {
       const supabase = createClient();
 
-      // Fetch course
-      const { data: courseData, error: courseError } = await supabase
+      // Fetch course — admins can view any status, others only published
+      let query = supabase
         .from("courses")
         .select(
           `
@@ -32,9 +36,13 @@ export default function CourseDetailPage() {
           instructor:profiles!courses_instructor_id_fkey(full_name, full_name_ar, avatar_url)
         `
         )
-        .eq("slug", slug)
-        .eq("status", "published")
-        .single();
+        .eq("slug", slug);
+
+      if (!isAdmin) {
+        query = query.eq("status", "published");
+      }
+
+      const { data: courseData, error: courseError } = await query.single();
 
       if (courseError || !courseData) {
         setError(true);
