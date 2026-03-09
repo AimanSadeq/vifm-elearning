@@ -39,17 +39,37 @@ export function LoginForm() {
     setError(null);
     const supabase = createClient();
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
+    const { data: authData, error: authError } =
+      await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
 
     if (authError) {
       setError(authError.message);
       return;
     }
 
-    router.replace(redirectTo);
+    // If there's an explicit redirect param, use it; otherwise route by role
+    let destination = redirectTo;
+    if (!rawRedirect) {
+      const role = authData.user?.app_metadata?.role as string | undefined;
+      switch (role) {
+        case "super_admin":
+          destination = `/${locale}/admin/dashboard`;
+          break;
+        case "instructor":
+          destination = `/${locale}/instructor/dashboard`;
+          break;
+        case "corporate_admin":
+          destination = `/${locale}/corporate/dashboard`;
+          break;
+        default:
+          destination = `/${locale}/dashboard`;
+      }
+    }
+
+    router.replace(destination);
     router.refresh();
   };
 
