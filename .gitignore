@@ -48,3 +48,7 @@ supabase/.temp/
 
 # claude code local settings
 .claude/settings.local.json
+
+# thinkific migration
+thinkific-courses/node_modules
+thinkific-courses/backup
