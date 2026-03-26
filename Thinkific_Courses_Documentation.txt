@@ -1,0 +1,2396 @@
+VIFM eLearning - Thinkific Courses Documentation
+Generated: 2026-03-26
+Total Courses: 59
+Total Chapters: 263
+Total Content Items: 1289
+================================================================================
+
+================================================================================
+COURSE 1:  اختبار تحديد مستوى الاكسل - قبل الجلسة
+================================================================================
+Slug: pre-data12
+
+  (No chapters)
+
+================================================================================
+COURSE 2: A Deep Dive into GCC Financial Analysis with Ashom
+================================================================================
+Slug: a-deep-dive-into-gcc-financial-analysis-with-ashom
+
+  Chapter 1: Webinar replay
+    Duration: 47m 13s
+    1. [Lesson] A Deep Dive into GCC Financial Analysis with Ashom
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 3: A Dynamic Approach in Managing Project Risks
+================================================================================
+Slug: a-dynamic-approach-in-managing-project-risks
+
+  Chapter 1: Webinar replay
+    Duration: 71m 55s
+    1. [Lesson] A Dynamic Approach in Managing Project Risks
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 4: Accounting Fundamentals & Financial Reporting
+================================================================================
+Slug: accounting-fundamentals-financial-reporting
+
+  Chapter 1: Webinar replay
+    Duration: 43m 59s
+    1. [Lesson] Accounting Fundamentals & Financial Reporting
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 5: Advanced Financial Modeler - AFM 1
+================================================================================
+Slug: advanced-financial-modeler-afm-1
+
+  Chapter 1: Course Introduction
+    Duration: 8m 1s
+    1. [Download] Consolidated Course Material
+    2. [Lesson] Financial Modeling Introduction
+    3. [Lesson] Course Overview
+    4. [Lesson] AFM 1 Introduction
+
+  Chapter 2: MODULE 1: FINANCIAL ANALYSIS, RATIOS, AND METRICS
+    Duration: 18m 54s
+    1. [Download] Module Material
+    2. [Lesson] Module Overview
+    3. [Lesson] Introduction to Financial Analysis
+    4. [Lesson] Income Statement vs Balance Sheet Analysis
+    5. [Lesson] Vertical, Trend, and Horizontal Analysis
+    6. [Lesson] Liquidity Ratios
+    7. [Lesson] Management and Ativity Ratios
+    8. [Lesson] Solvency and Leverage Ratios
+    9. [Lesson] Profitability Ratios
+
+  Chapter 3: MODULE 2: FINANCIAL MODELING BEST PRACTICES
+    Duration: 14m 24s
+    1. [Download] Module Material
+    2. [Lesson] Module Overview
+    3. [Lesson] Introduction to Financial Modeling Best Practices
+    4. [Lesson] Modeling as a Discipline
+    5. [Lesson] Model Planning
+    6. [Lesson] Design and Presentation
+    7. [Lesson] Tab Structures
+    8. [Lesson] Model Construction Tips
+
+  Chapter 4: MODULE 3: FINANCIAL MODELING ATTRIBUTES
+    Duration: 7m 16s
+    1. [Download] Module Material
+    2. [Lesson] Module Overview
+    3. [Lesson] Introduction to Financial Modeling Attributes
+    4. [Lesson] Attribute 1: Dynamic
+    5. [Lesson] Attribute 2: Flexible
+    6. [Lesson] Attribute 3: Intuitive
+    7. [Lesson] Attribute 4: Transparent
+    8. [Lesson] Attribute 5: Printable
+    9. [Lesson] Attribute 6: Transferable
+
+  Chapter 5: MODULE 4: MODELING SHORTCUTS
+    Duration: 1m 38s
+    1. [Download] Module Material
+    2. [Lesson] Module Overview
+    3. [Lesson] Introduction to Modeling Shortcuts
+
+  Chapter 6: MODULE 5: PROFESSIONAL EXCEL SKILLS
+    Duration: 35m 56s
+    1. [Download] Module Material
+    2. [Lesson] Module Overview
+    3. [Lesson] Introduction to Professional Excel Skills
+    4. [Lesson] Custom Formatting
+    5. [Lesson] Logical Functions
+    6. [Lesson] Lookup and Reference Functions
+    7. [Lesson] Absolute References
+    8. [Lesson] Conditional Formatting
+    9. [Lesson] Forms & Drop-Down Boxes
+    10. [Lesson] Printing
+
+  Chapter 7: MODULE 6: MODELING TOOLS AND TECHNIQUES
+    Duration: 22m 51s
+    1. [Lesson] Module Overview
+    2. [Download] Module Material
+    3. [Lesson] Introduction to Modeling Tools and Techniques
+    4. [Lesson] Dynamic Chart Titles
+    5. [Lesson] Check Box Data Modeling
+    6. [Lesson] Spinner Data Modeling
+    7. [Lesson] List Box Data Modeling
+    8. [Lesson] Option Box Data Modeling
+    9. [Lesson] Error Checking Techniques
+
+  Chapter 8: MODULE 7: MODEL CALCULATIONS, INTEGRATION, AND CASE STUDY
+    Duration: 6m 58s
+    1. [Download] Module Material
+    2. [Lesson] Module Overview
+    3. [Lesson] Model Design
+
+  Chapter 9: MODEL CONSTRUCTION: ASSUMPTIONS
+    Duration: 61m 5s
+    1. [Lesson] Revenue Assumptions
+    2. [Lesson] Cost Assumptions
+    3. [Lesson] Working Capital Assumptions
+    4. [Lesson] Fixed Assets Assumptions
+    5. [Lesson] Intangible Assets Assumptions
+    6. [Lesson] Debt Assumptions
+    7. [Lesson] Tax Assumptions
+    8. [Lesson] Equity Assumptions
+
+  Chapter 10: MODEL CONSTRUCTION: REVENUE
+    Duration: 17m 13s
+    1. [Lesson] Revenue Schedule Layout
+    2. [Lesson] Revenue Schedule Construction
+
+  Chapter 11: MODEL CONSTRUCTION: COSTS
+    Duration: 10m 46s
+    1. [Lesson] Costs Schedule Layout
+    2. [Lesson] Costs Schedule Construction
+
+  Chapter 12: MODEL CONSTRUCTION: WORKING CAPITAL
+    Duration: 15m 14s
+    1. [Lesson] Working Capital Schedule Layout
+    2. [Lesson] Working Capital Construction
+    3. [Lesson] Working Capital Changes
+
+  Chapter 13: MODEL CONSTRUCTION: CAPITAL EXPENDITURES
+    Duration: 29m 36s
+    1. [Lesson] Capital Expenditures: Fixed Assets
+    2. [Lesson] Capital Expenditures: Depreciation
+    3. [Lesson] Capital Expenditures: Intangible Assets
+    4. [Lesson] Capital Expenditures: Amortization
+
+  Chapter 14: MODEL CONSTRUCTION: DEBT, INTEREST EXPENSE, AND INTEREST INCOME
+    Duration: 18m 4s
+    1. [Lesson] Debt Schedule Layout
+    2. [Lesson] Debt Schedule: Fixed Rate Debt
+    3. [Lesson] Debt Schedule: Variable Rate Debt
+    4. [Lesson] Debt Schedule: Interest Income
+
+  Chapter 15: MODEL CONSTRUCTION: TAXES
+    Duration: 7m 22s
+    1. [Lesson] Taxes Schedule Construction
+
+  Chapter 16: MODEL CONSTRUCTION: EQUITY
+    Duration: 14m 42s
+    1. [Lesson] Equity Schedule: Common Equity
+    2. [Lesson] Equity Schedule: Preferred Equity
+    3. [Lesson] Equity Schedule: Retained Earnings
+
+  Chapter 17: MODEL CONSTRUCTION: FINANCIAL STATEMENTS INTEGRATION
+    Duration: 56m 51s
+    1. [Lesson] Financial Statement Integration: Income Statement
+    2. [Lesson] Financial Statement Integration: Balance Sheet
+    3. [Lesson] Financial Statement Integration: Cash Flow Statement
+    4. [Lesson] Financial Statement Integration: Loose Ends
+
+  Chapter 18: MODULE CONSTRUCTION: THE REVOLVER
+    Duration: 19m 17s
+    1. [Lesson] Revolver Construction and Integration
+
+  Chapter 19: MODEL CONSTRUCTION: SUMMARY
+    Duration: 8m 16s
+    1. [Lesson] Summary Sheet Construction
+
+  Chapter 20: MODULE CONSTRUCTION: SCENARIOS
+    Duration: 10m 8s
+    1. [Lesson] Scenarios Construction and Integration
+
+  Chapter 21: MODULE CONSTRUCTION: PRINTING
+    Duration: 3m 41s
+    1. [Lesson] Printing the Financial Model
+
+  Chapter 22: MODULE 8: FINANCIAL CALCULATIONS AND APPLICATIONS
+    Duration: 15m 8s
+    1. [Lesson] Module Overview
+    2. [Download] Module Material
+    3. [Lesson] Financial Calculations Introduction
+    4. [Lesson] PV and FV
+    5. [Lesson] IRR and XIRR
+    6. [Lesson] NPV and XNPV
+    7. [Lesson] Free Cash Flows
+
+  Chapter 23: Post-Course Final Exam
+    1. [Quiz] Post-Course Quiz
+
+
+================================================================================
+COURSE 6: Analyzing Financial Statements
+================================================================================
+Slug: Analyzing-Financial-Statements
+
+  Chapter 1: Webinar replay
+    Duration: 68m 43s
+    1. [Lesson] Analyzing Financial Statements
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 7: Certification in Business Data Analytics Prep Course
+================================================================================
+Slug: cbdaprep
+
+  Chapter 1: Introduction
+    Duration: 3m 31s
+    1. [Lesson] Welcome to the Course
+    2. [HtmlItem] Essential Reading
+    3. [Pdf] CBDA Presentation Slides
+
+  Chapter 2: Chapter 1 - Introduction to Business Data Analytics
+    Duration: 45m 44s
+    1. [Lesson] Chapter 1 - an overview
+    2. [Lesson] What is Business Data Analytics?
+    3. [Lesson] Business Data Analytics as a Movement
+    4. [Lesson] Business Data Analytics as a Capability
+    5. [Lesson] Business Data Analytics as a Data-Centric Activity Set
+    6. [Lesson] Business Data Analytics as a Decision-Making Paradigm
+    7. [Lesson] Business Data Analytics as a Set of Practices and Technologies
+    8. [Lesson] The Business Data Analytics Cycle
+    9. [Lesson] Business Data Analytics Objectives
+    10. [Lesson] Business Analysis and Business Data Analytics
+    11. [Quiz] Chapter 1 Quiz
+
+  Chapter 3: Chapter 2 - Business Data Analytics Domains and Tasks
+    Duration: 153m 35s
+    1. [Lesson] Chapter 2 - an overview
+    2. [Lesson] Identify the Research Questions
+    3. [Lesson] Define Business Problem or Opportunity
+    4. [Lesson] Identify and Understand the Stakeholders
+    5. [Lesson] Assess Current State
+    6. [Lesson] Define Future State
+    7. [Lesson] Formulate Research Questions
+    8. [Lesson] Plan Business Data Analytics Approach
+    9. [Lesson] Select Techniques for Identifying Research Questions
+    10. [Lesson] A Case Study for Identifying Research Questions
+    11. [Lesson] Source Data
+    12. [Lesson] Plan Data Collection
+    13. [Lesson] Determine the Data Sets
+    14. [Lesson] Collect Data
+    15. [Lesson] Validate Data
+    16. [Lesson] Use Results to Influence Business Decision-Making
+    17. [Lesson] Recommend Actions
+    18. [Lesson] Develop Implementation Plan
+    19. [Lesson] Manage Change
+    20. [Lesson] Select Techniques for Use Results to Influence Business Decision-Making
+    21. [Lesson] A Case Study for Use Results to Influence Business Decision-Making
+    22. [Lesson] Guide Organizational-Level Strategy for Business Data Analytics
+    23. [Lesson] Organizational Strategy
+    24. [Lesson]  Talent Strategy
+    25. [Lesson] Data Strategy
+    26. [Lesson] Select Techniques for Guide Organizational-Level Strategy for Business Data Analytics
+    27. [Lesson] Underlying Competencies for Guide Organizational-Level Strategy for Business Data Analytics
+    28. [Lesson] A Case Study for Guide Organizational-Level Strategy for Business Data Analytics
+    29. [Quiz] Chapter 2 Quiz
+
+  Chapter 4: Chapter 3: Techniques
+    Duration: 106m 45s
+    1. [Lesson] Chapter 3 - an overview
+    2. [Lesson] Business Simulation
+    3. [Lesson] Business Visualizations
+    4. [Lesson] Concept Modelling
+    5. [Lesson] Data Dictionary
+    6. [Lesson] Data Flow Diagrams
+    7. [Lesson] Data Mapping
+    8. [Lesson] Data Storytelling
+    9. [Lesson] Decision Modelling and Analysis
+    10. [Lesson] ETL (Extract, Transform, Load)
+    11. [Lesson] Hypothesis Testing
+    12. [Lesson] Descriptive and Inferential Statistics
+    13. [Lesson] Exploratory Data Analysis (EDA)
+    14. [Lesson] Hypothesis Formulation and Testing
+    15. [Lesson] Interface Analysis
+    16. [Lesson] Optimization
+    17. [Lesson] Problem Shaping and Reframing
+    18. [Lesson] Stakeholder List, Map, or Personas
+    19. [Lesson] Surveys and Questionnaires
+    20. [Lesson] Technical Visualizations
+    21. [Lesson] The Big Idea
+    22. [Lesson] 3-Minute Story
+    23. [Quiz] Chapter 3 Quiz
+
+  Chapter 5: Recap and Final Exam
+    Duration: 4m 4s
+    1. [Lesson] Summary and Recap
+    2. [Quiz] Final Practice Exam
+
+
+================================================================================
+COURSE 8: Certified Data Intelligence Professional (CDIP)
+================================================================================
+Slug: certified-data-intelligence-professional-cdip
+
+  Chapter 1: Welcome to the course!
+    1. [Lesson] A message from the instructor
+    2. [Download] Download Course Workshops and Book
+
+  Chapter 2: Module I - Pivot Tables: The 19 Rules
+    1. [Lesson] Rules 1-6: Designing Rules  in Pivot Tables
+    2. [Lesson] How-to lesson
+    3. [Quiz] Test your learning
+
+  Chapter 3: Pivot Tables: The 19 Rules
+    1. [Lesson] High-level lesson
+    2. [Lesson] How-to lesson
+    3. [Quiz] Test your learning
+
+  Chapter 4: Chapter #3
+    1. [Lesson] High-level lesson
+    2. [Lesson] How-to lesson
+    3. [Quiz] Test your learning
+
+  Chapter 5: Next steps
+    1. [Lesson] Congrats! Here's what's next...
+    2. [HtmlItem] More resources for you
+    3. [Survey] Before you go...
+
+
+================================================================================
+COURSE 9: Certified Data Intelligence Professional (CDIP)
+================================================================================
+Slug: CDIP
+
+  Chapter 1: Welcome to the Course !
+    Duration: 3m 7s
+    1. [Lesson] Course Introduction
+    2. [Download] Download Course Book, Materials, and Exercises
+
+  Chapter 2: Module 1: Excel-Pivot tables
+    Duration: 50m 54s
+    1. [Lesson] Module 1 Introduction
+    2. [Lesson] Rule 1: Creating Pivot tables
+    3. [Lesson] Rule 2: Number Formatting
+    4. [Lesson] Rule 3: Design Report Layout
+    5. [Lesson] Rule 4: Sorting
+    6. [Lesson] Rule 5: Filtering
+    7. [Lesson] Rule 6: Expand-Collapse
+    8. [Lesson] Rule 7: Data Analysis Type 1 - Summarize Values By
+    9. [Lesson] Rule 8: Data Analysis Type 2 - Show Value As
+    10. [Lesson] Rule 9: Data Analysis Type 3 - Insert Calculated Field
+    11. [Lesson] Rule 10: Date Analysis
+    12. [Lesson] Rule 11: Show Report Filter Pages
+    13. [Lesson] Rule 12: Copying Pivot tables
+    14. [Lesson] Rule 13: Pivot Charts
+    15. [Lesson] Rule 14: Dynamic Chart Labelling
+    16. [Lesson] Rule 15: Linking Pivot tables with Powerpoint
+    17. [Lesson] Rule 16: Pivot table options
+    18. [Lesson] Rule 17: Conditional Formatting
+    19. [Lesson] Rule 18: Get Pivot Data
+    20. [Lesson] Rule 19: Slicer
+
+  Chapter 3: Module 2: Power Pivot
+    Duration: 35m 48s
+    1. [Lesson] Module 2 Introduction
+    2. [Lesson] Enabling Power Pivot
+    3. [Lesson] Extract (Get data) from Text Csv
+    4. [Lesson] Extract (Get Data) from Excel
+    5. [Lesson] Extract (Get Data) from XML
+    6. [Lesson] Extract (Get Data) from MS Database
+    7. [Lesson] Project Management Case Study - Get Data
+    8. [Lesson] Project Management Case Study - Formatting Columns
+    9. [Lesson] Project Management Case Study - Adding Conditional Column Using DAX
+    10. [Lesson] Project Management Case Study - Creating Data Relationship
+    11. [Lesson] Project Management Case Study - LOOKUP DAX Function
+    12. [Lesson] Project Management Case Study - Creating Cost Column Using DAX
+    13. [Lesson] Project Management Case Study - Creating Measures
+    14. [Lesson] Project Management Case Study - Inserting Pivot tables from Data model
+    15. [Lesson] Project Management Case Study - Creating KPIs
+
+  Chapter 4: Module 3: Power BI
+    Duration: 2m 43s
+    1. [Lesson] Power Bi/Power Query Introduction
+
+  Chapter 5: Get & Transform Data
+    Duration: 43m 21s
+    1. [Lesson] Get Data from Text CSV File
+    2. [Lesson] Get Data from Excel Part 1
+    3. [Lesson] Get Data from Excel Part 2
+    4. [Lesson] Get Data from Excel Part 3
+    5. [Lesson] Get Data from XML
+    6. [Lesson] Get Data from Web
+    7. [Lesson] Get Data from MS Database
+    8. [Lesson] Get Data from Folder
+    9. [Lesson] Conditional Column
+    10. [Lesson] Group By
+    11. [Lesson] Transform Vs. Add Column
+    12. [Lesson] Append Queries
+    13. [Lesson] Merge Queries
+
+  Chapter 6: Power Bi - Model View
+    Duration: 7m 34s
+    1. [Lesson] Model View
+
+  Chapter 7: Analyze Data
+    Duration: 2m 32s
+    1. [Lesson] Summarize Values By and Show Value As
+
+  Chapter 8: Power BI - HR Training Case
+    Duration: 18m 36s
+    1. [Lesson] HR Training - Get Data and Clean Data
+    2. [Lesson] HR Training (Model View) - Manage Data Relationships
+    3. [Lesson] HR Training - Reports Part 1
+    4. [Lesson] HR Training - Reports Part 2
+    5. [Lesson] HR Training - Reports Part 3
+
+  Chapter 9: Power BI - Sales Case Study
+    Duration: 25m 41s
+    1. [Lesson] Get Data & Transform
+    2. [Lesson] Reporting & Visualization Part 1
+    3. [Lesson] Reporting & Visualization Part 2
+    4. [Lesson] Filters & Slicers
+    5. [Lesson] Creating Bookmarks
+    6. [Lesson] Publish to Power BI Service
+
+  Chapter 10: Power BI - Design Mobile Layout
+    Duration: 2m 53s
+    1. [Lesson] Mobile Layout
+
+  Chapter 11: Summary and final message
+    Duration: 0m 57s
+    1. [Lesson] Final Message
+    2. [HtmlItem] Scheduling Your CDIP Exam
+
+
+================================================================================
+COURSE 10: Certified Power BI Professional
+================================================================================
+Slug: certified-power-bi-professional
+
+  Chapter 1: Introduction
+    Duration: 11m 10s
+    1. [Lesson] Introduction to Certified Power BI Professional Course
+    2. [Download] Download Workshops
+    3. [Download] Download the presentation
+    4. [Lesson] About Data Analysis and Business Intelligence
+    5. [Lesson] Overview on Power BI
+
+  Chapter 2: Get and Transform Data
+    Duration: 78m 24s
+    1. [Lesson] Get Data from text CSV file
+    2. [Lesson] Get Data from Excel - Example 1
+    3. [Lesson] Get Data from Excel - Example 2
+    4. [Lesson] Get Data from Excel - Example 3
+    5. [Lesson] Get Data from XML
+    6. [Lesson] Get Data from Web
+    7. [Lesson] Get Data from Access Database
+    8. [Lesson] Get Data from SQL Server
+    9. [Lesson] Get Data from Folder
+    10. [Lesson] Get Data from Onedrive
+    11. [Lesson] Transform Data
+    12. [Lesson] Conditional Column
+    13. [Lesson] Group by
+    14. [Lesson] Transform vs. Add
+    15. [Lesson] Append Queries
+    16. [Lesson] Merge Queries
+    17. [Lesson] Review Get and Transform Data
+
+  Chapter 3: Model View
+    Duration: 24m 51s
+    1. [Lesson] Overview on Model View
+    2. [Lesson] Model View Table Properties
+    3. [Lesson] Model View Field Properties
+    4. [Lesson] Model View Create and Manage Relationships
+    5. [Lesson] Model View Table Properties
+
+  Chapter 4: Analyze Data
+    Duration: 18m 1s
+    1. [Lesson] Analyze Data - Summarize Values by and Show Values as
+    2. [Lesson] Understanding DAX Measures and Calculated Columns
+    3. [Lesson] Practicing DAX Functions
+
+  Chapter 5: Visualization
+    Duration: 35m 0s
+    1. [Lesson] Visualization Overview
+    2. [Lesson] Insert Visual and Format - Column Chart
+    3. [Lesson] Insert Visual and Format - Line Chart
+    4. [Lesson] Insert Elements - Text Box Buttons Shapes and Images
+    5. [Lesson] Page Format Tooltip Themes and Advanced Visual Features
+
+  Chapter 6: Case Studies
+    Duration: 63m 28s
+    1. [Lesson] HR Training - Get and Clean Data
+    2. [Lesson] HR Training - Formatting Data and Manage Relationships
+    3. [Lesson] Column Quality Column Distribution and Column Porfile
+    4. [Lesson] HR Training - Reports Part 1
+    5. [Lesson] HR Training - Reports Part 2
+    6. [Lesson] HR Training - Reports Part 3
+    7. [Lesson] Sales Case Study - Get Data and Transform
+    8. [Lesson] Sales Case Study - Format data and Manage Relationships
+    9. [Lesson] Sales Case Study - Reporting and Visualization - Part 1
+    10. [Lesson] Sales Case Study - Reporting and Visualization - Part 2
+    11. [Lesson] Sales Case Study - Slicers and Filters settings
+    12. [Lesson] Review Case Studies
+
+  Chapter 7: Advanced Design
+    Duration: 16m 38s
+    1. [Lesson] Create Bookmarks
+    2. [Lesson] Design Mobile Layout
+
+  Chapter 8: Power BI Service
+    Duration: 26m 39s
+    1. [Lesson] Overview on Power BI Service
+    2. [Lesson] Publish Report to Power BI Service
+    3. [Lesson] Create Dashboard
+    4. [Lesson] Get Quick Insights
+    5. [Lesson] Q&A Feature
+    6. [Lesson] On-Premises-Gateway setup and configuration
+
+  Chapter 9: Conclusion
+    Duration: 0m 33s
+    1. [Presentation] Final Assessment
+    2. [Lesson] Congratulations
+
+
+================================================================================
+COURSE 11: CertPrep: Excel Associate - Microsoft Office Specialist:  (Excel 2019 and Excel 365) Exam MO-200
+================================================================================
+Slug: cert-prep-excel-associate-microsoft-office-specialist-excel-2019-and-excel-365-exam-mo-200
+
+  Chapter 1: Welcome to the course!
+    Duration: 6m 57s
+    1. [Lesson] A message from the instructor
+    2. [Lesson] Overview - Microsoft Office Specialist certifications
+    3. [Lesson] Excel Associate Exam Domains
+    4. [Lesson] Excel Associate Exam Format
+    5. [Lesson] How to prepare for the Exam
+    6. [Download] Download Presentation File
+    7. [Download] Download Workshop Files
+    8. [Pdf] Excel Associate Exam MO-200 Skills Measured
+
+  Chapter 2: Domain #1: Manage worksheets and workbooks 
+    Duration: 47m 23s
+    1. [Lesson] Overview on Manage Worksheets and Workbooks Domain
+    2. [Lesson] Import data from .txt files 
+    3. [Lesson] Import data from .csv files 
+    4. [Lesson] Search for data within a workbook
+    5. [Lesson] Navigate to named cells, ranges, or workbook elements
+    6. [Lesson] Insert and remove hyperlinks 
+    7. [Lesson] Modify page setup
+    8. [Lesson] Adjust row height and column width
+    9. [Lesson] Customize headers and footers 
+    10. [Lesson] Customize the Quick Access toolbar
+    11. [Lesson] Customize Options and Views
+    12. [Lesson] Modify basic workbook properties
+    13. [Lesson] Inspect and Save in alternative file format
+    14. [Lesson] Configure print Setting and set a print area
+
+  Chapter 3: Domain #2: Manage data cells and ranges 
+    Duration: 33m 55s
+    1. [Lesson] Overview on Manage Data Cells and Ranges Domain
+    2. [Lesson] Paste data by using special paste options
+    3. [Lesson] Fill cells by using Auto Fill
+    4. [Lesson] Insert and delete multiple columns or rows
+    5. [Lesson] Format cells and ranges
+    6. [Lesson] Define and reference named ranges
+    7. [Lesson] Insert Sparklines
+    8. [Lesson] Apply Conditional Formatting
+
+  Chapter 4: Domain #3: Manage tables and table data 
+    Duration: 10m 55s
+    1. [Lesson] Overview on Manage Tables and Table Data Domain
+    2. [Lesson] Manage tables and table data
+
+  Chapter 5: Domain #4: Perform operations by using formulas and functions 
+    Duration: 36m 5s
+    1. [Lesson] Overview on Perform Operations by Using Formulas and Functions Domain
+    2. [Lesson] Reference named ranges and named tables in formulas
+    3. [Lesson] Formula using relative and absolute references
+    4. [Lesson] Perform Calculations using AVERAGE() MAX() MIN() SUM() COUNT() Functions
+    5. [Lesson] Perform conditional operations by using IF statement
+    6. [Lesson] Split text using LEFT() MID() RIGHT() CONCAT() TEXTJOIN() Functions
+    7. [Lesson] Format text by using UPPER(), LOWER(), and PROPER() functions
+    8. [Lesson] Clean text using TRIM() LEN() Functions
+
+  Chapter 6: Domain #5: Manage charts
+    Duration: 17m 1s
+    1. [Lesson] Overview on Manage Charts Domain
+    2. [Lesson] Create charts and chart sheets
+    3. [Lesson] Modify charts
+    4. [Lesson] Format charts and Trendline
+
+  Chapter 7: Practice Test
+    Duration: 37m 40s
+    1. [Lesson] Practice Test Instructions
+    2. [Download] Download Practice Test files
+    3. [Lesson] Practice Test Solution
+
+  Chapter 8: Conclusion
+    Duration: 0m 33s
+    1. [Survey] Course Evaluation تقييم الدورة
+    2. [Lesson] Congrats! Conclusion
+
+
+================================================================================
+COURSE 12: CertPrep: Excel Expert - Microsoft Office Specialist (Excel 2019 and 365) Exam MO-201
+================================================================================
+Slug: certprep-excel-expert-microsoft-office-specialist-excel-2019-and-365-exam-mo-201
+
+  Chapter 1: Introduction
+    Duration: 5m 44s
+    1. [Lesson] A message from the instructor
+    2. [Lesson] Overview - Microsoft Office Specialist Certifications
+    3. [Lesson] Excel Expert Exam Format
+    4. [Lesson] How to prepare for the exam
+    5. [Download] Excel Workshop files
+    6. [Download] Exam Objectives: Excel Expert Exam MO-201 skills measured 
+    7. [Download] Presentation file
+
+  Chapter 2: Domain 1: Manage workbook options and settings
+    Duration: 28m 26s
+    1. [Lesson] Overview on Manage workbook options and settings domain
+    2. [Lesson] Reference data in other workbooks
+    3. [Lesson] Manage workbook versions
+    4. [Lesson] Protect Worksheet and Workbook
+    5. [Lesson] Formula Calculation
+    6. [Lesson] Use and configure language options
+
+  Chapter 3: Domain 2: Manage and format data
+    Duration: 51m 27s
+    1. [Lesson] Overview on Manage and format data domain
+    2. [Lesson] Flash Fill
+    3. [Lesson] Advanced Fill Options
+    4. [Lesson] Custom Formats
+    5. [Lesson] Data Validation
+    6. [Lesson] Subtotal Group Ungroup
+    7. [Lesson] Remove Duplicates and Advanced Filtering
+    8. [Lesson] Conditional Formatting
+    9. [Lesson] Rules Formulas
+
+  Chapter 4: Domain 3: Create advanced formulas and macros
+    Duration: 85m 3s
+    1. [Lesson] Overview on Create advanced formulas and macros domain
+    2. [Lesson] AND_OR_NOT functions
+    3. [Lesson] IF_IFS functions
+    4. [Lesson] SWITCH function
+    5. [Lesson] One and Two Logical Operations
+    6. [Lesson] VLOOKUP_HLOOKUP
+    7. [Lesson] INDEX_MATCH functions
+    8. [Lesson] TODAY NOW functions
+    9. [Lesson] WEEKDAY function
+    10. [Lesson] WORKDAY function
+    11. [Lesson] Consolidation
+    12. [Lesson] Scenario Manager
+    13. [Lesson] Goal Seek
+    14. [Lesson] NPER PMT functions
+    15. [Lesson] Troubleshooting Formulas
+    16. [Lesson] Create and Copy Macro
+
+  Chapter 5: Domain 4: Manage advanced charts and tables
+    Duration: 36m 30s
+    1. [Lesson] Overview on Manage advanced charts and tables domain
+    2. [Lesson] Dual axis combo chart
+    3. [Lesson] Box and Whisker chart
+    4. [Lesson] Funnel chart
+    5. [Lesson] Histogram chart
+    6. [Lesson] Map chart
+    7. [Lesson] Sunburst chart
+    8. [Lesson] Waterfall chart
+    9. [Lesson] Pivot Tables - Part1
+    10. [Lesson] Pivot Tables - Part2
+    11. [Lesson] Pivot Chart
+
+  Chapter 6: Practices Test
+    Duration: 23m 26s
+    1. [Lesson] Practice Test Instructions
+    2. [Lesson] Practice Test Solution
+
+  Chapter 7: Assessment
+    1. [Quiz] Final Exam
+
+  Chapter 8: Conclusion
+    Duration: 0m 32s
+    1. [Survey] Course Evaluation تقييم الدورة
+    2. [Lesson] Congrats! Conclusion
+
+
+================================================================================
+COURSE 13: CertPrep: PowerPoint Associate - Microsoft Office Specialist:  (PowerPoint 2019 and PowerPoint 365)
+================================================================================
+Slug: cert-prep-powerpoint-associate-microsoft-office-specialist-powerpoint-2019-and-powerpoint-365
+
+  Chapter 1: Course Introduction
+    Duration: 5m 40s
+    1. [Lesson] A message from the instructor
+    2. [Lesson] Overview - Microsoft Office Specialist Certification
+    3. [Lesson] Exam Format
+    4. [Lesson] How to Prepare for the Exam
+    5. [Download] Download Workshop Files
+    6. [Download] Download Presentation File
+    7. [Download] Download Exam Objectives
+
+  Chapter 2: Domain 1: Manage Slides
+    Duration: 22m 9s
+    1. [Lesson] Overview on Manage Slides domain
+    2. [Lesson] Create Presentation
+    3. [Lesson] Insert Delete Duplicate a Slide
+    4. [Lesson] Insert slide from another presentation
+    5. [Lesson] Change Backgrounds
+    6. [Lesson] Apply Themes
+    7. [Lesson] Header & Footer
+    8. [Lesson] Create Sections
+    9. [Lesson] Summary Zoom Slide
+    10. [Lesson] Rearrange Slides
+
+  Chapter 3: Domain 2: Manage Presentations 
+    Duration: 36m 26s
+    1. [Lesson] Overview on Manage Presentations Domain
+    2. [Lesson] Customize Slide Masters
+    3. [Lesson] Customize Handouts and Notes Masters
+    4. [Lesson] Custom Slide Master Layouts
+    5. [Lesson] Change Slide Size
+    6. [Lesson] Display Presentations in Different Views
+    7. [Lesson] Set Basic File Properties
+    8. [Lesson] Print Slides
+    9. [Lesson] Create Custom Slide Shows
+    10. [Lesson] Configure Slide Show Options
+    11. [Lesson] Rehearse Slide Show Timing
+    12. [Lesson] Set up Slide Show Recording Options
+    13. [Lesson] Mark Presentations as Final and Protect by Password
+    14. [Lesson] Inspect Presentations and Preserve Content
+    15. [Lesson] Export Presentations to Other Formats
+
+  Chapter 4: Domain 3: Insert and Format Text, Shapes and Images 
+    Duration: 30m 52s
+    1. [Lesson] Overview on Insert and format text, shapes, and images domain
+    2. [Lesson] Insert and Format Text
+    3. [Lesson] Insert Links
+    4. [Lesson] Insert and Format Images
+    5. [Lesson] Insert and Format Shapes and Text Box
+    6. [Lesson] Draw by using Digital Ink
+    7. [Lesson] Order and Group Objects on Slides
+
+  Chapter 5: Domain 4: Insert Tables, Charts, SmartArt, 3D Models and Media
+    Duration: 22m 13s
+    1. [Lesson] Overview on Insert tables, Charts, SmartArt, 3D Models and Media domain
+    2. [Lesson] Insert and Format Tables
+    3. [Lesson] Insert and Modify Charts 
+    4. [Lesson] Insert and Format SmartArt Graphics
+    5. [Lesson] Insert and Modify 3D Models
+    6. [Lesson] Insert Audio
+    7. [Lesson] Apply and Configure Slide Transitions
+
+  Chapter 6: Domain 5: Apply Transitions and Animations
+    Duration: 13m 22s
+    1. [Lesson] Overview on Apply Transitions and Animations Domain
+    2. [Lesson] Apply and configure slide transitions
+    3. [Lesson] Animate slide content
+    4. [Lesson] Customize Transitions
+
+  Chapter 7: Practice Test
+    1. [Download] Download Practice Test Instructions
+    2. [Download] Download the files required
+
+  Chapter 8: Assessment
+    1. [Quiz] Final Exam
+
+  Chapter 9: Conclusion
+    Duration: 1m 1s
+    1. [Survey] Course Evaluation تقييم الدورة
+    2. [Lesson] Congratulations
+
+
+================================================================================
+COURSE 14: Connection Between Financial Statement & Tactics for Cash Liquidity Enhancement
+================================================================================
+Slug: connection-between-financial-statement-tactics-for-cash-liquidity-enhancement
+
+  Chapter 1: Webinar replay
+    Duration: 27m 55s
+    1. [Lesson] Connection Between Financial Statement & Tactics for Cash Liquidity Enhancement
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 15: Copy of Financial Statement Forecasting and Rules of Thumb
+================================================================================
+Slug: copy-of-financial-statement-forecasting-and-rules-of-thumb
+
+  Chapter 1: Webinar replay
+    1. [Download] Download Webinar Supporting Materials
+    2. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 16: Copy of Power Pivot Techniques
+================================================================================
+Slug: copy-of-power-pivot-techniques
+
+  Chapter 1: Webinar replay
+    Duration: 53m 5s
+    1. [Lesson] Power Pivot Techniques
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 17: Dashboard Types and Design Principles
+================================================================================
+Slug: Dashboard-Types-and-Design-Principles
+
+  Chapter 1: Webinar replay
+    Duration: 56m 49s
+    1. [Lesson] Dashboard Types & Design Principles
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 18: Data Analysis & Business Reporting Techniques Using Excel - Level 2
+================================================================================
+Slug: copy-of-data-analysis-business-reporting-techniques-using-excel-level-2
+
+  Chapter 1: Welcome to the course!
+    Duration: 4m 10s
+    1. [Lesson] A message from your Trainer
+    2. [Download] Download Complete Course Exercises
+
+  Chapter 2: COMPETENCY 3: BUSINESS MODELING
+    Duration: 0m 46s
+    1. [Lesson] Explaining Business Modeling
+
+  Chapter 3: Spinner
+    Duration: 16m 41s
+    1. [Lesson] Spinner: Demonstration
+    2. [Lesson] Spinner: Whole Number
+    3. [Lesson] Spinner: Whole Number above 30,000 units
+    4. [Lesson] Spinner: Percentage
+    5. [Lesson] Spinner: Text
+    6. [Download] Spinner Review Workshop
+
+  Chapter 4: Scenario Manager
+    Duration: 6m 18s
+    1. [Lesson] Scenario Manager: Demonstration
+    2. [Lesson] Scenario Manager: Demonstration using Pivot Tables
+    3. [Download] Scenario Manager Review Workshop
+
+  Chapter 5: Goal Seek
+    Duration: 1m 40s
+    1. [Lesson] Goal Seek: Demonstration
+    2. [Download] Goal Seek Review Workshop
+
+  Chapter 6: Data Tables
+    Duration: 3m 33s
+    1. [Lesson] Data Tables: Demonstration
+    2. [Download] Data Tables Review Workshop
+
+  Chapter 7: List Box Data Model
+    Duration: 7m 33s
+    1. [Lesson] List Box: Demonstration
+    2. [Download] List Box Review Workshop
+
+  Chapter 8: Check Box Data Model | IF Statement
+    Duration: 7m 44s
+    1. [Lesson] Check Box Data Model: Demonstration
+    2. [Download] Check Box Data Model Review Workshop
+
+  Chapter 9: Option Button Data Model
+    Duration: 7m 26s
+    1. [Lesson] Option Button: Demonstration
+    2. [Download] Option Button Review Workshop
+
+  Chapter 10: Next steps
+    Duration: 0m 33s
+    1. [Lesson] Congrats on Finishing Business Modeling!
+
+  Chapter 11: COMPETENCY FOUR: DATA INTEGRATION
+    Duration: 19m 26s
+    1. [Lesson] Explaining Data Integration
+    2. [Lesson] Connecting Excel to .CSV or .TXT Files: Demonstration
+    3. [Lesson] Connecting Excel a Database: Demonstration
+    4. [Lesson] Connecting Excel to Web: Demonstration
+    5. [Lesson] Connecting Excel to Excel: Demonstration
+    6. [Download] Integration Review Workshops
+    7. [Lesson] Congrats on Finishing Integration!
+
+  Chapter 12: COMPETENCY FIVE: AUTOMATION / MACRO / VBA
+    Duration: 15m 17s
+    1. [Lesson] Explaining Automation
+    2. [Lesson] First Things First!
+    3. [Lesson] Automation Control Board: Demonstration
+    4. [Lesson] Planning a Macro: Demonstration
+    5. [Lesson] Recording and Testing a Macro: Demonstration
+    6. [Lesson] Editing a Macro
+    7. [Download] Macro Workshop
+
+  Chapter 13: Assessment
+    1. [Quiz] Data Level 2 Final Exam
+
+  Chapter 14: Course Survey
+    1. [Survey] Course Evaluation تقييم الدورة
+
+  Chapter 15: Congratulations!
+    Duration: 3m 29s
+    1. [Lesson] Congrats! You have completed Data Analysis & Business Reporting Using Excel - Level 2
+
+
+================================================================================
+COURSE 19: Data Analysis and Business Reporting Techniques Using Excel - Level 1
+================================================================================
+Slug: data-analysis-business-reporting-techniques-using-excel-level-1
+
+  Chapter 1: Welcome to the course!
+    Duration: 5m 49s
+    1. [Lesson] A message from your trainer
+    2. [Lesson] Course Road Map
+    3. [Download] Download Complete Course Book, Materials, and Exercises
+
+  Chapter 2: COMPETENCY 1: MASSAGING DATA
+    Duration: 2m 51s
+    1. [Lesson] Explaining Massaging Data
+
+  Chapter 3: Consolidation
+    Duration: 11m 48s
+    1. [Download] Download Consolidation Workshop
+    2. [Lesson] Consolidation: Demonstration
+    3. [Lesson] Consolidation: Technical
+
+  Chapter 4: Data Validation
+    Duration: 16m 17s
+    1. [Lesson] Data Validation: What is Data Validation
+    2. [Download] Download Data Validation Workshop(s)
+    3. [Lesson] Data Validation: Demonstration - Whole Number
+    4. [Lesson] Data Validation: Demonstration - List
+    5. [Lesson] Data Validation: Demonstration - Date
+    6. [Lesson] Data Validation: Demonstration - Text Length
+    7. [Lesson] Data Validation: Demonstration - Custom
+
+  Chapter 5: Table Tools - Ctrl T
+    Duration: 10m 32s
+    1. [Download] Download Ctrl T Workshop(s)
+    2. [Lesson] Ctrl T (Table Design): Demonstration of Functionality
+    3. [Lesson] Ctrl T (Table Design): Demonstration of Technical Part 1
+    4. [Lesson] Ctrl T (Table Design): Demonstration of Technical Part 2
+
+  Chapter 6: Naming Cells & Ranges
+    Duration: 3m 16s
+    1. [Download] Download Naming Cells & Ranges Workshop(s)
+    2. [Lesson] Naming Cells & Ranges: Demonstration
+
+  Chapter 7: Surgeon Functions
+    Duration: 4m 35s
+    1. [Download] Download Surgeon Functions Workshop(s)
+    2. [Lesson] Surgeon Functions: Explaining the Concept
+
+  Chapter 8: Date Analysis
+    Duration: 8m 4s
+    1. [Download] Download Date Functions Workshop(s)
+    2. [Lesson] Date Functions: Demonstration
+
+  Chapter 9: Vlookup
+    Duration: 11m 31s
+    1. [Download] Download VLookup Workshop(s)
+    2. [Lesson] Vlookup: Date Demonstration
+    3. [Lesson] Vlookup: Bank Account Demonstration
+    4. [Lesson] Vlookup: Corporate Sales Demonstration
+
+  Chapter 10: Select, Shift, Select
+    Duration: 4m 42s
+    1. [Download] Download Select-Shift-Select Workshop(s)
+    2. [Lesson] Select Shift Select: Explaining the Concept
+
+  Chapter 11: Subtotal
+    Duration: 2m 36s
+    1. [Download] Download Subtotal Workshop(s)
+    2. [Lesson] Subtotal: Explaining the Concept
+
+  Chapter 12: Text Change Functions
+    Duration: 4m 3s
+    1. [Download] Download Text Change Case Workshop(s)
+    2. [Lesson] Text Change Functions: Explaining the Concept
+
+  Chapter 13: Text-To-Columns
+    Duration: 1m 44s
+    1. [Download] Download Text-To-Columns Workshop(s)
+    2. [Lesson] Text-To-Columns: Explaining the Concept
+
+  Chapter 14: Conditional Formatting
+    Duration: 4m 1s
+    1. [Download] Download Conditional Formatting Workshop(s)
+    2. [Lesson] Conditional Formatting: Explaining the Concept
+
+  Chapter 15: What is Next!
+    Duration: 0m 33s
+    1. [Lesson] Congratulation: Completing Data Massaging
+
+  Chapter 16: COMPETENCY 2: REPORTING, ANALYSIS, & DASHBOARDING
+    Duration: 60m 50s
+    1. [Lesson] Explaining: Reporting, Analysis, & Dashboarding
+    2. [Lesson] The 19 Rules of Pivot Tables
+    3. [Download] Download Pivot Table Rules 1 -12
+    4. [Lesson] Rule 1: Creating Pivot Tables
+    5. [Lesson] Rule 2: Number Formatting
+    6. [Lesson] Rule 3: Design Report Layout
+    7. [Lesson] Rule 4: Sorting in Pivot Tables
+    8. [Lesson] Rule 5: Filtering in Pivot Tables
+    9. [Lesson] Rule 6: Drill-down in Pivot Tables
+    10. [Lesson] Rule 7: Data Analysis Type 1 - Summarize Value by
+    11. [Lesson] Rule 8: Data Analysis Type 2 - Show Values As
+    12. [Lesson] Rule 9: Data Analysis Type 3 - Inserting Formulas
+    13. [Lesson] Rule 10: Date Analysis & Grouping
+    14. [Lesson] Rule 11: Show Report Filter Pages
+    15. [Lesson] Rule 12: Copying Pivot Tables
+    16. [Download] Review Workshop - Pivot Tables 1
+    17. [Lesson] Rule 13: Pivot Charts
+    18. [Lesson] Rule 14: Dynamic Chart Labeling
+    19. [Lesson] Rule 15: Linking Pivot Tables with Power Points
+    20. [Lesson] Rule 16: Pivot Table Options
+    21. [Lesson] Rule 17: Conditional Formatting in Pivot Tables
+    22. [Lesson] Rule 18: GetPivotData
+    23. [Lesson] Rule 19: The Magical Slicer
+    24. [Download] Review Workshop - Pivot Tables 2
+    25. [Lesson] Rule Dashboard: Creating an Excel-Based Dashboard
+    26. [Lesson] Congratulations: Completing Pivot Reporting, Analysis, and Dashboards
+
+  Chapter 17: Course Evaluation
+    1. [Survey] Course Evaluation تقييم الدورة
+
+  Chapter 18: Final Assessement
+    1. [Quiz] Data Analysis Final Exam
+
+
+================================================================================
+COURSE 20: Data Science Certification Program
+================================================================================
+Slug: ai-data-science-certification-program
+
+  Chapter 1: Introduction to Data Science Certification Program
+    Duration: 2m 49s
+    1. [Lesson] Welcome to the program
+
+  Chapter 2: Module 1: PowerQuery for Data Cleaning and Integration
+    Duration: 36m 9s
+    1. [Lesson] A First Look at Module 1: PowerQuery
+    2. [Download] Download Module's Learning Materials
+    3. [Lesson] powerQuery Fundamentals
+    4. [Lesson] Connect to Data Source
+    5. [Lesson] Handle Missing Data Clean and Normalize - PART 1
+    6. [Lesson] Handle Missing Data Clean and Normalize - PART 2
+    7. [Lesson] Handle Missing Data Clean and Normalize - PART 3
+    8. [Lesson] Identifying Anomalies Removing Outliers
+    9. [Lesson] Merge Queries
+    10. [Lesson] Your Learning Journey: Module 1 Recap
+    11. [Assignment] Module 1: Challenge Activity
+
+  Chapter 3: Module 2: Python Basics for Data Analysis
+    Duration: 88m 14s
+    1. [Lesson] A First Look at Module2: Python basics
+    2. [Download] Download Module's Learning Materials
+    3. [Lesson] Install Python
+    4. [Lesson] Install IDE
+    5. [Lesson] Visual Studio Code Essentails
+    6. [Lesson] Python Syntax
+    7. [Lesson] Variables - PART 1
+    8. [Lesson] Variables - PART 2
+    9. [Lesson] Operators in Python
+    10. [Lesson] Create Custom Functions
+    11. [Lesson] Python Object: Lists
+    12. [Lesson] Python Object: Dictionaries
+    13. [Lesson] Python Object: Tuples
+    14. [Lesson] Numpy Array
+    15. [Lesson] Read Data From File
+    16. [Lesson] Analyze Data: Filtering
+    17. [Lesson] Analyze Data: Descriptive Analysis
+    18. [Lesson] Analyze Data: Add New Features
+    19. [Lesson] Save to Excel File
+    20. [Lesson] Your Learning Journey: Module 2 Recap
+    21. [Assignment] Module 2: Challenge Activity
+
+  Chapter 4: Module 3: SQL for Data Management
+    Duration: 75m 0s
+    1. [Lesson] A First Look at Module 3: SQL
+    2. [Download] Download Module's Learning Materials
+    3. [Lesson] Install MySQL Server and Workbench
+    4. [Lesson] Import Database to SQL
+    5. [Lesson] SQL Basics Select Data
+    6. [Lesson] SQL Basics Filter and Sort
+    7. [Lesson] Aggregations in SQL
+    8. [Lesson] Understanding Type of Data Joins
+    9. [Lesson] Create INNER JOIN
+    10. [Lesson] Create LEFT JOIN
+    11. [Lesson] Create RIGHT JOIN
+    12. [Lesson] Create FULL OUTER JOIN
+    13. [Lesson] Create CROSS JOIN
+    14. [Lesson] Aggregation with Condition
+    15. [Lesson] Write Subquery Statement
+    16. [Lesson] Advanced SQL Analysis
+    17. [Lesson] Merge and Export
+    18. [Lesson] Indexing for Performance Optimization
+    19. [Lesson] Your Learning Journey: Module 3 Recap
+    20. [Quiz] SQL Revision Quiz
+
+  Chapter 5: Module 4: Statistics and Mathematics for Data Science
+    Duration: 116m 54s
+    1. [Lesson] A First Look at Module 4: Statistics & Math
+    2. [Download] Download Module's Learning Materials
+    3. [Lesson] Create Vectors
+    4. [Lesson] Create Matrices and Perform Operations
+    5. [Lesson] PCA for Dimensionality Reduction
+    6. [Lesson] Probability Theory: Random Variables
+    7. [Lesson] Probability Theory: Distribution
+    8. [Lesson] Probability Theory: Bionomial Distribution
+    9. [Lesson] Probability Theory: Normal Distribution
+    10. [Lesson] Probability Theory: Bayes Theorom
+    11. [Lesson] Basic Calculus: Derivatives & Gradient Descent
+    12. [Lesson] Descriptive Statistics: Measures of Central Tendency
+    13. [Lesson] Descriptive Statistics: Measures of Dispersion
+    14. [Lesson] Descriptive Statistics Plots
+    15. [Lesson] Inferential Statistics: Data Sampling
+    16. [Lesson] Inferential Statistics: Confidence Interval
+    17. [Lesson] Inferential Statistics: Hypothesis Testing
+    18. [Lesson] Statistical Modeling: Linear Regression
+    19. [Lesson] Statistical Modeling: Classification Models
+    20. [Lesson] Statistical Modeling: Time Series Analysis
+    21. [Lesson] Your Learning Journey: Module 4 Recap
+    22. [Assignment] Module 4: Challenge Activity
+
+  Chapter 6: Module 5: Advanced Python for Data Analysis
+    Duration: 36m 30s
+    1. [Lesson] First Look at Module 5: Advanced Python
+    2. [Download] Download Module's Learning Materials
+    3. [Lesson] Advanced Python: LAMBDA
+    4. [Lesson] Advanced Python: Decorators
+    5. [Lesson] Advanced Python: OOP
+    6. [Lesson] Debugging Techniques: Print Assert
+    7. [Lesson] Debugging Techniques: pdb
+    8. [Lesson] Pandas Operation Pivot and Melt Data
+    9. [Lesson] Working with Time Series Data
+    10. [Lesson] Your Learning Journey: Module 5 Recap
+    11. [Assignment] Module 5: Challenge Activity
+
+  Chapter 7: Module 6: Power BI for Data Visualization
+    Duration: 93m 9s
+    1. [Lesson] First Look at Module 6: Power BI
+    2. [Download] Download Module's Learning Materials
+    3. [Lesson] Power BI: Download Install and Navigation
+    4. [Lesson] Connect To Data Source (ETL)
+    5. [Lesson] Transform Data (ETL)
+    6. [Lesson] Data Visualization Techniques
+    7. [Lesson] Create First Visual
+    8. [Lesson] Understanding Measures and DAX
+    9. [Lesson] Create Card Visuals with Measures
+    10. [Lesson] Line Chart with Forecast and Confidence Interval
+    11. [Lesson] Bar Graph with Top 5 Filter
+    12. [Lesson] Create Table and Column with DAX for a Visual
+    13. [Lesson] Create Matrix with Conditional Formatting
+    14. [Lesson] Dynamic Filtering with Slicers
+    15. [Lesson] Format Visualization
+    16. [Lesson] Dashboard Design and Storylining
+    17. [Lesson] Publish Power BI Dashboard
+    18. [Lesson] Python Script in Power BI Visualization
+    19. [Lesson] Your Learning Journey: Module 6 Recap
+    20. [Assignment] Module 6: Challenge Activity
+
+  Chapter 8: Module 7: Machine Learning Basics
+    Duration: 66m 32s
+    1. [Lesson] A First Look at Module 7: Machine Learning
+    2. [Download] Download Module's Learning Materials
+    3. [Lesson] Overview on Machine Learning
+    4. [Lesson] Supervised Learning: Linear Regression
+    5. [Lesson] Supervised Learning: Logistic Regression
+    6. [Lesson] Supervised Learning: DecisionTree
+    7. [Lesson] Supervised Learning: Random Forest
+    8. [Lesson] Unsupervised Learning: KMeans
+    9. [Lesson] Unsupervised Learning: Principal Component Analysis (PCA)
+    10. [Lesson] Your Learning Journey: Module 7 Recap
+    11. [Assignment] Module 7: Challenge Activity
+
+  Chapter 9: Capstone Project: Applying Data Science in real-world scenario
+    1. [Assignment] Capstone Project: Supply Chain E-Commerce Company
+
+
+================================================================================
+COURSE 21: Derivatives: Forward vs Futures
+================================================================================
+Slug: derivatives-forward-vs-futures
+
+  Chapter 1: Webinar replay
+    Duration: 52m 36s
+    1. [Lesson] Derivatives: Forward vs Futures
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 22: Derivatives: Options Call & Put
+================================================================================
+Slug: derivatives-options-call-put
+
+  Chapter 1: Webinar replay
+    Duration: 61m 7s
+    1. [Lesson] Derivatives: Options Call & Put
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 23: Dynamic Business Dashboards using Excel
+================================================================================
+Slug: dynamic-business-dashboard-using-excel
+
+  Chapter 1: Welcome to the course!
+    Duration: 1m 21s
+    1. [Lesson] A message from the instructor
+    2. [Pdf] Download Presentation File
+    3. [Download] Download Workshop Files
+
+  Chapter 2: Visualization best practices
+    Duration: 9m 5s
+    1. [Lesson] Key Attributes of a Dashboard
+    2. [Lesson] Data Table Layouts
+    3. [Lesson] Dashboard Design Principles
+    4. [Lesson] Define the Purpose of the Dashboard and Dashboard Types
+    5. [Lesson] Choose Relevant KPI's
+
+  Chapter 3: Excel charting principles and advice
+    Duration: 7m 37s
+    1. [Lesson] Choose the Right Chart
+    2. [Lesson] Define Layout and Prioritize
+    3. [Lesson] Understanding Excel Chart Elements
+    4. [Lesson] Chart Types and Best Practices
+
+  Chapter 4: Charting tools and techniques
+    Duration: 69m 43s
+    1. [Lesson] Line chart
+    2. [Lesson] Two Data Sets
+    3. [Lesson] Area Chart
+    4. [Lesson] Logarithmic Scale
+    5. [Lesson] Column Chart Part 1
+    6. [Lesson] Column Chart Part 2 - Highlight Top Column Dynamically
+    7. [Lesson] Bar Chart
+    8. [Lesson] Combo Chart using Secondary Axis
+    9. [Lesson] Pie Chart
+    10. [Lesson] Doughnut Chart
+    11. [Lesson] Progress Doughnut
+    12. [Lesson] In-cell Charts Sparkline
+    13. [Lesson] Top and Bottom Ranking
+    14. [Lesson] Grade Distribution
+    15. [Lesson] Target vs Actual vs Variance Chart
+    16. [Lesson] Median Chart
+    17. [Lesson] Bullet Chart
+    18. [Lesson] Scatter
+    19. [Lesson] Bubble
+    20. [Lesson] Bubble
+    21. [Lesson] Waterfall Chart
+    22. [Lesson] Treemap
+    23. [Lesson] Sunburst
+    24. [Lesson] Histogram
+    25. [Lesson] Pareto
+
+  Chapter 5: Create the dashboard
+    Duration: 35m 52s
+    1. [Lesson] Part 1 - Introduction
+    2. [Lesson] Part 2 - Create Pivot Reports
+    3. [Lesson] Part 3 - Continue with Pivot Reports
+    4. [Lesson] Part 4 - Create Pivot Charts
+    5. [Lesson] Part 5 - Create the Dashboard
+    6. [Lesson] Part 6 - Add Slicers and Make it Dynamic
+
+  Chapter 6: Assessment
+    1. [Quiz] Final Exam
+
+  Chapter 7: Congratulations....
+    Duration: 0m 39s
+    1. [Survey] Course Evaluation تقييم الدورة
+    2. [Lesson] Congratulations 
+
+
+================================================================================
+COURSE 24: Effective Webinar Strategies
+================================================================================
+Slug: ai-placeholder
+
+  Chapter 1: Introduction to Webinars
+    1. [Lesson] What is a Webinar?
+    2. [HtmlItem] Setting Goals for Your Webinar
+
+  Chapter 2: Planning Your Webinar
+    1. [Lesson] Choosing the Right Topic
+    2. [HtmlItem] Building an Engaging Agenda
+
+  Chapter 3: Promoting Your Webinar
+    1. [Lesson] Creating a Compelling Invitation
+    2. [HtmlItem] Utilizing Social Media for Reach
+
+  Chapter 4: Delivering Your Webinar
+    1. [Lesson] Engaging Your Audience
+    2. [HtmlItem] Handling Q&A Effectively
+
+  Chapter 5: Post-Webinar Strategies
+    1. [Lesson] Measuring Success
+    2. [HtmlItem] Follow-up Techniques
+
+
+================================================================================
+COURSE 25: Entry Certificate in Business Analysis Exam Preperation
+================================================================================
+Slug: entry-certificate-in-business-analysis-exam-preperation
+
+  Chapter 1: Course Introduction
+    (No content)
+
+  Chapter 2: About Business Analysis
+    (No content)
+
+  Chapter 3: Business Analysis Key Concepts
+    (No content)
+
+  Chapter 4: Business Analysis Planning and Monitoring
+    (No content)
+
+  Chapter 5: Elicitation and Collaboration
+    (No content)
+
+  Chapter 6: Requirements Lifecycle Management
+    (No content)
+
+  Chapter 7: Strategy Analysis
+    (No content)
+
+  Chapter 8: Requirements Analysis and Design Definition
+    (No content)
+
+  Chapter 9: Solution Evaluation
+    (No content)
+
+  Chapter 10: Underlying Competencies
+    (No content)
+
+  Chapter 11: Techniques
+    (No content)
+
+  Chapter 12: Perspectives
+    (No content)
+
+  Chapter 13: Summary
+    (No content)
+
+  Chapter 14: Mockup exams
+    1. [Quiz] ECBA Exam 1
+
+
+================================================================================
+COURSE 26: Excel Assessment
+================================================================================
+Slug: excel-assessment
+
+  Chapter 1: Assessment
+    1. [Quiz] Choose the correct answer
+
+
+================================================================================
+COURSE 27: Excel Best Practices for Project Managers
+================================================================================
+Slug: excel-best-practices-for-project-managers
+
+  Chapter 1: Introduction - Welcome to the course
+    Duration: 3m 18s
+    1. [Lesson] Introduction - Welcome to the course
+    2. [Download] Download Workshop Files
+    3. [Pdf] Course Presentation
+    4. [Lesson] Excel Pros and Cons
+
+  Chapter 2: Unit 1 - Must Know Excel Functions
+    Duration: 75m 11s
+    1. [Lesson] TRIM and LEN Functions
+    2. [Lesson] The Sergeon Functions - Part 1
+    3. [Lesson] The Sergeon Functions - Part 2
+    4. [Lesson] FIND and SUBSTITUTE Functions
+    5. [Lesson] Date Functions - Part 1
+    6. [Lesson] Date Functions - Part 2
+    7. [Lesson] Date Functions - Part 3
+    8. [Lesson] WROKDAY WORKDAY.INTL Functions
+    9. [Lesson] NETWORKDAYS NETWROKDAYS.INTL Functions
+    10. [Lesson] Find duration using DATEDID Function
+    11. [Lesson] Find Duration using DAYS Function
+    12. [Lesson] Conditional Calculation using COUNTIF Function
+    13. [Lesson] Conditional Calculation using SUMIF AVERAGEIF Functions
+    14. [Lesson] Conditional Calculation using COUNTIFS Function
+    15. [Lesson] Conditional Calculation using SUMIFS AVERAGEIFS functions
+    16. [Lesson] Unit 1 Conclusion
+    17. [Download] Unit 1 - Review workshop
+    18. [Quiz] Unit 1 - Quick Quiz
+
+  Chapter 3: Unit 2 - Data analysis techniques - Report project KPI's
+    Duration: 30m 48s
+    1. [Lesson] Introduction to Unit 2
+    2. [Lesson] Create Pivot Table
+    3. [Lesson] Pivot Table Design Tab and Number Format
+    4. [Lesson] Date Analysis in Pivot Table
+    5. [Lesson] 23.0 Using Columns Filters Dimensions
+    6. [Lesson] Summarize Values by
+    7. [Lesson] Show Values as
+    8. [Lesson] Insert Calculated Field
+    9. [Lesson] Unit 2 Conclusion
+    10. [Download] Unit 2 - Review Workshop
+    11. [Quiz] Unit 2 - Quick Quiz
+
+  Chapter 4: Unit 3 - Graphs and Charts Techniques
+    Duration: 130m 39s
+    1. [Lesson] Unit 3 Introduction
+    2. [Lesson] Line chart
+    3. [Lesson] Two sets of data
+    4. [Lesson] Area chart
+    5. [Lesson] Logarithmic scale
+    6. [Lesson] Column chart
+    7. [Lesson] Dynamic Column coloring chart
+    8. [Lesson] Bar chart
+    9. [Lesson] Dual chart secondary axis
+    10. [Lesson] Pie chart
+    11. [Lesson] Pie chart alternative
+    12. [Lesson] Progress Doughnut
+    13. [Lesson] In-cell charts
+    14. [Lesson] Top Bottom Ranking
+    15. [Lesson] Budget Actual Variance Column chart
+    16. [Lesson] Budget Actual Variance Line chart
+    17. [Lesson] Median chart
+    18. [Lesson] Bullet graph
+    19. [Lesson] Scatter plot
+    20. [Lesson] Bubble
+    21. [Lesson] Waterfall Built-up
+    22. [Lesson] Waterfall Built-down
+    23. [Lesson] Treemap
+    24. [Lesson] Sunburst
+    25. [Lesson] Histogram
+    26. [Lesson] Pareto
+    27. [Lesson] Unit 3 conclusion
+    28. [Download] Unit 3 - Review Workshop
+    29. [Quiz] Unit 3 - Quick Quiz
+
+  Chapter 5: Unit 4 - Dashboard Design Principles and Techniques
+    Duration: 50m 21s
+    1. [Lesson] Unit 4 Introduction
+    2. [Lesson] Dashboard Design Principles
+    3. [Lesson] Dashboard Types and Decision Flowchart
+    4. [Lesson] Dashboard Design Instructions
+    5. [Lesson] Create Dashboard Layout Page
+    6. [Lesson] Create Pivot Reports - Part 1
+    7. [Lesson] Create Pivot Reports - Part 2
+    8. [Lesson] Create Score Cards
+    9. [Lesson] Create Charts
+    10. [Lesson] Dashboard Dynamic Filter using Slicer
+    11. [Lesson] Final Tuning Dashboard
+    12. [Lesson] Unit 4 Conculsion
+    13. [Quiz] Unit 4 - Quick Quiz
+
+  Chapter 6: Unit 5 - Create Project Management Excel Templates
+    Duration: 15m 10s
+    1. [Lesson] Unit 5 - Introduction
+    2. [Lesson] Gantt Chart
+    3. [Lesson] Budget Sheet
+    4. [Lesson] Unit 5 Conculsion
+
+  Chapter 7: Unit 6 - Case Study - Final Project
+    Duration: 1m 54s
+    1. [Lesson] Case Study Instructions
+
+  Chapter 8: Course Summary
+    Duration: 2m 8s
+    1. [Lesson] Course Summary
+    2. [Quiz] Final Quiz
+
+
+================================================================================
+COURSE 28: Exemplary Practices in Corporate Governance
+================================================================================
+Slug: elearning.viftraining.com
+
+  Chapter 1: Webinar replay
+    Duration: 43m 55s
+    1. [Lesson] Exemplary Practices in Corporate Governance
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 29: Finance for Non-Finance Professionals - COMING SOON!
+================================================================================
+Slug: finance-for-non-finance-professionals
+
+  Chapter 1: How to use this template
+    1. [HtmlItem] How to Use the Flagship Course Template
+
+  Chapter 2: Welcome to the course!
+    Duration: 0m 54s
+    1. [Lesson] A message from the instructor
+    2. [Lesson] How to use this course
+    3. [Survey] Before we begin...
+
+  Chapter 3: Chapter #1
+    1. [Lesson] High-level lesson
+    2. [Lesson] How-to lesson
+    3. [Quiz] Test your learning
+
+  Chapter 4: Chapter #2
+    1. [Lesson] High-level lesson
+    2. [Lesson] How-to lesson
+    3. [Quiz] Test your learning
+
+  Chapter 5: Chapter #3
+    1. [Lesson] High-level lesson
+    2. [Lesson] How-to lesson
+    3. [Quiz] Test your learning
+
+  Chapter 6: Next steps
+    1. [Lesson] Congrats! Here's what's next...
+    2. [HtmlItem] More resources for you
+    3. [Survey] Before you go...
+
+
+================================================================================
+COURSE 30: Financial Modeling and the Industry’s Best Practices
+================================================================================
+Slug: Financial-Modeling-and-the-Industrys-Best-Practices
+
+  Chapter 1: Webinar replay
+    Duration: 78m 9s
+    1. [Lesson] Financial Modeling and the Industry’s Best Practices
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 31: Financial Statement Analysis
+================================================================================
+Slug: financial-statement-analysis
+
+  Chapter 1: How to use this template
+    1. [HtmlItem] How to Use the Flagship Course Template
+
+  Chapter 2: Welcome to the course!
+    Duration: 0m 54s
+    1. [Lesson] A message from the instructor
+    2. [Lesson] How to use this course
+    3. [Survey] Before we begin...
+
+  Chapter 3: Chapter #1
+    1. [Lesson] High-level lesson
+    2. [Lesson] How-to lesson
+    3. [Quiz] Test your learning
+
+  Chapter 4: MODULE 1: COMPONENTS OF FINANCIAL STATEMENT ANALYSIS
+    1. [Lesson] Role of financial reporting and analysis
+    2. [Quiz] End of Topic MC Quiz - 10 questions
+    3. [Lesson] Core financial statements and the importance of the annual report
+    4. [Quiz] End of Topic MC Quiz - 10 questions
+    5. [Lesson] The important role of notes and supplementary information
+    6. [Lesson] Objectives of financial statements audit
+    7. [Quiz] End of Topic MC Quiz - 10 questions
+
+  Chapter 5: The 4 audit opinions
+    1. [Lesson] External audit
+    2. [Lesson] Internal audit
+    3. [Lesson] Government audit
+    4. [Lesson] Tax audit
+
+  Chapter 6: MODULE 2: FINANCIAL ACCOUNTING AND REPORTING STANDARDS
+    (No content)
+
+  Chapter 7: MODULE 3: AN INSIDE LOOK AT FINANCIAL STATEMENTS
+    (No content)
+
+  Chapter 8: MODULE 4: FINANCIAL ANALYSIS TECHNIQUES
+    (No content)
+
+
+================================================================================
+COURSE 32: Financial Statement Forecasting and Rules of Thumb
+================================================================================
+Slug: Financial-Statement-Forecasting
+
+  Chapter 1: Webinar replay
+    Duration: 63m 16s
+    1. [Lesson] Financial Statement Forecasting and Rules of Thumb
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 33: Generative AI: Changing How Business Innovates and Operates
+================================================================================
+Slug: generative-ai-changing-how-business-innovates-and-operates
+
+  Chapter 1: Webinar replay
+    Duration: 55m 59s
+    1. [Lesson] Generative AI: Changing How Business Innovates and Operates
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 34: How to Pass the AFM 1 Exam
+================================================================================
+Slug: how-to-pass-the-AFM1-EXAM
+
+  Chapter 1: Webinar replay
+    Duration: 70m 30s
+    1. [Lesson] How to Pass the AFM 1 Exam
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 35: How To Use What-If Analysis and Forecast Sheet in Excel
+================================================================================
+Slug: How-To-Use-What-If-Analysis-and-Forecast-Sheet-in-Excel
+
+  Chapter 1: Webinar replay
+    Duration: 57m 45s
+    1. [Lesson] How To Use What-If Analysis and Forecast Sheet in Excel
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 36: IFRS Vs GAAP Major Differences
+================================================================================
+Slug: ifrs-vs-gaap-major-differences
+
+  Chapter 1: Webinar replay
+    Duration: 45m 34s
+    1. [Lesson] IFRS Vs GAAP Major Differences
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 37: Internal Audit Basics and Principles & Governance & Risk Management
+================================================================================
+Slug: new-course-2
+
+  Chapter 1: Webinar replay
+    Duration: 28m 37s
+    1. [Lesson] Internal Audit Basics and Principles & Governance & Risk Management
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 38: Key Performance Indicators: Mastering Performance Management
+================================================================================
+Slug: key-performance-indicators-mastering-performance-management
+
+  Chapter 1: Webinar replay
+    Duration: 37m 37s
+    1. [Lesson] Key Performance Indicators: Mastering Performance Management
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 39: Managing Project Risks
+================================================================================
+Slug: managing-project-risks
+
+  Chapter 1: Welcome to the course!
+    Duration: 1m 14s
+    1. [Lesson] A message from the instructor
+
+  Chapter 2: Introduction to Project Risk Management 
+    Duration: 22m 5s
+    1. [Lesson] Introduction 
+    2. [Lesson] Defining Risk and  Project Risk Management 
+    3. [Lesson] Uncertainty and Risk
+    4. [Lesson] Risk Types 
+    5. [Lesson] Risk Categories
+    6. [Lesson] Project Risk Management Processes
+    7. [Lesson] Critical Success Factors 
+    8. [Quiz] Introduction to Project  Risk  Management Quiz 
+
+  Chapter 3: Risk Management Planning 
+    Duration: 23m 43s
+    1. [Lesson] Introduction 
+    2. [Lesson] Stakeholder Register 
+    3. [Lesson] Risk Management Plan Components 
+    4. [Lesson] Stakeholder Risk Tolerance 
+    5. [Lesson] Critical Success Factors 
+    6. [Lesson] Risk Register Updates
+    7. [Quiz] Risk Management Planning Quiz 
+
+  Chapter 4: Risk Identification 
+    Duration: 20m 8s
+    1. [Lesson] Introduction 
+    2. [Lesson] Risk Identification Tools
+    3. [Lesson] Brainstorming 
+    4. [Lesson] Risk Checklists
+    5. [Lesson] Risk Interviews 
+    6. [Lesson] Prompt Lists
+    7. [Lesson] Root Cause Analysis 
+    8. [Lesson] Assumptions Analysis 
+    9. [Lesson] SWOT Analysis 
+    10. [Lesson] Risk Statements
+    11. [Lesson] Critical Success Factors 
+    12. [Quiz] Risk Identification Quiz
+
+  Chapter 5: Performing Qualitative Risk Analysis 
+    Duration: 18m 52s
+    1. [Lesson] Introduction 
+    2. [Lesson] Qualitative Probability Scales 
+    3. [Lesson] Qualitative Impact Scales 
+    4. [Lesson] Probability and Impact Matrix 
+    5. [Lesson] Hierarchical Charts 
+    6. [Lesson] Risk Data Quality Assessment 
+    7. [Lesson] Risk Categorization 
+    8. [Lesson] Risk Urgency Assessment 
+    9. [Lesson] Critical Success Factors 
+    10. [Quiz] Performing Qualitative Risk Analysis 
+
+  Chapter 6: Performing Quantitative Risk Analysis 
+    Duration: 15m 21s
+    1. [Lesson] Introduction 
+    2. [Lesson] Interviews 
+    3. [Lesson] Probability Distribution  
+    4. [Lesson] Expected Monetary Value (EMV) Analysis 
+    5. [Lesson] Decision Tree Analysis 
+    6. [Lesson] Simulations 
+    7. [Lesson] Critical Success Factors
+    8. [Quiz] Performing Quantitative Risk  Analysis Quiz 
+
+  Chapter 7: Risk Responses Planning 
+    Duration: 19m 49s
+    1. [Lesson] Introduction 
+    2. [Lesson] Strategies for Threats 
+    3. [Lesson] Strategies for Opportunities
+    4. [Lesson] Creating Risk Reserves 
+    5. [Lesson] Fallback Plans
+    6. [Lesson] Secondary and Residual Risks 
+    7. [Lesson] Critical Success Factors 
+    8. [Quiz] Risk Response Planning Quiz 
+
+  Chapter 8: Monitoring Risks 
+    Duration: 20m 13s
+    1. [Lesson] Introduction
+    2. [Lesson] Risk Reassessments and Audits
+    3. [Lesson] Variance and Trend Analysis 
+    4. [Lesson] Earned Value Management (EVM) Indicators 
+    5. [Lesson] EVM Example 
+    6. [Quiz] Monitoring Risks Quiz 
+
+  Chapter 9: A Closing Remark
+    Duration: 1m 0s
+    1. [Lesson] A Message from your Instructor 
+    2. [Quiz] Course Exam
+
+
+================================================================================
+COURSE 40: Mastering Organizational Control: Frameworks and Governance for Excellence
+================================================================================
+Slug: new-course-1
+
+  Chapter 1: Webinar replay
+    Duration: 63m 57s
+    1. [Lesson] Mastering Organizational Control: Frameworks and Governance for Excellence
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 41: New Course
+================================================================================
+Slug: new-course
+
+  (No chapters)
+
+================================================================================
+COURSE 42: Optimal Practices for Ensuring Effective Internal Controls 
+================================================================================
+Slug: optimal-practices-for-ensuring-effective-internal-controls
+
+  Chapter 1: Webinar replay
+    Duration: 49m 19s
+    1. [Lesson] Optimal Practices for Ensuring Effective Internal Controls
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 43: Power BI
+================================================================================
+Slug: PowerBI
+
+  Chapter 1: Webinar replay
+    Duration: 58m 2s
+    1. [Lesson] Power BI
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 44: Power Pivot Techniques
+================================================================================
+Slug: power-pivot-techniques
+
+  Chapter 1: Webinar replay
+    Duration: 53m 5s
+    1. [Lesson] Power Pivot Techniques
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 45: Power Query / Power Pivot Using Excel - COMING SOON!
+================================================================================
+Slug: power-query-power-pivot-using-excel
+
+  Chapter 1: How to use this template
+    1. [HtmlItem] How to Use the Flagship Course Template
+
+  Chapter 2: Welcome to the course!
+    Duration: 0m 54s
+    1. [Lesson] A message from the instructor
+    2. [Lesson] How to use this course
+    3. [Survey] Before we begin...
+
+  Chapter 3: Chapter #1
+    1. [Lesson] High-level lesson
+    2. [Lesson] How-to lesson
+    3. [Quiz] Test your learning
+
+  Chapter 4: Chapter #2
+    1. [Lesson] High-level lesson
+    2. [Lesson] How-to lesson
+    3. [Quiz] Test your learning
+
+  Chapter 5: Chapter #3
+    1. [Lesson] High-level lesson
+    2. [Lesson] How-to lesson
+    3. [Quiz] Test your learning
+
+  Chapter 6: Next steps
+    1. [Lesson] Congrats! Here's what's next...
+    2. [HtmlItem] More resources for you
+    3. [Survey] Before you go...
+
+
+================================================================================
+COURSE 46: Secrets to Cash Flow Forecasting Optimization
+================================================================================
+Slug: secrets-to-cash-flow-forecasting-Optimization
+
+  Chapter 1: Webinar replay
+    Duration: 59m 20s
+    1. [Lesson]  Secrets to Cash Flow Forecasting Optimization
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 47: Storytelling with Data: Tips to Create Compelling Presentation
+================================================================================
+Slug: storytelling-with-data-tips-to-create-compelling-presentation
+
+  Chapter 1: Webinar replay
+    Duration: 45m 52s
+    1. [Lesson] Storytelling with Data: Tips to Create Compelling Presentation
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 48: Tableau for Non-Technical Professionals
+================================================================================
+Slug: tableau-for-non-technical-professionals
+
+  Chapter 1: Introduction
+    Duration: 2m 16s
+    1. [Lesson] A word from the Instructor
+    2. [Download] Presentation File
+    3. [Download] Workshop Files
+
+  Chapter 2: Tableau Basics
+    Duration: 21m 11s
+    1. [Lesson] Tableau Basics
+    2. [Lesson] Tableau Interface and Main Commands
+    3. [Lesson] Tableau File Types
+    4. [Lesson] Save Twb file type
+    5. [Lesson] Save tbm file type
+    6. [Lesson] Save tds file type
+    7. [Lesson] Save tde file type
+    8. [Lesson] Save twbx file type
+
+  Chapter 3: Managing Data Sources and Visuals
+    Duration: 41m 55s
+    1. [Lesson] Connect to Text and csv files
+    2. [Lesson] Connect to Database file and Database server
+    3. [Lesson] Connect to Excel File
+    4. [Lesson] Connect to PDF File
+    5. [Lesson] Cleaning and Structuring Text File
+    6. [Lesson] Cleaning and Structuring Excel file using Interpreter
+    7. [Lesson] Cleaning and Structuring Excel file Manually
+    8. [Lesson] Data Join - Inner
+    9. [Lesson] Data Joins - Left Right Outer
+    10. [Lesson] Connect Multiple Data source with Joins - Part 2
+    11. [Lesson] Connect Multiple Data source with Joins - Part 1
+    12. [Lesson] Rearrange fields
+    13. [Lesson] Summarize Data using Mathematical Operations
+    14. [Lesson] Display Data using the Storyline
+
+  Chapter 4: Manage Worksheets and Workbooks
+    Duration: 14m 13s
+    1. [Lesson] Manage Worksheets
+    2. [Lesson] Show and Hide Worksheet items
+    3. [Lesson] View Metadata
+    4. [Lesson] Create a Packaged Workbook
+    5. [Lesson] Export Data to a CSV File
+    6. [Lesson] Save File as PDF
+    7. [Lesson] Export Visualizations to PowerPoint
+
+  Chapter 5: Create Custom Calculated Fields
+    Duration: 13m 47s
+    1. [Lesson] Create Calculated Field
+    2. [Lesson] Add Table Calculation
+    3. [Lesson] Use Expression
+    4. [Lesson] Create Calculations in Filter Dialog Box
+
+  Chapter 6: Data Analysis and Forecasting
+    Duration: 17m 2s
+    1. [Lesson] Perform Data Analysis (Calculations, Percentages, Distinct Count)
+    2. [Lesson] Time Series Forecasting
+    3. [Lesson] Additive vs. Mulitplicative
+    4. [Lesson] Plot Forecast and Actual on a Line Chart
+
+  Chapter 7: Filter and Sort Data
+    Duration: 16m 3s
+    1. [Lesson] Sort Data
+    2. [Lesson] Filter Data
+    3. [Lesson] Filter using Wildcard
+    4. [Lesson] Conditional Filter
+    5. [Lesson] Top Filter
+    6. [Lesson] Create Crosstab table
+
+  Chapter 8: Create Data Visualizations
+    Duration: 19m 59s
+    1. [Lesson] Column and Bar Charts
+    2. [Lesson] Line and Area Charts
+    3. [Lesson] Pie Chart
+    4. [Lesson] Scatter Plot and Bubble Charts
+    5. [Lesson] Histogram Chart
+    6. [Lesson] Treemap
+    7. [Lesson] Format Chart Elements and Customize Tooltip
+
+  Chapter 9: Working with Parameters
+    Duration: 18m 46s
+    1. [Lesson] Text Parameter using List
+    2. [Lesson] String Parameter
+    3. [Lesson] Date Parameter using Range
+    4. [Lesson] Date Selection Parameter
+
+  Chapter 10: Create & Design a Dashboard
+    Duration: 18m 16s
+    1. [Lesson] Create Visuals for the Dashboard
+    2. [Lesson] Create a Dashboard and Assign Elements Size
+    3. [Lesson] Define Filter Effects
+    4. [Lesson] Define the Highlight Effect
+
+  Chapter 11: Case Study
+    Duration: 37m 30s
+    1. [Lesson] Case Study: Bank Accounts - Analytics
+    2. [Lesson] Case Study: Bank Accounts - Visualization
+    3. [Lesson] Case Study: Bank Accounts - Dashboard
+
+  Chapter 12: Assessment
+    1. [Quiz] Final Exam
+
+  Chapter 13: Conclusion
+    Duration: 5m 21s
+    1. [Lesson] Review Workshops and Case Study Instructions
+    2. [Survey] Course Evaluation تقييم الدورة
+    3. [Lesson] Thank you Message from the Instructor
+
+
+================================================================================
+COURSE 49: The Significance of Cash Flows
+================================================================================
+Slug: the-significance-of-cash-flows
+
+  Chapter 1: Webinar replay
+    Duration: 60m 9s
+    1. [Lesson] The Significance of Cash Flow
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 50: The Three Pillars of Finance
+================================================================================
+Slug: The-Three-Pillars-of-Finance
+
+  Chapter 1: Webinar replay
+    Duration: 55m 11s
+    1. [Lesson] The Three Pillars of Finance
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 51: Visio Create Commonly Used Diagrams in Business
+================================================================================
+Slug: Visio-Create-Commonly-Used-Diagrams-in-Business
+
+  Chapter 1: Webinar replay
+    Duration: 54m 51s
+    1. [Lesson] Visio Create Commonly Used Diagrams in Business
+    2. [Download] Download Webinar Supporting Materials
+    3. [HtmlItem] Thank you for attending Virginia Webinars!
+
+
+================================================================================
+COURSE 52: اختبار بعد الجلسة - دورة اكسل المستوى الأول 
+================================================================================
+Slug: excel02
+
+  Chapter 1: اختبار بعد الجلسة
+    1. [Quiz] اختر الإجابة الصحيحة
+    2. [Iframe] iSpring Quiz
+
+
+================================================================================
+COURSE 53: اختبار بعد الجلسة - دورة اكسل المستوى الثاني
+================================================================================
+Slug: excel04
+
+  Chapter 1: اختبار بعد الجلسة
+    1. [Quiz] اختر الاجابة الصحيحة
+    2. [Iframe] iSpring
+
+
+================================================================================
+COURSE 54: اختبار مسبق -  دورة الاكسل المستوى الثاني
+================================================================================
+Slug: excel03
+
+  Chapter 1: اختبار مسبق
+    1. [Quiz] اختر الاجابة الصحيحة
+    2. [Iframe] iSpring Quiz
+
+
+================================================================================
+COURSE 55: اختبارمسبق - دورة اكسل المستوى الأول 
+================================================================================
+Slug: excel01
+
+  Chapter 1: اختبار مسبق
+    1. [Quiz] اختر الإجابة الصحيحة
+
+
+================================================================================
+COURSE 56: اسلوب سرد القصة باستخدام البيانات
+================================================================================
+Slug: 7dcfef
+
+  Chapter 1: المقدمة
+    Duration: 3m 0s
+    1. [Lesson] نبذة عامة عن الدورة
+    2. [Download] ملفات ورش العمل
+    3. [Pdf] ملف العرض التقديمي
+    4. [Download] نماذج رسومات بيانية
+
+  Chapter 2: الوحدة الأولى - أهمية السياق في عرض البيانات
+    Duration: 5m 16s
+    1. [Lesson] أهمية السياق في عرض البيانات
+    2. [Quiz] اختبار الوحدة الأولى
+
+  Chapter 3: الوحدة الثانية - اختيار المرئيات الأفضل لتصور البيانات 
+    Duration: 114m 36s
+    1. [Lesson] مقدمة الوحدة الثانية
+    2. [Lesson] نص بسيط
+    3. [Lesson] جدول
+    4. [Lesson] خريطة حرارية
+    5. [Lesson] رسم بياني مبعثر
+    6. [Lesson] رسم بياني  مبعثر بتنسيق متقدم
+    7. [Lesson] رسم بياني خطوط متشابكة
+    8. [Lesson] رسم بياني خطوط متشابكة باستخدام عامل التصفية
+    9. [Lesson] رسم بياني خطي و مساحي مع المتوسط
+    10. [Lesson] رسم بياني خطي منحدر
+    11. [Lesson] رسم بياني عمودي لفئة واحدة
+    12. [Lesson] رسم بياني عمودي لفئتين أو أكثر
+    13. [Lesson] رسم بياني عمودي مكدس
+    14. [Lesson] رسم بياني انحداري أعمدة
+    15. [Lesson] رسم بياني شريطي
+    16. [Lesson] رسم بياني شريطي مكدس
+    17. [Lesson] رسم بياني مساحي
+    18. [Lesson] بديل الرسم البياني الدائري
+    19. [Lesson] بديل الرسم البياني المجوف
+    20. [Lesson] بديل رسم بياني ثنائي المحاور
+    21. [Lesson] رسم بياني ثلاثي الأبعاد
+
+  Chapter 4: الوحدة الثالثة - إزالة الضوضاء من الرسوم البيانية
+    Duration: 25m 58s
+    1. [Lesson] ازالة الضوضاء ازالة الحدود
+    2. [Lesson] ازالة خطوط الشبكة
+    3. [Lesson] ازالة العلامات
+    4. [Lesson] تنسيق المحور الأفقي و العمودي
+    5. [Lesson] اضافة المسميات
+    6. [Lesson] الاستفادة من اللون المتناسق
+
+  Chapter 5: الوحدة الرابعة - تركيز انتباه الجمهور على ما هو مهم
+    Duration: 7m 17s
+    1. [Lesson] مقدمة الوحدة الرابعة
+    2. [Lesson] السمات المسبقة للأرقام و الأشكال
+    3. [Lesson] السمات المسبقة للخطوط
+
+  Chapter 6: الوحدة الخامسة - تعلم التصميم مثل المحترفين
+    Duration: 10m 59s
+    1. [Lesson] مقدمة الوحدة الخامسة
+    2. [Lesson] المبدأ الأول - التفاعل
+    3. [Lesson] المبدأ الثاني - امكانية الوصول
+    4. [Lesson] المبدأ الثالث - المظهر الجمالي
+    5. [Lesson] المبدأ الرابع - القبول
+
+  Chapter 7: الوحدة السادسة - تصميم نموذج مرئي فعال
+    Duration: 57m 48s
+    1. [Lesson] مقدمة الوحدة السادسة
+    2. [Lesson] نموذج مرئي 1 - رسم بياني خطي
+    3. [Lesson] نموذج مرئي 2 – رسم بياني خطي منقط مع التوقعات
+    4. [Lesson] نموذج مرئي 3 - رسم بياني شريط مكدس بنسبة 100
+    5. [Lesson] نموذج مرئي 4 - رسم بياني شريط مكدس بقيم موجبة و سالبة
+    6. [Lesson] نموذج مرئي 5 - رسم بياني شريط مكدس
+
+  Chapter 8: الوحدة السابعة - سرد القصة باستخدام البيانات
+    Duration: 18m 13s
+    1. [Lesson] مقدمة الوحدة السابعة
+    2. [Lesson] استخدام بيانات الاكسل لسرد القصة
+    3. [Lesson] سرد القصة في شرائح بوربوينت
+    4. [Lesson] دورك الآن - قم بسرد قصتك
+
+  Chapter 9: الخاتمة
+    Duration: 1m 38s
+    1. [Lesson] ملخص الدورة - كلمة اختتام من المدرب
+
+
+================================================================================
+COURSE 57: تحليل البيانات و اعداد التقارير باستخدام الاكسل - المستوى الأول
+================================================================================
+Slug: 5702be
+
+  Chapter 1: المقدمة
+    Duration: 1m 50s
+    1. [Lesson] المقدمة - كلمة المدرب
+    2. [Download] ملفات ورش العمل
+    3. [HtmlItem] كتيب الدورة - النسخة الالكترونية
+    4. [Pdf] ملف العرض التقديمي
+    5. [Pdf] جدول بأهم اختصارات الاكسل
+    6. [Download] إختبار تقييم مستوى مسبق
+
+  Chapter 2: الكفاءة الأولى: هيكلة البيانات
+    Duration: 67m 40s
+    1. [Lesson] مقدمة الكفاءة الأولى - هيكلة البيانات
+    2. [Lesson] دمج و توحيد البيانات
+    3. [Lesson] التحقق من صحة البيانات - عدد صحيح
+    4. [Lesson] التحقق من صحة البيانات - قائمة
+    5. [Lesson] التحقق من صحة البيانات - التاريخ
+    6. [Lesson] التحقق من صحة البيانات - طول النص
+    7. [Lesson] التحقق من صحة البيانات - رسالة التنبيه و الإدخال
+    8. [Lesson] أدوات الجدول
+    9. [Lesson] أدوات الجدول - خصائص متقدمة
+    10. [Lesson] تسمية الخلايا و نطاق البيانات
+    11. [Lesson] دوال تقطيع النصوص
+    12. [Lesson] صيغ و دوال التاريخ
+    13. [Lesson] دالة البحث عن البيانات VLOOKUP
+    14. [Lesson] مصفوفة الجمع
+    15. [Lesson] دوال المجموع الفرعي
+    16. [Lesson] صيغ و دوال تغيير النص
+    17. [Quiz] اختبار الكفاءة الأولى - هيكلة البيانات
+
+  Chapter 3: تطبيق هيكلة البيانات
+    Duration: 11m 57s
+    1. [Lesson] تطبيق هيكلة البيانات لاعداد ملف الموازنات - الجزأ الأول
+    2. [Lesson] تطبيق هيكلة البيانات لاعداد ملف الموازنات - الجزأ الثاني
+
+  Chapter 4: اختبار الكفاءة الأولى - هيكلة البيانات
+    1. [Quiz] اختبار في صيغ و دوال و أدوات هيكلة البيانات
+
+  Chapter 5: الكفاءة الثانية: التقارير و التحليل
+    Duration: 57m 48s
+    1. [Lesson] مقدمة الكفاءة الثانية - التقارير و التحليل
+    2. [Lesson] القاعدة 1- انشاء جدول محوري
+    3. [Lesson] القاعدة 2- تقنيات تنسيق الأرقام
+    4. [Lesson] القاعدة 3- تصميم مخطط التقرير
+    5. [Lesson] القاعدة 4- فرز البيانات
+    6. [Lesson] القاعدة 5- تصفية البيانات
+    7. [Lesson] القاعدة 6- توسيع و طي التقارير
+    8. [Lesson] القاعدة 7- تلخيص القيم
+    9. [Lesson] القاعدة 8- عرض القيم كـ
+    10. [Lesson] القاعدة 9- انشاء حقل محتسب
+    11. [Lesson] القاعدة 10- تحليلات التاريخ
+    12. [Lesson] القاعدة 11- اعداد تقارير في صفحات منفصلة
+    13. [Lesson] القاعدة 12- نسخ الجدول المحوري
+    14. [Lesson] القاعدة 13- انشاء رسم بياني محوري
+    15. [Lesson] القاعدة 14- تغيير عنوان الرسم البياني تلقائيا
+    16. [Lesson] القاعدة 15- ربط الرسم البياني المحوري بالبوربوينت
+    17. [Lesson] القاعدة 16- خيارات الجدول المحوري
+    18. [Lesson] القاعدة 17- التنسيق الشرطي
+    19. [Lesson] (GetPivotData) القاعدة 18- دالة الجدول المحوري 
+    20. [Lesson] القاعدة 19- انشاء مقسم الشرائح
+
+  Chapter 6: تطبيق على اعداد التقارير و التحليلات و تصميم لوحة المعلومات
+    Duration: 18m 36s
+    1. [Lesson] انشاء لوحة معلومات - الجزأ الأول
+    2. [Lesson] انشاء لوحة معلومات - الجزأ الثاني
+    3. [Lesson] انشاء لوحة معلومات - الجزأ الثالث
+    4. [Lesson] انشاء لوحة معلومات - الجزأ الرابع
+
+  Chapter 7: ورش عمل مراجعة الكفاءة الثانية - دراسة الحالة
+    Duration: 2m 50s
+    1. [Lesson] شرح طريقة عمل دراسة الحالة
+    2. [Download] ملفات ورش عمل دراسة الحالة
+
+  Chapter 8: الاختبارات
+    1. [Quiz] الاختبارالنهائي - اختر الإجابة الصحيحة
+    2. [Download] اختبار تقييم مستوى بعد الدورة
+
+  Chapter 9: الخاتمة
+    Duration: 0m 45s
+    1. [Survey] Course Evaluation تقييم الدورة
+    2. [Lesson] الملخص وكلمة شكر من المدرب
+
+
+================================================================================
+COURSE 58: تحليل البيانات و اعداد التقارير باستخدام الاكسل - المستوى الثاني
+================================================================================
+Slug: Excel-Level2-GOSI
+
+  Chapter 1: المقدمة
+    Duration: 1m 43s
+    1. [Lesson] كلمة المقدمة من المدرب
+    2. [Download] تنزيل ملفات ورش العمل
+    3. [Pdf] جدول بأهم اختصارات الاكسل
+    4. [Pdf] تنزيل العرض التقديمي
+    5. [HtmlItem] تنزيل كتيب الدورة - النسخة الالكترونية
+    6. [Download] اختبار تقييم مستوى مسبق
+
+  Chapter 2: الكفاءة الثالثة - النمذجة
+    Duration: 55m 34s
+    1. [Lesson] مقدمة في النمذجة
+    2. [Lesson] أداة الدوار
+    3. [Lesson] أداة الدوار مع تجاوز القيمة القصوى
+    4. [Lesson] أداة الدوار النسبة المئوية
+    5. [Lesson] أداة الدوار تغيير النص
+    6. [Lesson] تحليل ماذا اذا - ادارة السيناريو
+    7. [Lesson] تحليل ماذا اذا - استهداف
+    8. [Lesson] تحليل ماذا اذا - جدول البيانات استخدام متغيرين
+    9. [Lesson] تحليل ماذا اذا - جدول البيانات استخدام متغير
+    10. [Lesson] عناصر تحكم النموذج - خانة الاختيار
+    11. [Lesson] عناصر تحكم النموذج - زر الخيار
+    12. [Lesson] عناصر تحكم النموذج - مربع القائمة
+    13. [Lesson] تطبيق في النمذجة
+    14. [Download] ورش عمل مراجعة النمذجة
+    15. [Quiz] اختبار في النمذجة
+
+  Chapter 3: الكفاءة الرابعة - الدمج و الروابط
+    Duration: 11m 44s
+    1. [Lesson] مقدمة في الدمج و الروابط
+    2. [Lesson] استيراد ملف نص
+    3. [Lesson] MS ACCESS استيراد ملف قاعدة بيانات مايكروسوفت اكسيس
+    4. [Lesson] SQL استيراد من خادم قاعدة بيانات
+    5. [Lesson] استيراد من الويب
+    6. [Lesson] استيراد ملف اكسل آخر
+    7. [Download]  ورش عمل مراجعة الدمج و الروابط
+    8. [Quiz] اختبار في الدمج و الروابط
+
+  Chapter 4: الكفاءة الخامسة - الأتمتة
+    Duration: 41m 50s
+    1. [Lesson] مقدمة  في الأتمتة
+    2. [Lesson] تسجيل أول ماكرو
+    3. [Lesson] تعديل الماكرو
+    4. [Lesson] ماكرو باستخدام المراجع النسبية
+    5. [Lesson] ماكرو باستخدام تصفية متقدمة
+    6. [Lesson] ماكرو لوحة التحكم - الجزأ الأول
+    7. [Lesson] ماكرو لوحة التحكم - الجزأ الثاني
+    8. [Lesson] ماكرو لوحة التحكم - الجزأ  الثالث
+    9. [Lesson] ماكرو لوحة التحكم - الجزأ الرابع
+    10. [Lesson] ماكرو لوحة التحكم - الجزأ الخامس
+    11. [Lesson] ماكرو لوحة التحكم - الجزأ السادس
+    12. [Download] ورش عمل مراجعة الماكرو
+    13. [Quiz] اختبار في الماكرو
+
+  Chapter 5: الاختبارات
+    1. [Quiz] اختبار نهائي -  اختر الاجابة الصحيحة
+    2. [Download] اختبار تقييم مستوى بعد الدورة
+
+  Chapter 6: ختام الدورة
+    Duration: 0m 46s
+    1. [Survey] Course Evaluation تقييم الدورة
+    2. [Lesson] ملخص عن الدورة و كلمة شكر من المدرب
+
+
+================================================================================
+COURSE 59: مقدمة في تحليل الأعمال الاحترافية
+================================================================================
+Slug: 5f1018
+
+  Chapter 1: مقدمة الدورة
+    Duration: 1m 54s
+    1. [Lesson] كلمة المدرب و التعريف بالدورة
+    2. [Download] ملف العرض التقديمي
+    3. [Download] النماذج
+    4. [Download] ملخص مخرجات الدورة
+
+  Chapter 2: الوحدة الأولى: أساسيات تحليل الأعمال
+    Duration: 12m 5s
+    1. [Lesson] ما هو تحليل الأعمال، من هو محلل الأعمال و ما قيمة تحليل الأعمال
+    2. [Lesson] مهام و أدوار محلل الأعمال
+    3. [Quiz] اختبار مهارات الوحدة الأولى
+
+  Chapter 3: الوحدة الثانية: بدء أنشطة تحليل الأعمال
+    Duration: 23m 28s
+    1. [Lesson] مقدمة الوحدة الثانية
+    2. [Lesson] فهم أهداف العمل
+    3. [Lesson] دراسة حالة الأعمال
+    4. [Lesson] المراحل 5 لدراسة حالة المشروع الفعالة
+    5. [Lesson] تكملة: المراحل 5 لدراسة حالة المشروع الفعالة
+    6. [Lesson] أصحاب المصلحة
+    7. [Lesson] تحديد مسؤوليات أصحاب المصلحة
+    8. [Quiz] اختبار الوحدة الثانية
+
+  Chapter 4: الوحدة الثالثة: تحديد متطلبات العمل
+    Duration: 19m 22s
+    1. [Lesson] امفهوم متطلبات العمل و تصنيفاته
+    2. [Lesson] كيفية تحديد المتطلبات الجيدة
+    3. [Lesson] مراحل متطلبات العمل و قةاعد الأعمال
+    4. [Quiz] اختبار الوحدة الثالثة
+
+  Chapter 5: الوحدة الرابعة: أدوات وتقنيات الاستنباط
+    Duration: 23m 31s
+    1. [Lesson] مفهوم وأساسيات الاستنباط
+    2. [Lesson] أدوات و تقنيات استنباط المتطلبات: الجزأ الأول
+    3. [Lesson] أدوات و تقنيات استنباط المتطلبات: الجزأ الثاني
+    4. [Lesson] أدوات و تقنيات استنباط المتطلبات: الجزأ الثالث
+    5. [Quiz] اختبار الوحدة الرابعة
+
+  Chapter 6: الوحدة الخامسة: إجراء التحليل باستخدام النمذجة المرئية
+    Duration: 10m 20s
+    1. [Lesson] مفاهيم النمذجة المرئية
+    2. [Lesson] نماذج الأعمال
+    3. [Lesson] النماذج الفنية
+
+  Chapter 7: الوحدة السادسة: عملية تصميم وإنشاء المواصفات
+    Duration: 11m 9s
+    1. [Lesson] مقدمة عن تصنيف المتطلبات
+    2. [Lesson] تصنيف و اشتقاق المتطلبات
+    3. [Lesson] مراحل اشتقاق المتطلبات
+    4. [Lesson] تعيين سمات المتطلبات و تحديد الأولويات
+
+  Chapter 8: الوحدة السابعة: الموافقة على المتطلبات من أصحاب المصلحة
+    Duration: 9m 27s
+    1. [Lesson] مقدمة عن موافقة المتطلبات من أصحاب العمل
+    2. [Lesson] موافقة فريق العمل
+    3. [Lesson] موافقة الفريق الفني
+    4. [Lesson] موافقة راعي المشروع
+
+  Chapter 9: الوحدة الثامنة: اكتمال المشروع
+    Duration: 3m 8s
+    1. [Lesson] التحقق من اكتمال المشروع و عمل جلسة مراجعة
+
+  Chapter 10: اختتام الدورة
+    Duration: 2m 22s
+    1. [Survey] Course Evaluation تقييم الدورة
+    2. [Lesson] كلمة المدرب و مراجعة عامة
+
+
