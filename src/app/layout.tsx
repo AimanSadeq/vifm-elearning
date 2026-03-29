@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: {
@@ -18,7 +19,11 @@ export default function RootLayout({
 }) {
   return (
     <html suppressHydrationWarning>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <Script src="/demo-data.js" strategy="beforeInteractive" />
+        <Script src="/demo-mode.js" strategy="beforeInteractive" />
+        {children}
+      </body>
     </html>
   );
 }
