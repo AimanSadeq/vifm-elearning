@@ -97,8 +97,8 @@ test.describe("Bulk Import Wizard", () => {
   }) => {
     // ── Sign in ─────────────────────────────────────────────
     await page.goto("/en/login");
-    await page.getByLabel(/email/i).fill(ADMIN_EMAIL);
-    await page.getByLabel(/password/i).fill(ADMIN_PASS);
+    await page.locator("#email").fill(ADMIN_EMAIL);
+    await page.locator("#password").fill(ADMIN_PASS);
     await page.getByRole("button", { name: /sign in|log in/i }).click();
 
     // Wait for redirect to dashboard

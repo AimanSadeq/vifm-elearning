@@ -131,8 +131,8 @@ test.describe.serial("Course Player — video, document, quiz flow", () => {
   }) => {
     // ── 1. Login ──────────────────────────────────────────
     await page.goto("/en/login");
-    await page.getByLabel(/email/i).fill(LEARNER_EMAIL);
-    await page.getByLabel(/password/i).fill(LEARNER_PASS);
+    await page.locator("#email").fill(LEARNER_EMAIL);
+    await page.locator("#password").fill(LEARNER_PASS);
     await page.getByRole("button", { name: /sign in|log in/i }).click();
     await page.waitForURL(
       (url) => url.pathname.startsWith("/en") && !url.pathname.includes("/login"),
@@ -270,8 +270,8 @@ test.describe.serial("Course Player — video, document, quiz flow", () => {
   test("Arabic locale renders translated strings", async ({ page }) => {
     // Login via English first (more reliable selectors), then switch to Arabic
     await page.goto("/en/login");
-    await page.getByLabel(/email/i).fill(LEARNER_EMAIL);
-    await page.getByLabel(/password/i).fill(LEARNER_PASS);
+    await page.locator("#email").fill(LEARNER_EMAIL);
+    await page.locator("#password").fill(LEARNER_PASS);
     await page.getByRole("button", { name: /sign in|log in/i }).click();
     await page.waitForURL(
       (url) => url.pathname.startsWith("/en") && !url.pathname.includes("/login"),
@@ -282,7 +282,7 @@ test.describe.serial("Course Player — video, document, quiz flow", () => {
     await page.goto(
       `/ar/courses/${COURSE_SLUG}/learn/${lessonIds.document}`
     );
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Verify Arabic document UI strings
     await expect(
@@ -298,7 +298,7 @@ test.describe.serial("Course Player — video, document, quiz flow", () => {
     await page.goto(
       `/ar/courses/${COURSE_SLUG}/learn/${lessonIds.quiz}`
     );
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Verify Arabic quiz UI strings — either start or retry depending on prior test state
     await expect(
