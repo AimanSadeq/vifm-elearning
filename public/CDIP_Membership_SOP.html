@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CDIP Membership SOP — VIFM</title>
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/open-sans@5.0.28/index.css" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #010131;
+    --dark: #0A0C26;
+    --card-bg: #121140;
+    --accent: #5391D5;
+    --offwhite: #FEFFF9;
+    --muted: rgba(254,255,249,0.55);
+    --dimmer: rgba(254,255,249,0.28);
+    --stroke: rgba(83,145,213,0.18);
+    --card-border: rgba(83,145,213,0.10);
+    --sidebar-w: 260px;
+  }
+  html, body { height: 100%; font-family: 'Open Sans', sans-serif; background: var(--navy); color: var(--offwhite); }
+  a { color: var(--accent); text-decoration: none; }
+
+  /* LAYOUT */
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: var(--dark); border-right: 1px solid var(--stroke); position: fixed; top: 0; left: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; z-index: 100; }
+  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sb-header { padding: 28px 24px 20px; border-bottom: 1px solid var(--stroke); }
+  .sb-wordmark { font-size: 12px; font-weight: 700; letter-spacing: 0.38em; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; }
+  .sb-title { font-size: 14px; font-weight: 700; color: var(--offwhite); line-height: 1.4; }
+  .sb-sub { font-size: 11px; color: var(--dimmer); margin-top: 4px; }
+  .sb-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
+  .sb-nav::-webkit-scrollbar { width: 4px; }
+  .sb-nav::-webkit-scrollbar-track { background: transparent; }
+  .sb-nav::-webkit-scrollbar-thumb { background: var(--stroke); border-radius: 2px; }
+  .nav-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 24px; cursor: pointer; border-left: 3px solid transparent; transition: background 0.15s, border-color 0.15s; }
+  .nav-item:hover { background: rgba(83,145,213,0.07); }
+  .nav-item.active { background: rgba(83,145,213,0.14); border-left-color: var(--accent); }
+  .nav-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--dimmer); flex-shrink: 0; margin-top: 5px; transition: background 0.15s; }
+  .nav-item.active .nav-dot { background: var(--accent); }
+  .nav-label { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .nav-item.active .nav-label { color: var(--offwhite); font-weight: 700; }
+  .sb-footer { padding: 16px 24px; border-top: 1px solid var(--stroke); }
+  .prog-label { font-size: 10px; color: var(--dimmer); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 7px; }
+  .prog-bar { height: 3px; background: rgba(83,145,213,0.18); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+  .prog-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; width: 0%; }
+  .prog-count { font-size: 11px; color: var(--dimmer); }
+
+  /* SECTIONS */
+  .section { display: none; padding: 52px 64px; max-width: 1000px; }
+  .section.visible { display: block; }
+
+  /* SECTION HEADER */
+  .sec-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.22em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+  .sec-title { font-size: 32px; font-weight: 700; color: var(--offwhite); margin-bottom: 6px; line-height: 1.15; }
+  .sec-title span { color: var(--accent); }
+  .sec-sub { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 32px; max-width: 680px; }
+  .gbar { width: 40px; height: 3px; background: var(--accent); border-radius: 2px; margin-bottom: 28px; }
+
+  /* INFO BOX */
+  .info-box { background: rgba(83,145,213,0.08); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 28px; font-size: 13px; color: rgba(254,255,249,0.8); line-height: 1.7; }
+  .warn-box { background: rgba(239,159,39,0.1); border-left: 3px solid #EF9F27; border-radius: 0 8px 8px 0; padding: 12px 18px; margin-bottom: 24px; font-size: 13px; color: rgba(239,159,39,0.9); line-height: 1.6; }
+  .warn-box svg { display: inline; vertical-align: middle; margin-right: 6px; }
+
+  /* OWNER BADGES */
+  .owners-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .owner-label { font-size: 11px; color: var(--dimmer); }
+  .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .badge-vifm { background: rgba(83,145,213,0.18); color: var(--accent); }
+  .badge-ops { background: rgba(45,180,120,0.15); color: #4dd8a0; }
+  .badge-date { background: rgba(254,255,249,0.08); color: var(--muted); }
+  .badge-note { background: rgba(239,159,39,0.12); color: #EF9F27; }
+  .contact-line { font-size: 12px; color: var(--dimmer); margin-bottom: 32px; }
+  .contact-line a { color: var(--accent); }
+
+  /* REFERENCE GRID */
+  .ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+  .ref-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 18px; }
+  .ref-card-title { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; color: var(--accent); text-transform: uppercase; margin-bottom: 14px; }
+  .ref-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--stroke); font-size: 12px; }
+  .ref-row:last-child { border-bottom: none; }
+  .rk { color: var(--muted); }
+  .rv { font-weight: 700; color: var(--offwhite); text-align: right; max-width: 55%; }
+
+  /* TIMELINE */
+  .tl-wrap { display: flex; align-items: center; overflow-x: auto; padding: 8px 0 20px; gap: 0; }
+  .tl-node { display: flex; flex-direction: column; align-items: center; min-width: 90px; }
+  .tl-dot { width: 11px; height: 11px; border-radius: 50%; margin-bottom: 7px; }
+  .tl-line { flex: 1; height: 2px; background: var(--stroke); margin-bottom: 24px; min-width: 24px; }
+  .tl-name { font-size: 10px; color: var(--muted); text-align: center; line-height: 1.4; }
+  .tl-date { font-size: 10px; font-weight: 700; color: var(--offwhite); text-align: center; }
+
+  /* TASK GROUPS */
+  .task-group { margin-bottom: 32px; }
+  .task-group-title { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--stroke); }
+  .task-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border-radius: 8px; margin-bottom: 6px; border: 1px solid var(--card-border); background: var(--card-bg); transition: background 0.15s, opacity 0.2s; cursor: pointer; }
+  .task-item:hover { background: rgba(83,145,213,0.08); }
+  .task-item.done { opacity: 0.45; }
+  .task-item.done .task-text { text-decoration: line-through; color: var(--dimmer); }
+  .task-cb { width: 17px; height: 17px; border-radius: 4px; border: 1.5px solid var(--stroke); background: transparent; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .task-cb.checked { background: var(--accent); border-color: var(--accent); }
+  .task-cb svg { display: none; }
+  .task-cb.checked svg { display: block; }
+  .task-body { flex: 1; }
+  .task-text { font-size: 13px; color: var(--offwhite); line-height: 1.6; }
+  .task-meta { display: flex; align-items: center; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
+
+  /* CPE TABLE */
+  .cpe-table { width: 100%; border-collapse: collapse; margin-bottom: 28px; }
+  .cpe-table th { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; color: var(--accent); text-transform: uppercase; text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--stroke); }
+  .cpe-table td { font-size: 13px; color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--card-border); }
+  .cpe-table td:first-child { color: var(--offwhite); font-weight: 700; }
+  .cpe-table tr:last-child td { border-bottom: none; }
+  .cpe-table tbody tr { background: var(--card-bg); }
+  .cpe-table tbody tr:hover { background: rgba(83,145,213,0.06); }
+
+  /* PRINT */
+  @media print {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .section { display: block !important; page-break-after: always; }
+  }
+
+  /* SCROLLBAR */
+  .main::-webkit-scrollbar { width: 6px; }
+  .main::-webkit-scrollbar-track { background: var(--navy); }
+  .main::-webkit-scrollbar-thumb { background: var(--stroke); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-header">
+      <div class="sb-wordmark">VIFM</div>
+      <div class="sb-title">CDIP Membership<br>Standard Operating Procedure</div>
+      <div class="sb-sub">Internal Use Only &middot; 2026</div>
+    </div>
+    <div class="sb-nav">
+      <div class="nav-item active" onclick="show('overview',this)">
+        <div class="nav-dot"></div>
+        <div class="nav-label">Program Overview</div>
+      </div>
+      <div class="nav-item" onclick="show('phase1',this)">
+        <div class="nav-dot"></div>
+        <div class="nav-label">Phase 1 &mdash; Preparation</div>
+      </div>
+      <div class="nav-item" onclick="show('phase2',this)">
+        <div class="nav-dot"></div>
+        <div class="nav-label">Phase 2 &mdash; Soft Launch</div>
+      </div>
+      <div class="nav-item" onclick="show('phase3',this)">
+        <div class="nav-dot"></div>
+        <div class="nav-label">Phase 3 &mdash; Renewal Campaign</div>
+      </div>
+      <div class="nav-item" onclick="show('phase4',this)">
+        <div class="nav-dot"></div>
+        <div class="nav-label">Phase 4 &mdash; Deadline &amp; Fulfillment</div>
+      </div>
+      <div class="nav-item" onclick="show('phase5',this)">
+        <div class="nav-dot"></div>
+        <div class="nav-label">Phase 5 &mdash; Grace Period</div>
+      </div>
+      <div class="nav-item" onclick="show('phase6',this)">
+        <div class="nav-dot"></div>
+        <div class="nav-label">Phase 6 &mdash; Ongoing Operations</div>
+      </div>
+      <div class="nav-item" onclick="show('phase7',this)">
+        <div class="nav-dot"></div>
+        <div class="nav-label">Annual Cycle (Year 2+)</div>
+      </div>
+      <div class="nav-item" onclick="show('cpe',this)">
+        <div class="nav-dot"></div>
+        <div class="nav-label">CPE Administration</div>
+      </div>
+    </div>
+    <div class="sb-footer">
+      <div class="prog-label">Task completion</div>
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+      <div class="prog-count" id="prog-count">0 / 0 tasks</div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- SECTION 1: OVERVIEW -->
+    <div class="section visible" id="sec-overview">
+      <div class="sec-eyebrow">Section 1 of 9 &mdash; Reference</div>
+      <div class="sec-title">Program <span>Overview</span></div>
+      <div class="gbar"></div>
+      <div class="sec-sub">Virginia Institute of Finance and Management (VIFM) &middot; Internal Use Only &middot; Effective July 1, 2026</div>
+
+      <div class="info-box">This SOP governs the full lifecycle of the CDIP annual membership subscription, from the 2026 Founding Member launch through ongoing annual renewal cycles. It covers renewal operations, benefits fulfillment, CPE tracking, suspension, and reinstatement. All staff executing any part of the CDIP program must be familiar with this document in its entirety.</div>
+
+      <div class="owners-row">
+        <span class="owner-label">Document Owners:</span>
+        <span class="badge badge-vifm">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="3.5" r="1.8" stroke="#5391D5" stroke-width="1.2"/><path d="M1.5 8.5c0-1.93 1.567-3.5 3.5-3.5s3.5 1.57 3.5 3.5" stroke="#5391D5" stroke-width="1.2" stroke-linecap="round"/></svg>
+          VIFM Certification Team
+        </span>
+        <span class="badge badge-ops">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1.5" y="3" width="7" height="5.5" rx="1.2" stroke="#4dd8a0" stroke-width="1.2"/><path d="M3.5 3V2.5a1.5 1.5 0 013 0V3" stroke="#4dd8a0" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Operations Department
+        </span>
+      </div>
+      <div class="contact-line">Primary contact: <a href="/cdn-cgi/l/email-protection#f3909681879a959a9092879a9c9db3859a958781929a9d9a9d94dd909c9e"><span class="__cf_email__" data-cfemail="f7949285839e919e9496839e9899b7819e918385969e999e9990d994989a">[email&#160;protected]</span></a> &middot; Registry: <a href="https://learn.viftraining.com/designations/cdip/registry">learn.viftraining.com/designations/cdip/registry</a></div>
+
+      <div class="ref-grid">
+        <div class="ref-card">
+          <div class="ref-card-title">Key Dates &mdash; 2026 Cycle</div>
+          <div class="ref-row"><span class="rk">Preparation complete</span><span class="rv">Feb 28, 2026</span></div>
+          <div class="ref-row"><span class="rk">Soft launch / announcement</span><span class="rv">Apr 21, 2026</span></div>
+          <div class="ref-row"><span class="rk">Introductory webinar</span><span class="rv">May 5, 2026</span></div>
+          <div class="ref-row"><span class="rk">Annual renewal deadline</span><span class="rv">Jul 1, 2026</span></div>
+          <div class="ref-row"><span class="rk">Grace period ends</span><span class="rv">Oct 1, 2026</span></div>
+          <div class="ref-row"><span class="rk">Next campaign begins</span><span class="rv">May 2027</span></div>
+        </div>
+        <div class="ref-card">
+          <div class="ref-card-title">Pricing and Fees</div>
+          <div class="ref-row"><span class="rk">Founding Member renewal (Year 1)</span><span class="rv">$50 USD</span></div>
+          <div class="ref-row"><span class="rk">Standard annual renewal</span><span class="rv">$70 USD</span></div>
+          <div class="ref-row"><span class="rk">Late fee (grace period)</span><span class="rv">$30 USD</span></div>
+          <div class="ref-row"><span class="rk">Reinstatement (within 12 months)</span><span class="rv">Dues + $30</span></div>
+        </div>
+        <div class="ref-card">
+          <div class="ref-card-title">CPE Requirements (Annual)</div>
+          <div class="ref-row"><span class="rk">Total required per renewal year</span><span class="rv">20 hours</span></div>
+          <div class="ref-row"><span class="rk">VIFM courses and webinars</span><span class="rv">Unlimited</span></div>
+          <div class="ref-row"><span class="rk">External conferences</span><span class="rv">Max 10 hrs/year</span></div>
+          <div class="ref-row"><span class="rk">Self-study</span><span class="rv">Max 5 hrs/year</span></div>
+          <div class="ref-row"><span class="rk">CPE year</span><span class="rv">Jul 1 &ndash; Jun 30</span></div>
+        </div>
+        <div class="ref-card">
+          <div class="ref-card-title">Founding Member Benefits</div>
+          <div class="ref-row"><span class="rk">Re-examination required</span><span class="rv">No</span></div>
+          <div class="ref-row"><span class="rk">"Founding Member" badge on registry</span><span class="rv">Yes</span></div>
+          <div class="ref-row"><span class="rk">Free e-Learning Portal access</span><span class="rv">With active membership</span></div>
+          <div class="ref-row"><span class="rk">Free digital DIBoK (7 documents)</span><span class="rv">Yes</span></div>
+          <div class="ref-row"><span class="rk">Priority registration for VIFM programs</span><span class="rv">Yes</span></div>
+          <div class="ref-row"><span class="rk">Discount on VIFM program registration</span><span class="rv">5%</span></div>
+          <div class="ref-row"><span class="rk">Listed in CDIP public registry</span><span class="rv">Yes</span></div>
+        </div>
+      </div>
+
+      <div class="warn-box">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L12.5 11H1.5L7 1.5z" stroke="#EF9F27" stroke-width="1.3" stroke-linejoin="round"/><rect x="6.4" y="5.5" width="1.2" height="3" rx="0.6" fill="#EF9F27"/><rect x="6.4" y="9.5" width="1.2" height="1.2" rx="0.6" fill="#EF9F27"/></svg>
+        Founding Member status is exclusively for professionals who certified before July 1, 2026. All future candidates follow the standard certification process. This status will never be offered again.
+      </div>
+
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;">Program Timeline at a Glance</div>
+      <div class="tl-wrap">
+        <div class="tl-node"><div class="tl-dot" style="background:#5391D5;"></div><div class="tl-name">Preparation</div><div class="tl-date">Jan &ndash; Feb</div></div>
+        <div class="tl-line"></div>
+        <div class="tl-node"><div class="tl-dot" style="background:#5391D5;"></div><div class="tl-name">Soft Launch</div><div class="tl-date">Apr 21</div></div>
+        <div class="tl-line"></div>
+        <div class="tl-node"><div class="tl-dot" style="background:#5391D5;"></div><div class="tl-name">Campaign</div><div class="tl-date">Mar &ndash; Jun</div></div>
+        <div class="tl-line"></div>
+        <div class="tl-node"><div class="tl-dot" style="background:#FEFFF9;"></div><div class="tl-name">Deadline</div><div class="tl-date">Jul 1</div></div>
+        <div class="tl-line"></div>
+        <div class="tl-node"><div class="tl-dot" style="background:#5391D5;"></div><div class="tl-name">Fulfillment</div><div class="tl-date">Jul 2 &ndash; 7</div></div>
+        <div class="tl-line"></div>
+        <div class="tl-node"><div class="tl-dot" style="background:#EF9F27;"></div><div class="tl-name">Grace Period</div><div class="tl-date">Jul &ndash; Oct 1</div></div>
+        <div class="tl-line"></div>
+        <div class="tl-node"><div class="tl-dot" style="background:#E24B4A;"></div><div class="tl-name">Suspensions</div><div class="tl-date">Oct 1</div></div>
+        <div class="tl-line"></div>
+        <div class="tl-node"><div class="tl-dot" style="background:#4dd8a0;"></div><div class="tl-name">Ongoing Ops</div><div class="tl-date">Oct+</div></div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: PHASE 1 PREPARATION -->
+    <div class="section" id="sec-phase1">
+      <div class="sec-eyebrow">Section 2 of 9 &mdash; Phase 1</div>
+      <div class="sec-title">Preparation</div>
+      <div class="gbar"></div>
+      <div class="sec-sub">January 23 &ndash; February 28, 2026 &middot; Goal: Build all infrastructure, content, and systems before public launch. All items in this phase must be complete before March 1.</div>
+
+      <div class="task-group">
+        <div class="task-group-title">1A &mdash; Content and Policy Finalization</div>
+        <div class="task-item" id="t1" onclick="toggle('t1')"><div class="task-cb" id="cb-t1"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Complete the CPE Policy document: activity types, hours per category, annual maximums, renewal schedule, and non-compliance rules</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Jan 31</span><span class="badge badge-note">See CPE Policy doc</span></div></div></div>
+        <div class="task-item" id="t2" onclick="toggle('t2')"><div class="task-cb" id="cb-t2"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Complete the FAQ document covering all member categories: general questions, renewal and payment, CPE, benefits, suspension and reinstatement</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Jan 31</span><span class="badge badge-note">See FAQ doc</span></div></div></div>
+        <div class="task-item" id="t3" onclick="toggle('t3')"><div class="task-cb" id="cb-t3"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Create the CPE Tracking Form template (members log hours by category) and publish on learn.viftraining.com</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Jan 31</span></div></div></div>
+        <div class="task-item" id="t4" onclick="toggle('t4')"><div class="task-cb" id="cb-t4"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Compile and export the full DIBoK digital package: all 7 documents as PDFs, quality-checked and ready for distribution</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Feb 28</span><span class="badge badge-note">Documents 1&ndash;7</span></div></div></div>
+        <div class="task-item" id="t5" onclick="toggle('t5')"><div class="task-cb" id="cb-t5"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Prepare the Founding Member announcement email template, ready for deployment on launch day</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Feb 28</span></div></div></div>
+        <div class="task-item" id="t6" onclick="toggle('t6')"><div class="task-cb" id="cb-t6"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Verify and clean the contact list for all 300 certified professionals: confirm names, email addresses, and tier (Founding Member vs. Standard)</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Feb 28</span></div></div></div>
+      </div>
+
+      <div class="task-group">
+        <div class="task-group-title">1B &mdash; Platform and Systems Setup</div>
+        <div class="task-item" id="t7" onclick="toggle('t7')"><div class="task-cb" id="cb-t7"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Build and test the CDIP Registry page at learn.viftraining.com/designations/cdip/registry: searchable by name and company, Founding Member badge visible, admin management access configured</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">Feb 28</span></div></div></div>
+        <div class="task-item" id="t8" onclick="toggle('t8')"><div class="task-cb" id="cb-t8"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Configure the Renewal Payment Portal with two tiers: $50 USD (Founding Member Year 1) and $70 USD (Standard). Accepted methods: credit card and bank transfer. Payment confirmation email must trigger automatically on successful payment.</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">Feb 28</span></div></div></div>
+        <div class="task-item" id="t9" onclick="toggle('t9')"><div class="task-cb" id="cb-t9"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Configure the e-Learning Portal: auto-grant access on successful payment, auto-revoke on expiry after October 1, bulk enrollment capability for all 300 Founding Members</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">Feb 28</span></div></div></div>
+        <div class="task-item" id="t10" onclick="toggle('t10')"><div class="task-cb" id="cb-t10"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Publish CPE Policy and FAQ as static pages on the website and link from the member portal</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">Feb 28</span></div></div></div>
+        <div class="task-item" id="t11" onclick="toggle('t11')"><div class="task-cb" id="cb-t11"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Set up CPE submission form online (or email-based workflow): members must be able to submit activity type, hours, date, provider name, and supporting documentation</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">Feb 28</span></div></div></div>
+        <div class="task-item" id="t12" onclick="toggle('t12')"><div class="task-cb" id="cb-t12"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Configure automated membership status transitions via nightly scheduled job: active &rarr; grace period &rarr; suspended &rarr; lapsed, with automated email triggers at each transition</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">Feb 28</span></div></div></div>
+        <div class="task-item" id="t13" onclick="toggle('t13')"><div class="task-cb" id="cb-t13"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">End-to-end user acceptance test (UAT): simulate a full renewal payment cycle, confirm e-Learning access is granted and confirmation email is received. Sign off before April 21.</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">Feb 28</span><span class="badge badge-note">UAT sign-off required</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: PHASE 2 SOFT LAUNCH -->
+    <div class="section" id="sec-phase2">
+      <div class="sec-eyebrow">Section 3 of 9 &mdash; Phase 2</div>
+      <div class="sec-title">Soft Launch <span>&amp; Announcement</span></div>
+      <div class="gbar"></div>
+      <div class="sec-sub">April 21 &ndash; May 5, 2026 &middot; Goal: Announce Founding Member status and open the renewal portal to all 300 certified professionals.</div>
+
+      <div class="task-group">
+        <div class="task-group-title">Launch Day &mdash; April 21</div>
+        <div class="task-item" id="t14" onclick="toggle('t14')"><div class="task-cb" id="cb-t14"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Pre-launch system check: confirm all systems are fully live &mdash; CDIP Registry page, renewal payment portal, e-Learning Portal, CPE policy and FAQ pages</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">Apr 21, before 8 AM</span></div></div></div>
+        <div class="task-item" id="t15" onclick="toggle('t15')"><div class="task-cb" id="cb-t15"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Send the Founding Member announcement email to all 300 certified professionals. Email must be personalized with recipient name, membership tier, renewal fee, renewal link, and key dates.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Apr 21</span><span class="badge badge-note">Subject: "You're Now a CDIP Founding Member"</span></div></div></div>
+        <div class="task-item" id="t16" onclick="toggle('t16')"><div class="task-cb" id="cb-t16"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Monitor email delivery rates over the following 48 hours. Flag any bounced or undelivered emails and follow up directly with those contacts.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Apr 21 &ndash; 23</span></div></div></div>
+        <div class="task-item" id="t17" onclick="toggle('t17')"><div class="task-cb" id="cb-t17"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Monitor inbound member queries following the announcement and respond within 2 business days via <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4a292f383e232c23292b3e2325240a3c232c3e382b232423242d64292527">[email&#160;protected]</a></div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Apr 21 onwards</span></div></div></div>
+      </div>
+
+      <div class="task-group">
+        <div class="task-group-title">Introductory Webinar &mdash; May 5</div>
+        <div class="task-item" id="t18" onclick="toggle('t18')"><div class="task-cb" id="cb-t18"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Send webinar invitation to all 300 members at least 7 days in advance. Include registration link, agenda summary, and CPE credit confirmation (1 hour).</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Apr 28</span></div></div></div>
+        <div class="task-item" id="t19" onclick="toggle('t19')"><div class="task-cb" id="cb-t19"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Host the CDIP Founding Member introductory webinar. Cover: program overview, what has changed, renewal process, CPE requirements, benefits, and Q&amp;A</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">May 5</span><span class="badge badge-note">1 CPE hour awarded to attendees</span></div></div></div>
+        <div class="task-item" id="t20" onclick="toggle('t20')"><div class="task-cb" id="cb-t20"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Upload the webinar recording to the e-Learning Portal within 48 hours of the live session</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">May 7</span></div></div></div>
+        <div class="task-item" id="t21" onclick="toggle('t21')"><div class="task-cb" id="cb-t21"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Log 1 CPE hour in the system for all confirmed webinar attendees</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">May 7</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: PHASE 3 RENEWAL CAMPAIGN -->
+    <div class="section" id="sec-phase3">
+      <div class="sec-eyebrow">Section 4 of 9 &mdash; Phase 3</div>
+      <div class="sec-title">Renewal <span>Campaign</span></div>
+      <div class="gbar"></div>
+      <div class="sec-sub">May 6 &ndash; June 30, 2026 &middot; Goal: Drive maximum renewals before the July 1 deadline through a structured, multi-touchpoint outreach campaign.</div>
+
+      <div class="task-group">
+        <div class="task-group-title">Reminder Sequence</div>
+        <div class="task-item" id="t22" onclick="toggle('t22')"><div class="task-cb" id="cb-t22"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Reminder #1 (90 days before deadline): Personalized renewal notice to all non-renewed members. Include deadline, fee, renewal link, and summary of benefits.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Apr 1</span></div></div></div>
+        <div class="task-item" id="t23" onclick="toggle('t23')"><div class="task-cb" id="cb-t23"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Reminder #2 (60 days before deadline): Benefits-focused message. Highlight what members stand to lose &mdash; registry listing, e-Learning access, DIBoK access, and Founding Member status recognition.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">May 1</span></div></div></div>
+        <div class="task-item" id="t24" onclick="toggle('t24')"><div class="task-cb" id="cb-t24"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Reminder #3 (30 days before deadline): Urgency-focused message. Emphasize that renewal takes under 5 minutes. Include a direct call-to-action button.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Jun 1</span></div></div></div>
+        <div class="task-item" id="t25" onclick="toggle('t25')"><div class="task-cb" id="cb-t25"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Final Reminder (14 days before deadline): Last-chance notice to all members who have not yet renewed. State clearly that a $30 late fee applies after July 1.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Jun 17</span></div></div></div>
+      </div>
+
+      <div class="task-group">
+        <div class="task-group-title">Ongoing Campaign Monitoring</div>
+        <div class="task-item" id="t26" onclick="toggle('t26')"><div class="task-cb" id="cb-t26"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Track renewal payments weekly. Update the internal renewal count and flag any anomalies (duplicate payments, failed transactions, tier mismatches) to Operations for resolution.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Weekly &mdash; Mar to Jul</span></div></div></div>
+        <div class="task-item" id="t27" onclick="toggle('t27')"><div class="task-cb" id="cb-t27"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Respond to all inbound member queries about renewal, payment issues, and CPE eligibility within 2 business days via <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="55363027213c333c3634213c3a3b15233c332127343c3b3c3b327b363a38">[email&#160;protected]</a></div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Ongoing</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- SECTION 5: PHASE 4 DEADLINE & FULFILLMENT -->
+    <div class="section" id="sec-phase4">
+      <div class="sec-eyebrow">Section 5 of 9 &mdash; Phase 4</div>
+      <div class="sec-title">Renewal Deadline <span>&amp; Fulfillment</span></div>
+      <div class="gbar"></div>
+      <div class="sec-sub">July 1 &ndash; July 7, 2026 &middot; Goal: Process all renewals, deliver all member benefits, and initiate grace period outreach for non-renewed members.</div>
+
+      <div class="task-group">
+        <div class="task-group-title">Deadline Day &mdash; July 1</div>
+        <div class="task-item" id="t28" onclick="toggle('t28')"><div class="task-cb" id="cb-t28"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Process and reconcile all renewal payments received by July 1. Confirm payment records match member accounts in the system.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Jul 1</span></div></div></div>
+        <div class="task-item" id="t29" onclick="toggle('t29')"><div class="task-cb" id="cb-t29"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Generate the final list of renewed vs. non-renewed members as of July 1. Share with Operations to begin benefits fulfillment and Registry update.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Jul 1</span></div></div></div>
+      </div>
+
+      <div class="task-group">
+        <div class="task-group-title">Benefits Fulfillment &mdash; July 2 to 7</div>
+        <div class="task-item" id="t30" onclick="toggle('t30')"><div class="task-cb" id="cb-t30"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Send thank-you / welcome email to all renewed Founding Members. Include confirmation of active status, next renewal date, and e-Learning Portal access details.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Jul 2 &ndash; 7</span></div></div></div>
+        <div class="task-item" id="t31" onclick="toggle('t31')"><div class="task-cb" id="cb-t31"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Bulk-enroll all renewed members in the e-Learning Portal. Confirm access is active for each member account.</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">Jul 2 &ndash; 7</span></div></div></div>
+        <div class="task-item" id="t32" onclick="toggle('t32')"><div class="task-cb" id="cb-t32"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Deliver the DIBoK digital package (7 PDFs) to all renewed members via email download link or portal access</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Jul 2 &ndash; 7</span></div></div></div>
+        <div class="task-item" id="t33" onclick="toggle('t33')"><div class="task-cb" id="cb-t33"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Issue updated Founding Member certificates to all renewed members (if applicable)</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Jul 2 &ndash; 7</span></div></div></div>
+        <div class="task-item" id="t34" onclick="toggle('t34')"><div class="task-cb" id="cb-t34"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Update the public CDIP Registry: add all newly renewed active members, confirm Founding Member badges are displaying correctly, and go live on the website</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">Jul 7</span></div></div></div>
+        <div class="task-item" id="t35" onclick="toggle('t35')"><div class="task-cb" id="cb-t35"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Send grace period notice to all non-renewed members: inform them the 3-month window is now open, a $30 late fee applies, and their benefits are suspended until renewal</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Jul 7</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- SECTION 6: PHASE 5 GRACE PERIOD -->
+    <div class="section" id="sec-phase5">
+      <div class="sec-eyebrow">Section 6 of 9 &mdash; Phase 5</div>
+      <div class="sec-title">Grace <span>Period</span></div>
+      <div class="gbar"></div>
+      <div class="sec-sub">July 2 &ndash; October 1, 2026 &middot; Goal: Give non-renewed members a final 3-month window to reinstate with a $30 late fee, then suspend all who remain non-renewed on October 1.</div>
+
+      <div class="warn-box">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L12.5 11H1.5L7 1.5z" stroke="#EF9F27" stroke-width="1.3" stroke-linejoin="round"/><rect x="6.4" y="5.5" width="1.2" height="3" rx="0.6" fill="#EF9F27"/><rect x="6.4" y="9.5" width="1.2" height="1.2" rx="0.6" fill="#EF9F27"/></svg>
+        A $30 late fee applies to all renewals processed during the grace period. Total cost becomes $80 (Founding Member) or $100 (Standard). No exceptions without VIFM leadership approval.
+      </div>
+
+      <div class="task-group">
+        <div class="task-group-title">Grace Period Outreach</div>
+        <div class="task-item" id="t36" onclick="toggle('t36')"><div class="task-cb" id="cb-t36"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Grace Period Reminder #1: Send to all non-renewed members. State that the $30 late fee is now in effect and benefits remain suspended until renewal is completed.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Jul 15</span></div></div></div>
+        <div class="task-item" id="t37" onclick="toggle('t37')"><div class="task-cb" id="cb-t37"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Grace Period Reminder #2: Escalate urgency. Emphasize that access to the CDIP Registry, e-Learning Portal, and DIBoK is suspended. Include a direct renewal link.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Aug 15</span></div></div></div>
+        <div class="task-item" id="t38" onclick="toggle('t38')"><div class="task-cb" id="cb-t38"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Final Grace Period Warning: Last chance communication. Suspension is effective October 1. After suspension, reinstatement requires a re-application process if more than 12 months pass.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Sep 15</span></div></div></div>
+      </div>
+
+      <div class="task-group">
+        <div class="task-group-title">Suspension Processing &mdash; October 1</div>
+        <div class="task-item" id="t39" onclick="toggle('t39')"><div class="task-cb" id="cb-t39"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Prepare the final suspension list: all members who remain non-renewed as of September 30. Share with Operations for processing.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Sep 30</span></div></div></div>
+        <div class="task-item" id="t40" onclick="toggle('t40')"><div class="task-cb" id="cb-t40"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Process suspensions: remove all non-renewed members from the CDIP public Registry</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">Oct 1</span></div></div></div>
+        <div class="task-item" id="t41" onclick="toggle('t41')"><div class="task-cb" id="cb-t41"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Revoke e-Learning Portal access for all suspended members</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">Oct 1</span></div></div></div>
+        <div class="task-item" id="t42" onclick="toggle('t42')"><div class="task-cb" id="cb-t42"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Send suspension notification email to all affected members. Include: what has changed, the 12-month reinstatement window, reinstatement fee (dues + $30), and steps to reinstate.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Oct 2</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- SECTION 7: PHASE 6 ONGOING OPERATIONS -->
+    <div class="section" id="sec-phase6">
+      <div class="sec-eyebrow">Section 7 of 9 &mdash; Phase 6</div>
+      <div class="sec-title">Ongoing <span>Operations</span></div>
+      <div class="gbar"></div>
+      <div class="sec-sub">October 2026 onwards &middot; Goal: Sustain the CDIP program with continuous CPE processing, quarterly member engagement, registry maintenance, and annual cycle preparation.</div>
+
+      <div class="task-group">
+        <div class="task-group-title">Registry Maintenance</div>
+        <div class="task-item" id="t43" onclick="toggle('t43')"><div class="task-cb" id="cb-t43"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Update the CDIP Registry monthly: add newly renewed or reinstated members, remove members whose status has changed to suspended or lapsed</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">Monthly</span></div></div></div>
+        <div class="task-item" id="t44" onclick="toggle('t44')"><div class="task-cb" id="cb-t44"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Conduct quarterly reinstatement outreach to all currently suspended members (within their 12-month reinstatement window). Include current reinstatement fee and steps.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Quarterly</span></div></div></div>
+      </div>
+
+      <div class="task-group">
+        <div class="task-group-title">Member Engagement and CPE</div>
+        <div class="task-item" id="t45" onclick="toggle('t45')"><div class="task-cb" id="cb-t45"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Process CPE submissions on a rolling basis: verify eligibility against the CPE Policy, approve or reject with written reason, and update the member's CPE total in the system</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Ongoing</span><span class="badge badge-note">20 hrs/year required</span></div></div></div>
+        <div class="task-item" id="t46" onclick="toggle('t46')"><div class="task-cb" id="cb-t46"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Host quarterly CPE-eligible webinars (1 CPE hour per webinar). Upload recording to the e-Learning Portal within 48 hours of the live session.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Quarterly</span></div></div></div>
+        <div class="task-item" id="t47" onclick="toggle('t47')"><div class="task-cb" id="cb-t47"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Send quarterly CPE progress reminders to members whose logged hours are below the 20-hour annual requirement. Include current total, remaining hours needed, and eligible activity suggestions.</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">Quarterly</span></div></div></div>
+      </div>
+
+      <div class="task-group">
+        <div class="task-group-title">Annual CPE Audit</div>
+        <div class="task-item" id="t48" onclick="toggle('t48')"><div class="task-cb" id="cb-t48"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Select a random sample of members annually for CPE audit. Issue written audit notice requiring supporting documentation (certificates, attendance records, self-study logs) within 30 days.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Annually</span><span class="badge badge-note">30-day response window</span></div></div></div>
+        <div class="task-item" id="t49" onclick="toggle('t49')"><div class="task-cb" id="cb-t49"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Review submitted audit documentation. Approve compliant members; escalate non-compliant cases to VIFM leadership for action.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Within 30 days of audit</span></div></div></div>
+        <div class="task-item" id="t50" onclick="toggle('t50')"><div class="task-cb" id="cb-t50"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Conduct annual program review in June: assess CPE Policy, FAQ, fee schedule, and operational processes. Publish any updated versions on the website and notify all active members of changes.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Jun annually</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- SECTION 8: ANNUAL CYCLE -->
+    <div class="section" id="sec-phase7">
+      <div class="sec-eyebrow">Section 8 of 9 &mdash; Annual Cycle</div>
+      <div class="sec-title">Annual Cycle <span>(Year 2+)</span></div>
+      <div class="gbar"></div>
+      <div class="sec-sub">Repeating cycle beginning May each year &middot; Standard renewal rate: $70 USD for all members. The Founding Member discounted rate of $50 USD applied to Year 1 (2026) only.</div>
+
+      <div class="info-box">From Year 2 onwards, all members &mdash; including Founding Members &mdash; renew at the standard annual rate of $70 USD. The Founding Member designation and benefits (badge, registry recognition) remain active as long as membership is maintained. Repeat Phases 3, 4, and 5 each year.</div>
+
+      <div class="task-group">
+        <div class="task-group-title">Pre-Campaign Preparation (May Each Year)</div>
+        <div class="task-item" id="t51" onclick="toggle('t51')"><div class="task-cb" id="cb-t51"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Review and confirm fees, CPE requirements, and any policy changes for the upcoming renewal year. Obtain VIFM leadership sign-off before communicating to members.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">May annually</span></div></div></div>
+        <div class="task-item" id="t52" onclick="toggle('t52')"><div class="task-cb" id="cb-t52"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Update all email templates and renewal portal content to reflect the current renewal year fees, dates, and any policy changes</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">May annually</span></div></div></div>
+        <div class="task-item" id="t53" onclick="toggle('t53')"><div class="task-cb" id="cb-t53"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Verify and clean the member database: confirm all active members, resolve any pending status issues, and archive lapsed records older than 12 months</div><div class="task-meta"><span class="badge badge-ops">Operations</span><span class="badge badge-date">May annually</span></div></div></div>
+        <div class="task-item" id="t54" onclick="toggle('t54')"><div class="task-cb" id="cb-t54"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Launch the annual renewal campaign: send renewal announcement to all active members and execute the 90/60/30/14-day reminder sequence leading to the July 1 deadline</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Jun &ndash; Jul 1 deadline</span></div></div></div>
+        <div class="task-item" id="t55" onclick="toggle('t55')"><div class="task-cb" id="cb-t55"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">After renewal deadline: execute Phases 4 and 5 (fulfillment, grace period, and suspension processing) as documented in Sections 5 and 6 of this SOP</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-ops">Operations</span><span class="badge badge-date">Jul &ndash; Oct annually</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- SECTION 9: CPE ADMINISTRATION -->
+    <div class="section" id="sec-cpe">
+      <div class="sec-eyebrow">Section 9 of 9 &mdash; CPE Administration</div>
+      <div class="sec-title">CPE <span>Administration</span></div>
+      <div class="gbar"></div>
+      <div class="sec-sub">Ongoing &middot; Standard procedures for receiving, verifying, approving, and auditing continuing professional education submissions from all active CDIP members.</div>
+
+      <div class="info-box">All active CDIP members must complete 20 CPE hours per renewal year (July 1 &ndash; June 30). Members are responsible for submitting their hours and retaining documentation for a minimum of 2 years. VIFM reserves the right to audit any member's CPE records at any time.</div>
+
+      <table class="cpe-table">
+        <thead>
+          <tr><th>Activity Type</th><th>Credit Rate</th><th>Annual Maximum</th><th>Documentation Required</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>VIFM Training Courses</td><td>1 hr per training hr</td><td>Unlimited</td><td>Certificate of completion</td></tr>
+          <tr><td>VIFM Webinars</td><td>1 hr per webinar hr</td><td>Unlimited</td><td>Attendance record</td></tr>
+          <tr><td>External Conferences</td><td>1 hr per session hr</td><td>10 hours</td><td>Attendance certificate or registration confirmation</td></tr>
+          <tr><td>Self-Study</td><td>1 hr per study hr</td><td>5 hours</td><td>Brief written description of activity</td></tr>
+        </tbody>
+      </table>
+
+      <div class="task-group">
+        <div class="task-group-title">CPE Submission Processing Procedure</div>
+        <div class="task-item" id="t56" onclick="toggle('t56')"><div class="task-cb" id="cb-t56"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Step 1 &mdash; Receive CPE submission via the online form or email. Confirm all required fields are present: activity type, hours claimed, activity date, provider name, and supporting documentation.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span></div></div></div>
+        <div class="task-item" id="t57" onclick="toggle('t57')"><div class="task-cb" id="cb-t57"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Step 2 &mdash; Verify eligibility: confirm the activity qualifies under the CPE Policy, check that the annual maximum for that activity type has not been exceeded, and confirm the activity falls within the current CPE year.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span></div></div></div>
+        <div class="task-item" id="t58" onclick="toggle('t58')"><div class="task-cb" id="cb-t58"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Step 3a &mdash; If approved: update the member's CPE total in the system and send an approval confirmation email with the new running total and remaining hours needed.</div><div class="task-meta"><span class="badge badge-ops">Operations</span></div></div></div>
+        <div class="task-item" id="t59" onclick="toggle('t59')"><div class="task-cb" id="cb-t59"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Step 3b &mdash; If rejected: send a rejection email with a clear reason and specific guidance on how to resubmit. Do not update the CPE total.</div><div class="task-meta"><span class="badge badge-ops">Operations</span></div></div></div>
+      </div>
+
+      <div class="task-group">
+        <div class="task-group-title">Documentation and Audit Procedure</div>
+        <div class="task-item" id="t60" onclick="toggle('t60')"><div class="task-cb" id="cb-t60"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Communicate the documentation retention requirement to all members annually: all CPE records must be retained for a minimum of 2 years (certificates, attendance records, self-study logs).</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span></div></div></div>
+        <div class="task-item" id="t61" onclick="toggle('t61')"><div class="task-cb" id="cb-t61"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Select annual audit sample (random). Issue written audit notice to selected members requiring documentation submission within 30 days. Log audit initiation date.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Annually</span></div></div></div>
+        <div class="task-item" id="t62" onclick="toggle('t62')"><div class="task-cb" id="cb-t62"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-body"><div class="task-text">Review all submitted audit documentation against logged CPE totals. Approve compliant submissions; escalate non-compliant or missing documentation cases to VIFM leadership for a determination within 14 days.</div><div class="task-meta"><span class="badge badge-vifm">VIFM</span><span class="badge badge-date">Within 30 days of audit request</span></div></div></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  function show(id, el) {
+    document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('visible'); });
+    document.getElementById('sec-' + id).classList.add('visible');
+    document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+    el.classList.add('active');
+    document.querySelector('.main').scrollTop = 0;
+  }
+  function toggle(id) {
+    var item = document.getElementById(id);
+    var cb = document.getElementById('cb-' + id);
+    cb.clas

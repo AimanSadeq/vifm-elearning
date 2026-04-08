@@ -101,35 +101,7 @@ export async function POST(request: NextRequest) {
         })
         .eq("id", holderId);
 
-      // 5. Send renewal confirmation email
-      try {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("email, full_name")
-          .eq("id", userId)
-          .single();
-
-        if (profile?.email) {
-          await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/email/send`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              to: profile.email,
-              template: "designation-renewal-confirmation",
-              data: {
-                name: profile.full_name,
-                memberNumber: metadata.member_number,
-                amount: totalAmount,
-                periodStart: newStart.toISOString(),
-                periodEnd: newEnd.toISOString(),
-              },
-            }),
-          });
-        }
-      } catch (emailErr) {
-        // Log but don't fail the webhook
-        console.error("Renewal confirmation email failed:", emailErr);
-      }
+      // 5. Email notification handled by Operations outside the portal
 
       console.log(`Renewal completed for holder ${holderId}`);
     } catch (dbError: unknown) {

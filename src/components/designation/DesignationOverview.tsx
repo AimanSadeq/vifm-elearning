@@ -37,8 +37,8 @@ export function DesignationOverview({
     },
     {
       icon: Clock,
-      labelEn: `${cpeHours} CPE Hours / ${cpeCycleYears} Years`,
-      labelAr: `${cpeHours} ساعة CPE / ${cpeCycleYears} سنوات`,
+      labelEn: `${cpeHours} CPE Hours / ${cpeCycleYears === 1 ? "Year" : `${cpeCycleYears} Years`}`,
+      labelAr: `${cpeHours} ساعة CPE / ${cpeCycleYears === 1 ? "سنة" : `${cpeCycleYears} سنوات`}`,
     },
   ];
 

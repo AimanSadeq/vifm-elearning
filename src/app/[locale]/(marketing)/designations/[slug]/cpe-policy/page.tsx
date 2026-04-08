@@ -151,7 +151,7 @@ export default function DesignationCPEPolicyPage() {
           <p className="text-sm text-muted-foreground leading-relaxed">
             {locale === "ar"
               ? `يجب على جميع حاملي شهادة ${d.abbreviation} النشطين إكمال ${cpeHours} ساعة من التعليم المهني المستمر (CPE) كل ${cpeCycleYears} سنوات (دورة التجديد: ${renewalMonthLabel}) للحفاظ على شهادتهم النشطة. يضمن برنامج CPE أن يظل المحترفون المعتمدون على اطلاع بأحدث التطورات في مجال تخصصهم.`
-              : `All active ${d.abbreviation} holders must complete ${cpeHours} hours of Continuing Professional Education (CPE) every ${cpeCycleYears} years (renewal cycle: ${renewalMonthLabel}) to maintain active certification. The CPE program ensures certified professionals stay current with evolving practices in their field.`}
+              : `All active ${d.abbreviation} holders must complete ${cpeHours} hours of Continuing Professional Education (CPE) ${cpeCycleYears === 1 ? "every year" : `every ${cpeCycleYears} years`} (renewal cycle: ${renewalMonthLabel}) to maintain active certification. The CPE program ensures certified professionals stay current with evolving practices in their field.`}
           </p>
         </CardContent>
       </Card>
@@ -237,8 +237,8 @@ export default function DesignationCPEPolicyPage() {
               <p className="text-2xl font-bold text-success">{cpeHours}</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {locale === "ar"
-                  ? `ساعات CPE / ${cpeCycleYears} سنوات`
-                  : `CPE Hours / ${cpeCycleYears} Years`}
+                  ? `ساعات CPE / ${cpeCycleYears === 1 ? "سنة" : `${cpeCycleYears} سنوات`}`
+                  : `CPE Hours / ${cpeCycleYears === 1 ? "Year" : `${cpeCycleYears} Years`}`}
               </p>
             </div>
           </div>
