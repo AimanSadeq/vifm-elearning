@@ -115,7 +115,7 @@ export default function AdminBadgesPage() {
       header: "",
       render: (item) =>
         item.icon_url ? (
-{/* eslint-disable-next-line @next/next/no-img-element */}
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={item.icon_url}
             alt={item.name}

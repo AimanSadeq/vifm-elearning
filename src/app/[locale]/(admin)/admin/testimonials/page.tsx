@@ -163,7 +163,7 @@ export default function AdminTestimonialsPage() {
       render: (item) => (
         <div className="flex items-center gap-3">
           {item.avatar_url ? (
-{/* eslint-disable-next-line @next/next/no-img-element */}
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={item.avatar_url}
               alt={item.name}
