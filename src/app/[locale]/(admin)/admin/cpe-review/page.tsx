@@ -44,6 +44,7 @@ export default function AdminCpeReviewPage() {
 
   useEffect(() => {
     fetchSubmissions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter]);
 
   async function fetchSubmissions() {

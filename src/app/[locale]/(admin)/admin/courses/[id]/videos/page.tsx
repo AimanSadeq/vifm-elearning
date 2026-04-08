@@ -13,14 +13,12 @@ import {
   Video,
   ChevronDown,
   ChevronRight,
-  ExternalLink,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
-import { cn } from "@/lib/utils/cn";
 import { toast, Toaster } from "sonner";
 import type { Module, Lesson, Course } from "@/types";
 
@@ -46,7 +44,7 @@ function LessonRow({
   onVideoUpdated: () => void;
 }) {
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [, setUploadProgress] = useState(0);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [externalUrl, setExternalUrl] = useState("");
   const [isSavingUrl, setIsSavingUrl] = useState(false);
@@ -464,6 +462,7 @@ export default function BulkVideosPage() {
 
   useEffect(() => {
     if (courseId) fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
 
   if (isLoading) {

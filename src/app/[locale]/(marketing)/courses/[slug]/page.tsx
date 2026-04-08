@@ -80,7 +80,8 @@ export default function CourseDetailPage() {
     }
 
     if (slug) fetchCourseDetail();
-  }, [slug]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug, isAdmin]);
 
   if (isLoading) {
     return (

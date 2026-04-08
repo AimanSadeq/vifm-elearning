@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import Link from "next/link";
 import {
@@ -11,7 +11,6 @@ import {
   Clock,
   XCircle,
   Filter,
-  Download,
   ArrowLeft,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";

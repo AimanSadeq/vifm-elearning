@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
-import { RefreshCw, Shield, CheckCircle2, AlertTriangle, CreditCard, ArrowLeft } from "lucide-react";
+import { Shield, CheckCircle2, AlertTriangle, CreditCard, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
-import { formatDate } from "@/lib/utils/formatters";
 
 interface RenewalData {
   holderId: string;
@@ -160,7 +159,7 @@ export default function RenewalPage() {
     );
   }
 
-  const alreadyRenewed = renewalData.status === "active" && renewalData.currentPeriodEnd &&
+  const _alreadyRenewed = renewalData.status === "active" && renewalData.currentPeriodEnd &&
     new Date(renewalData.currentPeriodEnd).getTime() > Date.now() + (180 * 24 * 60 * 60 * 1000);
 
   return (

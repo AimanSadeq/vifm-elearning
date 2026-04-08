@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { SearchBar } from "@/components/shared/SearchBar";
 import { useDebounce } from "@/lib/hooks/useDebounce";
-import { formatCurrency, formatRelativeDate } from "@/lib/utils/formatters";
+import { formatCurrency } from "@/lib/utils/formatters";
 import type { Course } from "@/types";
 
 export default function AdminCoursesPage() {

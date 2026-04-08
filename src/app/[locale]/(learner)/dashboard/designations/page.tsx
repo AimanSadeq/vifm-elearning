@@ -16,14 +16,12 @@ import {
   XCircle,
   Plus,
   BarChart3,
-  BookOpen,
   Video,
   Calendar,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { formatDate } from "@/lib/utils/formatters";
@@ -217,7 +215,6 @@ export default function DesignationDashboardPage() {
     : null;
 
   const isGracePeriod = holder.status === "grace_period";
-  const isSuspended = holder.status === "suspended";
   const isActive = holder.status === "active";
 
   const tierName =

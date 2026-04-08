@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import Link from "next/link";
-import { FileText, Download, Lock, ArrowLeft, BookOpen } from "lucide-react";
+import { Download, Lock, ArrowLeft, BookOpen } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 
@@ -131,7 +131,7 @@ export default function DocumentsPage() {
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
-          {documents.map((doc, index) => {
+          {documents.map((doc) => {
             const title = locale === "ar" && doc.title_ar ? doc.title_ar : doc.title;
             const desc = locale === "ar" && doc.description_ar ? doc.description_ar : doc.description;
             const isDownloading = downloading === doc.id;
