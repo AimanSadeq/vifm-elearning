@@ -429,7 +429,6 @@ async function transferCourses() {
                 category_id: categoryId,
                 instructor_id: instructorId,
                 status: "draft",  // Start as draft, publish after review
-                level: "beginner",
                 price: 0,
                 currency: "USD",
                 is_free: true,     // Set pricing manually later
@@ -534,16 +533,16 @@ async function transferModulesForCourse(thinkificCourseId, supabaseCourseId) {
                 .from("lessons")
                 .insert({
                     module_id: moduleId,
+                    course_id: supabaseCourseId,
                     title: content.name || `Lesson ${content.thinkific_id}`,
-                    content_type: contentType,
                     sort_order: content.position || 0,
-                    duration_minutes: 0,
                     is_preview: content.is_free || false,
-                    content_url: content.video_url || null,
                     metadata: {
                         thinkific_id: content.thinkific_id,
                         thinkific_type: content.contentable_type,
                         thinkific_take_url: content.take_url,
+                        content_type: contentType,
+                        content_url: content.video_url || null,
                         migrated_at: new Date().toISOString(),
                     },
                 })
@@ -636,8 +635,12 @@ async function transferEnrollments() {
             status,
             enrolled_at: enr.thinkific_created_at || new Date().toISOString(),
             completed_at: enr.completed_at || null,
-            expires_at: enr.expiry_date || null,
-            progress: enr.percentage_completed || 0,
+            metadata: {
+                thinkific_id: enr.thinkific_id,
+                expires_at: enr.expiry_date || null,
+                progress_percentage: enr.percentage_completed || 0,
+                migrated_at: new Date().toISOString(),
+            },
         });
 
         if (error) {
@@ -720,7 +723,7 @@ async function transferOrders() {
             amount,
             currency: "USD",
             status: paymentStatus,
-            method: "stripe",  // Thinkific uses Stripe
+            payment_method: "stripe",
             discount_amount: 0,
             paid_at: paymentStatus === "completed" ? (order.thinkific_created_at || new Date().toISOString()) : null,
             metadata: {
@@ -969,6 +972,8 @@ async function main() {
                 await transferUsers();
                 break;
             case "--courses":
+                await buildIdMaps();
+                await transferCategories();
                 await transferCourses();
                 break;
             case "--enrollments":
