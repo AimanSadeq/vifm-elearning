@@ -1,0 +1,6 @@
+[     450ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/hot-reloader/app/hot-reloader-app.js:196
+[    1095ms] [LOG] [Fast Refresh] done in 645ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/report-hmr-latency.js:13
+[    2139ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:25630
+[   28871ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://guvjbtepgeivfrjdhldx.supabase.co/rest/v1/badges?select=*&order=created_at.desc:0
+[   82379ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://guvjbtepgeivfrjdhldx.supabase.co/rest/v1/badges:0
+[   83441ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://guvjbtepgeivfrjdhldx.supabase.co/rest/v1/badges?select=*&order=created_at.desc:0

@@ -1,0 +1,265 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "VIFM - Virginia Institute of Finance and Management":
+          - /url: /en
+          - img "VIFM - Virginia Institute of Finance and Management"
+        - navigation [ref=e7]:
+          - link "Home" [ref=e9] [cursor=pointer]:
+            - /url: /en
+            - text: Home
+            - img [ref=e10]
+          - link "Courses" [ref=e13] [cursor=pointer]:
+            - /url: /en/courses
+            - text: Courses
+            - img [ref=e14]
+          - link "Certifications" [ref=e17] [cursor=pointer]:
+            - /url: /en/designations
+            - text: Certifications
+            - img [ref=e18]
+          - link "Webinars" [ref=e21] [cursor=pointer]:
+            - /url: /en/webinars
+            - text: Webinars
+            - img [ref=e22]
+          - link "Pricing" [ref=e24] [cursor=pointer]:
+            - /url: /en/pricing
+          - link "About" [ref=e25] [cursor=pointer]:
+            - /url: /en/about
+          - link "Contact" [ref=e26] [cursor=pointer]:
+            - /url: /en/contact
+        - generic [ref=e27]:
+          - link "Admin" [ref=e194] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e195]
+            - text: Admin
+          - button "Search" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+          - button "Switch to Arabic" [ref=e32] [cursor=pointer]:
+            - img [ref=e33]
+            - generic [ref=e36]: العربية
+          - button "Notifications" [ref=e199] [cursor=pointer]:
+            - img [ref=e200]
+          - button "A Admin User" [ref=e204] [cursor=pointer]:
+            - generic [ref=e205]: A
+            - generic [ref=e206]: Admin User
+    - generic [ref=e37]:
+      - complementary [ref=e38]:
+        - button "Collapse" [ref=e40] [cursor=pointer]:
+          - img [ref=e41]
+          - generic [ref=e44]: Collapse
+        - navigation [ref=e45]:
+          - link "Dashboard" [ref=e46] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e47]
+            - generic [ref=e52]: Dashboard
+          - generic [ref=e53]:
+            - button "Catalog" [ref=e54] [cursor=pointer]:
+              - generic [ref=e55]:
+                - img [ref=e56]
+                - generic [ref=e60]: Catalog
+              - img [ref=e61]
+            - generic [ref=e63]:
+              - link "Courses" [ref=e64] [cursor=pointer]:
+                - /url: /en/admin/courses
+              - link "Certifications" [ref=e65] [cursor=pointer]:
+                - /url: /en/admin/certifications
+              - link "Webinars" [ref=e66] [cursor=pointer]:
+                - /url: /en/admin/webinars
+              - link "Categories" [ref=e67] [cursor=pointer]:
+                - /url: /en/admin/categories
+              - link "Learning Paths" [ref=e68] [cursor=pointer]:
+                - /url: /en/admin/learning-paths
+          - link "Manage Users" [ref=e69] [cursor=pointer]:
+            - /url: /en/admin/users
+            - img [ref=e70]
+            - generic [ref=e75]: Manage Users
+          - link "Manage Organizations" [ref=e76] [cursor=pointer]:
+            - /url: /en/admin/organizations
+            - img [ref=e77]
+            - generic [ref=e81]: Manage Organizations
+          - button "Manage Payments" [ref=e83] [cursor=pointer]:
+            - generic [ref=e84]:
+              - img [ref=e85]
+              - generic [ref=e87]: Manage Payments
+            - img [ref=e88]
+          - button "Manage Certificates" [ref=e91] [cursor=pointer]:
+            - generic [ref=e92]:
+              - img [ref=e93]
+              - generic [ref=e96]: Manage Certificates
+            - img [ref=e97]
+          - button "Analytics" [ref=e100] [cursor=pointer]:
+            - generic [ref=e101]:
+              - img [ref=e102]
+              - generic [ref=e104]: Analytics
+            - img [ref=e105]
+          - link "Badges" [ref=e107] [cursor=pointer]:
+            - /url: /en/admin/badges
+            - img [ref=e108]
+            - generic [ref=e114]: Badges
+          - link "Testimonials" [ref=e115] [cursor=pointer]:
+            - /url: /en/admin/testimonials
+            - img [ref=e116]
+            - generic [ref=e118]: Testimonials
+          - link "Notifications" [ref=e119] [cursor=pointer]:
+            - /url: /en/admin/notifications
+            - img [ref=e120]
+            - generic [ref=e123]: Notifications
+          - link "Settings" [ref=e124] [cursor=pointer]:
+            - /url: /en/admin/settings
+            - img [ref=e125]
+            - generic [ref=e128]: Settings
+      - main [ref=e129]:
+        - generic [ref=e130]:
+          - region "Notifications alt+T"
+          - generic [ref=e220]:
+            - generic [ref=e221]:
+              - generic [ref=e222]:
+                - link "Back to Courses" [ref=e223] [cursor=pointer]:
+                  - /url: /en/admin/courses
+                  - img [ref=e224]
+                  - text: Back to Courses
+                - button "? Shortcuts" [ref=e226] [cursor=pointer]:
+                  - generic [ref=e227]: "?"
+                  - generic [ref=e228]: Shortcuts
+              - button "Save Changes" [ref=e324] [cursor=pointer]:
+                - img [ref=e325]
+                - text: Save Changes
+            - generic [ref=e229]:
+              - generic [ref=e232]:
+                - heading "Playwright Test Course" [level=1] [ref=e233]
+                - generic [ref=e234]: Draft
+              - generic [ref=e235]:
+                - generic [ref=e236]:
+                  - paragraph [ref=e237]: Modules
+                  - paragraph [ref=e238]: "0"
+                - generic [ref=e239]:
+                  - paragraph [ref=e240]: Lessons
+                  - paragraph [ref=e241]: "0"
+                - generic [ref=e242]:
+                  - paragraph [ref=e243]: Duration
+                  - paragraph [ref=e244]: N/A
+                - generic [ref=e245]:
+                  - paragraph [ref=e246]: Enrollments
+                  - paragraph [ref=e247]: "0"
+            - navigation "Course editor tabs" [ref=e249]:
+              - tab "Course Details" [selected] [ref=e250] [cursor=pointer]
+              - tab "Content (0)" [ref=e251] [cursor=pointer]
+              - tab "Quizzes" [ref=e252] [cursor=pointer]
+            - generic [ref=e266]:
+              - link "Manage Videos" [ref=e267] [cursor=pointer]:
+                - /url: /en/admin/courses/21efdef1-1ae6-46db-bb85-7dc66e1e8b9f/videos
+                - img [ref=e268]
+                - text: Manage Videos
+              - generic [ref=e271]:
+                - heading "Course Thumbnail" [level=2] [ref=e272]
+                - generic [ref=e273]:
+                  - generic [ref=e276]:
+                    - img [ref=e277]
+                    - paragraph [ref=e281]: No thumbnail
+                  - generic [ref=e282]:
+                    - generic [ref=e283] [cursor=pointer]:
+                      - img [ref=e284]
+                      - text: Upload Image
+                    - paragraph [ref=e287]: "Recommended: 16:9 ratio, max 5MB. JPG, PNG, or WebP."
+              - generic [ref=e288]:
+                - generic [ref=e289]:
+                  - heading "Course Information" [level=2] [ref=e290]
+                  - button "Cancel" [ref=e329] [cursor=pointer]:
+                    - img [ref=e292]
+                    - text: Cancel
+                - generic [ref=e330]:
+                  - generic [ref=e331]:
+                    - generic [ref=e332]: Title (EN) *
+                    - textbox [ref=e333]: Playwright Test Course
+                  - generic [ref=e334]:
+                    - generic [ref=e335]: Title (AR)
+                    - textbox [ref=e336]
+                  - generic [ref=e337]:
+                    - generic [ref=e338]: Description (EN)
+                    - textbox [ref=e339]
+                  - generic [ref=e340]:
+                    - generic [ref=e341]: Description (AR)
+                    - textbox [ref=e342]
+                  - generic [ref=e343]:
+                    - generic [ref=e344]: Short Description (EN)
+                    - textbox [ref=e345]
+                  - generic [ref=e346]:
+                    - generic [ref=e347]: Short Description (AR)
+                    - textbox [ref=e348]
+                  - generic [ref=e349]:
+                    - generic [ref=e350]: Category *
+                    - combobox [ref=e351]:
+                      - option "Finance, Investment, Accounting, and Banking" [selected]
+                      - option "Data Analytics and AI"
+                      - option "Leadership, Strategy, and management."
+                      - option "ALL COURSES"
+                      - option "DATA ANALYTICS"
+                      - option "FINANCE"
+                      - option "Compliance & Risk Management"
+                      - option "FREE WEBINARS"
+                      - option "PROJECT MANAGEMENT"
+                      - option "General"
+                  - generic [ref=e352]:
+                    - generic [ref=e353]: Instructor
+                    - combobox [ref=e354]:
+                      - option "None" [selected]
+                      - option "Admin User"
+                      - option "Omar Zatara"
+                      - option "Farid Saadeh"
+                      - option "Mohamed Mufid Bazbazat"
+                      - option "Dr. Ibrahim Khanji"
+                      - option "Mouayyad Ghousheh"
+                      - option "Mahmoud Elaiwat"
+                      - option "Ammar Qaddoura"
+                      - option "Ahmad Ghosheh"
+                      - option "Instructor User"
+                      - option "Aiman Sadeq"
+                      - option "sarah.johnson"
+                      - option "mohammed.khalid"
+                      - option "Ahmad Rashid"
+                      - option "Najwa Zeidan"
+                  - generic [ref=e355]:
+                    - generic [ref=e356]: Difficulty Level
+                    - combobox [ref=e357]:
+                      - option "Beginner" [selected]
+                      - option "Intermediate"
+                      - option "Advanced"
+                      - option "Expert"
+                  - generic [ref=e358]:
+                    - generic [ref=e359]: Status
+                    - combobox [ref=e360]:
+                      - option "Draft" [selected]
+                      - option "Published"
+                      - option "Archived"
+                  - generic [ref=e361]:
+                    - generic [ref=e362]: Price
+                    - generic [ref=e363]:
+                      - spinbutton [ref=e364]: "0"
+                      - combobox [ref=e365]:
+                        - option "USD" [selected]
+                        - option "AED"
+                  - generic [ref=e366]:
+                    - generic [ref=e367]: Passing Score (%)
+                    - spinbutton [ref=e368]: "70"
+                  - generic [ref=e369]:
+                    - generic [ref=e370]:
+                      - checkbox "Free Course" [checked] [ref=e371]
+                      - text: Free Course
+                    - generic [ref=e372]:
+                      - checkbox "Featured" [ref=e373]
+                      - text: Featured
+                    - generic [ref=e374]:
+                      - checkbox "Certificate Enabled" [checked] [ref=e375]
+                      - text: Certificate Enabled
+                    - generic [ref=e376]:
+                      - checkbox "Sequential Locking" [ref=e377]
+                      - text: Sequential Locking
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e189] [cursor=pointer]:
+    - img [ref=e190]
+  - alert [ref=e193]
+  - button "🎓 Try Demo No Login" [ref=e208] [cursor=pointer]:
+    - generic [ref=e209]: 🎓
+    - generic [ref=e210]: Try Demo
+    - generic [ref=e211]: No Login

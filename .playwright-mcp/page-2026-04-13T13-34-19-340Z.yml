@@ -1,0 +1,95 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "VIFM - Virginia Institute of Finance and Management" [ref=e5] [cursor=pointer]:
+          - /url: /en
+          - img "VIFM - Virginia Institute of Finance and Management" [ref=e6]
+        - navigation [ref=e7]:
+          - link "Home" [ref=e9] [cursor=pointer]:
+            - /url: /en
+            - text: Home
+            - img [ref=e10]
+          - link "Courses" [ref=e13] [cursor=pointer]:
+            - /url: /en/courses
+            - text: Courses
+            - img [ref=e14]
+          - link "Certifications" [ref=e17] [cursor=pointer]:
+            - /url: /en/designations
+            - text: Certifications
+            - img [ref=e18]
+          - link "Webinars" [ref=e21] [cursor=pointer]:
+            - /url: /en/webinars
+            - text: Webinars
+            - img [ref=e22]
+          - link "Pricing" [ref=e24] [cursor=pointer]:
+            - /url: /en/pricing
+          - link "About" [ref=e25] [cursor=pointer]:
+            - /url: /en/about
+          - link "Contact" [ref=e26] [cursor=pointer]:
+            - /url: /en/contact
+        - generic [ref=e27]:
+          - button "Search" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+          - button "Switch to Arabic" [ref=e32] [cursor=pointer]:
+            - img [ref=e33]
+            - generic [ref=e36]: العربية
+    - generic [ref=e37]:
+      - complementary [ref=e38]:
+        - button "Collapse" [ref=e40] [cursor=pointer]:
+          - img [ref=e41]
+          - generic [ref=e44]: Collapse
+        - navigation [ref=e45]:
+          - link "Dashboard" [ref=e46] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e47]
+            - generic [ref=e52]: Dashboard
+          - button "Catalog" [ref=e54] [cursor=pointer]:
+            - generic [ref=e55]:
+              - img [ref=e56]
+              - generic [ref=e60]: Catalog
+            - img [ref=e61]
+          - link "Manage Users" [ref=e63] [cursor=pointer]:
+            - /url: /en/admin/users
+            - img [ref=e64]
+            - generic [ref=e69]: Manage Users
+          - link "Manage Organizations" [ref=e70] [cursor=pointer]:
+            - /url: /en/admin/organizations
+            - img [ref=e71]
+            - generic [ref=e75]: Manage Organizations
+          - button "Manage Payments" [ref=e77] [cursor=pointer]:
+            - generic [ref=e78]:
+              - img [ref=e79]
+              - generic [ref=e81]: Manage Payments
+            - img [ref=e82]
+          - button "Manage Certificates" [ref=e85] [cursor=pointer]:
+            - generic [ref=e86]:
+              - img [ref=e87]
+              - generic [ref=e90]: Manage Certificates
+            - img [ref=e91]
+          - button "Analytics" [ref=e94] [cursor=pointer]:
+            - generic [ref=e95]:
+              - img [ref=e96]
+              - generic [ref=e98]: Analytics
+            - img [ref=e99]
+          - link "Badges" [ref=e101] [cursor=pointer]:
+            - /url: /en/admin/badges
+            - img [ref=e102]
+            - generic [ref=e108]: Badges
+          - link "Testimonials" [ref=e109] [cursor=pointer]:
+            - /url: /en/admin/testimonials
+            - img [ref=e110]
+            - generic [ref=e112]: Testimonials
+          - link "Notifications" [ref=e113] [cursor=pointer]:
+            - /url: /en/admin/notifications
+            - img [ref=e114]
+            - generic [ref=e117]: Notifications
+          - link "Settings" [ref=e118] [cursor=pointer]:
+            - /url: /en/admin/settings
+            - img [ref=e119]
+            - generic [ref=e122]: Settings
+      - main [ref=e123]
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e132] [cursor=pointer]:
+    - img [ref=e133]
+  - alert [ref=e136]

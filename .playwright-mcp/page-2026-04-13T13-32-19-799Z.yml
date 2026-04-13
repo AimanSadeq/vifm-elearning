@@ -1,0 +1,220 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "VIFM - Virginia Institute of Finance and Management":
+          - /url: /en
+          - img "VIFM - Virginia Institute of Finance and Management"
+        - navigation [ref=e7]:
+          - link "Home" [ref=e9] [cursor=pointer]:
+            - /url: /en
+            - text: Home
+            - img [ref=e10]
+          - link "Courses" [ref=e13] [cursor=pointer]:
+            - /url: /en/courses
+            - text: Courses
+            - img [ref=e14]
+          - link "Certifications" [ref=e17] [cursor=pointer]:
+            - /url: /en/designations
+            - text: Certifications
+            - img [ref=e18]
+          - link "Webinars" [ref=e21] [cursor=pointer]:
+            - /url: /en/webinars
+            - text: Webinars
+            - img [ref=e22]
+          - link "Pricing" [ref=e24] [cursor=pointer]:
+            - /url: /en/pricing
+          - link "About" [ref=e25] [cursor=pointer]:
+            - /url: /en/about
+          - link "Contact" [ref=e26] [cursor=pointer]:
+            - /url: /en/contact
+        - generic [ref=e27]:
+          - link "Admin" [ref=e155] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e156]
+            - text: Admin
+          - button "Search" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+          - button "Switch to Arabic" [ref=e32] [cursor=pointer]:
+            - img [ref=e33]
+            - generic [ref=e36]: العربية
+          - button "Notifications" [ref=e160] [cursor=pointer]:
+            - img [ref=e161]
+          - button "A Admin User" [ref=e165] [cursor=pointer]:
+            - generic [ref=e166]: A
+            - generic [ref=e167]: Admin User
+    - generic [ref=e37]:
+      - complementary [ref=e38]:
+        - button "Collapse" [ref=e40] [cursor=pointer]:
+          - img [ref=e41]
+          - generic [ref=e44]: Collapse
+        - navigation [ref=e45]:
+          - link "Dashboard" [ref=e46] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e47]
+            - generic [ref=e52]: Dashboard
+          - generic [ref=e53]:
+            - button "Catalog" [ref=e54] [cursor=pointer]:
+              - generic [ref=e55]:
+                - img [ref=e56]
+                - generic [ref=e60]: Catalog
+              - img [ref=e61]
+            - generic [ref=e63]:
+              - link "Courses" [ref=e64] [cursor=pointer]:
+                - /url: /en/admin/courses
+              - link "Certifications" [ref=e65] [cursor=pointer]:
+                - /url: /en/admin/certifications
+              - link "Webinars" [ref=e66] [cursor=pointer]:
+                - /url: /en/admin/webinars
+              - link "Categories" [ref=e67] [cursor=pointer]:
+                - /url: /en/admin/categories
+              - link "Learning Paths" [ref=e68] [cursor=pointer]:
+                - /url: /en/admin/learning-paths
+          - link "Manage Users" [ref=e69] [cursor=pointer]:
+            - /url: /en/admin/users
+            - img [ref=e70]
+            - generic [ref=e75]: Manage Users
+          - link "Manage Organizations" [ref=e76] [cursor=pointer]:
+            - /url: /en/admin/organizations
+            - img [ref=e77]
+            - generic [ref=e81]: Manage Organizations
+          - button "Manage Payments" [ref=e83] [cursor=pointer]:
+            - generic [ref=e84]:
+              - img [ref=e85]
+              - generic [ref=e87]: Manage Payments
+            - img [ref=e88]
+          - button "Manage Certificates" [ref=e91] [cursor=pointer]:
+            - generic [ref=e92]:
+              - img [ref=e93]
+              - generic [ref=e96]: Manage Certificates
+            - img [ref=e97]
+          - button "Analytics" [ref=e100] [cursor=pointer]:
+            - generic [ref=e101]:
+              - img [ref=e102]
+              - generic [ref=e104]: Analytics
+            - img [ref=e105]
+          - link "Badges" [ref=e107] [cursor=pointer]:
+            - /url: /en/admin/badges
+            - img [ref=e108]
+            - generic [ref=e114]: Badges
+          - link "Testimonials" [ref=e115] [cursor=pointer]:
+            - /url: /en/admin/testimonials
+            - img [ref=e116]
+            - generic [ref=e118]: Testimonials
+          - link "Notifications" [ref=e119] [cursor=pointer]:
+            - /url: /en/admin/notifications
+            - img [ref=e120]
+            - generic [ref=e123]: Notifications
+          - link "Settings" [ref=e124] [cursor=pointer]:
+            - /url: /en/admin/settings
+            - img [ref=e125]
+            - generic [ref=e128]: Settings
+      - main [ref=e129]:
+        - generic [ref=e131]:
+          - generic [ref=e132]:
+            - heading "Learning Paths" [level=1] [ref=e133]
+            - button "Create Learning Path" [ref=e134] [cursor=pointer]:
+              - img [ref=e135]
+              - text: Create Learning Path
+          - generic [ref=e206]:
+            - heading "Create Learning Path" [level=3] [ref=e208]
+            - generic [ref=e210]:
+              - generic [ref=e211]:
+                - generic [ref=e212]:
+                  - text: Title (English)
+                  - textbox "Title (English)" [ref=e213]:
+                    - /placeholder: e.g. Full Stack Development
+                - generic [ref=e214]:
+                  - text: Title (Arabic)
+                  - textbox "Title (Arabic)" [ref=e215]:
+                    - /placeholder: العنوان بالعربية
+              - generic [ref=e216]:
+                - generic [ref=e217]:
+                  - text: Description (English)
+                  - textbox "Description (English)" [ref=e218]:
+                    - /placeholder: Describe this learning path...
+                - generic [ref=e219]:
+                  - text: Description (Arabic)
+                  - textbox "Description (Arabic)" [ref=e220]:
+                    - /placeholder: الوصف بالعربية
+              - generic [ref=e221]:
+                - generic [ref=e222]:
+                  - text: Difficulty Level
+                  - combobox "Difficulty Level" [ref=e223]:
+                    - option "Beginner" [selected]
+                    - option "Intermediate"
+                    - option "Advanced"
+                    - option "Expert"
+                - generic [ref=e224]:
+                  - text: Category
+                  - combobox "Category" [ref=e225]:
+                    - option "No Category" [selected]
+                    - option "ALL COURSES"
+                    - option "Compliance & Risk Management"
+                    - option "DATA ANALYTICS"
+                    - option "Data Analytics and AI"
+                    - option "FINANCE"
+                    - option "Finance, Investment, Accounting, and Banking"
+                    - option "FREE WEBINARS"
+                    - option "General"
+                    - option "Leadership, Strategy, and management."
+                    - option "PROJECT MANAGEMENT"
+                - generic [ref=e226]:
+                  - text: Estimated Hours
+                  - spinbutton "Estimated Hours" [ref=e227]: "0"
+              - generic [ref=e228]:
+                - generic [ref=e229]:
+                  - text: Sort Order
+                  - spinbutton "Sort Order" [ref=e230]: "0"
+                - generic [ref=e231]:
+                  - checkbox "Published" [ref=e232]
+                  - generic [ref=e233]: Published
+                - generic [ref=e234]:
+                  - checkbox "Featured" [ref=e235]
+                  - generic [ref=e236]: Featured
+              - generic [ref=e237]:
+                - generic [ref=e238]:
+                  - generic [ref=e239]: Courses in this Path
+                  - button "Add Course" [ref=e240] [cursor=pointer]:
+                    - img [ref=e241]
+                    - text: Add Course
+                - paragraph [ref=e242]: No courses added yet. Click "Add Course" to begin.
+              - generic [ref=e243]:
+                - button "Cancel" [ref=e244] [cursor=pointer]
+                - button "Create Learning Path" [ref=e245] [cursor=pointer]
+          - table [ref=e168]:
+            - rowgroup [ref=e169]:
+              - row "Title Category Difficulty Courses Enrollments Status" [ref=e170]:
+                - columnheader "Title" [ref=e171]
+                - columnheader "Category" [ref=e172]
+                - columnheader "Difficulty" [ref=e173]
+                - columnheader "Courses" [ref=e174]
+                - columnheader "Enrollments" [ref=e175]
+                - columnheader "Status" [ref=e176]
+                - columnheader [ref=e177]
+            - rowgroup [ref=e178]:
+              - row "Data Analysis MBA — Intermediate 3 0 Draft Publish" [ref=e179]:
+                - cell "Data Analysis MBA" [ref=e180]:
+                  - generic [ref=e181]: Data Analysis MBA
+                - cell "—" [ref=e182]
+                - cell "Intermediate" [ref=e183]:
+                  - generic [ref=e184]: Intermediate
+                - cell "3" [ref=e185]
+                - cell "0" [ref=e186]
+                - cell "Draft" [ref=e187]:
+                  - generic [ref=e189]: Draft
+                - cell "Publish" [ref=e190]:
+                  - generic [ref=e191]:
+                    - button [ref=e192] [cursor=pointer]:
+                      - img [ref=e193]
+                    - button "Publish" [ref=e196] [cursor=pointer]
+                    - button [ref=e197] [cursor=pointer]:
+                      - img [ref=e198]
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e150] [cursor=pointer]:
+    - img [ref=e151]
+  - alert [ref=e154]
+  - button "🎓 Try Demo No Login" [ref=e202] [cursor=pointer]:
+    - generic [ref=e203]: 🎓
+    - generic [ref=e204]: Try Demo
+    - generic [ref=e205]: No Login

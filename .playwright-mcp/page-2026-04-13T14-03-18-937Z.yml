@@ -1,0 +1,27 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - link "VIFM Academy" [ref=e7] [cursor=pointer]:
+        - /url: /en
+      - heading "Welcome Back" [level=1] [ref=e8]
+      - paragraph [ref=e9]: Sign in to continue your learning journey
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - text: Email Address
+        - textbox "Email Address" [ref=e12]:
+          - /placeholder: name@example.com
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - generic [ref=e15]: Password
+          - link "Forgot Password?" [ref=e16] [cursor=pointer]:
+            - /url: /en/forgot-password
+        - generic [ref=e17]:
+          - textbox "Password" [ref=e18]
+          - button [ref=e19] [cursor=pointer]:
+            - img [ref=e20]
+      - button "Sign In" [ref=e23] [cursor=pointer]
+    - paragraph [ref=e24]:
+      - text: Don't have an account?
+      - link "Sign Up" [ref=e25] [cursor=pointer]:
+        - /url: /en/register
+  - alert [ref=e26]

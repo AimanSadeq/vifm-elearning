@@ -1,0 +1,35 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - link "VIFM Academy" [ref=e7] [cursor=pointer]:
+        - /url: /en
+      - heading "Welcome Back" [level=1] [ref=e8]
+      - paragraph [ref=e9]: Sign in to continue your learning journey
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - text: Email Address
+        - textbox "Email Address" [ref=e12]:
+          - /placeholder: name@example.com
+          - text: admin@vifm.org
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - generic [ref=e15]: Password
+          - link "Forgot Password?" [ref=e16] [cursor=pointer]:
+            - /url: /en/forgot-password
+        - generic [ref=e17]:
+          - textbox "Password" [ref=e18]: Admin@2026!
+          - button [ref=e19] [cursor=pointer]:
+            - img [ref=e20]
+      - button [disabled]:
+        - img
+    - paragraph [ref=e24]:
+      - text: Don't have an account?
+      - link "Sign Up" [ref=e25] [cursor=pointer]:
+        - /url: /en/register
+  - button "Open Next.js Dev Tools" [ref=e32] [cursor=pointer]:
+    - img [ref=e33]
+  - alert [ref=e26]
+  - button "🎓 Try Demo No Login" [ref=e37] [cursor=pointer]:
+    - generic [ref=e38]: 🎓
+    - generic [ref=e39]: Try Demo
+    - generic [ref=e40]: No Login

@@ -1,0 +1,313 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "VIFM - Virginia Institute of Finance and Management":
+          - /url: /en
+          - img "VIFM - Virginia Institute of Finance and Management"
+        - navigation [ref=e5]:
+          - link "Home" [ref=e7] [cursor=pointer]:
+            - /url: /en
+            - text: Home
+            - img [ref=e8]
+          - link "Courses" [ref=e11] [cursor=pointer]:
+            - /url: /en/courses
+            - text: Courses
+            - img [ref=e12]
+          - link "Certifications" [ref=e15] [cursor=pointer]:
+            - /url: /en/designations
+            - text: Certifications
+            - img [ref=e16]
+          - link "Webinars" [ref=e19] [cursor=pointer]:
+            - /url: /en/webinars
+            - text: Webinars
+            - img [ref=e20]
+          - link "Pricing" [ref=e22] [cursor=pointer]:
+            - /url: /en/pricing
+          - link "About" [ref=e23] [cursor=pointer]:
+            - /url: /en/about
+          - link "Contact" [ref=e24] [cursor=pointer]:
+            - /url: /en/contact
+        - generic [ref=e25]:
+          - link "Admin" [ref=e26] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e27]
+            - text: Admin
+          - button "Search" [ref=e30] [cursor=pointer]:
+            - img [ref=e31]
+          - button "Switch to Arabic" [ref=e34] [cursor=pointer]:
+            - img [ref=e35]
+            - generic [ref=e38]: العربية
+          - button "Notifications" [ref=e40] [cursor=pointer]:
+            - img [ref=e41]
+          - button "A Admin User" [ref=e45] [cursor=pointer]:
+            - generic [ref=e46]: A
+            - generic [ref=e47]: Admin User
+    - generic [ref=e48]:
+      - complementary [ref=e49]:
+        - button "Collapse" [ref=e51] [cursor=pointer]:
+          - img [ref=e52]
+          - generic [ref=e55]: Collapse
+        - navigation [ref=e56]:
+          - link "Dashboard" [ref=e57] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e58]
+            - generic [ref=e63]: Dashboard
+          - button "Catalog" [ref=e65] [cursor=pointer]:
+            - generic [ref=e66]:
+              - img [ref=e67]
+              - generic [ref=e71]: Catalog
+            - img [ref=e72]
+          - link "Manage Users" [ref=e74] [cursor=pointer]:
+            - /url: /en/admin/users
+            - img [ref=e75]
+            - generic [ref=e80]: Manage Users
+          - link "Manage Organizations" [ref=e81] [cursor=pointer]:
+            - /url: /en/admin/organizations
+            - img [ref=e82]
+            - generic [ref=e86]: Manage Organizations
+          - button "Manage Payments" [ref=e88] [cursor=pointer]:
+            - generic [ref=e89]:
+              - img [ref=e90]
+              - generic [ref=e92]: Manage Payments
+            - img [ref=e93]
+          - button "Manage Certificates" [ref=e96] [cursor=pointer]:
+            - generic [ref=e97]:
+              - img [ref=e98]
+              - generic [ref=e101]: Manage Certificates
+            - img [ref=e102]
+          - button "Analytics" [ref=e105] [cursor=pointer]:
+            - generic [ref=e106]:
+              - img [ref=e107]
+              - generic [ref=e109]: Analytics
+            - img [ref=e110]
+          - link "Badges" [ref=e112] [cursor=pointer]:
+            - /url: /en/admin/badges
+            - img [ref=e113]
+            - generic [ref=e119]: Badges
+          - link "Testimonials" [ref=e120] [cursor=pointer]:
+            - /url: /en/admin/testimonials
+            - img [ref=e121]
+            - generic [ref=e123]: Testimonials
+          - link "Notifications" [ref=e124] [cursor=pointer]:
+            - /url: /en/admin/notifications
+            - img [ref=e125]
+            - generic [ref=e128]: Notifications
+          - link "Settings" [ref=e129] [cursor=pointer]:
+            - /url: /en/admin/settings
+            - img [ref=e130]
+            - generic [ref=e133]: Settings
+      - main [ref=e134]:
+        - generic [ref=e136]:
+          - heading "Admin Dashboard" [level=1] [ref=e137]
+          - generic [ref=e138]:
+            - generic [ref=e140]:
+              - img [ref=e142]
+              - generic [ref=e144]:
+                - paragraph [ref=e145]: $0.00
+                - paragraph [ref=e146]: Total Revenue
+            - generic [ref=e148]:
+              - img [ref=e150]
+              - generic [ref=e155]:
+                - paragraph [ref=e156]: 8,322
+                - paragraph [ref=e157]: Active Users
+            - generic [ref=e159]:
+              - img [ref=e161]
+              - generic [ref=e163]:
+                - paragraph [ref=e164]: 3,494
+                - paragraph [ref=e165]: Total Enrollments
+            - generic [ref=e167]:
+              - img [ref=e169]
+              - generic [ref=e172]:
+                - paragraph [ref=e173]: 20%
+                - paragraph [ref=e174]: Completion Rate
+          - generic [ref=e175]:
+            - link "Add Course" [ref=e176] [cursor=pointer]:
+              - /url: /en/admin/courses/new
+              - img [ref=e177]
+              - text: Add Course
+            - link "Manage Users" [ref=e179] [cursor=pointer]:
+              - /url: /en/admin/users
+              - img [ref=e180]
+              - text: Manage Users
+            - link "View Analytics" [ref=e185] [cursor=pointer]:
+              - /url: /en/admin/analytics
+              - img [ref=e186]
+              - text: View Analytics
+            - link "Webinars" [ref=e188] [cursor=pointer]:
+              - /url: /en/admin/webinars
+              - img [ref=e189]
+              - text: Webinars
+          - generic [ref=e192]:
+            - generic [ref=e193]:
+              - generic [ref=e194]:
+                - heading "Recent Enrollments" [level=3] [ref=e195]
+                - img [ref=e196]
+              - table [ref=e201]:
+                - rowgroup [ref=e202]:
+                  - row "User Course Status Date" [ref=e203]:
+                    - columnheader "User" [ref=e204]
+                    - columnheader "Course" [ref=e205]
+                    - columnheader "Status" [ref=e206]
+                    - columnheader "Date" [ref=e207]
+                - rowgroup [ref=e208]:
+                  - row "ahmed ALBASIRIY ahmedrx1100@gmail.com Certified Power BI Professional active about 1 month ago" [ref=e209]:
+                    - cell "ahmed ALBASIRIY ahmedrx1100@gmail.com" [ref=e210]:
+                      - generic [ref=e211]:
+                        - paragraph [ref=e212]: ahmed ALBASIRIY
+                        - paragraph [ref=e213]: ahmedrx1100@gmail.com
+                    - cell "Certified Power BI Professional" [ref=e214]
+                    - cell "active" [ref=e215]:
+                      - generic [ref=e216]: active
+                    - cell "about 1 month ago" [ref=e217]
+                  - row "Aiman Sadeq asadeq@viftraining.com Certified AI Powered Accountant active about 1 month ago" [ref=e218]:
+                    - cell "Aiman Sadeq asadeq@viftraining.com" [ref=e219]:
+                      - generic [ref=e220]:
+                        - paragraph [ref=e221]: Aiman Sadeq
+                        - paragraph [ref=e222]: asadeq@viftraining.com
+                    - cell "Certified AI Powered Accountant" [ref=e223]
+                    - cell "active" [ref=e224]:
+                      - generic [ref=e225]: active
+                    - cell "about 1 month ago" [ref=e226]
+                  - row "Aiman Sadeq asadeq@viftraining.com Certified AI Finance Leader (CAIFL) active about 1 month ago" [ref=e227]:
+                    - cell "Aiman Sadeq asadeq@viftraining.com" [ref=e228]:
+                      - generic [ref=e229]:
+                        - paragraph [ref=e230]: Aiman Sadeq
+                        - paragraph [ref=e231]: asadeq@viftraining.com
+                    - cell "Certified AI Finance Leader (CAIFL)" [ref=e232]
+                    - cell "active" [ref=e233]:
+                      - generic [ref=e234]: active
+                    - cell "about 1 month ago" [ref=e235]
+                  - row "Aiman Sadeq asadeq@gmail.com Data Visualization with Power BI active about 1 month ago" [ref=e236]:
+                    - cell "Aiman Sadeq asadeq@gmail.com" [ref=e237]:
+                      - generic [ref=e238]:
+                        - paragraph [ref=e239]: Aiman Sadeq
+                        - paragraph [ref=e240]: asadeq@gmail.com
+                    - cell "Data Visualization with Power BI" [ref=e241]
+                    - cell "active" [ref=e242]:
+                      - generic [ref=e243]: active
+                    - cell "about 1 month ago" [ref=e244]
+                  - row "Aiman Sadeq asadeq@viftraining.com Data Visualization with Power BI active about 1 month ago" [ref=e245]:
+                    - cell "Aiman Sadeq asadeq@viftraining.com" [ref=e246]:
+                      - generic [ref=e247]:
+                        - paragraph [ref=e248]: Aiman Sadeq
+                        - paragraph [ref=e249]: asadeq@viftraining.com
+                    - cell "Data Visualization with Power BI" [ref=e250]
+                    - cell "active" [ref=e251]:
+                      - generic [ref=e252]: active
+                    - cell "about 1 month ago" [ref=e253]
+                  - row "fatima.zahra fatima.zahra@dfg.ae Strategic Leadership in Financial Services active about 2 months ago" [ref=e254]:
+                    - cell "fatima.zahra fatima.zahra@dfg.ae" [ref=e255]:
+                      - generic [ref=e256]:
+                        - paragraph [ref=e257]: fatima.zahra
+                        - paragraph [ref=e258]: fatima.zahra@dfg.ae
+                    - cell "Strategic Leadership in Financial Services" [ref=e259]
+                    - cell "active" [ref=e260]:
+                      - generic [ref=e261]: active
+                    - cell "about 2 months ago" [ref=e262]
+                  - row "Asma Hassan rjrj.11@hotmail.com تحليل البيانات و اعداد التقارير باستخدام الاكسل - المستوى الأول active about 2 months ago" [ref=e263]:
+                    - cell "Asma Hassan rjrj.11@hotmail.com" [ref=e264]:
+                      - generic [ref=e265]:
+                        - paragraph [ref=e266]: Asma Hassan
+                        - paragraph [ref=e267]: rjrj.11@hotmail.com
+                    - cell "تحليل البيانات و اعداد التقارير باستخدام الاكسل - المستوى الأول" [ref=e268]
+                    - cell "active" [ref=e269]:
+                      - generic [ref=e270]: active
+                    - cell "about 2 months ago" [ref=e271]
+                  - row "noura.suwaidi noura.suwaidi@adcp.ae Enterprise Risk Management Framework active about 2 months ago" [ref=e272]:
+                    - cell "noura.suwaidi noura.suwaidi@adcp.ae" [ref=e273]:
+                      - generic [ref=e274]:
+                        - paragraph [ref=e275]: noura.suwaidi
+                        - paragraph [ref=e276]: noura.suwaidi@adcp.ae
+                    - cell "Enterprise Risk Management Framework" [ref=e277]
+                    - cell "active" [ref=e278]:
+                      - generic [ref=e279]: active
+                    - cell "about 2 months ago" [ref=e280]
+                  - row "emily.chen emily.chen@gmail.com Digital Transformation in Banking active about 2 months ago" [ref=e281]:
+                    - cell "emily.chen emily.chen@gmail.com" [ref=e282]:
+                      - generic [ref=e283]:
+                        - paragraph [ref=e284]: emily.chen
+                        - paragraph [ref=e285]: emily.chen@gmail.com
+                    - cell "Digital Transformation in Banking" [ref=e286]
+                    - cell "active" [ref=e287]:
+                      - generic [ref=e288]: active
+                    - cell "about 2 months ago" [ref=e289]
+                  - row "layla.mansoori layla.mansoori@dfg.ae Strategic Leadership in Financial Services active about 2 months ago" [ref=e290]:
+                    - cell "layla.mansoori layla.mansoori@dfg.ae" [ref=e291]:
+                      - generic [ref=e292]:
+                        - paragraph [ref=e293]: layla.mansoori
+                        - paragraph [ref=e294]: layla.mansoori@dfg.ae
+                    - cell "Strategic Leadership in Financial Services" [ref=e295]
+                    - cell "active" [ref=e296]:
+                      - generic [ref=e297]: active
+                    - cell "about 2 months ago" [ref=e298]
+            - generic [ref=e299]:
+              - generic [ref=e300]:
+                - heading "Top Courses" [level=3] [ref=e301]
+                - img [ref=e302]
+              - table [ref=e306]:
+                - rowgroup [ref=e307]:
+                  - row "Course Enrollments Revenue Rating" [ref=e308]:
+                    - columnheader "Course" [ref=e309]
+                    - columnheader "Enrollments" [ref=e310]
+                    - columnheader "Revenue" [ref=e311]
+                    - columnheader "Rating" [ref=e312]
+                - rowgroup [ref=e313]:
+                  - row "Digital Transformation in Banking 0 $0.00 —" [ref=e314]:
+                    - cell "Digital Transformation in Banking" [ref=e315]
+                    - cell "0" [ref=e316]
+                    - cell "$0.00" [ref=e317]
+                    - cell "—" [ref=e318]
+                  - row "Strategic Leadership in Financial Services 0 $0.00 —" [ref=e319]:
+                    - cell "Strategic Leadership in Financial Services" [ref=e320]
+                    - cell "0" [ref=e321]
+                    - cell "$0.00" [ref=e322]
+                    - cell "—" [ref=e323]
+                  - row "Python for Financial Analysis 0 $0.00 —" [ref=e324]:
+                    - cell "Python for Financial Analysis" [ref=e325]
+                    - cell "0" [ref=e326]
+                    - cell "$0.00" [ref=e327]
+                    - cell "—" [ref=e328]
+                  - row "Financial Statement Analysis Masterclass 0 $0.00 —" [ref=e329]:
+                    - cell "Financial Statement Analysis Masterclass" [ref=e330]
+                    - cell "0" [ref=e331]
+                    - cell "$0.00" [ref=e332]
+                    - cell "—" [ref=e333]
+                  - row "Machine Learning in Banking 0 $0.00 —" [ref=e334]:
+                    - cell "Machine Learning in Banking" [ref=e335]
+                    - cell "0" [ref=e336]
+                    - cell "$0.00" [ref=e337]
+                    - cell "—" [ref=e338]
+                  - row "Data Visualization with Power BI 0 $0.00 —" [ref=e339]:
+                    - cell "Data Visualization with Power BI" [ref=e340]
+                    - cell "0" [ref=e341]
+                    - cell "$0.00" [ref=e342]
+                    - cell "—" [ref=e343]
+                  - row "Investment Banking Fundamentals 0 $0.00 —" [ref=e344]:
+                    - cell "Investment Banking Fundamentals" [ref=e345]
+                    - cell "0" [ref=e346]
+                    - cell "$0.00" [ref=e347]
+                    - cell "—" [ref=e348]
+                  - row "Islamic Finance and Sukuk 0 $0.00 —" [ref=e349]:
+                    - cell "Islamic Finance and Sukuk" [ref=e350]
+                    - cell "0" [ref=e351]
+                    - cell "$0.00" [ref=e352]
+                    - cell "—" [ref=e353]
+                  - row "Enterprise Risk Management Framework 0 $0.00 —" [ref=e354]:
+                    - cell "Enterprise Risk Management Framework" [ref=e355]
+                    - cell "0" [ref=e356]
+                    - cell "$0.00" [ref=e357]
+                    - cell "—" [ref=e358]
+                  - row "Anti-Money Laundering Compliance 0 $0.00 —" [ref=e359]:
+                    - cell "Anti-Money Laundering Compliance" [ref=e360]
+                    - cell "0" [ref=e361]
+                    - cell "$0.00" [ref=e362]
+                    - cell "—" [ref=e363]
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e369] [cursor=pointer]:
+    - img [ref=e370]
+  - alert [ref=e373]
+  - button "🎓 Try Demo No Login" [ref=e375] [cursor=pointer]:
+    - generic [ref=e376]: 🎓
+    - generic [ref=e377]: Try Demo
+    - generic [ref=e378]: No Login

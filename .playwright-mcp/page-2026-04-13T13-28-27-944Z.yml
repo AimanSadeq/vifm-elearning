@@ -1,0 +1,163 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "VIFM - Virginia Institute of Finance and Management" [ref=e5] [cursor=pointer]:
+          - /url: /en
+          - img "VIFM - Virginia Institute of Finance and Management" [ref=e6]
+        - navigation [ref=e7]:
+          - link "Home" [ref=e9] [cursor=pointer]:
+            - /url: /en
+            - text: Home
+            - img [ref=e10]
+          - link "Courses" [ref=e13] [cursor=pointer]:
+            - /url: /en/courses
+            - text: Courses
+            - img [ref=e14]
+          - link "Certifications" [ref=e17] [cursor=pointer]:
+            - /url: /en/designations
+            - text: Certifications
+            - img [ref=e18]
+          - link "Webinars" [ref=e21] [cursor=pointer]:
+            - /url: /en/webinars
+            - text: Webinars
+            - img [ref=e22]
+          - link "Pricing" [ref=e24] [cursor=pointer]:
+            - /url: /en/pricing
+          - link "About" [ref=e25] [cursor=pointer]:
+            - /url: /en/about
+          - link "Contact" [ref=e26] [cursor=pointer]:
+            - /url: /en/contact
+        - generic [ref=e27]:
+          - button "Search" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+          - button "Switch to Arabic" [ref=e32] [cursor=pointer]:
+            - img [ref=e33]
+            - generic [ref=e36]: العربية
+    - generic [ref=e37]:
+      - complementary [ref=e38]:
+        - button "Collapse" [ref=e40] [cursor=pointer]:
+          - img [ref=e41]
+          - generic [ref=e44]: Collapse
+        - navigation [ref=e45]:
+          - link "Dashboard" [ref=e46] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e47]
+            - generic [ref=e52]: Dashboard
+          - generic [ref=e53]:
+            - button "Catalog" [ref=e54] [cursor=pointer]:
+              - generic [ref=e55]:
+                - img [ref=e56]
+                - generic [ref=e60]: Catalog
+              - img [ref=e61]
+            - generic [ref=e63]:
+              - link "Courses" [ref=e64] [cursor=pointer]:
+                - /url: /en/admin/courses
+              - link "Certifications" [ref=e65] [cursor=pointer]:
+                - /url: /en/admin/certifications
+              - link "Webinars" [ref=e66] [cursor=pointer]:
+                - /url: /en/admin/webinars
+              - link "Categories" [ref=e67] [cursor=pointer]:
+                - /url: /en/admin/categories
+              - link "Learning Paths" [ref=e68] [cursor=pointer]:
+                - /url: /en/admin/learning-paths
+          - link "Manage Users" [ref=e69] [cursor=pointer]:
+            - /url: /en/admin/users
+            - img [ref=e70]
+            - generic [ref=e75]: Manage Users
+          - link "Manage Organizations" [ref=e76] [cursor=pointer]:
+            - /url: /en/admin/organizations
+            - img [ref=e77]
+            - generic [ref=e81]: Manage Organizations
+          - button "Manage Payments" [ref=e83] [cursor=pointer]:
+            - generic [ref=e84]:
+              - img [ref=e85]
+              - generic [ref=e87]: Manage Payments
+            - img [ref=e88]
+          - button "Manage Certificates" [ref=e91] [cursor=pointer]:
+            - generic [ref=e92]:
+              - img [ref=e93]
+              - generic [ref=e96]: Manage Certificates
+            - img [ref=e97]
+          - button "Analytics" [ref=e100] [cursor=pointer]:
+            - generic [ref=e101]:
+              - img [ref=e102]
+              - generic [ref=e104]: Analytics
+            - img [ref=e105]
+          - link "Badges" [ref=e107] [cursor=pointer]:
+            - /url: /en/admin/badges
+            - img [ref=e108]
+            - generic [ref=e114]: Badges
+          - link "Testimonials" [ref=e115] [cursor=pointer]:
+            - /url: /en/admin/testimonials
+            - img [ref=e116]
+            - generic [ref=e118]: Testimonials
+          - link "Notifications" [ref=e119] [cursor=pointer]:
+            - /url: /en/admin/notifications
+            - img [ref=e120]
+            - generic [ref=e123]: Notifications
+          - link "Settings" [ref=e124] [cursor=pointer]:
+            - /url: /en/admin/settings
+            - img [ref=e125]
+            - generic [ref=e128]: Settings
+      - main [ref=e129]:
+        - generic [ref=e131]:
+          - heading "Create Certification" [level=1] [ref=e132]
+          - generic [ref=e134]:
+            - generic [ref=e135]:
+              - generic [ref=e136]:
+                - generic [ref=e137]: Certification Name (English) *
+                - textbox "e.g., Certified AI Financial Analyst" [ref=e138]
+              - generic [ref=e139]:
+                - generic [ref=e140]: Certification Name (Arabic)
+                - textbox "محلل مالي معتمد بالذكاء الاصطناعي" [ref=e141]
+            - generic [ref=e142]:
+              - generic [ref=e143]:
+                - generic [ref=e144]: Abbreviation *
+                - textbox "e.g., CAFA" [ref=e145]
+                - paragraph [ref=e146]: Short code displayed on badges. Must be unique.
+              - generic [ref=e147]:
+                - generic [ref=e148]: URL Slug *
+                - textbox [ref=e149]
+                - paragraph [ref=e150]: Auto-generated from name. Must be unique.
+            - generic [ref=e151]:
+              - generic [ref=e152]:
+                - generic [ref=e153]: Description (English)
+                - textbox [ref=e154]
+              - generic [ref=e155]:
+                - generic [ref=e156]: Description (Arabic)
+                - textbox [ref=e157]
+            - generic [ref=e158]:
+              - generic [ref=e159]:
+                - generic [ref=e160]: Tier Level *
+                - combobox [ref=e161]:
+                  - option "Gateway" [selected]
+                  - option "Professional"
+                  - option "Executive"
+              - generic [ref=e162]:
+                - generic [ref=e163]: Founding Fee
+                - spinbutton [ref=e164]: "0"
+              - generic [ref=e165]:
+                - generic [ref=e166]: Renewal Fee
+                - spinbutton [ref=e167]: "70"
+            - generic [ref=e168]:
+              - generic [ref=e169]:
+                - generic [ref=e170]: Annual CPE Hours
+                - spinbutton [ref=e171]: "20"
+              - generic [ref=e172]:
+                - generic [ref=e173]: Currency
+                - combobox [ref=e174]:
+                  - option "USD" [selected]
+                  - option "AED"
+              - generic [ref=e176]:
+                - checkbox "Active on launch" [checked] [ref=e177]
+                - text: Active on launch
+            - generic [ref=e178]:
+              - button "Cancel" [ref=e179] [cursor=pointer]
+              - button "Create Certification" [ref=e180] [cursor=pointer]:
+                - img [ref=e181]
+                - text: Create Certification
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e190] [cursor=pointer]:
+    - img [ref=e191]
+  - alert [ref=e194]

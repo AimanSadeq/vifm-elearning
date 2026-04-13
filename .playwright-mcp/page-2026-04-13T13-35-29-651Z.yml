@@ -1,0 +1,204 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "VIFM - Virginia Institute of Finance and Management" [ref=e5] [cursor=pointer]:
+          - /url: /en
+          - img "VIFM - Virginia Institute of Finance and Management" [ref=e6]
+        - navigation [ref=e7]:
+          - link "Home" [ref=e9] [cursor=pointer]:
+            - /url: /en
+            - text: Home
+            - img [ref=e10]
+          - link "Courses" [ref=e13] [cursor=pointer]:
+            - /url: /en/courses
+            - text: Courses
+            - img [ref=e14]
+          - link "Certifications" [ref=e17] [cursor=pointer]:
+            - /url: /en/designations
+            - text: Certifications
+            - img [ref=e18]
+          - link "Webinars" [ref=e21] [cursor=pointer]:
+            - /url: /en/webinars
+            - text: Webinars
+            - img [ref=e22]
+          - link "Pricing" [ref=e24] [cursor=pointer]:
+            - /url: /en/pricing
+          - link "About" [ref=e25] [cursor=pointer]:
+            - /url: /en/about
+          - link "Contact" [ref=e26] [cursor=pointer]:
+            - /url: /en/contact
+        - generic [ref=e27]:
+          - button "Search" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+          - button "Switch to Arabic" [ref=e32] [cursor=pointer]:
+            - img [ref=e33]
+            - generic [ref=e36]: العربية
+    - generic [ref=e37]:
+      - complementary [ref=e38]:
+        - button "Collapse" [ref=e40] [cursor=pointer]:
+          - img [ref=e41]
+          - generic [ref=e44]: Collapse
+        - navigation [ref=e45]:
+          - link "Dashboard" [ref=e46] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e47]
+            - generic [ref=e52]: Dashboard
+          - button "Catalog" [ref=e54] [cursor=pointer]:
+            - generic [ref=e55]:
+              - img [ref=e56]
+              - generic [ref=e60]: Catalog
+            - img [ref=e61]
+          - link "Manage Users" [ref=e63] [cursor=pointer]:
+            - /url: /en/admin/users
+            - img [ref=e64]
+            - generic [ref=e69]: Manage Users
+          - link "Manage Organizations" [ref=e70] [cursor=pointer]:
+            - /url: /en/admin/organizations
+            - img [ref=e71]
+            - generic [ref=e75]: Manage Organizations
+          - button "Manage Payments" [ref=e77] [cursor=pointer]:
+            - generic [ref=e78]:
+              - img [ref=e79]
+              - generic [ref=e81]: Manage Payments
+            - img [ref=e82]
+          - button "Manage Certificates" [ref=e85] [cursor=pointer]:
+            - generic [ref=e86]:
+              - img [ref=e87]
+              - generic [ref=e90]: Manage Certificates
+            - img [ref=e91]
+          - button "Analytics" [ref=e94] [cursor=pointer]:
+            - generic [ref=e95]:
+              - img [ref=e96]
+              - generic [ref=e98]: Analytics
+            - img [ref=e99]
+          - link "Badges" [ref=e101] [cursor=pointer]:
+            - /url: /en/admin/badges
+            - img [ref=e102]
+            - generic [ref=e108]: Badges
+          - link "Testimonials" [ref=e109] [cursor=pointer]:
+            - /url: /en/admin/testimonials
+            - img [ref=e110]
+            - generic [ref=e112]: Testimonials
+          - link "Notifications" [ref=e113] [cursor=pointer]:
+            - /url: /en/admin/notifications
+            - img [ref=e114]
+            - generic [ref=e117]: Notifications
+          - link "Settings" [ref=e118] [cursor=pointer]:
+            - /url: /en/admin/settings
+            - img [ref=e119]
+            - generic [ref=e122]: Settings
+      - main [ref=e123]:
+        - generic [ref=e125]:
+          - heading "Settings" [level=1] [ref=e126]
+          - generic [ref=e127]:
+            - heading "Platform Information" [level=3] [ref=e129]:
+              - img [ref=e130]
+              - text: Platform Information
+            - generic [ref=e134]:
+              - generic [ref=e135]:
+                - paragraph [ref=e136]: Framework
+                - paragraph [ref=e137]: Next.js 14 (App Router)
+              - generic [ref=e138]:
+                - paragraph [ref=e139]: Database
+                - paragraph [ref=e140]: Supabase (PostgreSQL)
+              - generic [ref=e141]:
+                - paragraph [ref=e142]: Styling
+                - paragraph [ref=e143]: Tailwind CSS
+              - generic [ref=e144]:
+                - paragraph [ref=e145]: Auth
+                - paragraph [ref=e146]: Supabase Auth
+              - generic [ref=e147]:
+                - paragraph [ref=e148]: Locales
+                - paragraph [ref=e149]: English, Arabic
+              - generic [ref=e150]:
+                - paragraph [ref=e151]: Default Currency
+                - paragraph [ref=e152]: USD
+          - generic [ref=e153]:
+            - heading "Integrations" [level=3] [ref=e155]:
+              - img [ref=e156]
+              - text: Integrations
+            - generic [ref=e160]:
+              - generic [ref=e161]:
+                - generic [ref=e162]:
+                  - img [ref=e164]
+                  - generic [ref=e168]:
+                    - paragraph [ref=e169]: Supabase
+                    - paragraph [ref=e170]: Database, Auth & Storage
+                    - paragraph [ref=e171]: PostgreSQL + Row Level Security
+                - generic [ref=e172]:
+                  - img [ref=e173]
+                  - text: Connected
+              - generic [ref=e176]:
+                - generic [ref=e177]:
+                  - img [ref=e179]
+                  - generic [ref=e181]:
+                    - paragraph [ref=e182]: Stripe
+                    - paragraph [ref=e183]: Payment processing
+                    - paragraph [ref=e184]: Cards, invoices, subscriptions
+                - generic [ref=e185]:
+                  - img [ref=e186]
+                  - text: Not Configured
+              - generic [ref=e190]:
+                - generic [ref=e191]:
+                  - img [ref=e193]
+                  - generic [ref=e195]:
+                    - paragraph [ref=e196]: PayTabs
+                    - paragraph [ref=e197]: Regional payment gateway
+                    - paragraph [ref=e198]: GCC payment methods
+                - generic [ref=e199]:
+                  - img [ref=e200]
+                  - text: Not Configured
+              - generic [ref=e204]:
+                - generic [ref=e205]:
+                  - img [ref=e207]
+                  - generic [ref=e210]:
+                    - paragraph [ref=e211]: Zoom
+                    - paragraph [ref=e212]: Webinar hosting
+                    - paragraph [ref=e213]: Live webinars & recordings
+                - generic [ref=e214]:
+                  - img [ref=e215]
+                  - text: Not Configured
+              - generic [ref=e219]:
+                - generic [ref=e220]:
+                  - img [ref=e222]
+                  - generic [ref=e225]:
+                    - paragraph [ref=e226]: SendGrid / Resend
+                    - paragraph [ref=e227]: Email delivery
+                    - paragraph [ref=e228]: Transactional & marketing emails
+                - generic [ref=e229]:
+                  - img [ref=e230]
+                  - text: Not Configured
+          - generic [ref=e234]:
+            - heading "Feature Status" [level=3] [ref=e236]:
+              - img [ref=e237]
+              - text: Feature Status
+            - generic [ref=e240]:
+              - generic [ref=e241]:
+                - generic [ref=e242]: Discussion Forums
+                - generic [ref=e243]: "On"
+              - generic [ref=e244]:
+                - generic [ref=e245]: Certificates
+                - generic [ref=e246]: "On"
+              - generic [ref=e247]:
+                - generic [ref=e248]: Promo Codes
+                - generic [ref=e249]: "On"
+              - generic [ref=e250]:
+                - generic [ref=e251]: Corporate Licenses
+                - generic [ref=e252]: "On"
+              - generic [ref=e253]:
+                - generic [ref=e254]: Quiz System
+                - generic [ref=e255]: "On"
+              - generic [ref=e256]:
+                - generic [ref=e257]: Webinars
+                - generic [ref=e258]: "On"
+              - generic [ref=e259]:
+                - generic [ref=e260]: Multi-language (EN/AR)
+                - generic [ref=e261]: "On"
+              - generic [ref=e262]:
+                - generic [ref=e263]: Dark Mode
+                - generic [ref=e264]: "On"
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e270] [cursor=pointer]:
+    - img [ref=e271]
+  - alert [ref=e274]

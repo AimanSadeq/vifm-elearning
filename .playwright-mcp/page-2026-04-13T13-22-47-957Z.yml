@@ -1,0 +1,652 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "VIFM - Virginia Institute of Finance and Management" [ref=e5] [cursor=pointer]:
+          - /url: /en
+          - img "VIFM - Virginia Institute of Finance and Management" [ref=e6]
+        - navigation [ref=e7]:
+          - link "Home" [ref=e9] [cursor=pointer]:
+            - /url: /en
+            - text: Home
+            - img [ref=e10]
+          - link "Courses" [ref=e13] [cursor=pointer]:
+            - /url: /en/courses
+            - text: Courses
+            - img [ref=e14]
+          - link "Certifications" [ref=e17] [cursor=pointer]:
+            - /url: /en/designations
+            - text: Certifications
+            - img [ref=e18]
+          - link "Webinars" [ref=e21] [cursor=pointer]:
+            - /url: /en/webinars
+            - text: Webinars
+            - img [ref=e22]
+          - link "Pricing" [ref=e24] [cursor=pointer]:
+            - /url: /en/pricing
+          - link "About" [ref=e25] [cursor=pointer]:
+            - /url: /en/about
+          - link "Contact" [ref=e26] [cursor=pointer]:
+            - /url: /en/contact
+        - generic [ref=e27]:
+          - button "Search" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+          - button "Switch to Arabic" [ref=e32] [cursor=pointer]:
+            - img [ref=e33]
+            - generic [ref=e36]: العربية
+    - main [ref=e37]:
+      - generic [ref=e38]:
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - button "Show stat 1" [ref=e44] [cursor=pointer]
+            - button "Show stat 2" [ref=e45] [cursor=pointer]
+            - button "Show stat 3" [ref=e46] [cursor=pointer]
+            - button "Show stat 4" [ref=e47] [cursor=pointer]
+            - button "Show stat 5" [ref=e48] [cursor=pointer]
+          - generic [ref=e51]:
+            - img [ref=e52]
+            - generic [ref=e57]: 500+
+            - generic [ref=e58]: Professionals Trained
+        - generic [ref=e60]:
+          - generic [ref=e61]: Professional E-Learning Platform
+          - heading "Advance Your Career with World-Class Professional E-Learning" [level=1] [ref=e63]:
+            - generic [ref=e64]: Advance
+            - generic [ref=e65]: Your
+            - generic [ref=e66]: Career
+            - generic [ref=e67]: with
+            - generic [ref=e68]: World-Class
+            - generic [ref=e69]: Professional
+            - generic [ref=e70]: E-Learning
+          - paragraph [ref=e72]: Expert-led courses in Finance, Data Analytics, Strategy, and Compliance — designed for professionals across the GCC region.
+          - generic [ref=e73]:
+            - link "Explore Courses" [ref=e75] [cursor=pointer]:
+              - /url: /en/courses
+              - text: Explore Courses
+              - img [ref=e76]
+            - link "Get Started Free" [ref=e79] [cursor=pointer]:
+              - /url: /en/register
+              - img [ref=e80]
+              - text: Get Started Free
+      - generic [ref=e84]:
+        - generic [ref=e86]:
+          - paragraph [ref=e87]: Explore
+          - heading "Browse by Category" [level=2] [ref=e88]
+        - generic [ref=e89]:
+          - link "Finance & Banking Banking, accounting, financial analysis, and investment management" [ref=e91] [cursor=pointer]:
+            - /url: /en/categories/finance-banking
+            - generic [ref=e96]:
+              - img [ref=e98]
+              - heading "Finance & Banking" [level=3] [ref=e100]
+              - paragraph [ref=e101]: Banking, accounting, financial analysis, and investment management
+              - img [ref=e103]
+          - link "Data Analytics & AI Machine learning, Python, Power BI, and business intelligence" [ref=e106] [cursor=pointer]:
+            - /url: /en/categories/data-analytics-ai
+            - generic [ref=e111]:
+              - img [ref=e113]
+              - heading "Data Analytics & AI" [level=3] [ref=e125]
+              - paragraph [ref=e126]: Machine learning, Python, Power BI, and business intelligence
+              - img [ref=e128]
+          - link "Strategy & Leadership Leadership development, strategic planning, and management" [ref=e131] [cursor=pointer]:
+            - /url: /en/categories/strategy-leadership
+            - generic [ref=e136]:
+              - img [ref=e138]
+              - heading "Strategy & Leadership" [level=3] [ref=e142]
+              - paragraph [ref=e143]: Leadership development, strategic planning, and management
+              - img [ref=e145]
+          - link "Compliance & Risk Management Regulatory compliance, risk assessment, and governance" [ref=e148] [cursor=pointer]:
+            - /url: /en/categories/compliance-risk
+            - generic [ref=e153]:
+              - img [ref=e155]
+              - heading "Compliance & Risk Management" [level=3] [ref=e158]
+              - paragraph [ref=e159]: Regulatory compliance, risk assessment, and governance
+              - img [ref=e161]
+      - generic [ref=e164]:
+        - generic [ref=e166]:
+          - paragraph [ref=e167]: Popular Right Now
+          - heading "Featured Courses" [level=2] [ref=e168]
+          - link "View All Courses" [ref=e169] [cursor=pointer]:
+            - /url: /en/courses
+            - text: View All Courses
+            - img [ref=e170]
+        - generic [ref=e172]:
+          - button "Previous" [ref=e173] [cursor=pointer]:
+            - img [ref=e174]
+          - button "Next" [ref=e176] [cursor=pointer]:
+            - img [ref=e177]
+          - generic [ref=e179]:
+            - link "C Finance, Investment, Accounting, and Banking Featured Intermediate Certified AI Powered Accountant 2h 42m $0.00 Overview →" [ref=e181] [cursor=pointer]:
+              - /url: /en/courses/certified-ai-powered-accountant
+              - generic [ref=e182]:
+                - generic [ref=e184]: C
+                - generic [ref=e185]: Finance, Investment, Accounting, and Banking
+                - generic [ref=e186]: Featured
+              - generic [ref=e187]:
+                - generic [ref=e189]: Intermediate
+                - heading "Certified AI Powered Accountant" [level=3] [ref=e190]
+                - generic [ref=e192]:
+                  - img [ref=e193]
+                  - generic [ref=e196]: 2h 42m
+                - generic [ref=e197]:
+                  - generic [ref=e198]: $0.00
+                  - generic [ref=e199]: Overview →
+            - 'link "C Data Analytics and AI Featured Advanced Certified AI Finance Leader (CAIFL) mohammed.khalid Master AI applications in finance: forecasting, analytics, risk management, valuation, and strategic integration. 3h $0.00 Overview →" [ref=e201] [cursor=pointer]':
+              - /url: /en/courses/certified-ai-finance-leader
+              - generic [ref=e202]:
+                - generic [ref=e204]: C
+                - generic [ref=e205]: Data Analytics and AI
+                - generic [ref=e206]: Featured
+              - generic [ref=e207]:
+                - generic [ref=e209]: Advanced
+                - heading "Certified AI Finance Leader (CAIFL)" [level=3] [ref=e210]
+                - paragraph [ref=e211]: mohammed.khalid
+                - paragraph [ref=e212]: "Master AI applications in finance: forecasting, analytics, risk management, valuation, and strategic integration."
+                - generic [ref=e214]:
+                  - img [ref=e215]
+                  - generic [ref=e218]: 3h
+                - generic [ref=e219]:
+                  - generic [ref=e220]: $0.00
+                  - generic [ref=e221]: Overview →
+            - link "Digital Transformation in Banking Leadership, Strategy, and management. Featured Advanced Digital Transformation in Banking mohammed.khalid Lead digital innovation in banking with fintech, APIs, and AI strategies. 2h 18m $449.00 Overview →" [ref=e223] [cursor=pointer]:
+              - /url: /en/courses/digital-transformation-in-banking
+              - generic [ref=e224]:
+                - img "Digital Transformation in Banking" [ref=e225]
+                - generic [ref=e226]: Leadership, Strategy, and management.
+                - generic [ref=e227]: Featured
+              - generic [ref=e228]:
+                - generic [ref=e230]: Advanced
+                - heading "Digital Transformation in Banking" [level=3] [ref=e231]
+                - paragraph [ref=e232]: mohammed.khalid
+                - paragraph [ref=e233]: Lead digital innovation in banking with fintech, APIs, and AI strategies.
+                - generic [ref=e235]:
+                  - img [ref=e236]
+                  - generic [ref=e239]: 2h 18m
+                - generic [ref=e240]:
+                  - generic [ref=e241]: $449.00
+                  - generic [ref=e242]: Overview →
+          - generic [ref=e243]:
+            - button "Page 1" [ref=e244] [cursor=pointer]
+            - button "Page 2" [ref=e245] [cursor=pointer]
+            - button "Page 3" [ref=e246] [cursor=pointer]
+      - generic [ref=e248]:
+        - generic [ref=e250]:
+          - paragraph [ref=e251]: Platform Capabilities
+          - heading "Immersive Learning Experience" [level=2] [ref=e252]
+        - generic [ref=e253]:
+          - generic [ref=e254]:
+            - button "Bilingual Arabic & English" [ref=e255] [cursor=pointer]:
+              - img [ref=e257]
+              - generic [ref=e261]: Bilingual Arabic & English
+            - button "HD Video Learning" [ref=e263] [cursor=pointer]:
+              - img [ref=e265]
+              - generic [ref=e268]: HD Video Learning
+            - button "Interactive Assessments" [ref=e269] [cursor=pointer]:
+              - img [ref=e271]
+              - generic [ref=e283]: Interactive Assessments
+            - button "CPE Credit Tracking" [ref=e284] [cursor=pointer]:
+              - img [ref=e286]
+              - generic [ref=e288]: CPE Credit Tracking
+            - button "Digital Certificates" [ref=e289] [cursor=pointer]:
+              - img [ref=e291]
+              - generic [ref=e294]: Digital Certificates
+            - button "Proctored Examinations" [ref=e295] [cursor=pointer]:
+              - img [ref=e297]
+              - generic [ref=e301]: Proctored Examinations
+          - generic [ref=e303]:
+            - generic [ref=e304]:
+              - img [ref=e306]
+              - heading "Bilingual Arabic & English" [level=3] [ref=e310]
+            - paragraph [ref=e311]: Full platform and content support in both Arabic and English, with seamless switching. Every course, interface element, and assessment adapts to your preferred language.
+            - list [ref=e312]:
+              - listitem [ref=e313]:
+                - generic [ref=e314]: ✓
+                - generic [ref=e315]: RTL-native Arabic interface with full localization
+              - listitem [ref=e316]:
+                - generic [ref=e317]: ✓
+                - generic [ref=e318]: Course content available in both languages
+              - listitem [ref=e319]:
+                - generic [ref=e320]: ✓
+                - generic [ref=e321]: Switch languages without losing your progress
+      - generic [ref=e323]:
+        - generic [ref=e325]:
+          - paragraph [ref=e326]: Social Proof
+          - heading "Trusted by leading organizations" [level=2] [ref=e327]
+        - generic [ref=e328]:
+          - generic [ref=e331]:
+            - img [ref=e332]
+            - generic [ref=e338]: 0+
+            - paragraph [ref=e339]: Professionals Trained
+          - generic [ref=e342]:
+            - img [ref=e343]
+            - generic [ref=e346]: 0+
+            - paragraph [ref=e347]: Expert-Led Courses
+          - generic [ref=e350]:
+            - img [ref=e351]
+            - generic [ref=e355]: 0%
+            - paragraph [ref=e356]: Satisfaction Rate
+          - generic [ref=e359]:
+            - img [ref=e360]
+            - generic [ref=e365]: 0+
+            - paragraph [ref=e366]: Corporate Partners
+          - generic [ref=e369]:
+            - img [ref=e370]
+            - generic [ref=e374]: 0+
+            - paragraph [ref=e375]: Countries Represented
+      - generic [ref=e378]:
+        - generic [ref=e380]:
+          - paragraph [ref=e381]: Career Pathways
+          - heading "Your Career Progression" [level=2] [ref=e382]
+        - generic [ref=e385]:
+          - generic [ref=e386]:
+            - img [ref=e388]
+            - generic [ref=e394]:
+              - generic [ref=e395]:
+                - generic [ref=e396]: STEP 01
+                - generic [ref=e397]: 4 certifications
+              - heading "Gateway Tier" [level=3] [ref=e398]
+              - paragraph [ref=e399]: Begin your professional journey with foundational certifications that build core competencies in finance, data analytics, and AI.
+              - list [ref=e400]:
+                - listitem [ref=e401]:
+                  - generic [ref=e402]: ✓
+                  - generic [ref=e403]: No prerequisites — open to all professionals
+                - listitem [ref=e404]:
+                  - generic [ref=e405]: ✓
+                  - generic [ref=e406]: Build a strong foundation in your chosen field
+                - listitem [ref=e407]:
+                  - generic [ref=e408]: ✓
+                  - generic [ref=e409]: Earn your first professional credential
+            - img [ref=e411]
+          - generic [ref=e413]:
+            - img [ref=e415]
+            - generic [ref=e421]:
+              - generic [ref=e422]:
+                - generic [ref=e423]: STEP 02
+                - generic [ref=e424]: 7 certifications
+              - heading "Professional Tier" [level=3] [ref=e425]
+              - paragraph [ref=e426]: Advance your expertise with specialized certifications that deepen your knowledge and differentiate you in the market.
+              - list [ref=e427]:
+                - listitem [ref=e428]:
+                  - generic [ref=e429]: ✓
+                  - generic [ref=e430]: Specialized tracks across finance, AI, and strategy
+                - listitem [ref=e431]:
+                  - generic [ref=e432]: ✓
+                  - generic [ref=e433]: Annual CPE requirements to stay current
+                - listitem [ref=e434]:
+                  - generic [ref=e435]: ✓
+                  - generic [ref=e436]: Recognized by employers across the GCC region
+            - img [ref=e438]
+          - generic [ref=e440]:
+            - img [ref=e442]
+            - generic [ref=e447]:
+              - generic [ref=e448]:
+                - generic [ref=e449]: STEP 03
+                - generic [ref=e450]: 4 certifications
+              - heading "Executive Tier" [level=3] [ref=e451]
+              - paragraph [ref=e452]: Reach the pinnacle of professional achievement with executive-level credentials that signify mastery and leadership.
+              - list [ref=e453]:
+                - listitem [ref=e454]:
+                  - generic [ref=e455]: ✓
+                  - generic [ref=e456]: Comprehensive body of knowledge examinations
+                - listitem [ref=e457]:
+                  - generic [ref=e458]: ✓
+                  - generic [ref=e459]: Demonstrated leadership and strategic thinking
+                - listitem [ref=e460]:
+                  - generic [ref=e461]: ✓
+                  - generic [ref=e462]: Join an elite network of certified professionals
+        - link "Explore All Certifications" [ref=e465] [cursor=pointer]:
+          - /url: /en/designations
+          - text: Explore All Certifications
+          - img [ref=e466]
+      - generic [ref=e469]:
+        - generic [ref=e471]:
+          - paragraph [ref=e472]: Advance Your Career
+          - heading "Professional Certifications" [level=2] [ref=e473]
+          - link "View All Certifications" [ref=e474] [cursor=pointer]:
+            - /url: /en/designations
+            - text: View All Certifications
+            - img [ref=e475]
+        - generic [ref=e477]:
+          - generic [ref=e478]:
+            - generic [ref=e479]:
+              - img [ref=e481]
+              - heading "Gateway" [level=3] [ref=e484]
+              - generic [ref=e485]: "4"
+            - generic [ref=e486]:
+              - link "CDA Free Certificate in Data Analysis & Business Reporting Techniques Using Excel This hands-on course advances your data massaging, modeling, integration and automation skills using Excel. Master normalization, preparation of reports, analysis and reconciliation. Gateway 20 CPE/yr View Details" [ref=e488] [cursor=pointer]:
+                - /url: /en/designations/cda
+                - generic [ref=e491]:
+                  - generic [ref=e492]:
+                    - generic [ref=e493]: CDA
+                    - generic [ref=e494]: Free
+                  - heading "Certificate in Data Analysis & Business Reporting Techniques Using Excel" [level=4] [ref=e495]
+                  - paragraph [ref=e496]: This hands-on course advances your data massaging, modeling, integration and automation skills using Excel. Master normalization, preparation of reports, analysis and reconciliation.
+                  - generic [ref=e497]:
+                    - generic [ref=e498]: Gateway
+                    - generic [ref=e499]: 20 CPE/yr
+                  - generic [ref=e500]:
+                    - text: View Details
+                    - img [ref=e501]
+              - link "CAPA Free Certified AI Powered Accountant The CAPA program equips accounting professionals with practical AI skills to modernize their workflows. Participants learn AI fundamentals and apply AI tools to bookkeeping, financial reporting, and Excel-based tasks. Gateway View Details" [ref=e504] [cursor=pointer]:
+                - /url: /en/designations/capa
+                - generic [ref=e507]:
+                  - generic [ref=e508]:
+                    - generic [ref=e509]: CAPA
+                    - generic [ref=e510]: Free
+                  - heading "Certified AI Powered Accountant" [level=4] [ref=e511]
+                  - paragraph [ref=e512]: The CAPA program equips accounting professionals with practical AI skills to modernize their workflows. Participants learn AI fundamentals and apply AI tools to bookkeeping, financial reporting, and Excel-based tasks.
+                  - generic [ref=e514]: Gateway
+                  - generic [ref=e515]:
+                    - text: View Details
+                    - img [ref=e516]
+              - link "CASP Free Certified AI Strategy Professional This intensive program is designed for professionals aiming to master the strategic integration of AI within their organizations. Participants develop the acumen to formulate robust AI strategies, drive innovation, and lead successful AI-driven transformations. Gateway 20 CPE/yr View Details" [ref=e519] [cursor=pointer]:
+                - /url: /en/designations/casp
+                - generic [ref=e522]:
+                  - generic [ref=e523]:
+                    - generic [ref=e524]: CASP
+                    - generic [ref=e525]: Free
+                  - heading "Certified AI Strategy Professional" [level=4] [ref=e526]
+                  - paragraph [ref=e527]: This intensive program is designed for professionals aiming to master the strategic integration of AI within their organizations. Participants develop the acumen to formulate robust AI strategies, drive innovation, and lead successful AI-driven transformations.
+                  - generic [ref=e528]:
+                    - generic [ref=e529]: Gateway
+                    - generic [ref=e530]: 20 CPE/yr
+                  - generic [ref=e531]:
+                    - text: View Details
+                    - img [ref=e532]
+              - 'link "CDIP $50 Certified Data Intelligence Professional The CDIP certification validates expertise across the full Data Intelligence lifecycle: data acquisition, transformation, modeling, analytical intelligence, visualization, and professional practice. Backed by the DIBoK (Data Intelligence Body of Knowledge), CDIP positions holders alongside globally recognized credentials like PMP, CFA, and CISA. Gateway 20 CPE/yr View Details" [ref=e535] [cursor=pointer]':
+                - /url: /en/designations/cdip
+                - generic [ref=e538]:
+                  - generic [ref=e539]:
+                    - generic [ref=e540]: CDIP
+                    - generic [ref=e541]: $50
+                  - heading "Certified Data Intelligence Professional" [level=4] [ref=e542]
+                  - paragraph [ref=e543]: "The CDIP certification validates expertise across the full Data Intelligence lifecycle: data acquisition, transformation, modeling, analytical intelligence, visualization, and professional practice. Backed by the DIBoK (Data Intelligence Body of Knowledge), CDIP positions holders alongside globally recognized credentials like PMP, CFA, and CISA."
+                  - generic [ref=e544]:
+                    - generic [ref=e545]: Gateway
+                    - generic [ref=e546]: 20 CPE/yr
+                  - generic [ref=e547]:
+                    - text: View Details
+                    - img [ref=e548]
+          - generic [ref=e550]:
+            - generic [ref=e551]:
+              - img [ref=e553]
+              - heading "Professional" [level=3] [ref=e556]
+              - generic [ref=e557]: "7"
+            - generic [ref=e558]:
+              - link "CHRS $50 Certified AI - Human Resources Dynamics Strategist The CHRS designation validates expertise in leveraging artificial intelligence to redefine human capital strategies. Professional 20 CPE/yr View Details" [ref=e560] [cursor=pointer]:
+                - /url: /en/designations/chrs
+                - generic [ref=e563]:
+                  - generic [ref=e564]:
+                    - generic [ref=e565]: CHRS
+                    - generic [ref=e566]: $50
+                  - heading "Certified AI - Human Resources Dynamics Strategist" [level=4] [ref=e567]
+                  - paragraph [ref=e568]: The CHRS designation validates expertise in leveraging artificial intelligence to redefine human capital strategies.
+                  - generic [ref=e569]:
+                    - generic [ref=e570]: Professional
+                    - generic [ref=e571]: 20 CPE/yr
+                  - generic [ref=e572]:
+                    - text: View Details
+                    - img [ref=e573]
+              - link "CAIFL $50 Certified AI Finance Leader The CAIFL program empowers finance professionals to leverage artificial intelligence for strategic decision-making in financial planning, forecasting, analytics, risk assessment, and corporate valuation. Professional 20 CPE/yr View Details" [ref=e576] [cursor=pointer]:
+                - /url: /en/designations/caifl
+                - generic [ref=e579]:
+                  - generic [ref=e580]:
+                    - generic [ref=e581]: CAIFL
+                    - generic [ref=e582]: $50
+                  - heading "Certified AI Finance Leader" [level=4] [ref=e583]
+                  - paragraph [ref=e584]: The CAIFL program empowers finance professionals to leverage artificial intelligence for strategic decision-making in financial planning, forecasting, analytics, risk assessment, and corporate valuation.
+                  - generic [ref=e585]:
+                    - generic [ref=e586]: Professional
+                    - generic [ref=e587]: 20 CPE/yr
+                  - generic [ref=e588]:
+                    - text: View Details
+                    - img [ref=e589]
+              - link "CAFA $50 Certified AI Financial Analyst The Certified AI Financial Analyst program introduces a modern way of working with financial data by combining solid analytical skills with the power of Microsoft Copilot AI. Professional 20 CPE/yr View Details" [ref=e592] [cursor=pointer]:
+                - /url: /en/designations/cafa
+                - generic [ref=e595]:
+                  - generic [ref=e596]:
+                    - generic [ref=e597]: CAFA
+                    - generic [ref=e598]: $50
+                  - heading "Certified AI Financial Analyst" [level=4] [ref=e599]
+                  - paragraph [ref=e600]: The Certified AI Financial Analyst program introduces a modern way of working with financial data by combining solid analytical skills with the power of Microsoft Copilot AI.
+                  - generic [ref=e601]:
+                    - generic [ref=e602]: Professional
+                    - generic [ref=e603]: 20 CPE/yr
+                  - generic [ref=e604]:
+                    - text: View Details
+                    - img [ref=e605]
+              - link "CAIP $50 Certified Artificial Intelligence Practitioner The CAIP course equips professionals with skills to use AI in a modern and effective way. Participants learn AI for content creation, data analysis, workflow automation, and machine learning without needing coding expertise. Professional 20 CPE/yr Prerequisites View Details" [ref=e608] [cursor=pointer]:
+                - /url: /en/designations/caip
+                - generic [ref=e611]:
+                  - generic [ref=e612]:
+                    - generic [ref=e613]: CAIP
+                    - generic [ref=e614]: $50
+                  - heading "Certified Artificial Intelligence Practitioner" [level=4] [ref=e615]
+                  - paragraph [ref=e616]: The CAIP course equips professionals with skills to use AI in a modern and effective way. Participants learn AI for content creation, data analysis, workflow automation, and machine learning without needing coding expertise.
+                  - generic [ref=e617]:
+                    - generic [ref=e618]: Professional
+                    - generic [ref=e619]: 20 CPE/yr
+                    - generic [ref=e620]: Prerequisites
+                  - generic [ref=e621]:
+                    - text: View Details
+                    - img [ref=e622]
+              - link "CCTP $50 Certified Cost Transformation Practitioner This certification helps professionals rethink how organizations manage and improve their costs through practical frameworks using Excel, Power BI, and Copilot. Professional 20 CPE/yr View Details" [ref=e625] [cursor=pointer]:
+                - /url: /en/designations/cctp
+                - generic [ref=e628]:
+                  - generic [ref=e629]:
+                    - generic [ref=e630]: CCTP
+                    - generic [ref=e631]: $50
+                  - heading "Certified Cost Transformation Practitioner" [level=4] [ref=e632]
+                  - paragraph [ref=e633]: This certification helps professionals rethink how organizations manage and improve their costs through practical frameworks using Excel, Power BI, and Copilot.
+                  - generic [ref=e634]:
+                    - generic [ref=e635]: Professional
+                    - generic [ref=e636]: 20 CPE/yr
+                  - generic [ref=e637]:
+                    - text: View Details
+                    - img [ref=e638]
+              - link "CDBTL $50 Certified Digital & Business Transformation Leader This course prepares business leaders to design, lead, and implement transformation strategies that drive sustainable growth, focusing on both business strategy and digital tools. Professional 20 CPE/yr View Details" [ref=e641] [cursor=pointer]:
+                - /url: /en/designations/cdbtl
+                - generic [ref=e644]:
+                  - generic [ref=e645]:
+                    - generic [ref=e646]: CDBTL
+                    - generic [ref=e647]: $50
+                  - heading "Certified Digital & Business Transformation Leader" [level=4] [ref=e648]
+                  - paragraph [ref=e649]: This course prepares business leaders to design, lead, and implement transformation strategies that drive sustainable growth, focusing on both business strategy and digital tools.
+                  - generic [ref=e650]:
+                    - generic [ref=e651]: Professional
+                    - generic [ref=e652]: 20 CPE/yr
+                  - generic [ref=e653]:
+                    - text: View Details
+                    - img [ref=e654]
+              - link "CSMP $50 Certified Strategic Marketing Professional This course equips participants with the knowledge and tools to design, execute, and measure strategic marketing initiatives that create sustainable growth and competitive advantage. Professional 20 CPE/yr View Details" [ref=e657] [cursor=pointer]:
+                - /url: /en/designations/csmp
+                - generic [ref=e660]:
+                  - generic [ref=e661]:
+                    - generic [ref=e662]: CSMP
+                    - generic [ref=e663]: $50
+                  - heading "Certified Strategic Marketing Professional" [level=4] [ref=e664]
+                  - paragraph [ref=e665]: This course equips participants with the knowledge and tools to design, execute, and measure strategic marketing initiatives that create sustainable growth and competitive advantage.
+                  - generic [ref=e666]:
+                    - generic [ref=e667]: Professional
+                    - generic [ref=e668]: 20 CPE/yr
+                  - generic [ref=e669]:
+                    - text: View Details
+                    - img [ref=e670]
+          - generic [ref=e672]:
+            - generic [ref=e673]:
+              - img [ref=e675]
+              - heading "Executive" [level=3] [ref=e677]
+              - generic [ref=e678]: "4"
+            - generic [ref=e679]:
+              - link "CAIQLP $70 Certified AI Quality Leadership Professional This program equips supervisors, team leaders, and managers to lead small, safe AI initiatives within Quality Management Systems while maintaining compliance and control. Executive 20 CPE/yr View Details" [ref=e681] [cursor=pointer]:
+                - /url: /en/designations/caiqlp
+                - generic [ref=e684]:
+                  - generic [ref=e685]:
+                    - generic [ref=e686]: CAIQLP
+                    - generic [ref=e687]: $70
+                  - heading "Certified AI Quality Leadership Professional" [level=4] [ref=e688]
+                  - paragraph [ref=e689]: This program equips supervisors, team leaders, and managers to lead small, safe AI initiatives within Quality Management Systems while maintaining compliance and control.
+                  - generic [ref=e690]:
+                    - generic [ref=e691]: Executive
+                    - generic [ref=e692]: 20 CPE/yr
+                  - generic [ref=e693]:
+                    - text: View Details
+                    - img [ref=e694]
+              - link "CBACP $70 Certified Board Audit Committee Professional The CBACP program empowers professionals to serve as the ethical backbone of corporate governance. Participants explore how effective audit committees shape financial transparency, strengthen internal control, and ensure strategic resilience. Executive 20 CPE/yr View Details" [ref=e697] [cursor=pointer]:
+                - /url: /en/designations/cbacp
+                - generic [ref=e700]:
+                  - generic [ref=e701]:
+                    - generic [ref=e702]: CBACP
+                    - generic [ref=e703]: $70
+                  - heading "Certified Board Audit Committee Professional" [level=4] [ref=e704]
+                  - paragraph [ref=e705]: The CBACP program empowers professionals to serve as the ethical backbone of corporate governance. Participants explore how effective audit committees shape financial transparency, strengthen internal control, and ensure strategic resilience.
+                  - generic [ref=e706]:
+                    - generic [ref=e707]: Executive
+                    - generic [ref=e708]: 20 CPE/yr
+                  - generic [ref=e709]:
+                    - text: View Details
+                    - img [ref=e710]
+              - link "CPAFG $70 Certified Professional in AI Forensic Governance This program empowers professionals to lead with integrity at the intersection of technology, ethics, and accountability. It blends forensic investigation principles with AI governance. Executive 20 CPE/yr View Details" [ref=e713] [cursor=pointer]:
+                - /url: /en/designations/cpafg
+                - generic [ref=e716]:
+                  - generic [ref=e717]:
+                    - generic [ref=e718]: CPAFG
+                    - generic [ref=e719]: $70
+                  - heading "Certified Professional in AI Forensic Governance" [level=4] [ref=e720]
+                  - paragraph [ref=e721]: This program empowers professionals to lead with integrity at the intersection of technology, ethics, and accountability. It blends forensic investigation principles with AI governance.
+                  - generic [ref=e722]:
+                    - generic [ref=e723]: Executive
+                    - generic [ref=e724]: 20 CPE/yr
+                  - generic [ref=e725]:
+                    - text: View Details
+                    - img [ref=e726]
+              - 'link "CSBIP $70 Certified Strategic Business Intelligence Partner This course focuses on the highest-impact role of data: building one system and driving decisions. For BI professionals who think strategically and translate data into actionable business decisions. Executive 20 CPE/yr Prerequisites View Details" [ref=e729] [cursor=pointer]':
+                - /url: /en/designations/csbip
+                - generic [ref=e732]:
+                  - generic [ref=e733]:
+                    - generic [ref=e734]: CSBIP
+                    - generic [ref=e735]: $70
+                  - heading "Certified Strategic Business Intelligence Partner" [level=4] [ref=e736]
+                  - paragraph [ref=e737]: "This course focuses on the highest-impact role of data: building one system and driving decisions. For BI professionals who think strategically and translate data into actionable business decisions."
+                  - generic [ref=e738]:
+                    - generic [ref=e739]: Executive
+                    - generic [ref=e740]: 20 CPE/yr
+                    - generic [ref=e741]: Prerequisites
+                  - generic [ref=e742]:
+                    - text: View Details
+                    - img [ref=e743]
+      - generic [ref=e746]:
+        - generic [ref=e748]:
+          - paragraph [ref=e749]: What Our Learners Say
+          - heading "Success Stories" [level=2] [ref=e750]
+        - generic [ref=e752]:
+          - generic [ref=e753]:
+            - img [ref=e754]
+            - generic [ref=e757]:
+              - img [ref=e758]
+              - img [ref=e760]
+              - img [ref=e762]
+              - img [ref=e764]
+              - img [ref=e766]
+            - paragraph [ref=e768]: “The CDA program gave me practical skills I use daily in my role. The Excel modeling techniques and data analysis frameworks have transformed how I approach financial reporting. I highly recommend it to any finance professional looking to advance their career.”
+            - generic [ref=e770]:
+              - generic [ref=e771]: SA
+              - generic [ref=e772]:
+                - paragraph [ref=e773]: Sarah Al-Mahmoud
+                - paragraph [ref=e774]: Senior Financial Analyst, National Bank of Bahrain
+              - generic [ref=e775]: CDA
+          - generic [ref=e776]:
+            - img [ref=e777]
+            - generic [ref=e780]:
+              - img [ref=e781]
+              - img [ref=e783]
+              - img [ref=e785]
+              - img [ref=e787]
+              - img [ref=e789]
+            - paragraph [ref=e791]: “VIFM's CDIP certification was a game-changer for my career. The curriculum covers everything from data acquisition to visualization in a structured way. I gained confidence in leading data initiatives and the credential is recognized across the GCC region.”
+            - generic [ref=e793]:
+              - generic [ref=e794]: OK
+              - generic [ref=e795]:
+                - paragraph [ref=e796]: Omar Khalid
+                - paragraph [ref=e797]: Data Intelligence Manager, Deloitte Middle East
+              - generic [ref=e798]: CDIP
+          - generic [ref=e799]:
+            - img [ref=e800]
+            - generic [ref=e803]:
+              - img [ref=e804]
+              - img [ref=e806]
+              - img [ref=e808]
+              - img [ref=e810]
+              - img [ref=e812]
+            - paragraph [ref=e814]: “What sets VIFM apart is the bilingual approach and focus on GCC market relevance. The course material is practical and directly applicable. After completing my certification, I was promoted within three months. The investment in VIFM training paid for itself many times over.”
+            - generic [ref=e816]:
+              - generic [ref=e817]: FH
+              - generic [ref=e818]:
+                - paragraph [ref=e819]: Fatima Hassan
+                - paragraph [ref=e820]: Risk & Compliance Officer, Kuwait Finance House
+              - generic [ref=e821]: CDA
+      - generic [ref=e824]:
+        - heading "Ready to Start Your Learning Journey?" [level=2] [ref=e826]
+        - paragraph [ref=e828]: Join thousands of professionals already learning with VIFM
+        - link "Get Started Free" [ref=e832] [cursor=pointer]:
+          - /url: /en/register
+          - text: Get Started Free
+          - img [ref=e833]
+    - contentinfo [ref=e835]:
+      - generic [ref=e836]:
+        - generic [ref=e837]:
+          - generic [ref=e838]:
+            - img "VIFM - Virginia Institute of Finance and Management" [ref=e839]
+            - paragraph [ref=e840]: Virginia Institute of Finance and Management — Professional training and consulting across the GCC region.
+            - generic [ref=e841]:
+              - paragraph [ref=e842]: Get the App
+              - generic [ref=e843]:
+                - generic [ref=e844]:
+                  - img [ref=e845]
+                  - generic [ref=e847]:
+                    - generic [ref=e848]: App Store
+                    - generic [ref=e849]: Coming Soon
+                - generic [ref=e850]:
+                  - img [ref=e851]
+                  - generic [ref=e853]:
+                    - generic [ref=e854]: Google Play
+                    - generic [ref=e855]: Coming Soon
+          - generic [ref=e856]:
+            - heading "Quick Links" [level=4] [ref=e857]
+            - list [ref=e858]:
+              - listitem [ref=e859]:
+                - link "Courses" [ref=e860] [cursor=pointer]:
+                  - /url: /en/courses
+              - listitem [ref=e861]:
+                - link "Webinars" [ref=e862] [cursor=pointer]:
+                  - /url: /en/webinars
+              - listitem [ref=e863]:
+                - link "Pricing" [ref=e864] [cursor=pointer]:
+                  - /url: /en/pricing
+              - listitem [ref=e865]:
+                - link "About" [ref=e866] [cursor=pointer]:
+                  - /url: /en/about
+          - generic [ref=e867]:
+            - heading "Support" [level=4] [ref=e868]
+            - list [ref=e869]:
+              - listitem [ref=e870]:
+                - link "Contact Us" [ref=e871] [cursor=pointer]:
+                  - /url: /en/contact
+              - listitem [ref=e872]:
+                - link "Help Center" [ref=e873] [cursor=pointer]:
+                  - /url: /en/contact
+          - generic [ref=e874]:
+            - heading "Legal" [level=4] [ref=e875]
+            - list [ref=e876]:
+              - listitem [ref=e877]:
+                - link "Privacy Policy" [ref=e878] [cursor=pointer]:
+                  - /url: /en/privacy-policy
+              - listitem [ref=e879]:
+                - link "Terms of Service" [ref=e880] [cursor=pointer]:
+                  - /url: /en/terms-of-service
+        - paragraph [ref=e882]: © 2026 VIFM. All rights reserved.
+  - button "Open Next.js Dev Tools" [ref=e888] [cursor=pointer]:
+    - img [ref=e889]
+  - alert [ref=e892]
+  - button "🎓 Try Demo No Login" [ref=e894] [cursor=pointer]:
+    - generic [ref=e895]: 🎓
+    - generic [ref=e896]: Try Demo
+    - generic [ref=e897]: No Login

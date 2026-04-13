@@ -1,0 +1,2303 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "VIFM - Virginia Institute of Finance and Management":
+          - /url: /en
+          - img "VIFM - Virginia Institute of Finance and Management"
+        - navigation [ref=e7]:
+          - link "Home" [ref=e9] [cursor=pointer]:
+            - /url: /en
+            - text: Home
+            - img [ref=e10]
+          - link "Courses" [ref=e13] [cursor=pointer]:
+            - /url: /en/courses
+            - text: Courses
+            - img [ref=e14]
+          - link "Certifications" [ref=e17] [cursor=pointer]:
+            - /url: /en/designations
+            - text: Certifications
+            - img [ref=e18]
+          - link "Webinars" [ref=e21] [cursor=pointer]:
+            - /url: /en/webinars
+            - text: Webinars
+            - img [ref=e22]
+          - link "Pricing" [ref=e24] [cursor=pointer]:
+            - /url: /en/pricing
+          - link "About" [ref=e25] [cursor=pointer]:
+            - /url: /en/about
+          - link "Contact" [ref=e26] [cursor=pointer]:
+            - /url: /en/contact
+        - generic [ref=e27]:
+          - link "Admin" [ref=e167] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e168]
+            - text: Admin
+          - button "Search" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+          - button "Switch to Arabic" [ref=e32] [cursor=pointer]:
+            - img [ref=e33]
+            - generic [ref=e36]: العربية
+          - button "Notifications" [ref=e172] [cursor=pointer]:
+            - img [ref=e173]
+          - button "A Admin User" [ref=e177] [cursor=pointer]:
+            - generic [ref=e178]: A
+            - generic [ref=e179]: Admin User
+    - generic [ref=e37]:
+      - complementary [ref=e38]:
+        - button "Collapse" [ref=e40] [cursor=pointer]:
+          - img [ref=e41]
+          - generic [ref=e44]: Collapse
+        - navigation [ref=e45]:
+          - link "Dashboard" [ref=e46] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e47]
+            - generic [ref=e52]: Dashboard
+          - generic [ref=e53]:
+            - button "Catalog" [ref=e54] [cursor=pointer]:
+              - generic [ref=e55]:
+                - img [ref=e56]
+                - generic [ref=e60]: Catalog
+              - img [ref=e61]
+            - generic [ref=e63]:
+              - link "Courses" [ref=e64] [cursor=pointer]:
+                - /url: /en/admin/courses
+              - link "Certifications" [ref=e65] [cursor=pointer]:
+                - /url: /en/admin/certifications
+              - link "Webinars" [ref=e66] [cursor=pointer]:
+                - /url: /en/admin/webinars
+              - link "Categories" [ref=e67] [cursor=pointer]:
+                - /url: /en/admin/categories
+              - link "Learning Paths" [ref=e68] [cursor=pointer]:
+                - /url: /en/admin/learning-paths
+          - link "Manage Users" [ref=e69] [cursor=pointer]:
+            - /url: /en/admin/users
+            - img [ref=e70]
+            - generic [ref=e75]: Manage Users
+          - link "Manage Organizations" [ref=e76] [cursor=pointer]:
+            - /url: /en/admin/organizations
+            - img [ref=e77]
+            - generic [ref=e81]: Manage Organizations
+          - button "Manage Payments" [ref=e83] [cursor=pointer]:
+            - generic [ref=e84]:
+              - img [ref=e85]
+              - generic [ref=e87]: Manage Payments
+            - img [ref=e88]
+          - button "Manage Certificates" [ref=e91] [cursor=pointer]:
+            - generic [ref=e92]:
+              - img [ref=e93]
+              - generic [ref=e96]: Manage Certificates
+            - img [ref=e97]
+          - button "Analytics" [ref=e100] [cursor=pointer]:
+            - generic [ref=e101]:
+              - img [ref=e102]
+              - generic [ref=e104]: Analytics
+            - img [ref=e105]
+          - link "Badges" [ref=e107] [cursor=pointer]:
+            - /url: /en/admin/badges
+            - img [ref=e108]
+            - generic [ref=e114]: Badges
+          - link "Testimonials" [ref=e115] [cursor=pointer]:
+            - /url: /en/admin/testimonials
+            - img [ref=e116]
+            - generic [ref=e118]: Testimonials
+          - link "Notifications" [ref=e119] [cursor=pointer]:
+            - /url: /en/admin/notifications
+            - img [ref=e120]
+            - generic [ref=e123]: Notifications
+          - link "Settings" [ref=e124] [cursor=pointer]:
+            - /url: /en/admin/settings
+            - img [ref=e125]
+            - generic [ref=e128]: Settings
+      - main [ref=e129]:
+        - generic [ref=e131]:
+          - generic [ref=e132]:
+            - heading "Courses" [level=1] [ref=e133]
+            - link "Create Course" [ref=e134] [cursor=pointer]:
+              - /url: /en/admin/courses/new
+              - button "Create Course" [ref=e135]:
+                - img [ref=e136]
+                - text: Create Course
+          - generic [ref=e137]:
+            - generic [ref=e139]:
+              - generic [ref=e140]:
+                - img [ref=e141]
+                - textbox "Search courses..." [ref=e144]
+              - generic [ref=e145]:
+                - button "All" [ref=e146] [cursor=pointer]
+                - button "Published" [ref=e147] [cursor=pointer]
+                - button "Draft" [ref=e148] [cursor=pointer]
+                - button "Archived" [ref=e149] [cursor=pointer]
+            - table [ref=e180]:
+              - rowgroup [ref=e181]:
+                - row "Course Status Price Students Actions" [ref=e182]:
+                  - columnheader "Course" [ref=e183]
+                  - columnheader "Status" [ref=e184]
+                  - columnheader "Price" [ref=e185]
+                  - columnheader "Students" [ref=e186]
+                  - columnheader "Actions" [ref=e187]
+              - rowgroup [ref=e188]:
+                - row "Test Finance, Investment, Accounting, and Banking Draft Free 0" [ref=e224]:
+                  - cell "Test Finance, Investment, Accounting, and Banking" [ref=e225]:
+                    - generic [ref=e226]:
+                      - link "Test" [ref=e227] [cursor=pointer]:
+                        - /url: /en/admin/courses/6614bbd5-1d18-476f-8271-3389c48a9ced/edit
+                      - paragraph [ref=e228]: Finance, Investment, Accounting, and Banking
+                  - cell "Draft" [ref=e229]:
+                    - generic [ref=e230]: Draft
+                  - cell "Free" [ref=e231]
+                  - cell "0" [ref=e232]
+                  - cell [ref=e233]:
+                    - generic [ref=e234]:
+                      - link "View public page" [ref=e235] [cursor=pointer]:
+                        - /url: /en/courses/test
+                        - button [ref=e236]:
+                          - img [ref=e237]
+                      - link "Edit" [ref=e240] [cursor=pointer]:
+                        - /url: /en/admin/courses/6614bbd5-1d18-476f-8271-3389c48a9ced/edit
+                        - button [ref=e241]:
+                          - img [ref=e242]
+                      - link "Manage Quizzes" [ref=e245] [cursor=pointer]:
+                        - /url: /en/admin/courses/6614bbd5-1d18-476f-8271-3389c48a9ced/quizzes
+                        - button [ref=e246]:
+                          - img [ref=e247]
+                      - button "Publish" [ref=e251] [cursor=pointer]:
+                        - img [ref=e252]
+                      - button "Delete" [ref=e255] [cursor=pointer]:
+                        - img [ref=e256]
+                - row "Data Science Certification Program ALL COURSES Draft Free 0" [ref=e259]:
+                  - cell "Data Science Certification Program ALL COURSES" [ref=e260]:
+                    - generic [ref=e261]:
+                      - link "Data Science Certification Program" [ref=e262] [cursor=pointer]:
+                        - /url: /en/admin/courses/2001e748-5ff1-436c-b65f-49f3d9b85b23/edit
+                      - paragraph [ref=e263]: ALL COURSES
+                  - cell "Draft" [ref=e264]:
+                    - generic [ref=e265]: Draft
+                  - cell "Free" [ref=e266]
+                  - cell "0" [ref=e267]
+                  - cell [ref=e268]:
+                    - generic [ref=e269]:
+                      - link "View public page" [ref=e270] [cursor=pointer]:
+                        - /url: /en/courses/data-science-certification-program
+                        - button [ref=e271]:
+                          - img [ref=e272]
+                      - link "Edit" [ref=e275] [cursor=pointer]:
+                        - /url: /en/admin/courses/2001e748-5ff1-436c-b65f-49f3d9b85b23/edit
+                        - button [ref=e276]:
+                          - img [ref=e277]
+                      - link "Manage Quizzes" [ref=e280] [cursor=pointer]:
+                        - /url: /en/admin/courses/2001e748-5ff1-436c-b65f-49f3d9b85b23/quizzes
+                        - button [ref=e281]:
+                          - img [ref=e282]
+                      - button "Publish" [ref=e286] [cursor=pointer]:
+                        - img [ref=e287]
+                      - button "Delete" [ref=e290] [cursor=pointer]:
+                        - img [ref=e291]
+                - row "Effective Webinar Strategies ALL COURSES Draft Free 0" [ref=e294]:
+                  - cell "Effective Webinar Strategies ALL COURSES" [ref=e295]:
+                    - generic [ref=e296]:
+                      - link "Effective Webinar Strategies" [ref=e297] [cursor=pointer]:
+                        - /url: /en/admin/courses/f162ab0a-471e-4707-9e16-00fdf3e91e88/edit
+                      - paragraph [ref=e298]: ALL COURSES
+                  - cell "Draft" [ref=e299]:
+                    - generic [ref=e300]: Draft
+                  - cell "Free" [ref=e301]
+                  - cell "0" [ref=e302]
+                  - cell [ref=e303]:
+                    - generic [ref=e304]:
+                      - link "View public page" [ref=e305] [cursor=pointer]:
+                        - /url: /en/courses/effective-webinar-strategies
+                        - button [ref=e306]:
+                          - img [ref=e307]
+                      - link "Edit" [ref=e310] [cursor=pointer]:
+                        - /url: /en/admin/courses/f162ab0a-471e-4707-9e16-00fdf3e91e88/edit
+                        - button [ref=e311]:
+                          - img [ref=e312]
+                      - link "Manage Quizzes" [ref=e315] [cursor=pointer]:
+                        - /url: /en/admin/courses/f162ab0a-471e-4707-9e16-00fdf3e91e88/quizzes
+                        - button [ref=e316]:
+                          - img [ref=e317]
+                      - button "Publish" [ref=e321] [cursor=pointer]:
+                        - img [ref=e322]
+                      - button "Delete" [ref=e325] [cursor=pointer]:
+                        - img [ref=e326]
+                - row "Exemplary Practices in Corporate Governance ALL COURSES Draft Free 0" [ref=e329]:
+                  - cell "Exemplary Practices in Corporate Governance ALL COURSES" [ref=e330]:
+                    - generic [ref=e331]:
+                      - link "Exemplary Practices in Corporate Governance" [ref=e332] [cursor=pointer]:
+                        - /url: /en/admin/courses/9d307a89-b855-4110-94e8-a6b018696e08/edit
+                      - paragraph [ref=e333]: ALL COURSES
+                  - cell "Draft" [ref=e334]:
+                    - generic [ref=e335]: Draft
+                  - cell "Free" [ref=e336]
+                  - cell "0" [ref=e337]
+                  - cell [ref=e338]:
+                    - generic [ref=e339]:
+                      - link "View public page" [ref=e340] [cursor=pointer]:
+                        - /url: /en/courses/exemplary-practices-in-corporate-governance
+                        - button [ref=e341]:
+                          - img [ref=e342]
+                      - link "Edit" [ref=e345] [cursor=pointer]:
+                        - /url: /en/admin/courses/9d307a89-b855-4110-94e8-a6b018696e08/edit
+                        - button [ref=e346]:
+                          - img [ref=e347]
+                      - link "Manage Quizzes" [ref=e350] [cursor=pointer]:
+                        - /url: /en/admin/courses/9d307a89-b855-4110-94e8-a6b018696e08/quizzes
+                        - button [ref=e351]:
+                          - img [ref=e352]
+                      - button "Publish" [ref=e356] [cursor=pointer]:
+                        - img [ref=e357]
+                      - button "Delete" [ref=e360] [cursor=pointer]:
+                        - img [ref=e361]
+                - row "Certification in Business Data Analytics Prep Course ALL COURSES Draft Free 0" [ref=e364]:
+                  - cell "Certification in Business Data Analytics Prep Course ALL COURSES" [ref=e365]:
+                    - generic [ref=e366]:
+                      - link "Certification in Business Data Analytics Prep Course" [ref=e367] [cursor=pointer]:
+                        - /url: /en/admin/courses/6a9b4b7a-0dba-4781-9d11-b73511920819/edit
+                      - paragraph [ref=e368]: ALL COURSES
+                  - cell "Draft" [ref=e369]:
+                    - generic [ref=e370]: Draft
+                  - cell "Free" [ref=e371]
+                  - cell "0" [ref=e372]
+                  - cell [ref=e373]:
+                    - generic [ref=e374]:
+                      - link "View public page" [ref=e375] [cursor=pointer]:
+                        - /url: /en/courses/certification-in-business-data-analytics-prep-course
+                        - button [ref=e376]:
+                          - img [ref=e377]
+                      - link "Edit" [ref=e380] [cursor=pointer]:
+                        - /url: /en/admin/courses/6a9b4b7a-0dba-4781-9d11-b73511920819/edit
+                        - button [ref=e381]:
+                          - img [ref=e382]
+                      - link "Manage Quizzes" [ref=e385] [cursor=pointer]:
+                        - /url: /en/admin/courses/6a9b4b7a-0dba-4781-9d11-b73511920819/quizzes
+                        - button [ref=e386]:
+                          - img [ref=e387]
+                      - button "Publish" [ref=e391] [cursor=pointer]:
+                        - img [ref=e392]
+                      - button "Delete" [ref=e395] [cursor=pointer]:
+                        - img [ref=e396]
+                - row "Internal Audit Basics and Principles & Governance & Risk Management ALL COURSES Draft Free 0" [ref=e399]:
+                  - cell "Internal Audit Basics and Principles & Governance & Risk Management ALL COURSES" [ref=e400]:
+                    - generic [ref=e401]:
+                      - link "Internal Audit Basics and Principles & Governance & Risk Management" [ref=e402] [cursor=pointer]:
+                        - /url: /en/admin/courses/16c87dd2-742c-4dd1-8469-a8b5a1f40306/edit
+                      - paragraph [ref=e403]: ALL COURSES
+                  - cell "Draft" [ref=e404]:
+                    - generic [ref=e405]: Draft
+                  - cell "Free" [ref=e406]
+                  - cell "0" [ref=e407]
+                  - cell [ref=e408]:
+                    - generic [ref=e409]:
+                      - link "View public page" [ref=e410] [cursor=pointer]:
+                        - /url: /en/courses/internal-audit-basics-and-principles-governance-risk-management
+                        - button [ref=e411]:
+                          - img [ref=e412]
+                      - link "Edit" [ref=e415] [cursor=pointer]:
+                        - /url: /en/admin/courses/16c87dd2-742c-4dd1-8469-a8b5a1f40306/edit
+                        - button [ref=e416]:
+                          - img [ref=e417]
+                      - link "Manage Quizzes" [ref=e420] [cursor=pointer]:
+                        - /url: /en/admin/courses/16c87dd2-742c-4dd1-8469-a8b5a1f40306/quizzes
+                        - button [ref=e421]:
+                          - img [ref=e422]
+                      - button "Publish" [ref=e426] [cursor=pointer]:
+                        - img [ref=e427]
+                      - button "Delete" [ref=e430] [cursor=pointer]:
+                        - img [ref=e431]
+                - 'row "Mastering Organizational Control: Frameworks and Governance for Excellence ALL COURSES Draft Free 0" [ref=e434]':
+                  - 'cell "Mastering Organizational Control: Frameworks and Governance for Excellence ALL COURSES" [ref=e435]':
+                    - generic [ref=e436]:
+                      - 'link "Mastering Organizational Control: Frameworks and Governance for Excellence" [ref=e437] [cursor=pointer]':
+                        - /url: /en/admin/courses/17f79945-d201-4a0c-af5f-03e6f59d6e57/edit
+                      - paragraph [ref=e438]: ALL COURSES
+                  - cell "Draft" [ref=e439]:
+                    - generic [ref=e440]: Draft
+                  - cell "Free" [ref=e441]
+                  - cell "0" [ref=e442]
+                  - cell [ref=e443]:
+                    - generic [ref=e444]:
+                      - link "View public page" [ref=e445] [cursor=pointer]:
+                        - /url: /en/courses/mastering-organizational-control-frameworks-and-governance-for-excellence
+                        - button [ref=e446]:
+                          - img [ref=e447]
+                      - link "Edit" [ref=e450] [cursor=pointer]:
+                        - /url: /en/admin/courses/17f79945-d201-4a0c-af5f-03e6f59d6e57/edit
+                        - button [ref=e451]:
+                          - img [ref=e452]
+                      - link "Manage Quizzes" [ref=e455] [cursor=pointer]:
+                        - /url: /en/admin/courses/17f79945-d201-4a0c-af5f-03e6f59d6e57/quizzes
+                        - button [ref=e456]:
+                          - img [ref=e457]
+                      - button "Publish" [ref=e461] [cursor=pointer]:
+                        - img [ref=e462]
+                      - button "Delete" [ref=e465] [cursor=pointer]:
+                        - img [ref=e466]
+                - row "New Course ALL COURSES Draft Free 0" [ref=e469]:
+                  - cell "New Course ALL COURSES" [ref=e470]:
+                    - generic [ref=e471]:
+                      - link "New Course" [ref=e472] [cursor=pointer]:
+                        - /url: /en/admin/courses/693d1ee6-aa7e-4976-b868-b4cba3d5009f/edit
+                      - paragraph [ref=e473]: ALL COURSES
+                  - cell "Draft" [ref=e474]:
+                    - generic [ref=e475]: Draft
+                  - cell "Free" [ref=e476]
+                  - cell "0" [ref=e477]
+                  - cell [ref=e478]:
+                    - generic [ref=e479]:
+                      - link "View public page" [ref=e480] [cursor=pointer]:
+                        - /url: /en/courses/new-course
+                        - button [ref=e481]:
+                          - img [ref=e482]
+                      - link "Edit" [ref=e485] [cursor=pointer]:
+                        - /url: /en/admin/courses/693d1ee6-aa7e-4976-b868-b4cba3d5009f/edit
+                        - button [ref=e486]:
+                          - img [ref=e487]
+                      - link "Manage Quizzes" [ref=e490] [cursor=pointer]:
+                        - /url: /en/admin/courses/693d1ee6-aa7e-4976-b868-b4cba3d5009f/quizzes
+                        - button [ref=e491]:
+                          - img [ref=e492]
+                      - button "Publish" [ref=e496] [cursor=pointer]:
+                        - img [ref=e497]
+                      - button "Delete" [ref=e500] [cursor=pointer]:
+                        - img [ref=e501]
+                - row "Connection Between Financial Statement & Tactics for Cash Liquidity Enhancement ALL COURSES Draft Free 0" [ref=e504]:
+                  - cell "Connection Between Financial Statement & Tactics for Cash Liquidity Enhancement ALL COURSES" [ref=e505]:
+                    - generic [ref=e506]:
+                      - link "Connection Between Financial Statement & Tactics for Cash Liquidity Enhancement" [ref=e507] [cursor=pointer]:
+                        - /url: /en/admin/courses/8c641305-0eac-423e-a59d-d7fa3ac6cc61/edit
+                      - paragraph [ref=e508]: ALL COURSES
+                  - cell "Draft" [ref=e509]:
+                    - generic [ref=e510]: Draft
+                  - cell "Free" [ref=e511]
+                  - cell "0" [ref=e512]
+                  - cell [ref=e513]:
+                    - generic [ref=e514]:
+                      - link "View public page" [ref=e515] [cursor=pointer]:
+                        - /url: /en/courses/connection-between-financial-statement-tactics-for-cash-liquidity-enhancement
+                        - button [ref=e516]:
+                          - img [ref=e517]
+                      - link "Edit" [ref=e520] [cursor=pointer]:
+                        - /url: /en/admin/courses/8c641305-0eac-423e-a59d-d7fa3ac6cc61/edit
+                        - button [ref=e521]:
+                          - img [ref=e522]
+                      - link "Manage Quizzes" [ref=e525] [cursor=pointer]:
+                        - /url: /en/admin/courses/8c641305-0eac-423e-a59d-d7fa3ac6cc61/quizzes
+                        - button [ref=e526]:
+                          - img [ref=e527]
+                      - button "Publish" [ref=e531] [cursor=pointer]:
+                        - img [ref=e532]
+                      - button "Delete" [ref=e535] [cursor=pointer]:
+                        - img [ref=e536]
+                - row "Accounting Fundamentals & Financial Reporting ALL COURSES Draft Free 0" [ref=e539]:
+                  - cell "Accounting Fundamentals & Financial Reporting ALL COURSES" [ref=e540]:
+                    - generic [ref=e541]:
+                      - link "Accounting Fundamentals & Financial Reporting" [ref=e542] [cursor=pointer]:
+                        - /url: /en/admin/courses/acb2c290-90f2-4f11-bc4f-ca5168746bb7/edit
+                      - paragraph [ref=e543]: ALL COURSES
+                  - cell "Draft" [ref=e544]:
+                    - generic [ref=e545]: Draft
+                  - cell "Free" [ref=e546]
+                  - cell "0" [ref=e547]
+                  - cell [ref=e548]:
+                    - generic [ref=e549]:
+                      - link "View public page" [ref=e550] [cursor=pointer]:
+                        - /url: /en/courses/accounting-fundamentals-financial-reporting
+                        - button [ref=e551]:
+                          - img [ref=e552]
+                      - link "Edit" [ref=e555] [cursor=pointer]:
+                        - /url: /en/admin/courses/acb2c290-90f2-4f11-bc4f-ca5168746bb7/edit
+                        - button [ref=e556]:
+                          - img [ref=e557]
+                      - link "Manage Quizzes" [ref=e560] [cursor=pointer]:
+                        - /url: /en/admin/courses/acb2c290-90f2-4f11-bc4f-ca5168746bb7/quizzes
+                        - button [ref=e561]:
+                          - img [ref=e562]
+                      - button "Publish" [ref=e566] [cursor=pointer]:
+                        - img [ref=e567]
+                      - button "Delete" [ref=e570] [cursor=pointer]:
+                        - img [ref=e571]
+                - 'row "Derivatives: Forward vs Futures ALL COURSES Draft Free 0" [ref=e574]':
+                  - 'cell "Derivatives: Forward vs Futures ALL COURSES" [ref=e575]':
+                    - generic [ref=e576]:
+                      - 'link "Derivatives: Forward vs Futures" [ref=e577] [cursor=pointer]':
+                        - /url: /en/admin/courses/b717c758-6107-4b78-8b25-d2980b868e26/edit
+                      - paragraph [ref=e578]: ALL COURSES
+                  - cell "Draft" [ref=e579]:
+                    - generic [ref=e580]: Draft
+                  - cell "Free" [ref=e581]
+                  - cell "0" [ref=e582]
+                  - cell [ref=e583]:
+                    - generic [ref=e584]:
+                      - link "View public page" [ref=e585] [cursor=pointer]:
+                        - /url: /en/courses/derivatives-forward-vs-futures
+                        - button [ref=e586]:
+                          - img [ref=e587]
+                      - link "Edit" [ref=e590] [cursor=pointer]:
+                        - /url: /en/admin/courses/b717c758-6107-4b78-8b25-d2980b868e26/edit
+                        - button [ref=e591]:
+                          - img [ref=e592]
+                      - link "Manage Quizzes" [ref=e595] [cursor=pointer]:
+                        - /url: /en/admin/courses/b717c758-6107-4b78-8b25-d2980b868e26/quizzes
+                        - button [ref=e596]:
+                          - img [ref=e597]
+                      - button "Publish" [ref=e601] [cursor=pointer]:
+                        - img [ref=e602]
+                      - button "Delete" [ref=e605] [cursor=pointer]:
+                        - img [ref=e606]
+                - 'row "Key Performance Indicators: Mastering Performance Management ALL COURSES Draft Free 0" [ref=e609]':
+                  - 'cell "Key Performance Indicators: Mastering Performance Management ALL COURSES" [ref=e610]':
+                    - generic [ref=e611]:
+                      - 'link "Key Performance Indicators: Mastering Performance Management" [ref=e612] [cursor=pointer]':
+                        - /url: /en/admin/courses/9508dd5f-3d2c-4535-98e5-05aed7f6ddbb/edit
+                      - paragraph [ref=e613]: ALL COURSES
+                  - cell "Draft" [ref=e614]:
+                    - generic [ref=e615]: Draft
+                  - cell "Free" [ref=e616]
+                  - cell "0" [ref=e617]
+                  - cell [ref=e618]:
+                    - generic [ref=e619]:
+                      - link "View public page" [ref=e620] [cursor=pointer]:
+                        - /url: /en/courses/key-performance-indicators-mastering-performance-management
+                        - button [ref=e621]:
+                          - img [ref=e622]
+                      - link "Edit" [ref=e625] [cursor=pointer]:
+                        - /url: /en/admin/courses/9508dd5f-3d2c-4535-98e5-05aed7f6ddbb/edit
+                        - button [ref=e626]:
+                          - img [ref=e627]
+                      - link "Manage Quizzes" [ref=e630] [cursor=pointer]:
+                        - /url: /en/admin/courses/9508dd5f-3d2c-4535-98e5-05aed7f6ddbb/quizzes
+                        - button [ref=e631]:
+                          - img [ref=e632]
+                      - button "Publish" [ref=e636] [cursor=pointer]:
+                        - img [ref=e637]
+                      - button "Delete" [ref=e640] [cursor=pointer]:
+                        - img [ref=e641]
+                - 'row "Storytelling with Data: Tips to Create Compelling Presentation ALL COURSES Draft Free 0" [ref=e644]':
+                  - 'cell "Storytelling with Data: Tips to Create Compelling Presentation ALL COURSES" [ref=e645]':
+                    - generic [ref=e646]:
+                      - 'link "Storytelling with Data: Tips to Create Compelling Presentation" [ref=e647] [cursor=pointer]':
+                        - /url: /en/admin/courses/2f34880d-6979-4b02-875a-6b229f8b1a0b/edit
+                      - paragraph [ref=e648]: ALL COURSES
+                  - cell "Draft" [ref=e649]:
+                    - generic [ref=e650]: Draft
+                  - cell "Free" [ref=e651]
+                  - cell "0" [ref=e652]
+                  - cell [ref=e653]:
+                    - generic [ref=e654]:
+                      - link "View public page" [ref=e655] [cursor=pointer]:
+                        - /url: /en/courses/storytelling-with-data-tips-to-create-compelling-presentation
+                        - button [ref=e656]:
+                          - img [ref=e657]
+                      - link "Edit" [ref=e660] [cursor=pointer]:
+                        - /url: /en/admin/courses/2f34880d-6979-4b02-875a-6b229f8b1a0b/edit
+                        - button [ref=e661]:
+                          - img [ref=e662]
+                      - link "Manage Quizzes" [ref=e665] [cursor=pointer]:
+                        - /url: /en/admin/courses/2f34880d-6979-4b02-875a-6b229f8b1a0b/quizzes
+                        - button [ref=e666]:
+                          - img [ref=e667]
+                      - button "Publish" [ref=e671] [cursor=pointer]:
+                        - img [ref=e672]
+                      - button "Delete" [ref=e675] [cursor=pointer]:
+                        - img [ref=e676]
+                - row "Optimal Practices for Ensuring Effective Internal Controls ALL COURSES Draft Free 0" [ref=e679]:
+                  - cell "Optimal Practices for Ensuring Effective Internal Controls ALL COURSES" [ref=e680]:
+                    - generic [ref=e681]:
+                      - link "Optimal Practices for Ensuring Effective Internal Controls" [ref=e682] [cursor=pointer]:
+                        - /url: /en/admin/courses/f60aa6b5-5091-4855-8159-79fd7321bb14/edit
+                      - paragraph [ref=e683]: ALL COURSES
+                  - cell "Draft" [ref=e684]:
+                    - generic [ref=e685]: Draft
+                  - cell "Free" [ref=e686]
+                  - cell "0" [ref=e687]
+                  - cell [ref=e688]:
+                    - generic [ref=e689]:
+                      - link "View public page" [ref=e690] [cursor=pointer]:
+                        - /url: /en/courses/optimal-practices-for-ensuring-effective-internal-controls
+                        - button [ref=e691]:
+                          - img [ref=e692]
+                      - link "Edit" [ref=e695] [cursor=pointer]:
+                        - /url: /en/admin/courses/f60aa6b5-5091-4855-8159-79fd7321bb14/edit
+                        - button [ref=e696]:
+                          - img [ref=e697]
+                      - link "Manage Quizzes" [ref=e700] [cursor=pointer]:
+                        - /url: /en/admin/courses/f60aa6b5-5091-4855-8159-79fd7321bb14/quizzes
+                        - button [ref=e701]:
+                          - img [ref=e702]
+                      - button "Publish" [ref=e706] [cursor=pointer]:
+                        - img [ref=e707]
+                      - button "Delete" [ref=e710] [cursor=pointer]:
+                        - img [ref=e711]
+                - row "IFRS Vs GAAP Major Differences ALL COURSES Draft Free 0" [ref=e714]:
+                  - cell "IFRS Vs GAAP Major Differences ALL COURSES" [ref=e715]:
+                    - generic [ref=e716]:
+                      - link "IFRS Vs GAAP Major Differences" [ref=e717] [cursor=pointer]:
+                        - /url: /en/admin/courses/c77bda32-b60d-48df-a527-01841eb21135/edit
+                      - paragraph [ref=e718]: ALL COURSES
+                  - cell "Draft" [ref=e719]:
+                    - generic [ref=e720]: Draft
+                  - cell "Free" [ref=e721]
+                  - cell "0" [ref=e722]
+                  - cell [ref=e723]:
+                    - generic [ref=e724]:
+                      - link "View public page" [ref=e725] [cursor=pointer]:
+                        - /url: /en/courses/ifrs-vs-gaap-major-differences
+                        - button [ref=e726]:
+                          - img [ref=e727]
+                      - link "Edit" [ref=e730] [cursor=pointer]:
+                        - /url: /en/admin/courses/c77bda32-b60d-48df-a527-01841eb21135/edit
+                        - button [ref=e731]:
+                          - img [ref=e732]
+                      - link "Manage Quizzes" [ref=e735] [cursor=pointer]:
+                        - /url: /en/admin/courses/c77bda32-b60d-48df-a527-01841eb21135/quizzes
+                        - button [ref=e736]:
+                          - img [ref=e737]
+                      - button "Publish" [ref=e741] [cursor=pointer]:
+                        - img [ref=e742]
+                      - button "Delete" [ref=e745] [cursor=pointer]:
+                        - img [ref=e746]
+                - row "A Deep Dive into GCC Financial Analysis with Ashom ALL COURSES Draft Free 0" [ref=e749]:
+                  - cell "A Deep Dive into GCC Financial Analysis with Ashom ALL COURSES" [ref=e750]:
+                    - generic [ref=e751]:
+                      - link "A Deep Dive into GCC Financial Analysis with Ashom" [ref=e752] [cursor=pointer]:
+                        - /url: /en/admin/courses/98f6191f-0db9-4dca-83e0-fddeb8ab82e5/edit
+                      - paragraph [ref=e753]: ALL COURSES
+                  - cell "Draft" [ref=e754]:
+                    - generic [ref=e755]: Draft
+                  - cell "Free" [ref=e756]
+                  - cell "0" [ref=e757]
+                  - cell [ref=e758]:
+                    - generic [ref=e759]:
+                      - link "View public page" [ref=e760] [cursor=pointer]:
+                        - /url: /en/courses/a-deep-dive-into-gcc-financial-analysis-with-ashom
+                        - button [ref=e761]:
+                          - img [ref=e762]
+                      - link "Edit" [ref=e765] [cursor=pointer]:
+                        - /url: /en/admin/courses/98f6191f-0db9-4dca-83e0-fddeb8ab82e5/edit
+                        - button [ref=e766]:
+                          - img [ref=e767]
+                      - link "Manage Quizzes" [ref=e770] [cursor=pointer]:
+                        - /url: /en/admin/courses/98f6191f-0db9-4dca-83e0-fddeb8ab82e5/quizzes
+                        - button [ref=e771]:
+                          - img [ref=e772]
+                      - button "Publish" [ref=e776] [cursor=pointer]:
+                        - img [ref=e777]
+                      - button "Delete" [ref=e780] [cursor=pointer]:
+                        - img [ref=e781]
+                - 'row "Generative AI: Changing How Business Innovates and Operates ALL COURSES Draft Free 0" [ref=e784]':
+                  - 'cell "Generative AI: Changing How Business Innovates and Operates ALL COURSES" [ref=e785]':
+                    - generic [ref=e786]:
+                      - 'link "Generative AI: Changing How Business Innovates and Operates" [ref=e787] [cursor=pointer]':
+                        - /url: /en/admin/courses/3cf23caa-cb27-45e7-9c89-5bd898b5c8a0/edit
+                      - paragraph [ref=e788]: ALL COURSES
+                  - cell "Draft" [ref=e789]:
+                    - generic [ref=e790]: Draft
+                  - cell "Free" [ref=e791]
+                  - cell "0" [ref=e792]
+                  - cell [ref=e793]:
+                    - generic [ref=e794]:
+                      - link "View public page" [ref=e795] [cursor=pointer]:
+                        - /url: /en/courses/generative-ai-changing-how-business-innovates-and-operates
+                        - button [ref=e796]:
+                          - img [ref=e797]
+                      - link "Edit" [ref=e800] [cursor=pointer]:
+                        - /url: /en/admin/courses/3cf23caa-cb27-45e7-9c89-5bd898b5c8a0/edit
+                        - button [ref=e801]:
+                          - img [ref=e802]
+                      - link "Manage Quizzes" [ref=e805] [cursor=pointer]:
+                        - /url: /en/admin/courses/3cf23caa-cb27-45e7-9c89-5bd898b5c8a0/quizzes
+                        - button [ref=e806]:
+                          - img [ref=e807]
+                      - button "Publish" [ref=e811] [cursor=pointer]:
+                        - img [ref=e812]
+                      - button "Delete" [ref=e815] [cursor=pointer]:
+                        - img [ref=e816]
+                - 'row "Derivatives: Options Call & Put ALL COURSES Draft Free 0" [ref=e819]':
+                  - 'cell "Derivatives: Options Call & Put ALL COURSES" [ref=e820]':
+                    - generic [ref=e821]:
+                      - 'link "Derivatives: Options Call & Put" [ref=e822] [cursor=pointer]':
+                        - /url: /en/admin/courses/258e0f54-1205-4793-b2c0-5ed9bbb7ab34/edit
+                      - paragraph [ref=e823]: ALL COURSES
+                  - cell "Draft" [ref=e824]:
+                    - generic [ref=e825]: Draft
+                  - cell "Free" [ref=e826]
+                  - cell "0" [ref=e827]
+                  - cell [ref=e828]:
+                    - generic [ref=e829]:
+                      - link "View public page" [ref=e830] [cursor=pointer]:
+                        - /url: /en/courses/derivatives-options-call-put
+                        - button [ref=e831]:
+                          - img [ref=e832]
+                      - link "Edit" [ref=e835] [cursor=pointer]:
+                        - /url: /en/admin/courses/258e0f54-1205-4793-b2c0-5ed9bbb7ab34/edit
+                        - button [ref=e836]:
+                          - img [ref=e837]
+                      - link "Manage Quizzes" [ref=e840] [cursor=pointer]:
+                        - /url: /en/admin/courses/258e0f54-1205-4793-b2c0-5ed9bbb7ab34/quizzes
+                        - button [ref=e841]:
+                          - img [ref=e842]
+                      - button "Publish" [ref=e846] [cursor=pointer]:
+                        - img [ref=e847]
+                      - button "Delete" [ref=e850] [cursor=pointer]:
+                        - img [ref=e851]
+                - row "Copy of Power Pivot Techniques ALL COURSES Draft Free 0" [ref=e854]:
+                  - cell "Copy of Power Pivot Techniques ALL COURSES" [ref=e855]:
+                    - generic [ref=e856]:
+                      - link "Copy of Power Pivot Techniques" [ref=e857] [cursor=pointer]:
+                        - /url: /en/admin/courses/498db3a0-48a5-43f2-b575-1a9b1ad3ddc9/edit
+                      - paragraph [ref=e858]: ALL COURSES
+                  - cell "Draft" [ref=e859]:
+                    - generic [ref=e860]: Draft
+                  - cell "Free" [ref=e861]
+                  - cell "0" [ref=e862]
+                  - cell [ref=e863]:
+                    - generic [ref=e864]:
+                      - link "View public page" [ref=e865] [cursor=pointer]:
+                        - /url: /en/courses/copy-of-power-pivot-techniques
+                        - button [ref=e866]:
+                          - img [ref=e867]
+                      - link "Edit" [ref=e870] [cursor=pointer]:
+                        - /url: /en/admin/courses/498db3a0-48a5-43f2-b575-1a9b1ad3ddc9/edit
+                        - button [ref=e871]:
+                          - img [ref=e872]
+                      - link "Manage Quizzes" [ref=e875] [cursor=pointer]:
+                        - /url: /en/admin/courses/498db3a0-48a5-43f2-b575-1a9b1ad3ddc9/quizzes
+                        - button [ref=e876]:
+                          - img [ref=e877]
+                      - button "Publish" [ref=e881] [cursor=pointer]:
+                        - img [ref=e882]
+                      - button "Delete" [ref=e885] [cursor=pointer]:
+                        - img [ref=e886]
+                - row "Certified Power BI Professional ALL COURSES Draft Free 0" [ref=e889]:
+                  - cell "Certified Power BI Professional ALL COURSES" [ref=e890]:
+                    - generic [ref=e891]:
+                      - link "Certified Power BI Professional" [ref=e892] [cursor=pointer]:
+                        - /url: /en/admin/courses/f2d3c7d0-0def-4f50-a75e-0c8faf4bfdc2/edit
+                      - paragraph [ref=e893]: ALL COURSES
+                  - cell "Draft" [ref=e894]:
+                    - generic [ref=e895]: Draft
+                  - cell "Free" [ref=e896]
+                  - cell "0" [ref=e897]
+                  - cell [ref=e898]:
+                    - generic [ref=e899]:
+                      - link "View public page" [ref=e900] [cursor=pointer]:
+                        - /url: /en/courses/certified-power-bi-professional
+                        - button [ref=e901]:
+                          - img [ref=e902]
+                      - link "Edit" [ref=e905] [cursor=pointer]:
+                        - /url: /en/admin/courses/f2d3c7d0-0def-4f50-a75e-0c8faf4bfdc2/edit
+                        - button [ref=e906]:
+                          - img [ref=e907]
+                      - link "Manage Quizzes" [ref=e910] [cursor=pointer]:
+                        - /url: /en/admin/courses/f2d3c7d0-0def-4f50-a75e-0c8faf4bfdc2/quizzes
+                        - button [ref=e911]:
+                          - img [ref=e912]
+                      - button "Publish" [ref=e916] [cursor=pointer]:
+                        - img [ref=e917]
+                      - button "Delete" [ref=e920] [cursor=pointer]:
+                        - img [ref=e921]
+                - row "Certified Data Intelligence Professional (CDIP) ALL COURSES Draft Free 0" [ref=e924]:
+                  - cell "Certified Data Intelligence Professional (CDIP) ALL COURSES" [ref=e925]:
+                    - generic [ref=e926]:
+                      - link "Certified Data Intelligence Professional (CDIP)" [ref=e927] [cursor=pointer]:
+                        - /url: /en/admin/courses/71d90df2-13b4-4708-9a9e-f406ef12365b/edit
+                      - paragraph [ref=e928]: ALL COURSES
+                  - cell "Draft" [ref=e929]:
+                    - generic [ref=e930]: Draft
+                  - cell "Free" [ref=e931]
+                  - cell "0" [ref=e932]
+                  - cell [ref=e933]:
+                    - generic [ref=e934]:
+                      - link "View public page" [ref=e935] [cursor=pointer]:
+                        - /url: /en/courses/certified-data-intelligence-professional-cdip
+                        - button [ref=e936]:
+                          - img [ref=e937]
+                      - link "Edit" [ref=e940] [cursor=pointer]:
+                        - /url: /en/admin/courses/71d90df2-13b4-4708-9a9e-f406ef12365b/edit
+                        - button [ref=e941]:
+                          - img [ref=e942]
+                      - link "Manage Quizzes" [ref=e945] [cursor=pointer]:
+                        - /url: /en/admin/courses/71d90df2-13b4-4708-9a9e-f406ef12365b/quizzes
+                        - button [ref=e946]:
+                          - img [ref=e947]
+                      - button "Publish" [ref=e951] [cursor=pointer]:
+                        - img [ref=e952]
+                      - button "Delete" [ref=e955] [cursor=pointer]:
+                        - img [ref=e956]
+                - row "Excel Assessment ALL COURSES Draft Free 0" [ref=e959]:
+                  - cell "Excel Assessment ALL COURSES" [ref=e960]:
+                    - generic [ref=e961]:
+                      - link "Excel Assessment" [ref=e962] [cursor=pointer]:
+                        - /url: /en/admin/courses/d6861713-7e51-4bc2-bed0-73c4ef1144be/edit
+                      - paragraph [ref=e963]: ALL COURSES
+                  - cell "Draft" [ref=e964]:
+                    - generic [ref=e965]: Draft
+                  - cell "Free" [ref=e966]
+                  - cell "0" [ref=e967]
+                  - cell [ref=e968]:
+                    - generic [ref=e969]:
+                      - link "View public page" [ref=e970] [cursor=pointer]:
+                        - /url: /en/courses/excel-assessment
+                        - button [ref=e971]:
+                          - img [ref=e972]
+                      - link "Edit" [ref=e975] [cursor=pointer]:
+                        - /url: /en/admin/courses/d6861713-7e51-4bc2-bed0-73c4ef1144be/edit
+                        - button [ref=e976]:
+                          - img [ref=e977]
+                      - link "Manage Quizzes" [ref=e980] [cursor=pointer]:
+                        - /url: /en/admin/courses/d6861713-7e51-4bc2-bed0-73c4ef1144be/quizzes
+                        - button [ref=e981]:
+                          - img [ref=e982]
+                      - button "Publish" [ref=e986] [cursor=pointer]:
+                        - img [ref=e987]
+                      - button "Delete" [ref=e990] [cursor=pointer]:
+                        - img [ref=e991]
+                - row "اختبار تحديد مستوى الاكسل - قبل الجلسة ALL COURSES Draft Free 0" [ref=e994]:
+                  - cell "اختبار تحديد مستوى الاكسل - قبل الجلسة ALL COURSES" [ref=e995]:
+                    - generic [ref=e996]:
+                      - link "اختبار تحديد مستوى الاكسل - قبل الجلسة" [ref=e997] [cursor=pointer]:
+                        - /url: /en/admin/courses/9cf71df3-438b-4383-8ef5-5d699d1d5a7a/edit
+                      - paragraph [ref=e998]: ALL COURSES
+                  - cell "Draft" [ref=e999]:
+                    - generic [ref=e1000]: Draft
+                  - cell "Free" [ref=e1001]
+                  - cell "0" [ref=e1002]
+                  - cell [ref=e1003]:
+                    - generic [ref=e1004]:
+                      - link "View public page" [ref=e1005] [cursor=pointer]:
+                        - /url: /en/courses/course-1523315
+                        - button [ref=e1006]:
+                          - img [ref=e1007]
+                      - link "Edit" [ref=e1010] [cursor=pointer]:
+                        - /url: /en/admin/courses/9cf71df3-438b-4383-8ef5-5d699d1d5a7a/edit
+                        - button [ref=e1011]:
+                          - img [ref=e1012]
+                      - link "Manage Quizzes" [ref=e1015] [cursor=pointer]:
+                        - /url: /en/admin/courses/9cf71df3-438b-4383-8ef5-5d699d1d5a7a/quizzes
+                        - button [ref=e1016]:
+                          - img [ref=e1017]
+                      - button "Publish" [ref=e1021] [cursor=pointer]:
+                        - img [ref=e1022]
+                      - button "Delete" [ref=e1025] [cursor=pointer]:
+                        - img [ref=e1026]
+                - row "Entry Certificate in Business Analysis Exam Preperation ALL COURSES Draft Free 0" [ref=e1029]:
+                  - cell "Entry Certificate in Business Analysis Exam Preperation ALL COURSES" [ref=e1030]:
+                    - generic [ref=e1031]:
+                      - link "Entry Certificate in Business Analysis Exam Preperation" [ref=e1032] [cursor=pointer]:
+                        - /url: /en/admin/courses/231779da-edcd-4075-934b-d965731b9a3a/edit
+                      - paragraph [ref=e1033]: ALL COURSES
+                  - cell "Draft" [ref=e1034]:
+                    - generic [ref=e1035]: Draft
+                  - cell "Free" [ref=e1036]
+                  - cell "0" [ref=e1037]
+                  - cell [ref=e1038]:
+                    - generic [ref=e1039]:
+                      - link "View public page" [ref=e1040] [cursor=pointer]:
+                        - /url: /en/courses/entry-certificate-in-business-analysis-exam-preperation
+                        - button [ref=e1041]:
+                          - img [ref=e1042]
+                      - link "Edit" [ref=e1045] [cursor=pointer]:
+                        - /url: /en/admin/courses/231779da-edcd-4075-934b-d965731b9a3a/edit
+                        - button [ref=e1046]:
+                          - img [ref=e1047]
+                      - link "Manage Quizzes" [ref=e1050] [cursor=pointer]:
+                        - /url: /en/admin/courses/231779da-edcd-4075-934b-d965731b9a3a/quizzes
+                        - button [ref=e1051]:
+                          - img [ref=e1052]
+                      - button "Publish" [ref=e1056] [cursor=pointer]:
+                        - img [ref=e1057]
+                      - button "Delete" [ref=e1060] [cursor=pointer]:
+                        - img [ref=e1061]
+                - row "اسلوب سرد القصة باستخدام البيانات ALL COURSES Draft Free 0" [ref=e1064]:
+                  - cell "اسلوب سرد القصة باستخدام البيانات ALL COURSES" [ref=e1065]:
+                    - generic [ref=e1066]:
+                      - link "اسلوب سرد القصة باستخدام البيانات" [ref=e1067] [cursor=pointer]:
+                        - /url: /en/admin/courses/9a15865e-da74-4e59-9c7a-a67a999d61dc/edit
+                      - paragraph [ref=e1068]: ALL COURSES
+                  - cell "Draft" [ref=e1069]:
+                    - generic [ref=e1070]: Draft
+                  - cell "Free" [ref=e1071]
+                  - cell "0" [ref=e1072]
+                  - cell [ref=e1073]:
+                    - generic [ref=e1074]:
+                      - link "View public page" [ref=e1075] [cursor=pointer]:
+                        - /url: /en/courses/course-1463474
+                        - button [ref=e1076]:
+                          - img [ref=e1077]
+                      - link "Edit" [ref=e1080] [cursor=pointer]:
+                        - /url: /en/admin/courses/9a15865e-da74-4e59-9c7a-a67a999d61dc/edit
+                        - button [ref=e1081]:
+                          - img [ref=e1082]
+                      - link "Manage Quizzes" [ref=e1085] [cursor=pointer]:
+                        - /url: /en/admin/courses/9a15865e-da74-4e59-9c7a-a67a999d61dc/quizzes
+                        - button [ref=e1086]:
+                          - img [ref=e1087]
+                      - button "Publish" [ref=e1091] [cursor=pointer]:
+                        - img [ref=e1092]
+                      - button "Delete" [ref=e1095] [cursor=pointer]:
+                        - img [ref=e1096]
+                - row "اختبار بعد الجلسة - دورة اكسل المستوى الثاني ALL COURSES Draft Free 0" [ref=e1099]:
+                  - cell "اختبار بعد الجلسة - دورة اكسل المستوى الثاني ALL COURSES" [ref=e1100]:
+                    - generic [ref=e1101]:
+                      - link "اختبار بعد الجلسة - دورة اكسل المستوى الثاني" [ref=e1102] [cursor=pointer]:
+                        - /url: /en/admin/courses/9100ea1d-798f-4617-b7d7-63b3e9252894/edit
+                      - paragraph [ref=e1103]: ALL COURSES
+                  - cell "Draft" [ref=e1104]:
+                    - generic [ref=e1105]: Draft
+                  - cell "Free" [ref=e1106]
+                  - cell "0" [ref=e1107]
+                  - cell [ref=e1108]:
+                    - generic [ref=e1109]:
+                      - link "View public page" [ref=e1110] [cursor=pointer]:
+                        - /url: /en/courses/course-1418932
+                        - button [ref=e1111]:
+                          - img [ref=e1112]
+                      - link "Edit" [ref=e1115] [cursor=pointer]:
+                        - /url: /en/admin/courses/9100ea1d-798f-4617-b7d7-63b3e9252894/edit
+                        - button [ref=e1116]:
+                          - img [ref=e1117]
+                      - link "Manage Quizzes" [ref=e1120] [cursor=pointer]:
+                        - /url: /en/admin/courses/9100ea1d-798f-4617-b7d7-63b3e9252894/quizzes
+                        - button [ref=e1121]:
+                          - img [ref=e1122]
+                      - button "Publish" [ref=e1126] [cursor=pointer]:
+                        - img [ref=e1127]
+                      - button "Delete" [ref=e1130] [cursor=pointer]:
+                        - img [ref=e1131]
+                - row "اختبار بعد الجلسة - دورة اكسل المستوى الأول ALL COURSES Draft Free 0" [ref=e1134]:
+                  - cell "اختبار بعد الجلسة - دورة اكسل المستوى الأول ALL COURSES" [ref=e1135]:
+                    - generic [ref=e1136]:
+                      - link "اختبار بعد الجلسة - دورة اكسل المستوى الأول" [ref=e1137] [cursor=pointer]:
+                        - /url: /en/admin/courses/9ec52ef8-b3d0-4db7-ba6e-6222417062a9/edit
+                      - paragraph [ref=e1138]: ALL COURSES
+                  - cell "Draft" [ref=e1139]:
+                    - generic [ref=e1140]: Draft
+                  - cell "Free" [ref=e1141]
+                  - cell "0" [ref=e1142]
+                  - cell [ref=e1143]:
+                    - generic [ref=e1144]:
+                      - link "View public page" [ref=e1145] [cursor=pointer]:
+                        - /url: /en/courses/course-1418928
+                        - button [ref=e1146]:
+                          - img [ref=e1147]
+                      - link "Edit" [ref=e1150] [cursor=pointer]:
+                        - /url: /en/admin/courses/9ec52ef8-b3d0-4db7-ba6e-6222417062a9/edit
+                        - button [ref=e1151]:
+                          - img [ref=e1152]
+                      - link "Manage Quizzes" [ref=e1155] [cursor=pointer]:
+                        - /url: /en/admin/courses/9ec52ef8-b3d0-4db7-ba6e-6222417062a9/quizzes
+                        - button [ref=e1156]:
+                          - img [ref=e1157]
+                      - button "Publish" [ref=e1161] [cursor=pointer]:
+                        - img [ref=e1162]
+                      - button "Delete" [ref=e1165] [cursor=pointer]:
+                        - img [ref=e1166]
+                - row "Excel Best Practices for Project Managers ALL COURSES Draft Free 0" [ref=e1169]:
+                  - cell "Excel Best Practices for Project Managers ALL COURSES" [ref=e1170]:
+                    - generic [ref=e1171]:
+                      - link "Excel Best Practices for Project Managers" [ref=e1172] [cursor=pointer]:
+                        - /url: /en/admin/courses/5bd377bd-4de9-4382-8a92-1984e720ae0f/edit
+                      - paragraph [ref=e1173]: ALL COURSES
+                  - cell "Draft" [ref=e1174]:
+                    - generic [ref=e1175]: Draft
+                  - cell "Free" [ref=e1176]
+                  - cell "0" [ref=e1177]
+                  - cell [ref=e1178]:
+                    - generic [ref=e1179]:
+                      - link "View public page" [ref=e1180] [cursor=pointer]:
+                        - /url: /en/courses/excel-best-practices-for-project-managers
+                        - button [ref=e1181]:
+                          - img [ref=e1182]
+                      - link "Edit" [ref=e1185] [cursor=pointer]:
+                        - /url: /en/admin/courses/5bd377bd-4de9-4382-8a92-1984e720ae0f/edit
+                        - button [ref=e1186]:
+                          - img [ref=e1187]
+                      - link "Manage Quizzes" [ref=e1190] [cursor=pointer]:
+                        - /url: /en/admin/courses/5bd377bd-4de9-4382-8a92-1984e720ae0f/quizzes
+                        - button [ref=e1191]:
+                          - img [ref=e1192]
+                      - button "Publish" [ref=e1196] [cursor=pointer]:
+                        - img [ref=e1197]
+                      - button "Delete" [ref=e1200] [cursor=pointer]:
+                        - img [ref=e1201]
+                - row "اختبار مسبق - دورة الاكسل المستوى الثاني ALL COURSES Draft Free 0" [ref=e1204]:
+                  - cell "اختبار مسبق - دورة الاكسل المستوى الثاني ALL COURSES" [ref=e1205]:
+                    - generic [ref=e1206]:
+                      - link "اختبار مسبق - دورة الاكسل المستوى الثاني" [ref=e1207] [cursor=pointer]:
+                        - /url: /en/admin/courses/94a4f0c0-139a-4198-81b3-fa10e76932c0/edit
+                      - paragraph [ref=e1208]: ALL COURSES
+                  - cell "Draft" [ref=e1209]:
+                    - generic [ref=e1210]: Draft
+                  - cell "Free" [ref=e1211]
+                  - cell "0" [ref=e1212]
+                  - cell [ref=e1213]:
+                    - generic [ref=e1214]:
+                      - link "View public page" [ref=e1215] [cursor=pointer]:
+                        - /url: /en/courses/course-1358330
+                        - button [ref=e1216]:
+                          - img [ref=e1217]
+                      - link "Edit" [ref=e1220] [cursor=pointer]:
+                        - /url: /en/admin/courses/94a4f0c0-139a-4198-81b3-fa10e76932c0/edit
+                        - button [ref=e1221]:
+                          - img [ref=e1222]
+                      - link "Manage Quizzes" [ref=e1225] [cursor=pointer]:
+                        - /url: /en/admin/courses/94a4f0c0-139a-4198-81b3-fa10e76932c0/quizzes
+                        - button [ref=e1226]:
+                          - img [ref=e1227]
+                      - button "Publish" [ref=e1231] [cursor=pointer]:
+                        - img [ref=e1232]
+                      - button "Delete" [ref=e1235] [cursor=pointer]:
+                        - img [ref=e1236]
+                - row "اختبارمسبق - دورة اكسل المستوى الأول ALL COURSES Draft Free 0" [ref=e1239]:
+                  - cell "اختبارمسبق - دورة اكسل المستوى الأول ALL COURSES" [ref=e1240]:
+                    - generic [ref=e1241]:
+                      - link "اختبارمسبق - دورة اكسل المستوى الأول" [ref=e1242] [cursor=pointer]:
+                        - /url: /en/admin/courses/41375914-36ed-4461-bb99-cecfdf5de280/edit
+                      - paragraph [ref=e1243]: ALL COURSES
+                  - cell "Draft" [ref=e1244]:
+                    - generic [ref=e1245]: Draft
+                  - cell "Free" [ref=e1246]
+                  - cell "0" [ref=e1247]
+                  - cell [ref=e1248]:
+                    - generic [ref=e1249]:
+                      - link "View public page" [ref=e1250] [cursor=pointer]:
+                        - /url: /en/courses/course-1358329
+                        - button [ref=e1251]:
+                          - img [ref=e1252]
+                      - link "Edit" [ref=e1255] [cursor=pointer]:
+                        - /url: /en/admin/courses/41375914-36ed-4461-bb99-cecfdf5de280/edit
+                        - button [ref=e1256]:
+                          - img [ref=e1257]
+                      - link "Manage Quizzes" [ref=e1260] [cursor=pointer]:
+                        - /url: /en/admin/courses/41375914-36ed-4461-bb99-cecfdf5de280/quizzes
+                        - button [ref=e1261]:
+                          - img [ref=e1262]
+                      - button "Publish" [ref=e1266] [cursor=pointer]:
+                        - img [ref=e1267]
+                      - button "Delete" [ref=e1270] [cursor=pointer]:
+                        - img [ref=e1271]
+                - row "Analyzing Financial Statements ALL COURSES Draft Free 0" [ref=e1274]:
+                  - cell "Analyzing Financial Statements ALL COURSES" [ref=e1275]:
+                    - generic [ref=e1276]:
+                      - link "Analyzing Financial Statements" [ref=e1277] [cursor=pointer]:
+                        - /url: /en/admin/courses/cef2d517-6cb2-43eb-b911-05a56e809da1/edit
+                      - paragraph [ref=e1278]: ALL COURSES
+                  - cell "Draft" [ref=e1279]:
+                    - generic [ref=e1280]: Draft
+                  - cell "Free" [ref=e1281]
+                  - cell "0" [ref=e1282]
+                  - cell [ref=e1283]:
+                    - generic [ref=e1284]:
+                      - link "View public page" [ref=e1285] [cursor=pointer]:
+                        - /url: /en/courses/analyzing-financial-statements
+                        - button [ref=e1286]:
+                          - img [ref=e1287]
+                      - link "Edit" [ref=e1290] [cursor=pointer]:
+                        - /url: /en/admin/courses/cef2d517-6cb2-43eb-b911-05a56e809da1/edit
+                        - button [ref=e1291]:
+                          - img [ref=e1292]
+                      - link "Manage Quizzes" [ref=e1295] [cursor=pointer]:
+                        - /url: /en/admin/courses/cef2d517-6cb2-43eb-b911-05a56e809da1/quizzes
+                        - button [ref=e1296]:
+                          - img [ref=e1297]
+                      - button "Publish" [ref=e1301] [cursor=pointer]:
+                        - img [ref=e1302]
+                      - button "Delete" [ref=e1305] [cursor=pointer]:
+                        - img [ref=e1306]
+                - row "Copy of Financial Statement Forecasting and Rules of Thumb ALL COURSES Draft Free 0" [ref=e1309]:
+                  - cell "Copy of Financial Statement Forecasting and Rules of Thumb ALL COURSES" [ref=e1310]:
+                    - generic [ref=e1311]:
+                      - link "Copy of Financial Statement Forecasting and Rules of Thumb" [ref=e1312] [cursor=pointer]:
+                        - /url: /en/admin/courses/43da7adb-2623-4ad2-91ad-2a8f10658435/edit
+                      - paragraph [ref=e1313]: ALL COURSES
+                  - cell "Draft" [ref=e1314]:
+                    - generic [ref=e1315]: Draft
+                  - cell "Free" [ref=e1316]
+                  - cell "0" [ref=e1317]
+                  - cell [ref=e1318]:
+                    - generic [ref=e1319]:
+                      - link "View public page" [ref=e1320] [cursor=pointer]:
+                        - /url: /en/courses/copy-of-financial-statement-forecasting-and-rules-of-thumb
+                        - button [ref=e1321]:
+                          - img [ref=e1322]
+                      - link "Edit" [ref=e1325] [cursor=pointer]:
+                        - /url: /en/admin/courses/43da7adb-2623-4ad2-91ad-2a8f10658435/edit
+                        - button [ref=e1326]:
+                          - img [ref=e1327]
+                      - link "Manage Quizzes" [ref=e1330] [cursor=pointer]:
+                        - /url: /en/admin/courses/43da7adb-2623-4ad2-91ad-2a8f10658435/quizzes
+                        - button [ref=e1331]:
+                          - img [ref=e1332]
+                      - button "Publish" [ref=e1336] [cursor=pointer]:
+                        - img [ref=e1337]
+                      - button "Delete" [ref=e1340] [cursor=pointer]:
+                        - img [ref=e1341]
+                - row "Visio Create Commonly Used Diagrams in Business ALL COURSES Draft Free 0" [ref=e1344]:
+                  - cell "Visio Create Commonly Used Diagrams in Business ALL COURSES" [ref=e1345]:
+                    - generic [ref=e1346]:
+                      - link "Visio Create Commonly Used Diagrams in Business" [ref=e1347] [cursor=pointer]:
+                        - /url: /en/admin/courses/d527c306-640a-4203-b142-f03cda3d7895/edit
+                      - paragraph [ref=e1348]: ALL COURSES
+                  - cell "Draft" [ref=e1349]:
+                    - generic [ref=e1350]: Draft
+                  - cell "Free" [ref=e1351]
+                  - cell "0" [ref=e1352]
+                  - cell [ref=e1353]:
+                    - generic [ref=e1354]:
+                      - link "View public page" [ref=e1355] [cursor=pointer]:
+                        - /url: /en/courses/visio-create-commonly-used-diagrams-in-business
+                        - button [ref=e1356]:
+                          - img [ref=e1357]
+                      - link "Edit" [ref=e1360] [cursor=pointer]:
+                        - /url: /en/admin/courses/d527c306-640a-4203-b142-f03cda3d7895/edit
+                        - button [ref=e1361]:
+                          - img [ref=e1362]
+                      - link "Manage Quizzes" [ref=e1365] [cursor=pointer]:
+                        - /url: /en/admin/courses/d527c306-640a-4203-b142-f03cda3d7895/quizzes
+                        - button [ref=e1366]:
+                          - img [ref=e1367]
+                      - button "Publish" [ref=e1371] [cursor=pointer]:
+                        - img [ref=e1372]
+                      - button "Delete" [ref=e1375] [cursor=pointer]:
+                        - img [ref=e1376]
+                - row "Financial Statement Forecasting and Rules of Thumb ALL COURSES Draft Free 0" [ref=e1379]:
+                  - cell "Financial Statement Forecasting and Rules of Thumb ALL COURSES" [ref=e1380]:
+                    - generic [ref=e1381]:
+                      - link "Financial Statement Forecasting and Rules of Thumb" [ref=e1382] [cursor=pointer]:
+                        - /url: /en/admin/courses/f34b250c-ef11-4c2c-97d8-5ebcbcf382ad/edit
+                      - paragraph [ref=e1383]: ALL COURSES
+                  - cell "Draft" [ref=e1384]:
+                    - generic [ref=e1385]: Draft
+                  - cell "Free" [ref=e1386]
+                  - cell "0" [ref=e1387]
+                  - cell [ref=e1388]:
+                    - generic [ref=e1389]:
+                      - link "View public page" [ref=e1390] [cursor=pointer]:
+                        - /url: /en/courses/financial-statement-forecasting-and-rules-of-thumb
+                        - button [ref=e1391]:
+                          - img [ref=e1392]
+                      - link "Edit" [ref=e1395] [cursor=pointer]:
+                        - /url: /en/admin/courses/f34b250c-ef11-4c2c-97d8-5ebcbcf382ad/edit
+                        - button [ref=e1396]:
+                          - img [ref=e1397]
+                      - link "Manage Quizzes" [ref=e1400] [cursor=pointer]:
+                        - /url: /en/admin/courses/f34b250c-ef11-4c2c-97d8-5ebcbcf382ad/quizzes
+                        - button [ref=e1401]:
+                          - img [ref=e1402]
+                      - button "Publish" [ref=e1406] [cursor=pointer]:
+                        - img [ref=e1407]
+                      - button "Delete" [ref=e1410] [cursor=pointer]:
+                        - img [ref=e1411]
+                - row "Tableau for Non-Technical Professionals ALL COURSES Draft Free 0" [ref=e1414]:
+                  - cell "Tableau for Non-Technical Professionals ALL COURSES" [ref=e1415]:
+                    - generic [ref=e1416]:
+                      - link "Tableau for Non-Technical Professionals" [ref=e1417] [cursor=pointer]:
+                        - /url: /en/admin/courses/a6380f52-a47f-4640-9a3a-b2c6cc5f462b/edit
+                      - paragraph [ref=e1418]: ALL COURSES
+                  - cell "Draft" [ref=e1419]:
+                    - generic [ref=e1420]: Draft
+                  - cell "Free" [ref=e1421]
+                  - cell "0" [ref=e1422]
+                  - cell [ref=e1423]:
+                    - generic [ref=e1424]:
+                      - link "View public page" [ref=e1425] [cursor=pointer]:
+                        - /url: /en/courses/tableau-for-non-technical-professionals
+                        - button [ref=e1426]:
+                          - img [ref=e1427]
+                      - link "Edit" [ref=e1430] [cursor=pointer]:
+                        - /url: /en/admin/courses/a6380f52-a47f-4640-9a3a-b2c6cc5f462b/edit
+                        - button [ref=e1431]:
+                          - img [ref=e1432]
+                      - link "Manage Quizzes" [ref=e1435] [cursor=pointer]:
+                        - /url: /en/admin/courses/a6380f52-a47f-4640-9a3a-b2c6cc5f462b/quizzes
+                        - button [ref=e1436]:
+                          - img [ref=e1437]
+                      - button "Publish" [ref=e1441] [cursor=pointer]:
+                        - img [ref=e1442]
+                      - button "Delete" [ref=e1445] [cursor=pointer]:
+                        - img [ref=e1446]
+                - row "The Significance of Cash Flows ALL COURSES Draft Free 0" [ref=e1449]:
+                  - cell "The Significance of Cash Flows ALL COURSES" [ref=e1450]:
+                    - generic [ref=e1451]:
+                      - link "The Significance of Cash Flows" [ref=e1452] [cursor=pointer]:
+                        - /url: /en/admin/courses/331bb435-6d39-44a9-8e75-eafcc77b9a3c/edit
+                      - paragraph [ref=e1453]: ALL COURSES
+                  - cell "Draft" [ref=e1454]:
+                    - generic [ref=e1455]: Draft
+                  - cell "Free" [ref=e1456]
+                  - cell "0" [ref=e1457]
+                  - cell [ref=e1458]:
+                    - generic [ref=e1459]:
+                      - link "View public page" [ref=e1460] [cursor=pointer]:
+                        - /url: /en/courses/the-significance-of-cash-flows
+                        - button [ref=e1461]:
+                          - img [ref=e1462]
+                      - link "Edit" [ref=e1465] [cursor=pointer]:
+                        - /url: /en/admin/courses/331bb435-6d39-44a9-8e75-eafcc77b9a3c/edit
+                        - button [ref=e1466]:
+                          - img [ref=e1467]
+                      - link "Manage Quizzes" [ref=e1470] [cursor=pointer]:
+                        - /url: /en/admin/courses/331bb435-6d39-44a9-8e75-eafcc77b9a3c/quizzes
+                        - button [ref=e1471]:
+                          - img [ref=e1472]
+                      - button "Publish" [ref=e1476] [cursor=pointer]:
+                        - img [ref=e1477]
+                      - button "Delete" [ref=e1480] [cursor=pointer]:
+                        - img [ref=e1481]
+                - row "Power BI ALL COURSES Draft Free 0" [ref=e1484]:
+                  - cell "Power BI ALL COURSES" [ref=e1485]:
+                    - generic [ref=e1486]:
+                      - link "Power BI" [ref=e1487] [cursor=pointer]:
+                        - /url: /en/admin/courses/01244aa7-ac25-41eb-ad86-6020cca88523/edit
+                      - paragraph [ref=e1488]: ALL COURSES
+                  - cell "Draft" [ref=e1489]:
+                    - generic [ref=e1490]: Draft
+                  - cell "Free" [ref=e1491]
+                  - cell "0" [ref=e1492]
+                  - cell [ref=e1493]:
+                    - generic [ref=e1494]:
+                      - link "View public page" [ref=e1495] [cursor=pointer]:
+                        - /url: /en/courses/power-bi
+                        - button [ref=e1496]:
+                          - img [ref=e1497]
+                      - link "Edit" [ref=e1500] [cursor=pointer]:
+                        - /url: /en/admin/courses/01244aa7-ac25-41eb-ad86-6020cca88523/edit
+                        - button [ref=e1501]:
+                          - img [ref=e1502]
+                      - link "Manage Quizzes" [ref=e1505] [cursor=pointer]:
+                        - /url: /en/admin/courses/01244aa7-ac25-41eb-ad86-6020cca88523/quizzes
+                        - button [ref=e1506]:
+                          - img [ref=e1507]
+                      - button "Publish" [ref=e1511] [cursor=pointer]:
+                        - img [ref=e1512]
+                      - button "Delete" [ref=e1515] [cursor=pointer]:
+                        - img [ref=e1516]
+                - row "Secrets to Cash Flow Forecasting Optimization ALL COURSES Draft Free 0" [ref=e1519]:
+                  - cell "Secrets to Cash Flow Forecasting Optimization ALL COURSES" [ref=e1520]:
+                    - generic [ref=e1521]:
+                      - link "Secrets to Cash Flow Forecasting Optimization" [ref=e1522] [cursor=pointer]:
+                        - /url: /en/admin/courses/daa83abb-36a6-4710-ae96-64c6580d4ffd/edit
+                      - paragraph [ref=e1523]: ALL COURSES
+                  - cell "Draft" [ref=e1524]:
+                    - generic [ref=e1525]: Draft
+                  - cell "Free" [ref=e1526]
+                  - cell "0" [ref=e1527]
+                  - cell [ref=e1528]:
+                    - generic [ref=e1529]:
+                      - link "View public page" [ref=e1530] [cursor=pointer]:
+                        - /url: /en/courses/secrets-to-cash-flow-forecasting-optimization
+                        - button [ref=e1531]:
+                          - img [ref=e1532]
+                      - link "Edit" [ref=e1535] [cursor=pointer]:
+                        - /url: /en/admin/courses/daa83abb-36a6-4710-ae96-64c6580d4ffd/edit
+                        - button [ref=e1536]:
+                          - img [ref=e1537]
+                      - link "Manage Quizzes" [ref=e1540] [cursor=pointer]:
+                        - /url: /en/admin/courses/daa83abb-36a6-4710-ae96-64c6580d4ffd/quizzes
+                        - button [ref=e1541]:
+                          - img [ref=e1542]
+                      - button "Publish" [ref=e1546] [cursor=pointer]:
+                        - img [ref=e1547]
+                      - button "Delete" [ref=e1550] [cursor=pointer]:
+                        - img [ref=e1551]
+                - row "مقدمة في تحليل الأعمال الاحترافية ALL COURSES Draft Free 0" [ref=e1554]:
+                  - cell "مقدمة في تحليل الأعمال الاحترافية ALL COURSES" [ref=e1555]:
+                    - generic [ref=e1556]:
+                      - link "مقدمة في تحليل الأعمال الاحترافية" [ref=e1557] [cursor=pointer]:
+                        - /url: /en/admin/courses/81ee8668-400c-4204-84a4-72b4589f0453/edit
+                      - paragraph [ref=e1558]: ALL COURSES
+                  - cell "Draft" [ref=e1559]:
+                    - generic [ref=e1560]: Draft
+                  - cell "Free" [ref=e1561]
+                  - cell "0" [ref=e1562]
+                  - cell [ref=e1563]:
+                    - generic [ref=e1564]:
+                      - link "View public page" [ref=e1565] [cursor=pointer]:
+                        - /url: /en/courses/course-930283
+                        - button [ref=e1566]:
+                          - img [ref=e1567]
+                      - link "Edit" [ref=e1570] [cursor=pointer]:
+                        - /url: /en/admin/courses/81ee8668-400c-4204-84a4-72b4589f0453/edit
+                        - button [ref=e1571]:
+                          - img [ref=e1572]
+                      - link "Manage Quizzes" [ref=e1575] [cursor=pointer]:
+                        - /url: /en/admin/courses/81ee8668-400c-4204-84a4-72b4589f0453/quizzes
+                        - button [ref=e1576]:
+                          - img [ref=e1577]
+                      - button "Publish" [ref=e1581] [cursor=pointer]:
+                        - img [ref=e1582]
+                      - button "Delete" [ref=e1585] [cursor=pointer]:
+                        - img [ref=e1586]
+                - 'row "CertPrep: PowerPoint Associate - Microsoft Office Specialist: (PowerPoint 2019 and PowerPoint 365) ALL COURSES Draft Free 0" [ref=e1589]':
+                  - 'cell "CertPrep: PowerPoint Associate - Microsoft Office Specialist: (PowerPoint 2019 and PowerPoint 365) ALL COURSES" [ref=e1590]':
+                    - generic [ref=e1591]:
+                      - 'link "CertPrep: PowerPoint Associate - Microsoft Office Specialist: (PowerPoint 2019 and PowerPoint 365)" [ref=e1592] [cursor=pointer]':
+                        - /url: /en/admin/courses/933bd501-b928-4292-a7bc-32d496bacb1b/edit
+                      - paragraph [ref=e1593]: ALL COURSES
+                  - cell "Draft" [ref=e1594]:
+                    - generic [ref=e1595]: Draft
+                  - cell "Free" [ref=e1596]
+                  - cell "0" [ref=e1597]
+                  - cell [ref=e1598]:
+                    - generic [ref=e1599]:
+                      - link "View public page" [ref=e1600] [cursor=pointer]:
+                        - /url: /en/courses/certprep-powerpoint-associate-microsoft-office-specialist-powerpoint-2019-and-powerpoint-365
+                        - button [ref=e1601]:
+                          - img [ref=e1602]
+                      - link "Edit" [ref=e1605] [cursor=pointer]:
+                        - /url: /en/admin/courses/933bd501-b928-4292-a7bc-32d496bacb1b/edit
+                        - button [ref=e1606]:
+                          - img [ref=e1607]
+                      - link "Manage Quizzes" [ref=e1610] [cursor=pointer]:
+                        - /url: /en/admin/courses/933bd501-b928-4292-a7bc-32d496bacb1b/quizzes
+                        - button [ref=e1611]:
+                          - img [ref=e1612]
+                      - button "Publish" [ref=e1616] [cursor=pointer]:
+                        - img [ref=e1617]
+                      - button "Delete" [ref=e1620] [cursor=pointer]:
+                        - img [ref=e1621]
+                - row "Financial Statement Analysis ALL COURSES Draft Free 0" [ref=e1624]:
+                  - cell "Financial Statement Analysis ALL COURSES" [ref=e1625]:
+                    - generic [ref=e1626]:
+                      - link "Financial Statement Analysis" [ref=e1627] [cursor=pointer]:
+                        - /url: /en/admin/courses/ca2a6482-cf68-4304-aba9-dcb0628d8506/edit
+                      - paragraph [ref=e1628]: ALL COURSES
+                  - cell "Draft" [ref=e1629]:
+                    - generic [ref=e1630]: Draft
+                  - cell "Free" [ref=e1631]
+                  - cell "0" [ref=e1632]
+                  - cell [ref=e1633]:
+                    - generic [ref=e1634]:
+                      - link "View public page" [ref=e1635] [cursor=pointer]:
+                        - /url: /en/courses/financial-statement-analysis
+                        - button [ref=e1636]:
+                          - img [ref=e1637]
+                      - link "Edit" [ref=e1640] [cursor=pointer]:
+                        - /url: /en/admin/courses/ca2a6482-cf68-4304-aba9-dcb0628d8506/edit
+                        - button [ref=e1641]:
+                          - img [ref=e1642]
+                      - link "Manage Quizzes" [ref=e1645] [cursor=pointer]:
+                        - /url: /en/admin/courses/ca2a6482-cf68-4304-aba9-dcb0628d8506/quizzes
+                        - button [ref=e1646]:
+                          - img [ref=e1647]
+                      - button "Publish" [ref=e1651] [cursor=pointer]:
+                        - img [ref=e1652]
+                      - button "Delete" [ref=e1655] [cursor=pointer]:
+                        - img [ref=e1656]
+                - row "تحليل البيانات و اعداد التقارير باستخدام الاكسل - المستوى الأول ALL COURSES Draft Free 0" [ref=e1659]:
+                  - cell "تحليل البيانات و اعداد التقارير باستخدام الاكسل - المستوى الأول ALL COURSES" [ref=e1660]:
+                    - generic [ref=e1661]:
+                      - link "تحليل البيانات و اعداد التقارير باستخدام الاكسل - المستوى الأول" [ref=e1662] [cursor=pointer]:
+                        - /url: /en/admin/courses/d207c040-07d6-41b4-be30-a8650bcdc6bf/edit
+                      - paragraph [ref=e1663]: ALL COURSES
+                  - cell "Draft" [ref=e1664]:
+                    - generic [ref=e1665]: Draft
+                  - cell "Free" [ref=e1666]
+                  - cell "0" [ref=e1667]
+                  - cell [ref=e1668]:
+                    - generic [ref=e1669]:
+                      - link "View public page" [ref=e1670] [cursor=pointer]:
+                        - /url: /en/courses/course-857916
+                        - button [ref=e1671]:
+                          - img [ref=e1672]
+                      - link "Edit" [ref=e1675] [cursor=pointer]:
+                        - /url: /en/admin/courses/d207c040-07d6-41b4-be30-a8650bcdc6bf/edit
+                        - button [ref=e1676]:
+                          - img [ref=e1677]
+                      - link "Manage Quizzes" [ref=e1680] [cursor=pointer]:
+                        - /url: /en/admin/courses/d207c040-07d6-41b4-be30-a8650bcdc6bf/quizzes
+                        - button [ref=e1681]:
+                          - img [ref=e1682]
+                      - button "Publish" [ref=e1686] [cursor=pointer]:
+                        - img [ref=e1687]
+                      - button "Delete" [ref=e1690] [cursor=pointer]:
+                        - img [ref=e1691]
+                - 'row "CertPrep: Excel Expert - Microsoft Office Specialist (Excel 2019 and 365) Exam MO-201 ALL COURSES Draft Free 0" [ref=e1694]':
+                  - 'cell "CertPrep: Excel Expert - Microsoft Office Specialist (Excel 2019 and 365) Exam MO-201 ALL COURSES" [ref=e1695]':
+                    - generic [ref=e1696]:
+                      - 'link "CertPrep: Excel Expert - Microsoft Office Specialist (Excel 2019 and 365) Exam MO-201" [ref=e1697] [cursor=pointer]':
+                        - /url: /en/admin/courses/96a79ca0-3213-4d84-a67d-22d9bb1d7d6e/edit
+                      - paragraph [ref=e1698]: ALL COURSES
+                  - cell "Draft" [ref=e1699]:
+                    - generic [ref=e1700]: Draft
+                  - cell "Free" [ref=e1701]
+                  - cell "0" [ref=e1702]
+                  - cell [ref=e1703]:
+                    - generic [ref=e1704]:
+                      - link "View public page" [ref=e1705] [cursor=pointer]:
+                        - /url: /en/courses/certprep-excel-expert-microsoft-office-specialist-excel-2019-and-365-exam-mo-201
+                        - button [ref=e1706]:
+                          - img [ref=e1707]
+                      - link "Edit" [ref=e1710] [cursor=pointer]:
+                        - /url: /en/admin/courses/96a79ca0-3213-4d84-a67d-22d9bb1d7d6e/edit
+                        - button [ref=e1711]:
+                          - img [ref=e1712]
+                      - link "Manage Quizzes" [ref=e1715] [cursor=pointer]:
+                        - /url: /en/admin/courses/96a79ca0-3213-4d84-a67d-22d9bb1d7d6e/quizzes
+                        - button [ref=e1716]:
+                          - img [ref=e1717]
+                      - button "Publish" [ref=e1721] [cursor=pointer]:
+                        - img [ref=e1722]
+                      - button "Delete" [ref=e1725] [cursor=pointer]:
+                        - img [ref=e1726]
+                - row "تحليل البيانات و اعداد التقارير باستخدام الاكسل - المستوى الثاني ALL COURSES Draft Free 0" [ref=e1729]:
+                  - cell "تحليل البيانات و اعداد التقارير باستخدام الاكسل - المستوى الثاني ALL COURSES" [ref=e1730]:
+                    - generic [ref=e1731]:
+                      - link "تحليل البيانات و اعداد التقارير باستخدام الاكسل - المستوى الثاني" [ref=e1732] [cursor=pointer]:
+                        - /url: /en/admin/courses/9e15399d-b3ff-45d6-9e42-f0ee36f5bd15/edit
+                      - paragraph [ref=e1733]: ALL COURSES
+                  - cell "Draft" [ref=e1734]:
+                    - generic [ref=e1735]: Draft
+                  - cell "Free" [ref=e1736]
+                  - cell "0" [ref=e1737]
+                  - cell [ref=e1738]:
+                    - generic [ref=e1739]:
+                      - link "View public page" [ref=e1740] [cursor=pointer]:
+                        - /url: /en/courses/course-833131
+                        - button [ref=e1741]:
+                          - img [ref=e1742]
+                      - link "Edit" [ref=e1745] [cursor=pointer]:
+                        - /url: /en/admin/courses/9e15399d-b3ff-45d6-9e42-f0ee36f5bd15/edit
+                        - button [ref=e1746]:
+                          - img [ref=e1747]
+                      - link "Manage Quizzes" [ref=e1750] [cursor=pointer]:
+                        - /url: /en/admin/courses/9e15399d-b3ff-45d6-9e42-f0ee36f5bd15/quizzes
+                        - button [ref=e1751]:
+                          - img [ref=e1752]
+                      - button "Publish" [ref=e1756] [cursor=pointer]:
+                        - img [ref=e1757]
+                      - button "Delete" [ref=e1760] [cursor=pointer]:
+                        - img [ref=e1761]
+                - row "How to Pass the AFM 1 Exam ALL COURSES Draft Free 0" [ref=e1764]:
+                  - cell "How to Pass the AFM 1 Exam ALL COURSES" [ref=e1765]:
+                    - generic [ref=e1766]:
+                      - link "How to Pass the AFM 1 Exam" [ref=e1767] [cursor=pointer]:
+                        - /url: /en/admin/courses/4db18a24-39cd-4263-b586-96753f8f2e52/edit
+                      - paragraph [ref=e1768]: ALL COURSES
+                  - cell "Draft" [ref=e1769]:
+                    - generic [ref=e1770]: Draft
+                  - cell "Free" [ref=e1771]
+                  - cell "0" [ref=e1772]
+                  - cell [ref=e1773]:
+                    - generic [ref=e1774]:
+                      - link "View public page" [ref=e1775] [cursor=pointer]:
+                        - /url: /en/courses/how-to-pass-the-afm-1-exam
+                        - button [ref=e1776]:
+                          - img [ref=e1777]
+                      - link "Edit" [ref=e1780] [cursor=pointer]:
+                        - /url: /en/admin/courses/4db18a24-39cd-4263-b586-96753f8f2e52/edit
+                        - button [ref=e1781]:
+                          - img [ref=e1782]
+                      - link "Manage Quizzes" [ref=e1785] [cursor=pointer]:
+                        - /url: /en/admin/courses/4db18a24-39cd-4263-b586-96753f8f2e52/quizzes
+                        - button [ref=e1786]:
+                          - img [ref=e1787]
+                      - button "Publish" [ref=e1791] [cursor=pointer]:
+                        - img [ref=e1792]
+                      - button "Delete" [ref=e1795] [cursor=pointer]:
+                        - img [ref=e1796]
+                - row "The Three Pillars of Finance ALL COURSES Draft Free 0" [ref=e1799]:
+                  - cell "The Three Pillars of Finance ALL COURSES" [ref=e1800]:
+                    - generic [ref=e1801]:
+                      - link "The Three Pillars of Finance" [ref=e1802] [cursor=pointer]:
+                        - /url: /en/admin/courses/59f137ba-e3e0-433e-9a6f-b10afb107d48/edit
+                      - paragraph [ref=e1803]: ALL COURSES
+                  - cell "Draft" [ref=e1804]:
+                    - generic [ref=e1805]: Draft
+                  - cell "Free" [ref=e1806]
+                  - cell "0" [ref=e1807]
+                  - cell [ref=e1808]:
+                    - generic [ref=e1809]:
+                      - link "View public page" [ref=e1810] [cursor=pointer]:
+                        - /url: /en/courses/the-three-pillars-of-finance
+                        - button [ref=e1811]:
+                          - img [ref=e1812]
+                      - link "Edit" [ref=e1815] [cursor=pointer]:
+                        - /url: /en/admin/courses/59f137ba-e3e0-433e-9a6f-b10afb107d48/edit
+                        - button [ref=e1816]:
+                          - img [ref=e1817]
+                      - link "Manage Quizzes" [ref=e1820] [cursor=pointer]:
+                        - /url: /en/admin/courses/59f137ba-e3e0-433e-9a6f-b10afb107d48/quizzes
+                        - button [ref=e1821]:
+                          - img [ref=e1822]
+                      - button "Publish" [ref=e1826] [cursor=pointer]:
+                        - img [ref=e1827]
+                      - button "Delete" [ref=e1830] [cursor=pointer]:
+                        - img [ref=e1831]
+                - 'row "CertPrep: Excel Associate - Microsoft Office Specialist: (Excel 2019 and Excel 365) Exam MO-200 ALL COURSES Draft Free 0" [ref=e1834]':
+                  - 'cell "CertPrep: Excel Associate - Microsoft Office Specialist: (Excel 2019 and Excel 365) Exam MO-200 ALL COURSES" [ref=e1835]':
+                    - generic [ref=e1836]:
+                      - 'link "CertPrep: Excel Associate - Microsoft Office Specialist: (Excel 2019 and Excel 365) Exam MO-200" [ref=e1837] [cursor=pointer]':
+                        - /url: /en/admin/courses/9a8069af-e409-478f-b51e-a885d9e86aa2/edit
+                      - paragraph [ref=e1838]: ALL COURSES
+                  - cell "Draft" [ref=e1839]:
+                    - generic [ref=e1840]: Draft
+                  - cell "Free" [ref=e1841]
+                  - cell "0" [ref=e1842]
+                  - cell [ref=e1843]:
+                    - generic [ref=e1844]:
+                      - link "View public page" [ref=e1845] [cursor=pointer]:
+                        - /url: /en/courses/certprep-excel-associate-microsoft-office-specialist-excel-2019-and-excel-365-exam-mo-200
+                        - button [ref=e1846]:
+                          - img [ref=e1847]
+                      - link "Edit" [ref=e1850] [cursor=pointer]:
+                        - /url: /en/admin/courses/9a8069af-e409-478f-b51e-a885d9e86aa2/edit
+                        - button [ref=e1851]:
+                          - img [ref=e1852]
+                      - link "Manage Quizzes" [ref=e1855] [cursor=pointer]:
+                        - /url: /en/admin/courses/9a8069af-e409-478f-b51e-a885d9e86aa2/quizzes
+                        - button [ref=e1856]:
+                          - img [ref=e1857]
+                      - button "Publish" [ref=e1861] [cursor=pointer]:
+                        - img [ref=e1862]
+                      - button "Delete" [ref=e1865] [cursor=pointer]:
+                        - img [ref=e1866]
+                - row "Financial Modeling and the Industry’s Best Practices ALL COURSES Draft Free 0" [ref=e1869]:
+                  - cell "Financial Modeling and the Industry’s Best Practices ALL COURSES" [ref=e1870]:
+                    - generic [ref=e1871]:
+                      - link "Financial Modeling and the Industry’s Best Practices" [ref=e1872] [cursor=pointer]:
+                        - /url: /en/admin/courses/4ec09e7a-da82-432b-bcbf-19c6da2c62dd/edit
+                      - paragraph [ref=e1873]: ALL COURSES
+                  - cell "Draft" [ref=e1874]:
+                    - generic [ref=e1875]: Draft
+                  - cell "Free" [ref=e1876]
+                  - cell "0" [ref=e1877]
+                  - cell [ref=e1878]:
+                    - generic [ref=e1879]:
+                      - link "View public page" [ref=e1880] [cursor=pointer]:
+                        - /url: /en/courses/financial-modeling-and-the-industry-s-best-practices
+                        - button [ref=e1881]:
+                          - img [ref=e1882]
+                      - link "Edit" [ref=e1885] [cursor=pointer]:
+                        - /url: /en/admin/courses/4ec09e7a-da82-432b-bcbf-19c6da2c62dd/edit
+                        - button [ref=e1886]:
+                          - img [ref=e1887]
+                      - link "Manage Quizzes" [ref=e1890] [cursor=pointer]:
+                        - /url: /en/admin/courses/4ec09e7a-da82-432b-bcbf-19c6da2c62dd/quizzes
+                        - button [ref=e1891]:
+                          - img [ref=e1892]
+                      - button "Publish" [ref=e1896] [cursor=pointer]:
+                        - img [ref=e1897]
+                      - button "Delete" [ref=e1900] [cursor=pointer]:
+                        - img [ref=e1901]
+                - row "How To Use What-If Analysis and Forecast Sheet in Excel ALL COURSES Draft Free 0" [ref=e1904]:
+                  - cell "How To Use What-If Analysis and Forecast Sheet in Excel ALL COURSES" [ref=e1905]:
+                    - generic [ref=e1906]:
+                      - link "How To Use What-If Analysis and Forecast Sheet in Excel" [ref=e1907] [cursor=pointer]:
+                        - /url: /en/admin/courses/265e1083-2428-4152-854b-9a2ff07d394b/edit
+                      - paragraph [ref=e1908]: ALL COURSES
+                  - cell "Draft" [ref=e1909]:
+                    - generic [ref=e1910]: Draft
+                  - cell "Free" [ref=e1911]
+                  - cell "0" [ref=e1912]
+                  - cell [ref=e1913]:
+                    - generic [ref=e1914]:
+                      - link "View public page" [ref=e1915] [cursor=pointer]:
+                        - /url: /en/courses/how-to-use-what-if-analysis-and-forecast-sheet-in-excel
+                        - button [ref=e1916]:
+                          - img [ref=e1917]
+                      - link "Edit" [ref=e1920] [cursor=pointer]:
+                        - /url: /en/admin/courses/265e1083-2428-4152-854b-9a2ff07d394b/edit
+                        - button [ref=e1921]:
+                          - img [ref=e1922]
+                      - link "Manage Quizzes" [ref=e1925] [cursor=pointer]:
+                        - /url: /en/admin/courses/265e1083-2428-4152-854b-9a2ff07d394b/quizzes
+                        - button [ref=e1926]:
+                          - img [ref=e1927]
+                      - button "Publish" [ref=e1931] [cursor=pointer]:
+                        - img [ref=e1932]
+                      - button "Delete" [ref=e1935] [cursor=pointer]:
+                        - img [ref=e1936]
+                - row "Dashboard Types and Design Principles ALL COURSES Draft Free 0" [ref=e1939]:
+                  - cell "Dashboard Types and Design Principles ALL COURSES" [ref=e1940]:
+                    - generic [ref=e1941]:
+                      - link "Dashboard Types and Design Principles" [ref=e1942] [cursor=pointer]:
+                        - /url: /en/admin/courses/09be0540-2606-4fba-9c84-c82e007990b7/edit
+                      - paragraph [ref=e1943]: ALL COURSES
+                  - cell "Draft" [ref=e1944]:
+                    - generic [ref=e1945]: Draft
+                  - cell "Free" [ref=e1946]
+                  - cell "0" [ref=e1947]
+                  - cell [ref=e1948]:
+                    - generic [ref=e1949]:
+                      - link "View public page" [ref=e1950] [cursor=pointer]:
+                        - /url: /en/courses/dashboard-types-and-design-principles
+                        - button [ref=e1951]:
+                          - img [ref=e1952]
+                      - link "Edit" [ref=e1955] [cursor=pointer]:
+                        - /url: /en/admin/courses/09be0540-2606-4fba-9c84-c82e007990b7/edit
+                        - button [ref=e1956]:
+                          - img [ref=e1957]
+                      - link "Manage Quizzes" [ref=e1960] [cursor=pointer]:
+                        - /url: /en/admin/courses/09be0540-2606-4fba-9c84-c82e007990b7/quizzes
+                        - button [ref=e1961]:
+                          - img [ref=e1962]
+                      - button "Publish" [ref=e1966] [cursor=pointer]:
+                        - img [ref=e1967]
+                      - button "Delete" [ref=e1970] [cursor=pointer]:
+                        - img [ref=e1971]
+                - row "A Dynamic Approach in Managing Project Risks ALL COURSES Draft Free 0" [ref=e1974]:
+                  - cell "A Dynamic Approach in Managing Project Risks ALL COURSES" [ref=e1975]:
+                    - generic [ref=e1976]:
+                      - link "A Dynamic Approach in Managing Project Risks" [ref=e1977] [cursor=pointer]:
+                        - /url: /en/admin/courses/e2e84f5c-be3e-42b6-8111-b344fa7c3699/edit
+                      - paragraph [ref=e1978]: ALL COURSES
+                  - cell "Draft" [ref=e1979]:
+                    - generic [ref=e1980]: Draft
+                  - cell "Free" [ref=e1981]
+                  - cell "0" [ref=e1982]
+                  - cell [ref=e1983]:
+                    - generic [ref=e1984]:
+                      - link "View public page" [ref=e1985] [cursor=pointer]:
+                        - /url: /en/courses/a-dynamic-approach-in-managing-project-risks
+                        - button [ref=e1986]:
+                          - img [ref=e1987]
+                      - link "Edit" [ref=e1990] [cursor=pointer]:
+                        - /url: /en/admin/courses/e2e84f5c-be3e-42b6-8111-b344fa7c3699/edit
+                        - button [ref=e1991]:
+                          - img [ref=e1992]
+                      - link "Manage Quizzes" [ref=e1995] [cursor=pointer]:
+                        - /url: /en/admin/courses/e2e84f5c-be3e-42b6-8111-b344fa7c3699/quizzes
+                        - button [ref=e1996]:
+                          - img [ref=e1997]
+                      - button "Publish" [ref=e2001] [cursor=pointer]:
+                        - img [ref=e2002]
+                      - button "Delete" [ref=e2005] [cursor=pointer]:
+                        - img [ref=e2006]
+                - row "Power Pivot Techniques ALL COURSES Draft Free 0" [ref=e2009]:
+                  - cell "Power Pivot Techniques ALL COURSES" [ref=e2010]:
+                    - generic [ref=e2011]:
+                      - link "Power Pivot Techniques" [ref=e2012] [cursor=pointer]:
+                        - /url: /en/admin/courses/4172d77e-bf4d-4316-8879-8b5367c8eb56/edit
+                      - paragraph [ref=e2013]: ALL COURSES
+                  - cell "Draft" [ref=e2014]:
+                    - generic [ref=e2015]: Draft
+                  - cell "Free" [ref=e2016]
+                  - cell "0" [ref=e2017]
+                  - cell [ref=e2018]:
+                    - generic [ref=e2019]:
+                      - link "View public page" [ref=e2020] [cursor=pointer]:
+                        - /url: /en/courses/power-pivot-techniques
+                        - button [ref=e2021]:
+                          - img [ref=e2022]
+                      - link "Edit" [ref=e2025] [cursor=pointer]:
+                        - /url: /en/admin/courses/4172d77e-bf4d-4316-8879-8b5367c8eb56/edit
+                        - button [ref=e2026]:
+                          - img [ref=e2027]
+                      - link "Manage Quizzes" [ref=e2030] [cursor=pointer]:
+                        - /url: /en/admin/courses/4172d77e-bf4d-4316-8879-8b5367c8eb56/quizzes
+                        - button [ref=e2031]:
+                          - img [ref=e2032]
+                      - button "Publish" [ref=e2036] [cursor=pointer]:
+                        - img [ref=e2037]
+                      - button "Delete" [ref=e2040] [cursor=pointer]:
+                        - img [ref=e2041]
+                - row "Dynamic Business Dashboards using Excel ALL COURSES Draft Free 0" [ref=e2044]:
+                  - cell "Dynamic Business Dashboards using Excel ALL COURSES" [ref=e2045]:
+                    - generic [ref=e2046]:
+                      - link "Dynamic Business Dashboards using Excel" [ref=e2047] [cursor=pointer]:
+                        - /url: /en/admin/courses/62811dd9-e406-4f4f-89a1-0e3218fb6fff/edit
+                      - paragraph [ref=e2048]: ALL COURSES
+                  - cell "Draft" [ref=e2049]:
+                    - generic [ref=e2050]: Draft
+                  - cell "Free" [ref=e2051]
+                  - cell "0" [ref=e2052]
+                  - cell [ref=e2053]:
+                    - generic [ref=e2054]:
+                      - link "View public page" [ref=e2055] [cursor=pointer]:
+                        - /url: /en/courses/dynamic-business-dashboards-using-excel
+                        - button [ref=e2056]:
+                          - img [ref=e2057]
+                      - link "Edit" [ref=e2060] [cursor=pointer]:
+                        - /url: /en/admin/courses/62811dd9-e406-4f4f-89a1-0e3218fb6fff/edit
+                        - button [ref=e2061]:
+                          - img [ref=e2062]
+                      - link "Manage Quizzes" [ref=e2065] [cursor=pointer]:
+                        - /url: /en/admin/courses/62811dd9-e406-4f4f-89a1-0e3218fb6fff/quizzes
+                        - button [ref=e2066]:
+                          - img [ref=e2067]
+                      - button "Publish" [ref=e2071] [cursor=pointer]:
+                        - img [ref=e2072]
+                      - button "Delete" [ref=e2075] [cursor=pointer]:
+                        - img [ref=e2076]
+                - row "Managing Project Risks ALL COURSES Draft Free 0" [ref=e2079]:
+                  - cell "Managing Project Risks ALL COURSES" [ref=e2080]:
+                    - generic [ref=e2081]:
+                      - link "Managing Project Risks" [ref=e2082] [cursor=pointer]:
+                        - /url: /en/admin/courses/4464dea4-36d7-482c-a4fa-619b14d2e595/edit
+                      - paragraph [ref=e2083]: ALL COURSES
+                  - cell "Draft" [ref=e2084]:
+                    - generic [ref=e2085]: Draft
+                  - cell "Free" [ref=e2086]
+                  - cell "0" [ref=e2087]
+                  - cell [ref=e2088]:
+                    - generic [ref=e2089]:
+                      - link "View public page" [ref=e2090] [cursor=pointer]:
+                        - /url: /en/courses/managing-project-risks
+                        - button [ref=e2091]:
+                          - img [ref=e2092]
+                      - link "Edit" [ref=e2095] [cursor=pointer]:
+                        - /url: /en/admin/courses/4464dea4-36d7-482c-a4fa-619b14d2e595/edit
+                        - button [ref=e2096]:
+                          - img [ref=e2097]
+                      - link "Manage Quizzes" [ref=e2100] [cursor=pointer]:
+                        - /url: /en/admin/courses/4464dea4-36d7-482c-a4fa-619b14d2e595/quizzes
+                        - button [ref=e2101]:
+                          - img [ref=e2102]
+                      - button "Publish" [ref=e2106] [cursor=pointer]:
+                        - img [ref=e2107]
+                      - button "Delete" [ref=e2110] [cursor=pointer]:
+                        - img [ref=e2111]
+                - row "Advanced Financial Modeler - AFM 1 ALL COURSES Draft Free 0" [ref=e2114]:
+                  - cell "Advanced Financial Modeler - AFM 1 ALL COURSES" [ref=e2115]:
+                    - generic [ref=e2116]:
+                      - link "Advanced Financial Modeler - AFM 1" [ref=e2117] [cursor=pointer]:
+                        - /url: /en/admin/courses/85892bd6-bbf4-42e4-aff3-975c1eba2b50/edit
+                      - paragraph [ref=e2118]: ALL COURSES
+                  - cell "Draft" [ref=e2119]:
+                    - generic [ref=e2120]: Draft
+                  - cell "Free" [ref=e2121]
+                  - cell "0" [ref=e2122]
+                  - cell [ref=e2123]:
+                    - generic [ref=e2124]:
+                      - link "View public page" [ref=e2125] [cursor=pointer]:
+                        - /url: /en/courses/advanced-financial-modeler-afm-1
+                        - button [ref=e2126]:
+                          - img [ref=e2127]
+                      - link "Edit" [ref=e2130] [cursor=pointer]:
+                        - /url: /en/admin/courses/85892bd6-bbf4-42e4-aff3-975c1eba2b50/edit
+                        - button [ref=e2131]:
+                          - img [ref=e2132]
+                      - link "Manage Quizzes" [ref=e2135] [cursor=pointer]:
+                        - /url: /en/admin/courses/85892bd6-bbf4-42e4-aff3-975c1eba2b50/quizzes
+                        - button [ref=e2136]:
+                          - img [ref=e2137]
+                      - button "Publish" [ref=e2141] [cursor=pointer]:
+                        - img [ref=e2142]
+                      - button "Delete" [ref=e2145] [cursor=pointer]:
+                        - img [ref=e2146]
+                - row "Power Query / Power Pivot Using Excel - COMING SOON! ALL COURSES Draft Free 0" [ref=e2149]:
+                  - cell "Power Query / Power Pivot Using Excel - COMING SOON! ALL COURSES" [ref=e2150]:
+                    - generic [ref=e2151]:
+                      - link "Power Query / Power Pivot Using Excel - COMING SOON!" [ref=e2152] [cursor=pointer]:
+                        - /url: /en/admin/courses/c20e8cde-0d58-4cc1-bada-f34268d03bd9/edit
+                      - paragraph [ref=e2153]: ALL COURSES
+                  - cell "Draft" [ref=e2154]:
+                    - generic [ref=e2155]: Draft
+                  - cell "Free" [ref=e2156]
+                  - cell "0" [ref=e2157]
+                  - cell [ref=e2158]:
+                    - generic [ref=e2159]:
+                      - link "View public page" [ref=e2160] [cursor=pointer]:
+                        - /url: /en/courses/power-query-power-pivot-using-excel-coming-soon
+                        - button [ref=e2161]:
+                          - img [ref=e2162]
+                      - link "Edit" [ref=e2165] [cursor=pointer]:
+                        - /url: /en/admin/courses/c20e8cde-0d58-4cc1-bada-f34268d03bd9/edit
+                        - button [ref=e2166]:
+                          - img [ref=e2167]
+                      - link "Manage Quizzes" [ref=e2170] [cursor=pointer]:
+                        - /url: /en/admin/courses/c20e8cde-0d58-4cc1-bada-f34268d03bd9/quizzes
+                        - button [ref=e2171]:
+                          - img [ref=e2172]
+                      - button "Publish" [ref=e2176] [cursor=pointer]:
+                        - img [ref=e2177]
+                      - button "Delete" [ref=e2180] [cursor=pointer]:
+                        - img [ref=e2181]
+                - row "Finance for Non-Finance Professionals - COMING SOON! ALL COURSES Draft Free 0" [ref=e2184]:
+                  - cell "Finance for Non-Finance Professionals - COMING SOON! ALL COURSES" [ref=e2185]:
+                    - generic [ref=e2186]:
+                      - link "Finance for Non-Finance Professionals - COMING SOON!" [ref=e2187] [cursor=pointer]:
+                        - /url: /en/admin/courses/f03d77cf-0624-42c0-978e-c10c2307b611/edit
+                      - paragraph [ref=e2188]: ALL COURSES
+                  - cell "Draft" [ref=e2189]:
+                    - generic [ref=e2190]: Draft
+                  - cell "Free" [ref=e2191]
+                  - cell "0" [ref=e2192]
+                  - cell [ref=e2193]:
+                    - generic [ref=e2194]:
+                      - link "View public page" [ref=e2195] [cursor=pointer]:
+                        - /url: /en/courses/finance-for-non-finance-professionals-coming-soon
+                        - button [ref=e2196]:
+                          - img [ref=e2197]
+                      - link "Edit" [ref=e2200] [cursor=pointer]:
+                        - /url: /en/admin/courses/f03d77cf-0624-42c0-978e-c10c2307b611/edit
+                        - button [ref=e2201]:
+                          - img [ref=e2202]
+                      - link "Manage Quizzes" [ref=e2205] [cursor=pointer]:
+                        - /url: /en/admin/courses/f03d77cf-0624-42c0-978e-c10c2307b611/quizzes
+                        - button [ref=e2206]:
+                          - img [ref=e2207]
+                      - button "Publish" [ref=e2211] [cursor=pointer]:
+                        - img [ref=e2212]
+                      - button "Delete" [ref=e2215] [cursor=pointer]:
+                        - img [ref=e2216]
+                - row "Data Analysis & Business Reporting Techniques Using Excel - Level 2 ALL COURSES Draft Free 0" [ref=e2219]:
+                  - cell "Data Analysis & Business Reporting Techniques Using Excel - Level 2 ALL COURSES" [ref=e2220]:
+                    - generic [ref=e2221]:
+                      - link "Data Analysis & Business Reporting Techniques Using Excel - Level 2" [ref=e2222] [cursor=pointer]:
+                        - /url: /en/admin/courses/1c2c5777-e044-4ed4-9f18-469363f8319f/edit
+                      - paragraph [ref=e2223]: ALL COURSES
+                  - cell "Draft" [ref=e2224]:
+                    - generic [ref=e2225]: Draft
+                  - cell "Free" [ref=e2226]
+                  - cell "0" [ref=e2227]
+                  - cell [ref=e2228]:
+                    - generic [ref=e2229]:
+                      - link "View public page" [ref=e2230] [cursor=pointer]:
+                        - /url: /en/courses/data-analysis-business-reporting-techniques-using-excel-level-2
+                        - button [ref=e2231]:
+                          - img [ref=e2232]
+                      - link "Edit" [ref=e2235] [cursor=pointer]:
+                        - /url: /en/admin/courses/1c2c5777-e044-4ed4-9f18-469363f8319f/edit
+                        - button [ref=e2236]:
+                          - img [ref=e2237]
+                      - link "Manage Quizzes" [ref=e2240] [cursor=pointer]:
+                        - /url: /en/admin/courses/1c2c5777-e044-4ed4-9f18-469363f8319f/quizzes
+                        - button [ref=e2241]:
+                          - img [ref=e2242]
+                      - button "Publish" [ref=e2246] [cursor=pointer]:
+                        - img [ref=e2247]
+                      - button "Delete" [ref=e2250] [cursor=pointer]:
+                        - img [ref=e2251]
+                - row "Data Analysis and Business Reporting Techniques Using Excel - Level 1 ALL COURSES Draft Free 0" [ref=e2254]:
+                  - cell "Data Analysis and Business Reporting Techniques Using Excel - Level 1 ALL COURSES" [ref=e2255]:
+                    - generic [ref=e2256]:
+                      - link "Data Analysis and Business Reporting Techniques Using Excel - Level 1" [ref=e2257] [cursor=pointer]:
+                        - /url: /en/admin/courses/512b439e-2b91-4b8d-9e26-063fa0baab55/edit
+                      - paragraph [ref=e2258]: ALL COURSES
+                  - cell "Draft" [ref=e2259]:
+                    - generic [ref=e2260]: Draft
+                  - cell "Free" [ref=e2261]
+                  - cell "0" [ref=e2262]
+                  - cell [ref=e2263]:
+                    - generic [ref=e2264]:
+                      - link "View public page" [ref=e2265] [cursor=pointer]:
+                        - /url: /en/courses/data-analysis-and-business-reporting-techniques-using-excel-level-1
+                        - button [ref=e2266]:
+                          - img [ref=e2267]
+                      - link "Edit" [ref=e2270] [cursor=pointer]:
+                        - /url: /en/admin/courses/512b439e-2b91-4b8d-9e26-063fa0baab55/edit
+                        - button [ref=e2271]:
+                          - img [ref=e2272]
+                      - link "Manage Quizzes" [ref=e2275] [cursor=pointer]:
+                        - /url: /en/admin/courses/512b439e-2b91-4b8d-9e26-063fa0baab55/quizzes
+                        - button [ref=e2276]:
+                          - img [ref=e2277]
+                      - button "Publish" [ref=e2281] [cursor=pointer]:
+                        - img [ref=e2282]
+                      - button "Delete" [ref=e2285] [cursor=pointer]:
+                        - img [ref=e2286]
+                - row "Certified Data Intelligence for Professionals Data Analytics and AI Draft $0.00 0" [ref=e2289]:
+                  - cell "Certified Data Intelligence for Professionals Data Analytics and AI" [ref=e2290]:
+                    - generic [ref=e2291]:
+                      - link "Certified Data Intelligence for Professionals" [ref=e2292] [cursor=pointer]:
+                        - /url: /en/admin/courses/2b0a7e24-7e80-4528-8422-2248cdf57ce2/edit
+                      - paragraph [ref=e2293]: Data Analytics and AI
+                  - cell "Draft" [ref=e2294]:
+                    - generic [ref=e2295]: Draft
+                  - cell "$0.00" [ref=e2296]
+                  - cell "0" [ref=e2297]
+                  - cell [ref=e2298]:
+                    - generic [ref=e2299]:
+                      - link "View public page" [ref=e2300] [cursor=pointer]:
+                        - /url: /en/courses/certified-data-intelligence-for-professionals
+                        - button [ref=e2301]:
+                          - img [ref=e2302]
+                      - link "Edit" [ref=e2305] [cursor=pointer]:
+                        - /url: /en/admin/courses/2b0a7e24-7e80-4528-8422-2248cdf57ce2/edit
+                        - button [ref=e2306]:
+                          - img [ref=e2307]
+                      - link "Manage Quizzes" [ref=e2310] [cursor=pointer]:
+                        - /url: /en/admin/courses/2b0a7e24-7e80-4528-8422-2248cdf57ce2/quizzes
+                        - button [ref=e2311]:
+                          - img [ref=e2312]
+                      - button "Publish" [ref=e2316] [cursor=pointer]:
+                        - img [ref=e2317]
+                      - button "Delete" [ref=e2320] [cursor=pointer]:
+                        - img [ref=e2321]
+                - row "Certified Strategic Business Intelligence Partner Course Finance, Investment, Accounting, and Banking Draft Free 0" [ref=e2324]:
+                  - cell "Certified Strategic Business Intelligence Partner Course Finance, Investment, Accounting, and Banking" [ref=e2325]:
+                    - generic [ref=e2326]:
+                      - link "Certified Strategic Business Intelligence Partner Course" [ref=e2327] [cursor=pointer]:
+                        - /url: /en/admin/courses/2a4b0e6b-5692-4ead-9f82-bd232344b184/edit
+                      - paragraph [ref=e2328]: Finance, Investment, Accounting, and Banking
+                  - cell "Draft" [ref=e2329]:
+                    - generic [ref=e2330]: Draft
+                  - cell "Free" [ref=e2331]
+                  - cell "0" [ref=e2332]
+                  - cell [ref=e2333]:
+                    - generic [ref=e2334]:
+                      - link "View public page" [ref=e2335] [cursor=pointer]:
+                        - /url: /en/courses/csbip-course
+                        - button [ref=e2336]:
+                          - img [ref=e2337]
+                      - link "Edit" [ref=e2340] [cursor=pointer]:
+                        - /url: /en/admin/courses/2a4b0e6b-5692-4ead-9f82-bd232344b184/edit
+                        - button [ref=e2341]:
+                          - img [ref=e2342]
+                      - link "Manage Quizzes" [ref=e2345] [cursor=pointer]:
+                        - /url: /en/admin/courses/2a4b0e6b-5692-4ead-9f82-bd232344b184/quizzes
+                        - button [ref=e2346]:
+                          - img [ref=e2347]
+                      - button "Publish" [ref=e2351] [cursor=pointer]:
+                        - img [ref=e2352]
+                      - button "Delete" [ref=e2355] [cursor=pointer]:
+                        - img [ref=e2356]
+                - row "Certified Strategic Marketing Professional Course Finance, Investment, Accounting, and Banking Draft Free 0" [ref=e2359]:
+                  - cell "Certified Strategic Marketing Professional Course Finance, Investment, Accounting, and Banking" [ref=e2360]:
+                    - generic [ref=e2361]:
+                      - link "Certified Strategic Marketing Professional Course" [ref=e2362] [cursor=pointer]:
+                        - /url: /en/admin/courses/b834e9d7-37e6-4815-aa8c-efbdd9cc8147/edit
+                      - paragraph [ref=e2363]: Finance, Investment, Accounting, and Banking
+                  - cell "Draft" [ref=e2364]:
+                    - generic [ref=e2365]: Draft
+                  - cell "Free" [ref=e2366]
+                  - cell "0" [ref=e2367]
+                  - cell [ref=e2368]:
+                    - generic [ref=e2369]:
+                      - link "View public page" [ref=e2370] [cursor=pointer]:
+                        - /url: /en/courses/csmp-course
+                        - button [ref=e2371]:
+                          - img [ref=e2372]
+                      - link "Edit" [ref=e2375] [cursor=pointer]:
+                        - /url: /en/admin/courses/b834e9d7-37e6-4815-aa8c-efbdd9cc8147/edit
+                        - button [ref=e2376]:
+                          - img [ref=e2377]
+                      - link "Manage Quizzes" [ref=e2380] [cursor=pointer]:
+                        - /url: /en/admin/courses/b834e9d7-37e6-4815-aa8c-efbdd9cc8147/quizzes
+                        - button [ref=e2381]:
+                          - img [ref=e2382]
+                      - button "Publish" [ref=e2386] [cursor=pointer]:
+                        - img [ref=e2387]
+                      - button "Delete" [ref=e2390] [cursor=pointer]:
+                        - img [ref=e2391]
+                - row "Certified Cost Transformation Practitioner Course Finance, Investment, Accounting, and Banking Draft Free 0" [ref=e2394]:
+                  - cell "Certified Cost Transformation Practitioner Course Finance, Investment, Accounting, and Banking" [ref=e2395]:
+                    - generic [ref=e2396]:
+                      - link "Certified Cost Transformation Practitioner Course" [ref=e2397] [cursor=pointer]:
+                        - /url: /en/admin/courses/6433d3ec-eaee-4b7f-8739-1233f90f1372/edit
+                      - paragraph [ref=e2398]: Finance, Investment, Accounting, and Banking
+                  - cell "Draft" [ref=e2399]:
+                    - generic [ref=e2400]: Draft
+                  - cell "Free" [ref=e2401]
+                  - cell "0" [ref=e2402]
+                  - cell [ref=e2403]:
+                    - generic [ref=e2404]:
+                      - link "View public page" [ref=e2405] [cursor=pointer]:
+                        - /url: /en/courses/cctp-course
+                        - button [ref=e2406]:
+                          - img [ref=e2407]
+                      - link "Edit" [ref=e2410] [cursor=pointer]:
+                        - /url: /en/admin/courses/6433d3ec-eaee-4b7f-8739-1233f90f1372/edit
+                        - button [ref=e2411]:
+                          - img [ref=e2412]
+                      - link "Manage Quizzes" [ref=e2415] [cursor=pointer]:
+                        - /url: /en/admin/courses/6433d3ec-eaee-4b7f-8739-1233f90f1372/quizzes
+                        - button [ref=e2416]:
+                          - img [ref=e2417]
+                      - button "Publish" [ref=e2421] [cursor=pointer]:
+                        - img [ref=e2422]
+                      - button "Delete" [ref=e2425] [cursor=pointer]:
+                        - img [ref=e2426]
+                - row "Certified AI Strategy Professional Course Finance, Investment, Accounting, and Banking Draft Free 0" [ref=e2429]:
+                  - cell "Certified AI Strategy Professional Course Finance, Investment, Accounting, and Banking" [ref=e2430]:
+                    - generic [ref=e2431]:
+                      - link "Certified AI Strategy Professional Course" [ref=e2432] [cursor=pointer]:
+                        - /url: /en/admin/courses/f3d6830d-93d6-412c-bfba-4d8ed4d13cc8/edit
+                      - paragraph [ref=e2433]: Finance, Investment, Accounting, and Banking
+                  - cell "Draft" [ref=e2434]:
+                    - generic [ref=e2435]: Draft
+                  - cell "Free" [ref=e2436]
+                  - cell "0" [ref=e2437]
+                  - cell [ref=e2438]:
+                    - generic [ref=e2439]:
+                      - link "View public page" [ref=e2440] [cursor=pointer]:
+                        - /url: /en/courses/casp-course
+                        - button [ref=e2441]:
+                          - img [ref=e2442]
+                      - link "Edit" [ref=e2445] [cursor=pointer]:
+                        - /url: /en/admin/courses/f3d6830d-93d6-412c-bfba-4d8ed4d13cc8/edit
+                        - button [ref=e2446]:
+                          - img [ref=e2447]
+                      - link "Manage Quizzes" [ref=e2450] [cursor=pointer]:
+                        - /url: /en/admin/courses/f3d6830d-93d6-412c-bfba-4d8ed4d13cc8/quizzes
+                        - button [ref=e2451]:
+                          - img [ref=e2452]
+                      - button "Publish" [ref=e2456] [cursor=pointer]:
+                        - img [ref=e2457]
+                      - button "Delete" [ref=e2460] [cursor=pointer]:
+                        - img [ref=e2461]
+                - row "Certified Data Intelligence Professional Course Finance, Investment, Accounting, and Banking Draft Free 0" [ref=e2464]:
+                  - cell "Certified Data Intelligence Professional Course Finance, Investment, Accounting, and Banking" [ref=e2465]:
+                    - generic [ref=e2466]:
+                      - link "Certified Data Intelligence Professional Course" [ref=e2467] [cursor=pointer]:
+                        - /url: /en/admin/courses/310b7d98-1799-4e16-89b5-57ba9cb028d0/edit
+                      - paragraph [ref=e2468]: Finance, Investment, Accounting, and Banking
+                  - cell "Draft" [ref=e2469]:
+                    - generic [ref=e2470]: Draft
+                  - cell "Free" [ref=e2471]
+                  - cell "0" [ref=e2472]
+                  - cell [ref=e2473]:
+                    - generic [ref=e2474]:
+                      - link "View public page" [ref=e2475] [cursor=pointer]:
+                        - /url: /en/courses/cdip-course
+                        - button [ref=e2476]:
+                          - img [ref=e2477]
+                      - link "Edit" [ref=e2480] [cursor=pointer]:
+                        - /url: /en/admin/courses/310b7d98-1799-4e16-89b5-57ba9cb028d0/edit
+                        - button [ref=e2481]:
+                          - img [ref=e2482]
+                      - link "Manage Quizzes" [ref=e2485] [cursor=pointer]:
+                        - /url: /en/admin/courses/310b7d98-1799-4e16-89b5-57ba9cb028d0/quizzes
+                        - button [ref=e2486]:
+                          - img [ref=e2487]
+                      - button "Publish" [ref=e2491] [cursor=pointer]:
+                        - img [ref=e2492]
+                      - button "Delete" [ref=e2495] [cursor=pointer]:
+                        - img [ref=e2496]
+                - row "Certified AI Powered Accountant Finance, Investment, Accounting, and Banking Published $0.00 0" [ref=e2499]:
+                  - cell "Certified AI Powered Accountant Finance, Investment, Accounting, and Banking" [ref=e2500]:
+                    - generic [ref=e2501]:
+                      - link "Certified AI Powered Accountant" [ref=e2502] [cursor=pointer]:
+                        - /url: /en/admin/courses/c7572b69-e41f-4cb3-9600-618af4b87b04/edit
+                      - paragraph [ref=e2503]: Finance, Investment, Accounting, and Banking
+                  - cell "Published" [ref=e2504]:
+                    - generic [ref=e2505]: Published
+                  - cell "$0.00" [ref=e2506]
+                  - cell "0" [ref=e2507]
+                  - cell [ref=e2508]:
+                    - generic [ref=e2509]:
+                      - link "View public page" [ref=e2510] [cursor=pointer]:
+                        - /url: /en/courses/certified-ai-powered-accountant
+                        - button [ref=e2511]:
+                          - img [ref=e2512]
+                      - link "Edit" [ref=e2515] [cursor=pointer]:
+                        - /url: /en/admin/courses/c7572b69-e41f-4cb3-9600-618af4b87b04/edit
+                        - button [ref=e2516]:
+                          - img [ref=e2517]
+                      - link "Manage Quizzes" [ref=e2520] [cursor=pointer]:
+                        - /url: /en/admin/courses/c7572b69-e41f-4cb3-9600-618af4b87b04/quizzes
+                        - button [ref=e2521]:
+                          - img [ref=e2522]
+                      - button "Unpublish" [ref=e2526] [cursor=pointer]:
+                        - img [ref=e2527]
+                      - button "Delete" [ref=e2530] [cursor=pointer]:
+                        - img [ref=e2531]
+                - row "Certified AI Finance Leader (CAIFL) Data Analytics and AI Published $0.00 0" [ref=e2534]:
+                  - cell "Certified AI Finance Leader (CAIFL) Data Analytics and AI" [ref=e2535]:
+                    - generic [ref=e2536]:
+                      - link "Certified AI Finance Leader (CAIFL)" [ref=e2537] [cursor=pointer]:
+                        - /url: /en/admin/courses/1a3662c3-d739-4c80-8712-6405eb9cee13/edit
+                      - paragraph [ref=e2538]: Data Analytics and AI
+                  - cell "Published" [ref=e2539]:
+                    - generic [ref=e2540]: Published
+                  - cell "$0.00" [ref=e2541]
+                  - cell "0" [ref=e2542]
+                  - cell [ref=e2543]:
+                    - generic [ref=e2544]:
+                      - link "View public page" [ref=e2545] [cursor=pointer]:
+                        - /url: /en/courses/certified-ai-finance-leader
+                        - button [ref=e2546]:
+                          - img [ref=e2547]
+                      - link "Edit" [ref=e2550] [cursor=pointer]:
+                        - /url: /en/admin/courses/1a3662c3-d739-4c80-8712-6405eb9cee13/edit
+                        - button [ref=e2551]:
+                          - img [ref=e2552]
+                      - link "Manage Quizzes" [ref=e2555] [cursor=pointer]:
+                        - /url: /en/admin/courses/1a3662c3-d739-4c80-8712-6405eb9cee13/quizzes
+                        - button [ref=e2556]:
+                          - img [ref=e2557]
+                      - button "Unpublish" [ref=e2561] [cursor=pointer]:
+                        - img [ref=e2562]
+                      - button "Delete" [ref=e2565] [cursor=pointer]:
+                        - img [ref=e2566]
+                - row "Anti-Money Laundering Compliance Compliance & Risk Management Published $149.00 0" [ref=e2569]:
+                  - cell "Anti-Money Laundering Compliance Compliance & Risk Management" [ref=e2570]:
+                    - generic [ref=e2571]:
+                      - link "Anti-Money Laundering Compliance" [ref=e2572] [cursor=pointer]:
+                        - /url: /en/admin/courses/72548c14-0a31-49ce-b27c-eec07bf2c6ee/edit
+                      - paragraph [ref=e2573]: Compliance & Risk Management
+                  - cell "Published" [ref=e2574]:
+                    - generic [ref=e2575]: Published
+                  - cell "$149.00" [ref=e2576]
+                  - cell "0" [ref=e2577]
+                  - cell [ref=e2578]:
+                    - generic [ref=e2579]:
+                      - link "View public page" [ref=e2580] [cursor=pointer]:
+                        - /url: /en/courses/anti-money-laundering-compliance
+                        - button [ref=e2581]:
+                          - img [ref=e2582]
+                      - link "Edit" [ref=e2585] [cursor=pointer]:
+                        - /url: /en/admin/courses/72548c14-0a31-49ce-b27c-eec07bf2c6ee/edit
+                        - button [ref=e2586]:
+                          - img [ref=e2587]
+                      - link "Manage Quizzes" [ref=e2590] [cursor=pointer]:
+                        - /url: /en/admin/courses/72548c14-0a31-49ce-b27c-eec07bf2c6ee/quizzes
+                        - button [ref=e2591]:
+                          - img [ref=e2592]
+                      - button "Unpublish" [ref=e2596] [cursor=pointer]:
+                        - img [ref=e2597]
+                      - button "Delete" [ref=e2600] [cursor=pointer]:
+                        - img [ref=e2601]
+                - row "Digital Transformation in Banking Leadership, Strategy, and management. Published $449.00 0" [ref=e2604]:
+                  - cell "Digital Transformation in Banking Leadership, Strategy, and management." [ref=e2605]:
+                    - generic [ref=e2606]:
+                      - link "Digital Transformation in Banking" [ref=e2607] [cursor=pointer]:
+                        - /url: /en/admin/courses/cca00344-3553-4e91-bdd7-ace55f2bfccb/edit
+                      - paragraph [ref=e2608]: Leadership, Strategy, and management.
+                  - cell "Published" [ref=e2609]:
+                    - generic [ref=e2610]: Published
+                  - cell "$449.00" [ref=e2611]
+                  - cell "0" [ref=e2612]
+                  - cell [ref=e2613]:
+                    - generic [ref=e2614]:
+                      - link "View public page" [ref=e2615] [cursor=pointer]:
+                        - /url: /en/courses/digital-transformation-in-banking
+                        - button [ref=e2616]:
+                          - img [ref=e2617]
+                      - link "Edit" [ref=e2620] [cursor=pointer]:
+                        - /url: /en/admin/courses/cca00344-3553-4e91-bdd7-ace55f2bfccb/edit
+                        - button [ref=e2621]:
+                          - img [ref=e2622]
+                      - link "Manage Quizzes" [ref=e2625] [cursor=pointer]:
+                        - /url: /en/admin/courses/cca00344-3553-4e91-bdd7-ace55f2bfccb/quizzes
+                        - button [ref=e2626]:
+                          - img [ref=e2627]
+                      - button "Unpublish" [ref=e2631] [cursor=pointer]:
+                        - img [ref=e2632]
+                      - button "Delete" [ref=e2635] [cursor=pointer]:
+                        - img [ref=e2636]
+                - row "Enterprise Risk Management Framework Compliance & Risk Management Published $349.00 0" [ref=e2639]:
+                  - cell "Enterprise Risk Management Framework Compliance & Risk Management" [ref=e2640]:
+                    - generic [ref=e2641]:
+                      - link "Enterprise Risk Management Framework" [ref=e2642] [cursor=pointer]:
+                        - /url: /en/admin/courses/a2fb0235-fa1c-4c6c-9fbe-dbd1edb6cf6c/edit
+                      - paragraph [ref=e2643]: Compliance & Risk Management
+                  - cell "Published" [ref=e2644]:
+                    - generic [ref=e2645]: Published
+                  - cell "$349.00" [ref=e2646]
+                  - cell "0" [ref=e2647]
+                  - cell [ref=e2648]:
+                    - generic [ref=e2649]:
+                      - link "View public page" [ref=e2650] [cursor=pointer]:
+                        - /url: /en/courses/enterprise-risk-management-framework
+                        - button [ref=e2651]:
+                          - img [ref=e2652]
+                      - link "Edit" [ref=e2655] [cursor=pointer]:
+                        - /url: /en/admin/courses/a2fb0235-fa1c-4c6c-9fbe-dbd1edb6cf6c/edit
+                        - button [ref=e2656]:
+                          - img [ref=e2657]
+                      - link "Manage Quizzes" [ref=e2660] [cursor=pointer]:
+                        - /url: /en/admin/courses/a2fb0235-fa1c-4c6c-9fbe-dbd1edb6cf6c/quizzes
+                        - button [ref=e2661]:
+                          - img [ref=e2662]
+                      - button "Unpublish" [ref=e2666] [cursor=pointer]:
+                        - img [ref=e2667]
+                      - button "Delete" [ref=e2670] [cursor=pointer]:
+                        - img [ref=e2671]
+                - row "Strategic Leadership in Financial Services Leadership, Strategy, and management. Published $399.00 0" [ref=e2674]:
+                  - cell "Strategic Leadership in Financial Services Leadership, Strategy, and management." [ref=e2675]:
+                    - generic [ref=e2676]:
+                      - link "Strategic Leadership in Financial Services" [ref=e2677] [cursor=pointer]:
+                        - /url: /en/admin/courses/05d23c1c-bd3b-49bf-9306-d62935710ce4/edit
+                      - paragraph [ref=e2678]: Leadership, Strategy, and management.
+                  - cell "Published" [ref=e2679]:
+                    - generic [ref=e2680]: Published
+                  - cell "$399.00" [ref=e2681]
+                  - cell "0" [ref=e2682]
+                  - cell [ref=e2683]:
+                    - generic [ref=e2684]:
+                      - link "View public page" [ref=e2685] [cursor=pointer]:
+                        - /url: /en/courses/strategic-leadership-in-financial-services
+                        - button [ref=e2686]:
+                          - img [ref=e2687]
+                      - link "Edit" [ref=e2690] [cursor=pointer]:
+                        - /url: /en/admin/courses/05d23c1c-bd3b-49bf-9306-d62935710ce4/edit
+                        - button [ref=e2691]:
+                          - img [ref=e2692]
+                      - link "Manage Quizzes" [ref=e2695] [cursor=pointer]:
+                        - /url: /en/admin/courses/05d23c1c-bd3b-49bf-9306-d62935710ce4/quizzes
+                        - button [ref=e2696]:
+                          - img [ref=e2697]
+                      - button "Unpublish" [ref=e2701] [cursor=pointer]:
+                        - img [ref=e2702]
+                      - button "Delete" [ref=e2705] [cursor=pointer]:
+                        - img [ref=e2706]
+                - row "Data Visualization with Power BI Data Analytics and AI Published Free 0" [ref=e2709]:
+                  - cell "Data Visualization with Power BI Data Analytics and AI" [ref=e2710]:
+                    - generic [ref=e2711]:
+                      - link "Data Visualization with Power BI" [ref=e2712] [cursor=pointer]:
+                        - /url: /en/admin/courses/33b54b02-f37f-4e69-a73b-dfcb6a72f18c/edit
+                      - paragraph [ref=e2713]: Data Analytics and AI
+                  - cell "Published" [ref=e2714]:
+                    - generic [ref=e2715]: Published
+                  - cell "Free" [ref=e2716]
+                  - cell "0" [ref=e2717]
+                  - cell [ref=e2718]:
+                    - generic [ref=e2719]:
+                      - link "View public page" [ref=e2720] [cursor=pointer]:
+                        - /url: /en/courses/data-visualization-with-power-bi
+                        - button [ref=e2721]:
+                          - img [ref=e2722]
+                      - link "Edit" [ref=e2725] [cursor=pointer]:
+                        - /url: /en/admin/courses/33b54b02-f37f-4e69-a73b-dfcb6a72f18c/edit
+                        - button [ref=e2726]:
+                          - img [ref=e2727]
+                      - link "Manage Quizzes" [ref=e2730] [cursor=pointer]:
+                        - /url: /en/admin/courses/33b54b02-f37f-4e69-a73b-dfcb6a72f18c/quizzes
+                        - button [ref=e2731]:
+                          - img [ref=e2732]
+                      - button "Unpublish" [ref=e2736] [cursor=pointer]:
+                        - img [ref=e2737]
+                      - button "Delete" [ref=e2740] [cursor=pointer]:
+                        - img [ref=e2741]
+                - row "Machine Learning in Banking Data Analytics and AI Published $499.00 0" [ref=e2744]:
+                  - cell "Machine Learning in Banking Data Analytics and AI" [ref=e2745]:
+                    - generic [ref=e2746]:
+                      - link "Machine Learning in Banking" [ref=e2747] [cursor=pointer]:
+                        - /url: /en/admin/courses/bfd560c1-0dd4-4301-88e6-3201a92edb1b/edit
+                      - paragraph [ref=e2748]: Data Analytics and AI
+                  - cell "Published" [ref=e2749]:
+                    - generic [ref=e2750]: Published
+                  - cell "$499.00" [ref=e2751]
+                  - cell "0" [ref=e2752]
+                  - cell [ref=e2753]:
+                    - generic [ref=e2754]:
+                      - link "View public page" [ref=e2755] [cursor=pointer]:
+                        - /url: /en/courses/machine-learning-in-banking
+                        - button [ref=e2756]:
+                          - img [ref=e2757]
+                      - link "Edit" [ref=e2760] [cursor=pointer]:
+                        - /url: /en/admin/courses/bfd560c1-0dd4-4301-88e6-3201a92edb1b/edit
+                        - button [ref=e2761]:
+                          - img [ref=e2762]
+                      - link "Manage Quizzes" [ref=e2765] [cursor=pointer]:
+                        - /url: /en/admin/courses/bfd560c1-0dd4-4301-88e6-3201a92edb1b/quizzes
+                        - button [ref=e2766]:
+                          - img [ref=e2767]
+                      - button "Unpublish" [ref=e2771] [cursor=pointer]:
+                        - img [ref=e2772]
+                      - button "Delete" [ref=e2775] [cursor=pointer]:
+                        - img [ref=e2776]
+                - row "Python for Financial Analysis Data Analytics and AI Published $299.00 0" [ref=e2779]:
+                  - cell "Python for Financial Analysis Data Analytics and AI" [ref=e2780]:
+                    - generic [ref=e2781]:
+                      - link "Python for Financial Analysis" [ref=e2782] [cursor=pointer]:
+                        - /url: /en/admin/courses/1b9db072-6eb1-4b47-87f0-b2677de0a941/edit
+                      - paragraph [ref=e2783]: Data Analytics and AI
+                  - cell "Published" [ref=e2784]:
+                    - generic [ref=e2785]: Published
+                  - cell "$299.00" [ref=e2786]
+                  - cell "0" [ref=e2787]
+                  - cell [ref=e2788]:
+                    - generic [ref=e2789]:
+                      - link "View public page" [ref=e2790] [cursor=pointer]:
+                        - /url: /en/courses/python-for-financial-analysis
+                        - button [ref=e2791]:
+                          - img [ref=e2792]
+                      - link "Edit" [ref=e2795] [cursor=pointer]:
+                        - /url: /en/admin/courses/1b9db072-6eb1-4b47-87f0-b2677de0a941/edit
+                        - button [ref=e2796]:
+                          - img [ref=e2797]
+                      - link "Manage Quizzes" [ref=e2800] [cursor=pointer]:
+                        - /url: /en/admin/courses/1b9db072-6eb1-4b47-87f0-b2677de0a941/quizzes
+                        - button [ref=e2801]:
+                          - img [ref=e2802]
+                      - button "Unpublish" [ref=e2806] [cursor=pointer]:
+                        - img [ref=e2807]
+                      - button "Delete" [ref=e2810] [cursor=pointer]:
+                        - img [ref=e2811]
+                - row "Islamic Finance and Sukuk Finance, Investment, Accounting, and Banking Published $449.00 0" [ref=e2814]:
+                  - cell "Islamic Finance and Sukuk Finance, Investment, Accounting, and Banking" [ref=e2815]:
+                    - generic [ref=e2816]:
+                      - link "Islamic Finance and Sukuk" [ref=e2817] [cursor=pointer]:
+                        - /url: /en/admin/courses/84ba4f5a-789e-4369-b754-c32109269d41/edit
+                      - paragraph [ref=e2818]: Finance, Investment, Accounting, and Banking
+                  - cell "Published" [ref=e2819]:
+                    - generic [ref=e2820]: Published
+                  - cell "$449.00" [ref=e2821]
+                  - cell "0" [ref=e2822]
+                  - cell [ref=e2823]:
+                    - generic [ref=e2824]:
+                      - link "View public page" [ref=e2825] [cursor=pointer]:
+                        - /url: /en/courses/islamic-finance-and-sukuk
+                        - button [ref=e2826]:
+                          - img [ref=e2827]
+                      - link "Edit" [ref=e2830] [cursor=pointer]:
+                        - /url: /en/admin/courses/84ba4f5a-789e-4369-b754-c32109269d41/edit
+                        - button [ref=e2831]:
+                          - img [ref=e2832]
+                      - link "Manage Quizzes" [ref=e2835] [cursor=pointer]:
+                        - /url: /en/admin/courses/84ba4f5a-789e-4369-b754-c32109269d41/quizzes
+                        - button [ref=e2836]:
+                          - img [ref=e2837]
+                      - button "Unpublish" [ref=e2841] [cursor=pointer]:
+                        - img [ref=e2842]
+                      - button "Delete" [ref=e2845] [cursor=pointer]:
+                        - img [ref=e2846]
+                - row "Investment Banking Fundamentals Finance, Investment, Accounting, and Banking Published $349.00 0" [ref=e2849]:
+                  - cell "Investment Banking Fundamentals Finance, Investment, Accounting, and Banking" [ref=e2850]:
+                    - generic [ref=e2851]:
+                      - link "Investment Banking Fundamentals" [ref=e2852] [cursor=pointer]:
+                        - /url: /en/admin/courses/b401138f-0d4f-4b5f-9673-6e147f87a80d/edit
+                      - paragraph [ref=e2853]: Finance, Investment, Accounting, and Banking
+                  - cell "Published" [ref=e2854]:
+                    - generic [ref=e2855]: Published
+                  - cell "$349.00" [ref=e2856]
+                  - cell "0" [ref=e2857]
+                  - cell [ref=e2858]:
+                    - generic [ref=e2859]:
+                      - link "View public page" [ref=e2860] [cursor=pointer]:
+                        - /url: /en/courses/investment-banking-fundamentals
+                        - button [ref=e2861]:
+                          - img [ref=e2862]
+                      - link "Edit" [ref=e2865] [cursor=pointer]:
+                        - /url: /en/admin/courses/b401138f-0d4f-4b5f-9673-6e147f87a80d/edit
+                        - button [ref=e2866]:
+                          - img [ref=e2867]
+                      - link "Manage Quizzes" [ref=e2870] [cursor=pointer]:
+                        - /url: /en/admin/courses/b401138f-0d4f-4b5f-9673-6e147f87a80d/quizzes
+                        - button [ref=e2871]:
+                          - img [ref=e2872]
+                      - button "Unpublish" [ref=e2876] [cursor=pointer]:
+                        - img [ref=e2877]
+                      - button "Delete" [ref=e2880] [cursor=pointer]:
+                        - img [ref=e2881]
+                - row "Financial Statement Analysis Masterclass Finance, Investment, Accounting, and Banking Published $199.00 0" [ref=e2884]:
+                  - cell "Financial Statement Analysis Masterclass Finance, Investment, Accounting, and Banking" [ref=e2885]:
+                    - generic [ref=e2886]:
+                      - link "Financial Statement Analysis Masterclass" [ref=e2887] [cursor=pointer]:
+                        - /url: /en/admin/courses/da83dedd-995c-4527-8e49-73c4f70c704b/edit
+                      - paragraph [ref=e2888]: Finance, Investment, Accounting, and Banking
+                  - cell "Published" [ref=e2889]:
+                    - generic [ref=e2890]: Published
+                  - cell "$199.00" [ref=e2891]
+                  - cell "0" [ref=e2892]
+                  - cell [ref=e2893]:
+                    - generic [ref=e2894]:
+                      - link "View public page" [ref=e2895] [cursor=pointer]:
+                        - /url: /en/courses/financial-statement-analysis-masterclass
+                        - button [ref=e2896]:
+                          - img [ref=e2897]
+                      - link "Edit" [ref=e2900] [cursor=pointer]:
+                        - /url: /en/admin/courses/da83dedd-995c-4527-8e49-73c4f70c704b/edit
+                        - button [ref=e2901]:
+                          - img [ref=e2902]
+                      - link "Manage Quizzes" [ref=e2905] [cursor=pointer]:
+                        - /url: /en/admin/courses/da83dedd-995c-4527-8e49-73c4f70c704b/quizzes
+                        - button [ref=e2906]:
+                          - img [ref=e2907]
+                      - button "Unpublish" [ref=e2911] [cursor=pointer]:
+                        - img [ref=e2912]
+                      - button "Delete" [ref=e2915] [cursor=pointer]:
+                        - img [ref=e2916]
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e162] [cursor=pointer]:
+    - img [ref=e163]
+  - alert [ref=e166]
+  - button "🎓 Try Demo No Login" [ref=e2920] [cursor=pointer]:
+    - generic [ref=e2921]: 🎓
+    - generic [ref=e2922]: Try Demo
+    - generic [ref=e2923]: No Login

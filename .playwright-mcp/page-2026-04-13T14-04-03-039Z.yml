@@ -1,0 +1,146 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "VIFM - Virginia Institute of Finance and Management":
+          - /url: /en
+          - img "VIFM - Virginia Institute of Finance and Management"
+        - navigation [ref=e7]:
+          - link "Home" [ref=e9] [cursor=pointer]:
+            - /url: /en
+            - text: Home
+            - img [ref=e10]
+          - link "Courses" [ref=e13] [cursor=pointer]:
+            - /url: /en/courses
+            - text: Courses
+            - img [ref=e14]
+          - link "Certifications" [ref=e17] [cursor=pointer]:
+            - /url: /en/designations
+            - text: Certifications
+            - img [ref=e18]
+          - link "Webinars" [ref=e21] [cursor=pointer]:
+            - /url: /en/webinars
+            - text: Webinars
+            - img [ref=e22]
+          - link "Pricing" [ref=e24] [cursor=pointer]:
+            - /url: /en/pricing
+          - link "About" [ref=e25] [cursor=pointer]:
+            - /url: /en/about
+          - link "Contact" [ref=e26] [cursor=pointer]:
+            - /url: /en/contact
+        - generic [ref=e27]:
+          - link "Admin" [ref=e137] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e138]
+            - text: Admin
+          - button "Search" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+          - button "Switch to Arabic" [ref=e32] [cursor=pointer]:
+            - img [ref=e33]
+            - generic [ref=e36]: العربية
+          - button "Notifications" [ref=e142] [cursor=pointer]:
+            - img [ref=e143]
+          - button "A Admin User" [ref=e147] [cursor=pointer]:
+            - generic [ref=e148]: A
+            - generic [ref=e149]: Admin User
+    - generic [ref=e37]:
+      - complementary [ref=e38]:
+        - button "Collapse" [ref=e40] [cursor=pointer]:
+          - img [ref=e41]
+          - generic [ref=e44]: Collapse
+        - navigation [ref=e45]:
+          - link "Dashboard" [ref=e46] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e47]
+            - generic [ref=e52]: Dashboard
+          - button "Catalog" [ref=e54] [cursor=pointer]:
+            - generic [ref=e55]:
+              - img [ref=e56]
+              - generic [ref=e60]: Catalog
+            - img [ref=e61]
+          - link "Manage Users" [ref=e63] [cursor=pointer]:
+            - /url: /en/admin/users
+            - img [ref=e64]
+            - generic [ref=e69]: Manage Users
+          - link "Manage Organizations" [ref=e70] [cursor=pointer]:
+            - /url: /en/admin/organizations
+            - img [ref=e71]
+            - generic [ref=e75]: Manage Organizations
+          - button "Manage Payments" [ref=e77] [cursor=pointer]:
+            - generic [ref=e78]:
+              - img [ref=e79]
+              - generic [ref=e81]: Manage Payments
+            - img [ref=e82]
+          - button "Manage Certificates" [ref=e85] [cursor=pointer]:
+            - generic [ref=e86]:
+              - img [ref=e87]
+              - generic [ref=e90]: Manage Certificates
+            - img [ref=e91]
+          - button "Analytics" [ref=e94] [cursor=pointer]:
+            - generic [ref=e95]:
+              - img [ref=e96]
+              - generic [ref=e98]: Analytics
+            - img [ref=e99]
+          - link "Badges" [ref=e101] [cursor=pointer]:
+            - /url: /en/admin/badges
+            - img [ref=e102]
+            - generic [ref=e108]: Badges
+          - link "Testimonials" [ref=e109] [cursor=pointer]:
+            - /url: /en/admin/testimonials
+            - img [ref=e110]
+            - generic [ref=e112]: Testimonials
+          - link "Notifications" [ref=e113] [cursor=pointer]:
+            - /url: /en/admin/notifications
+            - img [ref=e114]
+            - generic [ref=e117]: Notifications
+          - link "Settings" [ref=e118] [cursor=pointer]:
+            - /url: /en/admin/settings
+            - img [ref=e119]
+            - generic [ref=e122]: Settings
+      - main [ref=e123]:
+        - generic [ref=e125]:
+          - generic [ref=e150]:
+            - heading "Badges" [level=1] [ref=e151]
+            - button "Add Badge" [ref=e152] [cursor=pointer]:
+              - img [ref=e153]
+              - text: Add Badge
+          - generic [ref=e154]:
+            - heading "Badges (1)" [level=3] [ref=e189]:
+              - img [ref=e157]
+              - text: Badges (1)
+            - table [ref=e190]:
+              - rowgroup [ref=e191]:
+                - row "Badge Description Criteria Status" [ref=e192]:
+                  - columnheader [ref=e193]
+                  - columnheader "Badge" [ref=e194]
+                  - columnheader "Description" [ref=e195]
+                  - columnheader "Criteria" [ref=e196]
+                  - columnheader "Status" [ref=e197]
+                  - columnheader [ref=e198]
+              - rowgroup [ref=e199]:
+                - row "Playwright Test Badge شارة اختبار Test badge Complete test Active" [ref=e200]:
+                  - cell [ref=e201]:
+                    - img [ref=e203]
+                  - cell "Playwright Test Badge شارة اختبار" [ref=e209]:
+                    - generic [ref=e210]:
+                      - text: Playwright Test Badge
+                      - paragraph [ref=e211]: شارة اختبار
+                  - cell "Test badge" [ref=e212]:
+                    - generic [ref=e213]: Test badge
+                  - cell "Complete test" [ref=e214]
+                  - cell "Active" [ref=e215]:
+                    - generic [ref=e216]: Active
+                  - cell [ref=e217]:
+                    - generic [ref=e218]:
+                      - button [ref=e219] [cursor=pointer]:
+                        - img [ref=e220]
+                      - button [ref=e223] [cursor=pointer]:
+                        - img [ref=e224]
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e132] [cursor=pointer]:
+    - img [ref=e133]
+  - alert [ref=e136]
+  - button "🎓 Try Demo No Login" [ref=e166] [cursor=pointer]:
+    - generic [ref=e167]: 🎓
+    - generic [ref=e168]: Try Demo
+    - generic [ref=e169]: No Login

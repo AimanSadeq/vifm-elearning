@@ -1,0 +1,108 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "VIFM - Virginia Institute of Finance and Management":
+          - /url: /en
+          - img "VIFM - Virginia Institute of Finance and Management"
+        - navigation [ref=e5]:
+          - link "Home" [ref=e7] [cursor=pointer]:
+            - /url: /en
+            - text: Home
+            - img [ref=e8]
+          - link "Courses" [ref=e11] [cursor=pointer]:
+            - /url: /en/courses
+            - text: Courses
+            - img [ref=e12]
+          - link "Certifications" [ref=e15] [cursor=pointer]:
+            - /url: /en/designations
+            - text: Certifications
+            - img [ref=e16]
+          - link "Webinars" [ref=e19] [cursor=pointer]:
+            - /url: /en/webinars
+            - text: Webinars
+            - img [ref=e20]
+          - link "Pricing" [ref=e22] [cursor=pointer]:
+            - /url: /en/pricing
+          - link "About" [ref=e23] [cursor=pointer]:
+            - /url: /en/about
+          - link "Contact" [ref=e24] [cursor=pointer]:
+            - /url: /en/contact
+        - generic [ref=e25]:
+          - link "Admin" [ref=e26] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e27]
+            - text: Admin
+          - button "Search" [ref=e30] [cursor=pointer]:
+            - img [ref=e31]
+          - button "Switch to Arabic" [ref=e34] [cursor=pointer]:
+            - img [ref=e35]
+            - generic [ref=e38]: العربية
+          - button "Notifications" [ref=e40] [cursor=pointer]:
+            - img [ref=e41]
+          - button "A Admin User" [ref=e45] [cursor=pointer]:
+            - generic [ref=e46]: A
+            - generic [ref=e47]: Admin User
+    - generic [ref=e48]:
+      - complementary [ref=e49]:
+        - button "Collapse" [ref=e51] [cursor=pointer]:
+          - img [ref=e52]
+          - generic [ref=e55]: Collapse
+        - navigation [ref=e56]:
+          - link "Dashboard" [ref=e57] [cursor=pointer]:
+            - /url: /en/admin/dashboard
+            - img [ref=e58]
+            - generic [ref=e63]: Dashboard
+          - button "Catalog" [ref=e65] [cursor=pointer]:
+            - generic [ref=e66]:
+              - img [ref=e67]
+              - generic [ref=e71]: Catalog
+            - img [ref=e72]
+          - link "Manage Users" [ref=e74] [cursor=pointer]:
+            - /url: /en/admin/users
+            - img [ref=e75]
+            - generic [ref=e80]: Manage Users
+          - link "Manage Organizations" [ref=e81] [cursor=pointer]:
+            - /url: /en/admin/organizations
+            - img [ref=e82]
+            - generic [ref=e86]: Manage Organizations
+          - button "Manage Payments" [ref=e88] [cursor=pointer]:
+            - generic [ref=e89]:
+              - img [ref=e90]
+              - generic [ref=e92]: Manage Payments
+            - img [ref=e93]
+          - button "Manage Certificates" [ref=e96] [cursor=pointer]:
+            - generic [ref=e97]:
+              - img [ref=e98]
+              - generic [ref=e101]: Manage Certificates
+            - img [ref=e102]
+          - button "Analytics" [ref=e105] [cursor=pointer]:
+            - generic [ref=e106]:
+              - img [ref=e107]
+              - generic [ref=e109]: Analytics
+            - img [ref=e110]
+          - link "Badges" [ref=e112] [cursor=pointer]:
+            - /url: /en/admin/badges
+            - img [ref=e113]
+            - generic [ref=e119]: Badges
+          - link "Testimonials" [ref=e120] [cursor=pointer]:
+            - /url: /en/admin/testimonials
+            - img [ref=e121]
+            - generic [ref=e123]: Testimonials
+          - link "Notifications" [ref=e124] [cursor=pointer]:
+            - /url: /en/admin/notifications
+            - img [ref=e125]
+            - generic [ref=e128]: Notifications
+          - link "Settings" [ref=e129] [cursor=pointer]:
+            - /url: /en/admin/settings
+            - img [ref=e130]
+            - generic [ref=e133]: Settings
+      - main [ref=e134]
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e143] [cursor=pointer]:
+    - img [ref=e144]
+  - alert [ref=e147]
+  - button "🎓 Try Demo No Login" [ref=e149] [cursor=pointer]:
+    - generic [ref=e150]: 🎓
+    - generic [ref=e151]: Try Demo
+    - generic [ref=e152]: No Login
