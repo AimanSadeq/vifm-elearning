@@ -90,6 +90,13 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     type: string
   } | null>(null)
 
+  const [deleteModuleConfirmation, setDeleteModuleConfirmation] = useState<{
+    id: string
+    title: string
+    lessonCount: number
+  } | null>(null)
+  const [deletingModuleId, setDeletingModuleId] = useState<string | null>(null)
+
   const [courseForm, setCourseForm] = useState({
     title: course.title,
     title_ar: course.title_ar || '',
@@ -314,6 +321,26 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     }
   }
 
+  // Delete module (cascades to lessons via FK)
+  const handleDeleteModule = async (moduleId: string) => {
+    setDeletingModuleId(moduleId)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from('modules').delete().eq('id', moduleId)
+
+      if (error) throw error
+
+      toast.success('Module deleted successfully')
+      setDeleteModuleConfirmation(null)
+      refreshModules()
+    } catch (error) {
+      console.error('Error deleting module:', error)
+      toast.error('Failed to delete module')
+    } finally {
+      setDeletingModuleId(null)
+    }
+  }
+
   // Handle drag end for lesson reorder within a module
   const handleDragEnd = async (event: DragEndEvent, moduleId: string) => {
     const { active, over } = event
@@ -362,7 +389,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable) return
-      if (e.key !== 'Escape' && (showAddContent || showAddModule || editingLesson || previewLesson || deleteConfirmation)) return
+      if (e.key !== 'Escape' && (showAddContent || showAddModule || editingLesson || previewLesson || deleteConfirmation || deleteModuleConfirmation)) return
 
       switch (e.key.toLowerCase()) {
         case 'n':
@@ -392,7 +419,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [activeTab, showAddContent, showAddModule, editingLesson, previewLesson, deleteConfirmation, isEditing])
+  }, [activeTab, showAddContent, showAddModule, editingLesson, previewLesson, deleteConfirmation, deleteModuleConfirmation, isEditing])
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -794,14 +821,29 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                           </div>
                         </button>
                       </div>
-                      <button
-                        onClick={() => setShowAddContent(mod.id)}
-                        className="inline-flex items-center gap-2 rounded-lg bg-card px-4 py-2 text-sm font-semibold text-foreground shadow-sm ring-1 ring-border transition-all hover:bg-muted hover:shadow-md"
-                      >
-                        <Plus className="h-4 w-4" />
-                        <span className="hidden sm:inline">Add Lesson</span>
-                        <span className="sm:hidden">Add</span>
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setShowAddContent(mod.id)}
+                          className="inline-flex items-center gap-2 rounded-lg bg-card px-4 py-2 text-sm font-semibold text-foreground shadow-sm ring-1 ring-border transition-all hover:bg-muted hover:shadow-md"
+                        >
+                          <Plus className="h-4 w-4" />
+                          <span className="hidden sm:inline">Add Lesson</span>
+                          <span className="sm:hidden">Add</span>
+                        </button>
+                        <button
+                          onClick={() => setDeleteModuleConfirmation({ id: mod.id, title: mod.title, lessonCount: mod.lessons.length })}
+                          disabled={deletingModuleId === mod.id}
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-card text-red-600 shadow-sm ring-1 ring-border transition-all hover:bg-red-50 hover:text-red-700 hover:shadow-md disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"
+                          title="Delete module"
+                          aria-label="Delete module"
+                        >
+                          {deletingModuleId === mod.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </header>
 
@@ -997,6 +1039,42 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
               className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
             >
               Delete Lesson
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Module Confirmation */}
+      <AlertDialog open={!!deleteModuleConfirmation} onOpenChange={() => setDeleteModuleConfirmation(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+              <Trash2 className="h-5 w-5" />
+              Delete module?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3 pt-2">
+              <p className="text-base font-semibold text-foreground">
+                &ldquo;{deleteModuleConfirmation?.title}&rdquo;
+              </p>
+              <p className="text-muted-foreground">
+                {deleteModuleConfirmation && deleteModuleConfirmation.lessonCount > 0
+                  ? `This will permanently delete this module and all ${deleteModuleConfirmation.lessonCount} ${deleteModuleConfirmation.lessonCount === 1 ? 'lesson' : 'lessons'} inside it. Learner progress for these lessons will be lost.`
+                  : 'This will permanently delete this module.'}
+              </p>
+              <p className="flex items-center gap-2 text-sm font-semibold text-red-600 dark:text-red-400">
+                This action cannot be undone.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteModuleConfirmation) handleDeleteModule(deleteModuleConfirmation.id)
+              }}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              Delete Module
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
