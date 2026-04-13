@@ -87,25 +87,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 7. Update the lesson record
-    const updateData: Record<string, unknown> = { video_url: path };
-    if (durationStr) {
-      const duration = parseFloat(durationStr);
-      if (!isNaN(duration) && duration > 0) {
-        updateData.video_duration_seconds = Math.round(duration);
+    // 7. Update the lesson record (skip for new-lesson flow where lesson
+    // doesn't exist yet — caller will insert the lesson with this video_url)
+    if (lessonId !== "pending") {
+      const updateData: Record<string, unknown> = { video_url: path };
+      if (durationStr) {
+        const duration = parseFloat(durationStr);
+        if (!isNaN(duration) && duration > 0) {
+          updateData.video_duration_seconds = Math.round(duration);
+        }
       }
-    }
 
-    const { error: updateError } = await supabaseAdmin
-      .from("lessons")
-      .update(updateData)
-      .eq("id", lessonId);
+      const { error: updateError } = await supabaseAdmin
+        .from("lessons")
+        .update(updateData)
+        .eq("id", lessonId);
 
-    if (updateError) {
-      return NextResponse.json(
-        { error: `Lesson update failed: ${updateError.message}` },
-        { status: 500 }
-      );
+      if (updateError) {
+        return NextResponse.json(
+          { error: `Lesson update failed: ${updateError.message}` },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json({ path, url: path }, { status: 200 });
