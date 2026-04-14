@@ -19,6 +19,14 @@
             avatar_url: null,
             created_at: '2025-01-01T00:00:00Z'
         },
+        instructorUser: {
+            id: 'demo-instructor-001',
+            email: 'instructor@vifm.org',
+            full_name: 'Demo Instructor',
+            role: 'instructor',
+            avatar_url: null,
+            created_at: '2025-01-01T00:00:00Z'
+        },
 
         categories: [
             { id: 'cat-1', name: 'Finance', slug: 'finance', course_count: 3 },

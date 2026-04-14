@@ -64,7 +64,9 @@
     function saveStore(s) { localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
 
     function getUser() {
-        return demoRole === 'super_admin' ? seed.adminUser : seed.currentUser;
+        if (demoRole === 'super_admin') return seed.adminUser;
+        if (demoRole === 'instructor') return seed.instructorUser || seed.currentUser;
+        return seed.currentUser;
     }
 
     // ── 4. Intercept fetch() ──────────────────────────────────

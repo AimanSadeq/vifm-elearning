@@ -28,7 +28,7 @@ export function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showDemoGate, setShowDemoGate] = useState(false);
+  const [demoGateTarget, setDemoGateTarget] = useState<{ role: string; path: string } | null>(null);
   const [demoGateView, setDemoGateView] = useState<"login" | "request">("login");
   const [demoEmail, setDemoEmail] = useState("");
   const [demoPassword, setDemoPassword] = useState("");
@@ -168,29 +168,43 @@ export function LoginForm() {
       </form>
 
       <div className="pt-5 border-t border-border">
-        <p className="mb-3 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-          Or explore with sample data
+        <p className="mb-1 text-center text-[13px] font-bold text-[#2563eb]">
+          👁 Try Demo
         </p>
-        <button
-          type="button"
-          onClick={() => setShowDemoGate(true)}
-          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-white font-semibold text-sm transition-all hover:opacity-90"
-          style={{ background: "linear-gradient(135deg, #2563eb, #1d4ed8)" }}
-        >
-          <span>🎓</span>
-          <span>Try Demo</span>
-        </button>
+        <p className="mb-3 text-center text-[12px] text-muted-foreground">
+          Explore the system with sample data — no login required
+        </p>
+        <div className="flex flex-col gap-2">
+          {[
+            { role: "super_admin", label: "Admin Demo", sub: "Full View", icon: "🔐", path: "/admin/dashboard" },
+            { role: "instructor", label: "Instructor Demo", sub: "Course Management", icon: "👨‍🏫", path: "/instructor/dashboard" },
+            { role: "learner", label: "Learner Demo", sub: "Personal View", icon: "👤", path: "/dashboard" },
+          ].map(({ role, label, sub, icon, path }) => (
+            <button
+              key={role}
+              type="button"
+              onClick={() => setDemoGateTarget({ role, path })}
+              className="flex w-full items-center gap-3 rounded-lg border border-border bg-card px-4 py-2.5 text-left text-sm font-medium transition-all duration-200 hover:bg-muted"
+            >
+              <span className="text-xl">{icon}</span>
+              <div className="flex flex-col">
+                <span className="font-semibold">{label}</span>
+                <span className="text-xs text-muted-foreground">{sub}</span>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
 
-      {showDemoGate && (
+      {demoGateTarget && (
         <div
-          onClick={(e) => { if (e.target === e.currentTarget) { setShowDemoGate(false); setDemoGateView("login"); } }}
+          onClick={(e) => { if (e.target === e.currentTarget) { setDemoGateTarget(null); setDemoGateView("login"); } }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
         >
           <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-bold text-gray-900">{demoGateView === "login" ? "Login" : "Request a Demo"}</h3>
-              <button type="button" onClick={() => { setShowDemoGate(false); setDemoGateView("login"); }} className="text-2xl leading-none text-gray-500 hover:text-gray-700">&times;</button>
+              <button type="button" onClick={() => { setDemoGateTarget(null); setDemoGateView("login"); }} className="text-2xl leading-none text-gray-500 hover:text-gray-700">&times;</button>
             </div>
 
             {demoGateView === "login" ? (
@@ -200,9 +214,10 @@ export function LoginForm() {
                   onSubmit={(e) => {
                     e.preventDefault();
                     if (demoEmail.trim().toLowerCase() === "demo@viftraining.com" && demoPassword === "demo@2026") {
+                      const { role, path } = demoGateTarget;
                       sessionStorage.setItem("elearn-demo", "true");
-                      sessionStorage.setItem("elearn-demo-role", "learner");
-                      window.location.href = `/${locale}/courses?demo=true`;
+                      sessionStorage.setItem("elearn-demo-role", role);
+                      window.location.href = `/${locale}${path}?demo=true&role=${role}`;
                     } else {
                       setDemoGateError("Invalid credentials. Please contact sales for demo access.");
                     }
