@@ -176,9 +176,9 @@ export function LoginForm() {
         </p>
         <div className="flex flex-col gap-2">
           {[
-            { role: "super_admin", label: "Admin Demo", sub: "Full View", icon: "🔐", path: "/admin/dashboard" },
-            { role: "instructor", label: "Instructor Demo", sub: "Course Management", icon: "👨‍🏫", path: "/instructor/dashboard" },
-            { role: "learner", label: "Learner Demo", sub: "Personal View", icon: "👤", path: "/dashboard" },
+            { role: "super_admin", label: "Admin Demo", sub: "Full View", icon: "🔐", path: "/demo/admin" },
+            { role: "instructor", label: "Instructor Demo", sub: "Course Management", icon: "👨‍🏫", path: "/demo/instructor" },
+            { role: "learner", label: "Learner Demo", sub: "Personal View", icon: "👤", path: "/demo/learner" },
           ].map(({ role, label, sub, icon, path }) => (
             <button
               key={role}
