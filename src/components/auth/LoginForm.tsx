@@ -221,13 +221,13 @@ export function LoginForm() {
                   <button type="submit" className="w-full py-2.5 rounded-lg text-white font-semibold text-sm" style={{ background: "linear-gradient(135deg, #2563eb, #1d4ed8)" }}>Enter Demo</button>
                 </form>
                 <p className="text-center text-sm text-gray-500 mt-4">
-                  Don't have credentials?{" "}
+                  Don&apos;t have credentials?{" "}
                   <button type="button" onClick={() => setDemoGateView("request")} className="font-semibold text-[#2563eb] hover:underline">Request a Demo</button>
                 </p>
               </>
             ) : (
               <>
-                <p className="text-sm text-gray-500 mb-4">Tell us about yourself and we'll get in touch.</p>
+                <p className="text-sm text-gray-500 mb-4">Tell us about yourself and we&apos;ll get in touch.</p>
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
