@@ -1,3 +1,4 @@
+import { DemoShell } from "@/components/demo/DemoShell";
 import { DollarSign, Users, BookOpen, TrendingUp, GraduationCap, FileCheck } from "lucide-react";
 
 const stats = [
@@ -23,11 +24,12 @@ const topCourses = [
   { title: "Leadership in Banking", enrollments: 142, rating: 4.9, revenue: "$63,758" },
 ];
 
-export default function AdminDemoPage() {
+export default async function AdminDemoDashboard({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   return (
-    <div>
+    <DemoShell role="admin" locale={locale} activePath="">
       <div className="mb-8">
-        <h1 className="mb-1 text-3xl font-bold">Admin Dashboard</h1>
+        <h1 className="mb-1 text-3xl font-bold">Dashboard</h1>
         <p className="text-muted-foreground">Platform-wide overview and analytics</p>
       </div>
 
@@ -35,9 +37,7 @@ export default function AdminDemoPage() {
         {stats.map((s) => (
           <div key={s.label} className="rounded-xl border bg-card p-5">
             <div className="mb-3 flex items-center justify-between">
-              <div className={`rounded-lg p-2 ${s.color}`}>
-                <s.icon className="h-5 w-5" />
-              </div>
+              <div className={`rounded-lg p-2 ${s.color}`}><s.icon className="h-5 w-5" /></div>
               <span className="text-xs font-semibold text-emerald-600">{s.trend}</span>
             </div>
             <div className="text-2xl font-bold">{s.value}</div>
@@ -49,10 +49,7 @@ export default function AdminDemoPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-xl border bg-card">
           <div className="border-b p-5">
-            <h2 className="flex items-center gap-2 text-lg font-semibold">
-              <GraduationCap className="h-5 w-5 text-violet-600" />
-              Recent Enrollments
-            </h2>
+            <h2 className="flex items-center gap-2 text-lg font-semibold"><GraduationCap className="h-5 w-5 text-violet-600" /> Recent Enrollments</h2>
           </div>
           <div className="divide-y">
             {recentEnrollments.map((e, i) => (
@@ -63,9 +60,7 @@ export default function AdminDemoPage() {
                 </div>
                 <div className="text-right text-xs">
                   <div className="text-muted-foreground">{e.date}</div>
-                  <span className={`inline-block rounded px-2 py-0.5 font-medium ${e.status === "completed" ? "bg-emerald-100 text-emerald-700" : "bg-blue-100 text-blue-700"}`}>
-                    {e.status}
-                  </span>
+                  <span className={`inline-block rounded px-2 py-0.5 font-medium ${e.status === "completed" ? "bg-emerald-100 text-emerald-700" : "bg-blue-100 text-blue-700"}`}>{e.status}</span>
                 </div>
               </div>
             ))}
@@ -74,19 +69,14 @@ export default function AdminDemoPage() {
 
         <div className="rounded-xl border bg-card">
           <div className="border-b p-5">
-            <h2 className="flex items-center gap-2 text-lg font-semibold">
-              <FileCheck className="h-5 w-5 text-amber-600" />
-              Top Courses
-            </h2>
+            <h2 className="flex items-center gap-2 text-lg font-semibold"><FileCheck className="h-5 w-5 text-amber-600" /> Top Courses</h2>
           </div>
           <div className="divide-y">
             {topCourses.map((c, i) => (
               <div key={i} className="flex items-center justify-between p-4">
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-medium">{c.title}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {c.enrollments} enrolled · ⭐ {c.rating}
-                  </div>
+                  <div className="text-xs text-muted-foreground">{c.enrollments} enrolled · ⭐ {c.rating}</div>
                 </div>
                 <div className="text-right text-sm font-semibold">{c.revenue}</div>
               </div>
@@ -94,6 +84,6 @@ export default function AdminDemoPage() {
           </div>
         </div>
       </div>
-    </div>
+    </DemoShell>
   );
 }
