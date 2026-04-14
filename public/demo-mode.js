@@ -19,7 +19,7 @@
 
     var isDemo = sessionStorage.getItem('elearn-demo') === 'true';
     if (!isDemo) {
-        injectTryDemoButton();
+        // Try Demo button is rendered inside the sign-in card (LoginForm.tsx)
         return;
     }
 

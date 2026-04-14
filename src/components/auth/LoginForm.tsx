@@ -157,6 +157,26 @@ export function LoginForm() {
         </Button>
       </form>
 
+      <div className="pt-5 border-t border-border">
+        <p className="mb-3 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          Or explore with sample data
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            sessionStorage.setItem("elearn-demo", "true");
+            sessionStorage.setItem("elearn-demo-role", "learner");
+            window.location.href = `/${locale}/courses?demo=true`;
+          }}
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-white font-semibold text-sm transition-all hover:opacity-90"
+          style={{ background: "linear-gradient(135deg, #2563eb, #1d4ed8)" }}
+        >
+          <span>🎓</span>
+          <span>Try Demo</span>
+          <span className="bg-white/20 px-2 py-0.5 rounded text-xs">No Login</span>
+        </button>
+      </div>
+
       {/* Footer */}
       <p className="text-center text-sm text-muted-foreground">
         {t("noAccount")}{" "}
