@@ -28,6 +28,10 @@ export function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDemoGate, setShowDemoGate] = useState(false);
+  const [demoEmail, setDemoEmail] = useState("");
+  const [demoPassword, setDemoPassword] = useState("");
+  const [demoGateError, setDemoGateError] = useState("");
 
   const {
     register,
@@ -163,19 +167,59 @@ export function LoginForm() {
         </p>
         <button
           type="button"
-          onClick={() => {
-            sessionStorage.setItem("elearn-demo", "true");
-            sessionStorage.setItem("elearn-demo-role", "learner");
-            window.location.href = `/${locale}/courses?demo=true`;
-          }}
+          onClick={() => setShowDemoGate(true)}
           className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-white font-semibold text-sm transition-all hover:opacity-90"
           style={{ background: "linear-gradient(135deg, #2563eb, #1d4ed8)" }}
         >
           <span>🎓</span>
           <span>Try Demo</span>
-          <span className="bg-white/20 px-2 py-0.5 rounded text-xs">No Login</span>
         </button>
       </div>
+
+      {showDemoGate && (
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) setShowDemoGate(false); }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        >
+          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-bold text-gray-900">Request a Demo</h3>
+              <button type="button" onClick={() => setShowDemoGate(false)} className="text-2xl leading-none text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">Enter demo credentials to continue.</p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (demoEmail.trim().toLowerCase() === "demo@viftraining.com" && demoPassword === "demo@2026") {
+                  sessionStorage.setItem("elearn-demo", "true");
+                  sessionStorage.setItem("elearn-demo-role", "learner");
+                  window.location.href = `/${locale}/courses?demo=true`;
+                } else {
+                  setDemoGateError("Invalid credentials. Please contact sales for demo access.");
+                }
+              }}
+              className="space-y-3"
+            >
+              <div>
+                <Label>Email</Label>
+                <Input type="email" value={demoEmail} onChange={(e) => { setDemoEmail(e.target.value); setDemoGateError(""); }} placeholder="demo@viftraining.com" required />
+              </div>
+              <div>
+                <Label>Password</Label>
+                <Input type="password" value={demoPassword} onChange={(e) => { setDemoPassword(e.target.value); setDemoGateError(""); }} placeholder="••••••••" required />
+              </div>
+              {demoGateError && <p className="text-sm text-red-600">{demoGateError}</p>}
+              <button
+                type="submit"
+                className="w-full py-2.5 rounded-lg text-white font-semibold text-sm"
+                style={{ background: "linear-gradient(135deg, #2563eb, #1d4ed8)" }}
+              >
+                Enter Demo
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <p className="text-center text-sm text-muted-foreground">
