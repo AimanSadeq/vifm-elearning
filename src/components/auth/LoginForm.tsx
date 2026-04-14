@@ -29,9 +29,15 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDemoGate, setShowDemoGate] = useState(false);
+  const [demoGateView, setDemoGateView] = useState<"login" | "request">("login");
   const [demoEmail, setDemoEmail] = useState("");
   const [demoPassword, setDemoPassword] = useState("");
   const [demoGateError, setDemoGateError] = useState("");
+  const [reqName, setReqName] = useState("");
+  const [reqEmail, setReqEmail] = useState("");
+  const [reqCompany, setReqCompany] = useState("");
+  const [reqPhone, setReqPhone] = useState("");
+  const [reqMessage, setReqMessage] = useState("");
 
   const {
     register,
@@ -178,45 +184,88 @@ export function LoginForm() {
 
       {showDemoGate && (
         <div
-          onClick={(e) => { if (e.target === e.currentTarget) setShowDemoGate(false); }}
+          onClick={(e) => { if (e.target === e.currentTarget) { setShowDemoGate(false); setDemoGateView("login"); } }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
         >
           <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-bold text-gray-900">Request a Demo</h3>
-              <button type="button" onClick={() => setShowDemoGate(false)} className="text-2xl leading-none text-gray-500 hover:text-gray-700">&times;</button>
+              <h3 className="text-lg font-bold text-gray-900">{demoGateView === "login" ? "Login" : "Request a Demo"}</h3>
+              <button type="button" onClick={() => { setShowDemoGate(false); setDemoGateView("login"); }} className="text-2xl leading-none text-gray-500 hover:text-gray-700">&times;</button>
             </div>
-            <p className="text-sm text-gray-500 mb-4">Enter demo credentials to continue.</p>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (demoEmail.trim().toLowerCase() === "demo@viftraining.com" && demoPassword === "demo@2026") {
-                  sessionStorage.setItem("elearn-demo", "true");
-                  sessionStorage.setItem("elearn-demo-role", "learner");
-                  window.location.href = `/${locale}/courses?demo=true`;
-                } else {
-                  setDemoGateError("Invalid credentials. Please contact sales for demo access.");
-                }
-              }}
-              className="space-y-3"
-            >
-              <div>
-                <Label>Email</Label>
-                <Input type="email" value={demoEmail} onChange={(e) => { setDemoEmail(e.target.value); setDemoGateError(""); }} placeholder="demo@viftraining.com" required />
-              </div>
-              <div>
-                <Label>Password</Label>
-                <Input type="password" value={demoPassword} onChange={(e) => { setDemoPassword(e.target.value); setDemoGateError(""); }} placeholder="••••••••" required />
-              </div>
-              {demoGateError && <p className="text-sm text-red-600">{demoGateError}</p>}
-              <button
-                type="submit"
-                className="w-full py-2.5 rounded-lg text-white font-semibold text-sm"
-                style={{ background: "linear-gradient(135deg, #2563eb, #1d4ed8)" }}
-              >
-                Enter Demo
-              </button>
-            </form>
+
+            {demoGateView === "login" ? (
+              <>
+                <p className="text-sm text-gray-500 mb-4">Enter demo credentials to continue.</p>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (demoEmail.trim().toLowerCase() === "demo@viftraining.com" && demoPassword === "demo@2026") {
+                      sessionStorage.setItem("elearn-demo", "true");
+                      sessionStorage.setItem("elearn-demo-role", "learner");
+                      window.location.href = `/${locale}/courses?demo=true`;
+                    } else {
+                      setDemoGateError("Invalid credentials. Please contact sales for demo access.");
+                    }
+                  }}
+                  className="space-y-3"
+                >
+                  <div>
+                    <Label>Email</Label>
+                    <Input type="email" value={demoEmail} onChange={(e) => { setDemoEmail(e.target.value); setDemoGateError(""); }} placeholder="demo@viftraining.com" required />
+                  </div>
+                  <div>
+                    <Label>Password</Label>
+                    <Input type="password" value={demoPassword} onChange={(e) => { setDemoPassword(e.target.value); setDemoGateError(""); }} placeholder="••••••••" required />
+                  </div>
+                  {demoGateError && <p className="text-sm text-red-600">{demoGateError}</p>}
+                  <button type="submit" className="w-full py-2.5 rounded-lg text-white font-semibold text-sm" style={{ background: "linear-gradient(135deg, #2563eb, #1d4ed8)" }}>Enter Demo</button>
+                </form>
+                <p className="text-center text-sm text-gray-500 mt-4">
+                  Don't have credentials?{" "}
+                  <button type="button" onClick={() => setDemoGateView("request")} className="font-semibold text-[#2563eb] hover:underline">Request a Demo</button>
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-gray-500 mb-4">Tell us about yourself and we'll get in touch.</p>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const subject = encodeURIComponent("Demo Request — VIFM Academy");
+                    const body = encodeURIComponent(
+                      `Name: ${reqName}\nEmail: ${reqEmail}\nCompany: ${reqCompany}\nPhone: ${reqPhone}\n\nMessage:\n${reqMessage}\n\n— Sent from VIFM demo request form`
+                    );
+                    window.location.href = `mailto:clients@VIFTRAINING.COM?subject=${subject}&body=${body}`;
+                  }}
+                  className="space-y-3"
+                >
+                  <div>
+                    <Label>Full Name *</Label>
+                    <Input type="text" value={reqName} onChange={(e) => setReqName(e.target.value)} required />
+                  </div>
+                  <div>
+                    <Label>Email *</Label>
+                    <Input type="email" value={reqEmail} onChange={(e) => setReqEmail(e.target.value)} required />
+                  </div>
+                  <div>
+                    <Label>Company *</Label>
+                    <Input type="text" value={reqCompany} onChange={(e) => setReqCompany(e.target.value)} required />
+                  </div>
+                  <div>
+                    <Label>Phone</Label>
+                    <Input type="tel" value={reqPhone} onChange={(e) => setReqPhone(e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>Message</Label>
+                    <textarea value={reqMessage} onChange={(e) => setReqMessage(e.target.value)} rows={3} className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                  </div>
+                  <button type="submit" className="w-full py-2.5 rounded-lg text-white font-semibold text-sm" style={{ background: "linear-gradient(135deg, #2563eb, #1d4ed8)" }}>Send Request</button>
+                </form>
+                <p className="text-center text-sm text-gray-500 mt-4">
+                  <button type="button" onClick={() => setDemoGateView("login")} className="font-semibold text-[#2563eb] hover:underline">← Back to Login</button>
+                </p>
+              </>
+            )}
           </div>
         </div>
       )}
