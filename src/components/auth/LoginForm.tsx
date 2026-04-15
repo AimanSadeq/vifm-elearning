@@ -38,6 +38,9 @@ export function LoginForm() {
   const [reqCompany, setReqCompany] = useState("");
   const [reqPhone, setReqPhone] = useState("");
   const [reqMessage, setReqMessage] = useState("");
+  const [reqSubmitting, setReqSubmitting] = useState(false);
+  const [reqError, setReqError] = useState("");
+  const [reqSuccess, setReqSuccess] = useState(false);
 
   const {
     register,
@@ -243,39 +246,77 @@ export function LoginForm() {
             ) : (
               <>
                 <p className="text-sm text-gray-500 mb-4">Tell us about yourself and we&apos;ll get in touch.</p>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const subject = encodeURIComponent("Demo Request — VIFM Academy");
-                    const body = encodeURIComponent(
-                      `Name: ${reqName}\nEmail: ${reqEmail}\nCompany: ${reqCompany}\nPhone: ${reqPhone}\n\nMessage:\n${reqMessage}\n\n— Sent from VIFM demo request form`
-                    );
-                    window.location.href = `mailto:clients@VIFTRAINING.COM?subject=${subject}&body=${body}`;
-                  }}
-                  className="space-y-3"
-                >
-                  <div>
-                    <Label>Full Name *</Label>
-                    <Input type="text" value={reqName} onChange={(e) => setReqName(e.target.value)} required />
+                {reqSuccess ? (
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-center">
+                    <div className="text-3xl mb-1">✅</div>
+                    <div className="font-bold text-emerald-800 mb-1">Request Sent</div>
+                    <div className="text-sm text-emerald-700">Thanks — our team will reach out shortly.</div>
                   </div>
-                  <div>
-                    <Label>Email *</Label>
-                    <Input type="email" value={reqEmail} onChange={(e) => setReqEmail(e.target.value)} required />
-                  </div>
-                  <div>
-                    <Label>Company *</Label>
-                    <Input type="text" value={reqCompany} onChange={(e) => setReqCompany(e.target.value)} required />
-                  </div>
-                  <div>
-                    <Label>Phone</Label>
-                    <Input type="tel" value={reqPhone} onChange={(e) => setReqPhone(e.target.value)} />
-                  </div>
-                  <div>
-                    <Label>Message</Label>
-                    <textarea value={reqMessage} onChange={(e) => setReqMessage(e.target.value)} rows={3} className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-                  </div>
-                  <button type="submit" className="w-full py-2.5 rounded-lg text-white font-semibold text-sm" style={{ background: "linear-gradient(135deg, #2563eb, #1d4ed8)" }}>Send Request</button>
-                </form>
+                ) : (
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      setReqSubmitting(true);
+                      setReqError("");
+                      try {
+                        const resp = await fetch("https://ops.viftraining.com/api/public/demo-request", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            name: reqName.trim(),
+                            email: reqEmail.trim(),
+                            company: reqCompany.trim(),
+                            phone: reqPhone.trim(),
+                            message: reqMessage.trim(),
+                            sourceSystem: "VIFM Academy — E-Learning Platform",
+                          }),
+                        });
+                        const data = await resp.json().catch(() => ({}));
+                        if (resp.ok && data.success) {
+                          setReqSuccess(true);
+                          setReqName(""); setReqEmail(""); setReqCompany(""); setReqPhone(""); setReqMessage("");
+                        } else {
+                          setReqError(data?.error || "Failed to send. Please email clients@viftraining.com directly.");
+                        }
+                      } catch {
+                        setReqError("Network error. Please email clients@viftraining.com directly.");
+                      } finally {
+                        setReqSubmitting(false);
+                      }
+                    }}
+                    className="space-y-3"
+                  >
+                    <div>
+                      <Label>Full Name *</Label>
+                      <Input type="text" value={reqName} onChange={(e) => setReqName(e.target.value)} required />
+                    </div>
+                    <div>
+                      <Label>Email *</Label>
+                      <Input type="email" value={reqEmail} onChange={(e) => setReqEmail(e.target.value)} required />
+                    </div>
+                    <div>
+                      <Label>Company *</Label>
+                      <Input type="text" value={reqCompany} onChange={(e) => setReqCompany(e.target.value)} required />
+                    </div>
+                    <div>
+                      <Label>Phone</Label>
+                      <Input type="tel" value={reqPhone} onChange={(e) => setReqPhone(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label>Message</Label>
+                      <textarea value={reqMessage} onChange={(e) => setReqMessage(e.target.value)} rows={3} className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                    </div>
+                    {reqError && <div className="text-sm text-red-600">{reqError}</div>}
+                    <button
+                      type="submit"
+                      disabled={reqSubmitting}
+                      className="w-full py-2.5 rounded-lg text-white font-semibold text-sm disabled:opacity-60"
+                      style={{ background: "linear-gradient(135deg, #2563eb, #1d4ed8)" }}
+                    >
+                      {reqSubmitting ? "Sending…" : "Send Request"}
+                    </button>
+                  </form>
+                )}
                 <p className="text-center text-sm text-gray-500 mt-4">
                   <button type="button" onClick={() => setDemoGateView("login")} className="font-semibold text-[#2563eb] hover:underline">← Back to Login</button>
                 </p>
