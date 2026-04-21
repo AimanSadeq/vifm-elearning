@@ -14,6 +14,8 @@ import {
   Trash2,
   ToggleLeft,
   ToggleRight,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -55,10 +57,14 @@ const ROLE_FILTER_OPTIONS: UserRole[] = [
   "learner",
 ];
 
+const PAGE_SIZE = 50;
+
 export default function AdminUsersPage() {
   const t = useTranslations("admin");
 
   const [users, setUsers] = useState<UserRow[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [page, setPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<UserRole | "all">("all");
@@ -77,13 +83,17 @@ export default function AdminUsersPage() {
     setIsLoading(true);
     const supabase = createClient();
 
+    const from = page * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+
     let query = supabase
       .from("profiles")
       .select(
-        "id, full_name, full_name_ar, email, phone, role, organization_id, language, is_active, last_login_at, created_at"
+        "id, full_name, full_name_ar, email, phone, role, organization_id, language, is_active, last_login_at, created_at",
+        { count: "exact" }
       )
       .order("created_at", { ascending: false })
-      .limit(100);
+      .range(from, to);
 
     if (roleFilter !== "all") {
       query = query.eq("role", roleFilter);
@@ -96,14 +106,20 @@ export default function AdminUsersPage() {
       );
     }
 
-    const { data } = await query;
+    const { data, count } = await query;
     setUsers((data as UserRow[]) ?? []);
+    setTotalCount(count ?? 0);
     setIsLoading(false);
-  }, [debouncedSearch, roleFilter]);
+  }, [debouncedSearch, roleFilter, page]);
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
+  // Reset to first page when filters/search change
+  useEffect(() => {
+    setPage(0);
+  }, [debouncedSearch, roleFilter]);
 
   const roleBadgeVariant = (role: UserRole) => {
     switch (role) {
@@ -348,7 +364,7 @@ export default function AdminUsersPage() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Users ({users.length})
+            Users ({totalCount.toLocaleString()})
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -359,6 +375,49 @@ export default function AdminUsersPage() {
             isLoading={isLoading}
             emptyMessage="No users found"
           />
+          {totalCount > 0 && (
+            <div className="mt-4 flex items-center justify-between gap-4 flex-wrap">
+              <p className="text-sm text-muted-foreground">
+                Showing{" "}
+                <span className="font-medium text-foreground">
+                  {(page * PAGE_SIZE + 1).toLocaleString()}
+                </span>
+                {"–"}
+                <span className="font-medium text-foreground">
+                  {Math.min((page + 1) * PAGE_SIZE, totalCount).toLocaleString()}
+                </span>{" "}
+                of{" "}
+                <span className="font-medium text-foreground">
+                  {totalCount.toLocaleString()}
+                </span>
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page === 0 || isLoading}
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                >
+                  <ChevronLeft className="h-4 w-4 me-1" />
+                  Prev
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  Page {page + 1} of {Math.max(1, Math.ceil(totalCount / PAGE_SIZE))}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={
+                    isLoading || (page + 1) * PAGE_SIZE >= totalCount
+                  }
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ms-1" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { escapeIlike } from "@/lib/utils/escape-search";
 import { Button } from "@/components/ui/button";
@@ -19,10 +19,14 @@ type PaymentRow = Payment & {
   course?: { title: string };
 };
 
+const PAGE_SIZE = 50;
+
 export default function AdminPaymentsPage() {
   const t = useTranslations("admin");
 
   const [payments, setPayments] = useState<PaymentRow[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [page, setPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -33,13 +37,18 @@ export default function AdminPaymentsPage() {
       setIsLoading(true);
       const supabase = createClient();
 
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
       let query = supabase
         .from("payments")
         .select(
-          "*, user:profiles!payments_user_id_fkey(full_name), course:courses(title)"
+          "*, user:profiles!payments_user_id_fkey(full_name), course:courses(title)",
+          { count: "exact" }
         )
+        .order("paid_at", { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false })
-        .limit(100);
+        .range(from, to);
 
       if (statusFilter !== "all") {
         query = query.eq("status", statusFilter);
@@ -52,12 +61,18 @@ export default function AdminPaymentsPage() {
         );
       }
 
-      const { data } = await query;
+      const { data, count } = await query;
       setPayments((data as PaymentRow[]) ?? []);
+      setTotalCount(count ?? 0);
       setIsLoading(false);
     }
 
     fetchPayments();
+  }, [debouncedSearch, statusFilter, page]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPage(0);
   }, [debouncedSearch, statusFilter]);
 
   const handleConfirmBankTransfer = async (paymentId: string) => {
@@ -133,7 +148,9 @@ export default function AdminPaymentsPage() {
       key: "date",
       header: "Date",
       render: (item) => (
-        <span className="text-sm">{formatDate(item.created_at)}</span>
+        <span className="text-sm">
+          {formatDate(item.paid_at ?? item.created_at)}
+        </span>
       ),
     },
     {
@@ -159,7 +176,7 @@ export default function AdminPaymentsPage() {
   return (
     <div className="space-y-6">
       <h1 className="font-heading text-2xl font-bold">
-        {t("managePayments")}
+        {t("managePayments")} ({totalCount.toLocaleString()})
       </h1>
 
       <Card>
@@ -197,6 +214,47 @@ export default function AdminPaymentsPage() {
             rowKey={(item) => item.id}
             emptyMessage="No payments found."
           />
+          {totalCount > 0 && (
+            <div className="mt-4 flex items-center justify-between gap-4 flex-wrap">
+              <p className="text-sm text-muted-foreground">
+                Showing{" "}
+                <span className="font-medium text-foreground">
+                  {(page * PAGE_SIZE + 1).toLocaleString()}
+                </span>
+                {"–"}
+                <span className="font-medium text-foreground">
+                  {Math.min((page + 1) * PAGE_SIZE, totalCount).toLocaleString()}
+                </span>{" "}
+                of{" "}
+                <span className="font-medium text-foreground">
+                  {totalCount.toLocaleString()}
+                </span>
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page === 0 || isLoading}
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                >
+                  <ChevronLeft className="h-4 w-4 me-1" />
+                  Prev
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  Page {page + 1} of {Math.max(1, Math.ceil(totalCount / PAGE_SIZE))}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isLoading || (page + 1) * PAGE_SIZE >= totalCount}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ms-1" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
