@@ -50,7 +50,7 @@ export default function CoursesAnalyticsPage() {
           supabase
             .from("courses")
             .select(
-              "id, title, enrollment_count, average_rating, status, level, lessons_count"
+              "id, title, enrollment_count, average_rating, status, difficulty_level, lessons:lessons(count)"
             )
             .order("enrollment_count", { ascending: false }),
         ]);
@@ -58,15 +58,18 @@ export default function CoursesAnalyticsPage() {
       setTotalCourses(total ?? 0);
       setPublishedCourses(published ?? 0);
 
-      const mapped = (coursesData ?? []).map((c: Record<string, unknown>) => ({
-        id: c.id as string,
-        title: (c.title as string) || "",
-        enrollment_count: (c.enrollment_count as number) || 0,
-        average_rating: (c.average_rating as number) || 0,
-        status: (c.status as string) || "draft",
-        level: (c.level as string) || "beginner",
-        lessons_count: (c.lessons_count as number) || 0,
-      }));
+      const mapped = (coursesData ?? []).map((c: Record<string, unknown>) => {
+        const lessonsRel = c.lessons as Array<{ count: number }> | undefined;
+        return {
+          id: c.id as string,
+          title: (c.title as string) || "",
+          enrollment_count: (c.enrollment_count as number) || 0,
+          average_rating: (c.average_rating as number) || 0,
+          status: (c.status as string) || "draft",
+          level: (c.difficulty_level as string) || "beginner",
+          lessons_count: lessonsRel?.[0]?.count ?? 0,
+        };
+      });
 
       setCourses(mapped);
 

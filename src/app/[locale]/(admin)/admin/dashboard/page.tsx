@@ -66,12 +66,31 @@ export default function AdminDashboardPage() {
     async function fetchDashboardData() {
       const supabase = createClient();
 
+      // Paginate through completed payments to get an accurate revenue sum.
+      // Supabase caps a single .select() at 1000 rows, so a lone query would
+      // silently under-count once there are more completed payments than that.
+      async function sumCompletedPayments() {
+        const pageSize = 1000;
+        let total = 0;
+        for (let from = 0; ; from += pageSize) {
+          const { data } = await supabase
+            .from("payments")
+            .select("amount")
+            .eq("status", "completed")
+            .range(from, from + pageSize - 1);
+          if (!data || data.length === 0) break;
+          for (const p of data) total += Number(p.amount ?? 0);
+          if (data.length < pageSize) break;
+        }
+        return total;
+      }
+
       // Fetch counts in parallel
       const [
         { count: usersCount },
         { count: enrollmentsCount },
         { count: completedCount },
-        { data: payments },
+        totalRevenue,
         { data: recentData },
         { data: coursesData },
       ] = await Promise.all([
@@ -86,10 +105,7 @@ export default function AdminDashboardPage() {
           .from("enrollments")
           .select("id", { count: "exact", head: true })
           .eq("status", "completed"),
-        supabase
-          .from("payments")
-          .select("amount")
-          .eq("status", "completed"),
+        sumCompletedPayments(),
         supabase
           .from("enrollments")
           .select(
@@ -111,9 +127,6 @@ export default function AdminDashboardPage() {
           .order("enrollment_count", { ascending: false })
           .limit(10),
       ]);
-
-      const totalRevenue =
-        payments?.reduce((sum, p) => sum + (p.amount || 0), 0) ?? 0;
       const completionRate =
         enrollmentsCount && enrollmentsCount > 0
           ? Math.round(

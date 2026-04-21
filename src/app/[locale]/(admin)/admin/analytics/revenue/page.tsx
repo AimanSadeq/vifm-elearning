@@ -52,11 +52,30 @@ export default function RevenueAnalyticsPage() {
     async function fetchRevenue() {
       const supabase = createClient();
 
-      const [{ data: payments }, { data: recent }] = await Promise.all([
-        supabase
-          .from("payments")
-          .select("amount, payment_method, created_at")
-          .eq("status", "completed"),
+      // Paginate past Supabase's 1000-row cap.
+      async function fetchAllCompletedPayments() {
+        const pageSize = 1000;
+        const all: Array<{
+          amount: number | null;
+          payment_method: string | null;
+          paid_at: string | null;
+          created_at: string | null;
+        }> = [];
+        for (let from = 0; ; from += pageSize) {
+          const { data } = await supabase
+            .from("payments")
+            .select("amount, payment_method, paid_at, created_at")
+            .eq("status", "completed")
+            .range(from, from + pageSize - 1);
+          if (!data || data.length === 0) break;
+          all.push(...(data as typeof all));
+          if (data.length < pageSize) break;
+        }
+        return all;
+      }
+
+      const [payments, { data: recent }] = await Promise.all([
+        fetchAllCompletedPayments(),
         supabase
           .from("payments")
           .select(
@@ -64,12 +83,14 @@ export default function RevenueAnalyticsPage() {
             id,
             amount,
             payment_method,
+            paid_at,
             created_at,
             user:profiles!payments_user_id_fkey(email),
             course:courses!payments_course_id_fkey(title)
           `
           )
           .eq("status", "completed")
+          .order("paid_at", { ascending: false, nullsFirst: false })
           .order("created_at", { ascending: false })
           .limit(20),
       ]);
@@ -77,6 +98,10 @@ export default function RevenueAnalyticsPage() {
       const total =
         payments?.reduce((sum, p) => sum + (p.amount || 0), 0) ?? 0;
       const count = payments?.length ?? 0;
+
+      // Use paid_at when present (real Thinkific date), fall back to created_at
+      const paymentDate = (p: { paid_at?: string | null; created_at?: string | null }) =>
+        p.paid_at ?? p.created_at ?? null;
 
       setTotalRevenue(total);
       setTransactionCount(count);
@@ -98,7 +123,9 @@ export default function RevenueAnalyticsPage() {
       }
 
       payments?.forEach((p) => {
-        const d = new Date(p.created_at);
+        const when = paymentDate(p);
+        if (!when) return;
+        const d = new Date(when);
         const key = d.toLocaleString("en-US", {
           month: "short",
           year: "2-digit",
@@ -133,7 +160,7 @@ export default function RevenueAnalyticsPage() {
         }))
       );
 
-      // Recent payments
+      // Recent payments — prefer paid_at for display
       setRecentPayments(
         (recent ?? []).map((p: Record<string, unknown>) => ({
           id: p.id as string,
@@ -143,7 +170,8 @@ export default function RevenueAnalyticsPage() {
             ((p.course as Record<string, unknown>)?.title as string) ?? "",
           amount: p.amount as number,
           payment_method: (p.payment_method as string) || "—",
-          created_at: p.created_at as string,
+          created_at:
+            ((p.paid_at as string) || (p.created_at as string)) ?? "",
         }))
       );
 

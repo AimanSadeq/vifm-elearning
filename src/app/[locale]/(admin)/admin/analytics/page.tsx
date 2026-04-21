@@ -62,11 +62,34 @@ export default function AnalyticsOverviewPage() {
     async function fetchAnalytics() {
       const supabase = createClient();
 
+      // Paginate past Supabase's 1000-row cap to sum the full payments set.
+      async function fetchAllCompletedPayments() {
+        const pageSize = 1000;
+        const all: Array<{
+          amount: number | null;
+          payment_method: string | null;
+          paid_at: string | null;
+          created_at: string | null;
+          status: string | null;
+        }> = [];
+        for (let from = 0; ; from += pageSize) {
+          const { data } = await supabase
+            .from("payments")
+            .select("amount, payment_method, paid_at, created_at, status")
+            .eq("status", "completed")
+            .range(from, from + pageSize - 1);
+          if (!data || data.length === 0) break;
+          all.push(...(data as typeof all));
+          if (data.length < pageSize) break;
+        }
+        return all;
+      }
+
       const [
         { count: enrollmentsCount },
         { count: activeLearners },
         { data: completedEnrollments },
-        { data: payments },
+        payments,
         { data: courses },
       ] = await Promise.all([
         supabase
@@ -81,10 +104,7 @@ export default function AnalyticsOverviewPage() {
           .from("enrollments")
           .select("id", { count: "exact" })
           .eq("status", "completed"),
-        supabase
-          .from("payments")
-          .select("amount, payment_method, created_at, status")
-          .eq("status", "completed"),
+        fetchAllCompletedPayments(),
         supabase
           .from("courses")
           .select("title, enrollment_count")
@@ -95,6 +115,10 @@ export default function AnalyticsOverviewPage() {
 
       const totalRevenue =
         payments?.reduce((sum, p) => sum + (p.amount || 0), 0) ?? 0;
+
+      // Use paid_at (real purchase date from Thinkific) when present, else created_at
+      const paymentDate = (p: { paid_at?: string | null; created_at?: string | null }) =>
+        p.paid_at ?? p.created_at ?? null;
       const completionRate =
         enrollmentsCount && enrollmentsCount > 0
           ? Math.round(
@@ -130,7 +154,9 @@ export default function AnalyticsOverviewPage() {
       }
 
       payments?.forEach((p) => {
-        const d = new Date(p.created_at);
+        const when = paymentDate(p);
+        if (!when) return;
+        const d = new Date(when);
         const key = d.toLocaleString("en-US", {
           month: "short",
           year: "2-digit",
