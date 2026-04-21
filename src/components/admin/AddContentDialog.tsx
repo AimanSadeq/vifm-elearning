@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { X, Save, Loader2, Video, FileText, ClipboardList } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
+import { directUpload } from '@/lib/uploads/direct-upload'
 import type { ContentType } from '@/types'
 
 interface AddContentDialogProps {
@@ -100,11 +101,6 @@ export function AddContentDialog({
     setIsUploading(true)
     setUploadProgress(0)
 
-    // Simulate progress
-    const progressInterval = setInterval(() => {
-      setUploadProgress((prev) => Math.min(prev + 5, 90))
-    }, 500)
-
     try {
       // Detect video duration client-side
       let duration: number | undefined
@@ -121,45 +117,23 @@ export function AddContentDialog({
         })
       }
 
-      const formDataUpload = new FormData()
-      formDataUpload.append('file', file)
+      const kind: 'video' | 'document' = contentType === 'video' ? 'video' : 'document'
+      const ticket = await directUpload(courseId, kind, file, (pct) =>
+        setUploadProgress(pct)
+      )
 
-      let endpoint: string
-      if (contentType === 'video') {
-        formDataUpload.append('courseId', courseId)
-        formDataUpload.append('lessonId', 'pending') // Will be updated after lesson creation
-        if (duration) formDataUpload.append('duration', duration.toString())
-        endpoint = '/api/video/upload'
-      } else {
-        endpoint = `/api/admin/courses/${courseId}/document/upload`
-      }
-
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        body: formDataUpload,
-      })
-
-      clearInterval(progressInterval)
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Upload failed')
-      }
-
-      const data = await response.json()
       setUploadProgress(100)
       setUploadedFile({
-        url: data.url || data.path,
-        path: data.path,
+        url: ticket.path,
+        path: ticket.path,
         duration,
-        documentType: data.documentType,
-        fileName: data.fileName,
-        fileSize: data.fileSize,
+        documentType: ticket.documentType,
+        fileName: file.name,
+        fileSize: file.size,
       })
       toast.success('File uploaded successfully')
       setStep('details')
     } catch (err) {
-      clearInterval(progressInterval)
       setError(err instanceof Error ? err.message : 'Upload failed')
     } finally {
       setIsUploading(false)

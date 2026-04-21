@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
+import { directUpload } from '@/lib/uploads/direct-upload'
 
 interface BulkUploadVideosDialogProps {
   courseId: string
@@ -120,31 +121,14 @@ export function BulkUploadVideosDialog({
   ): Promise<{ ok: boolean; error?: string }> => {
     const supabase = createClient()
 
-    updateRow(row.id, { status: 'uploading', progress: 10, error: undefined })
+    updateRow(row.id, { status: 'uploading', progress: 0, error: undefined })
 
     try {
       const duration = await getVideoDuration(row.file)
 
-      const fd = new FormData()
-      fd.append('file', row.file)
-      fd.append('courseId', courseId)
-      fd.append('lessonId', 'pending')
-      if (duration) fd.append('duration', String(duration))
-
-      updateRow(row.id, { progress: 40 })
-
-      const res = await fetch('/api/video/upload', {
-        method: 'POST',
-        body: fd,
-      })
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || `Upload failed (${res.status})`)
-      }
-
-      const data = await res.json()
-      updateRow(row.id, { progress: 80 })
+      const ticket = await directUpload(courseId, 'video', row.file, (pct) =>
+        updateRow(row.id, { progress: pct })
+      )
 
       const lessonData = {
         course_id: courseId,
@@ -154,7 +138,7 @@ export function BulkUploadVideosDialog({
         sort_order: sortOrder,
         is_mandatory: true,
         is_preview: false,
-        video_url: data.url || data.path,
+        video_url: ticket.path,
         video_duration_seconds: duration || null,
         duration_minutes: duration ? Math.ceil(duration / 60) : 0,
         metadata: {

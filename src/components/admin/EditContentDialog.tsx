@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { X, Loader2, Upload, Video, FileText, CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
+import { directUpload } from '@/lib/uploads/direct-upload'
 import type { Lesson } from '@/types'
 
 interface EditContentDialogProps {
@@ -39,13 +40,12 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
     setIsUploading(true)
     setUploadProgress(0)
 
-    const progressInterval = setInterval(() => {
-      setUploadProgress((prev) => Math.min(prev + 5, 90))
-    }, 500)
-
     try {
       let duration: number | undefined
-      if (lesson.content_type === 'video') {
+      const kind: 'video' | 'document' =
+        lesson.content_type === 'video' ? 'video' : 'document'
+
+      if (kind === 'video') {
         duration = await new Promise<number>((resolve) => {
           const video = document.createElement('video')
           video.preload = 'metadata'
@@ -55,31 +55,15 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
         })
       }
 
-      const formDataUpload = new FormData()
-      formDataUpload.append('file', file)
-      formDataUpload.append('courseId', lesson.course_id)
-      formDataUpload.append('lessonId', lesson.id)
-      if (duration) formDataUpload.append('duration', duration.toString())
+      const ticket = await directUpload(lesson.course_id, kind, file, (pct) =>
+        setUploadProgress(pct)
+      )
 
-      const response = await fetch('/api/video/upload', {
-        method: 'POST',
-        body: formDataUpload,
-      })
-
-      clearInterval(progressInterval)
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Upload failed')
-      }
-
-      const data = await response.json()
       setUploadProgress(100)
-      setUploadedFile({ url: data.url || data.path, path: data.path, duration })
+      setUploadedFile({ url: ticket.path, path: ticket.path, duration })
       setShowUploadSection(false)
       toast.success('File uploaded')
     } catch (err) {
-      clearInterval(progressInterval)
       setError(err instanceof Error ? err.message : 'Upload failed')
     } finally {
       setIsUploading(false)

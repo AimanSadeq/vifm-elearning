@@ -85,41 +85,32 @@ export function VideoUploader({
     const duration = await detectVideoDuration(file);
     setSelectedFile({ name: file.name, size: file.size, duration });
 
-    // Build form data
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("courseId", courseId);
-    formData.append("lessonId", lessonId);
-    if (duration !== null) {
-      formData.append("duration", duration.toString());
-    }
-
-    // Simulate progress
-    const progressTimer = setInterval(() => {
-      setProgress((prev) => Math.min(prev + 5, 90));
-    }, 500);
-
     try {
-      const res = await fetch("/api/video/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const { directUpload } = await import("@/lib/uploads/direct-upload");
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
 
-      clearInterval(progressTimer);
+      const ticket = await directUpload(courseId, "video", file, (pct) =>
+        setProgress(pct)
+      );
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        setError(body?.error ?? `Upload failed (${res.status})`);
-        setIsUploading(false);
+      const { error: updateError } = await supabase
+        .from("lessons")
+        .update({
+          video_url: ticket.path,
+          video_duration_seconds: duration ? Math.round(duration) : null,
+        })
+        .eq("id", lessonId);
+
+      if (updateError) {
+        setError(updateError.message);
         return;
       }
 
       setProgress(100);
-      const { path } = await res.json();
-      onUploadComplete(path);
-    } catch {
-      clearInterval(progressTimer);
-      setError("Network error — please try again");
+      onUploadComplete(ticket.path);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setIsUploading(false);
     }
