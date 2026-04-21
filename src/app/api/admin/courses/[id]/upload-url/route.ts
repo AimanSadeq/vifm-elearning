@@ -13,12 +13,20 @@ const ZIP_MIMES = [
   'application/x-zip-compressed',
   'application/x-zip',
   'multipart/x-zip',
-  'application/octet-stream', // some browsers send this for .zip
+]
+const WORD_MIMES = [
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+]
+const EXCEL_MIMES = [
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ]
 
 const VIDEO_MAX = 2 * 1024 * 1024 * 1024 // 2 GB
 const PDF_MAX = 100 * 1024 * 1024 // 100 MB
 const ZIP_MAX = 500 * 1024 * 1024 // 500 MB
+const OFFICE_MAX = 100 * 1024 * 1024 // 100 MB (Word/Excel)
 
 interface UploadUrlRequest {
   kind: 'video' | 'document'
@@ -74,7 +82,7 @@ export async function POST(
 
     let bucket: string
     let path: string
-    let documentType: 'pdf' | 'zip' | undefined
+    let documentType: 'pdf' | 'zip' | 'word' | 'excel' | undefined
 
     if (kind === 'video') {
       if (!VIDEO_MIMES.includes(mimeType)) {
@@ -93,24 +101,37 @@ export async function POST(
       path = `${courseId}/${Date.now()}-${sanitizeFileName(fileName)}`
     } else if (kind === 'document') {
       const lower = fileName.toLowerCase()
-      const isZip = ZIP_MIMES.includes(mimeType) || lower.endsWith('.zip')
-      const isPdf = PDF_MIMES.includes(mimeType) || lower.endsWith('.pdf')
+      const hasExt = (...exts: string[]) => exts.some((e) => lower.endsWith(e))
 
-      if (!isZip && !isPdf) {
+      const isZip = ZIP_MIMES.includes(mimeType) || hasExt('.zip')
+      const isPdf = PDF_MIMES.includes(mimeType) || hasExt('.pdf')
+      const isWord = WORD_MIMES.includes(mimeType) || hasExt('.doc', '.docx')
+      const isExcel = EXCEL_MIMES.includes(mimeType) || hasExt('.xls', '.xlsx')
+
+      if (!isZip && !isPdf && !isWord && !isExcel) {
         return NextResponse.json(
-          { error: 'Only PDF or ZIP files are allowed' },
+          { error: 'Only PDF, Word, Excel, or ZIP files are allowed' },
           { status: 400 }
         )
       }
 
-      // Prefer ZIP when both match (e.g. octet-stream + .zip extension)
-      documentType = isZip ? 'zip' : 'pdf'
-      const maxBytes = documentType === 'zip' ? ZIP_MAX : PDF_MAX
+      // Order matters for ambiguous mimes (e.g. .xlsx with generic mime should be excel, not zip).
+      if (isExcel) documentType = 'excel'
+      else if (isWord) documentType = 'word'
+      else if (isPdf) documentType = 'pdf'
+      else documentType = 'zip'
+
+      const maxBytes =
+        documentType === 'zip' ? ZIP_MAX
+          : documentType === 'pdf' ? PDF_MAX
+            : OFFICE_MAX
 
       if (fileSize > maxBytes) {
-        const limit = documentType === 'zip' ? '500 MB' : '100 MB'
+        const limit =
+          documentType === 'zip' ? '500 MB'
+            : '100 MB'
         return NextResponse.json(
-          { error: `File too large. Maximum size for ${documentType.toUpperCase()} is ${limit}.` },
+          { error: `File too large. Maximum size for ${documentType} files is ${limit}.` },
           { status: 413 }
         )
       }

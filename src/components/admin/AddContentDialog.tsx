@@ -28,7 +28,7 @@ export function AddContentDialog({
     url: string
     path: string
     duration?: number
-    documentType?: 'pdf' | 'zip'
+    documentType?: 'pdf' | 'zip' | 'word' | 'excel'
     fileName?: string
     fileSize?: number
   } | null>(null)
@@ -66,11 +66,20 @@ export function AddContentDialog({
 
     // Validate
     const lowerName = file.name.toLowerCase()
+    const hasExt = (...exts: string[]) => exts.some((e) => lowerName.endsWith(e))
     const isZip =
       file.type === 'application/zip' ||
       file.type === 'application/x-zip-compressed' ||
-      lowerName.endsWith('.zip')
-    const isPdf = file.type === 'application/pdf' || lowerName.endsWith('.pdf')
+      hasExt('.zip')
+    const isPdf = file.type === 'application/pdf' || hasExt('.pdf')
+    const isWord =
+      file.type === 'application/msword' ||
+      file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+      hasExt('.doc', '.docx')
+    const isExcel =
+      file.type === 'application/vnd.ms-excel' ||
+      file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+      hasExt('.xls', '.xlsx')
 
     if (contentType === 'video') {
       const allowed = ['video/mp4', 'video/webm', 'video/quicktime']
@@ -83,16 +92,16 @@ export function AddContentDialog({
         return
       }
     } else if (contentType === 'document') {
-      if (!isPdf && !isZip) {
-        setError('Only PDF or ZIP files are allowed')
-        return
-      }
-      if (isPdf && file.size > 100 * 1024 * 1024) {
-        setError('PDF must be under 100MB')
+      if (!isPdf && !isZip && !isWord && !isExcel) {
+        setError('Only PDF, Word, Excel, or ZIP files are allowed')
         return
       }
       if (isZip && file.size > 500 * 1024 * 1024) {
         setError('ZIP must be under 500MB')
+        return
+      }
+      if (!isZip && file.size > 100 * 1024 * 1024) {
+        setError('File must be under 100MB')
         return
       }
     }
@@ -291,7 +300,7 @@ export function AddContentDialog({
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">Document</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Upload PDF or ZIP</p>
+                  <p className="mt-1 text-sm text-muted-foreground">PDF, Word, Excel, or ZIP</p>
                 </div>
               </button>
 
@@ -334,7 +343,23 @@ export function AddContentDialog({
                     type="file"
                     id="file-upload"
                     className="hidden"
-                    accept={contentType === 'video' ? 'video/mp4,video/webm,video/quicktime' : 'application/pdf,application/zip,application/x-zip-compressed,.pdf,.zip'}
+                    accept={contentType === 'video'
+                      ? 'video/mp4,video/webm,video/quicktime'
+                      : [
+                          'application/pdf',
+                          'application/zip',
+                          'application/x-zip-compressed',
+                          'application/msword',
+                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                          'application/vnd.ms-excel',
+                          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                          '.pdf',
+                          '.zip',
+                          '.doc',
+                          '.docx',
+                          '.xls',
+                          '.xlsx',
+                        ].join(',')}
                     onChange={(e) => {
                       const file = e.target.files?.[0]
                       if (file) handleFileUpload(file)
@@ -350,7 +375,9 @@ export function AddContentDialog({
                       Click to select {contentType === 'video' ? 'video' : 'document'}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {contentType === 'video' ? 'MP4, WebM, MOV up to 2GB' : 'PDF up to 100MB · ZIP up to 500MB'}
+                      {contentType === 'video'
+                        ? 'MP4, WebM, MOV up to 2GB'
+                        : 'PDF / Word / Excel up to 100MB · ZIP up to 500MB'}
                     </p>
                   </label>
                 </div>

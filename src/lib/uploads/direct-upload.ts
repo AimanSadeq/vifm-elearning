@@ -11,7 +11,7 @@ export interface UploadTicket {
   path: string
   signedUrl: string
   token: string
-  documentType?: 'pdf' | 'zip'
+  documentType?: 'pdf' | 'zip' | 'word' | 'excel'
 }
 
 export type UploadKind = 'video' | 'document'

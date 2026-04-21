@@ -199,7 +199,23 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
                 <div className="space-y-2">
                   <input
                     type="file"
-                    accept={lesson.content_type === 'video' ? 'video/mp4,video/webm,video/quicktime' : 'application/pdf'}
+                    accept={lesson.content_type === 'video'
+                      ? 'video/mp4,video/webm,video/quicktime'
+                      : [
+                          'application/pdf',
+                          'application/zip',
+                          'application/x-zip-compressed',
+                          'application/msword',
+                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                          'application/vnd.ms-excel',
+                          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                          '.pdf',
+                          '.zip',
+                          '.doc',
+                          '.docx',
+                          '.xls',
+                          '.xlsx',
+                        ].join(',')}
                     onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(f) }}
                     className="block w-full text-sm text-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-primary/90"
                   />
