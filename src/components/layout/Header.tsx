@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import {
-  Menu, X, LogOut, User, LayoutDashboard, Settings, Search,
+  Menu, X, LogOut, User, LayoutDashboard, Search,
   ChevronDown, BookOpen, Award, Radio, TrendingUp, Building2, Mail,
   Landmark, BrainCircuit, Target, ShieldCheck, ArrowRight,
   GraduationCap, Briefcase, Crown, Sparkles, Clock, Video,
@@ -342,15 +342,6 @@ export function Header() {
 
         {/* Right section */}
         <div className="flex items-center gap-2">
-          {user?.role === "super_admin" && (
-            <Link
-              href={`/${locale}/admin/dashboard`}
-              className="hidden md:inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
-            >
-              <Settings className="h-4 w-4" />
-              Admin
-            </Link>
-          )}
           <button
             onClick={() => setSearchOpen(true)}
             className="rounded-md p-2 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"

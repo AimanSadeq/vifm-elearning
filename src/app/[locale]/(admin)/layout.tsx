@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { Header } from "@/components/layout/Header";
+import { AdminHeader } from "@/components/layout/AdminHeader";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Toaster } from "sonner";
 
@@ -29,7 +29,7 @@ export default async function AdminLayout({
 
   return (
     <>
-      <Header />
+      <AdminHeader dashboardHref={`/${locale}/admin/dashboard`} />
       <DashboardLayout role="super_admin">{children}</DashboardLayout>
       <Toaster position="top-right" richColors />
     </>
