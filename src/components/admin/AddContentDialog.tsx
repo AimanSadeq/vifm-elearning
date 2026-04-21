@@ -27,6 +27,9 @@ export function AddContentDialog({
     url: string
     path: string
     duration?: number
+    documentType?: 'pdf' | 'zip'
+    fileName?: string
+    fileSize?: number
   } | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -61,6 +64,13 @@ export function AddContentDialog({
     if (!file) return
 
     // Validate
+    const lowerName = file.name.toLowerCase()
+    const isZip =
+      file.type === 'application/zip' ||
+      file.type === 'application/x-zip-compressed' ||
+      lowerName.endsWith('.zip')
+    const isPdf = file.type === 'application/pdf' || lowerName.endsWith('.pdf')
+
     if (contentType === 'video') {
       const allowed = ['video/mp4', 'video/webm', 'video/quicktime']
       if (!allowed.includes(file.type)) {
@@ -72,12 +82,16 @@ export function AddContentDialog({
         return
       }
     } else if (contentType === 'document') {
-      if (file.type !== 'application/pdf') {
-        setError('Only PDF files are allowed')
+      if (!isPdf && !isZip) {
+        setError('Only PDF or ZIP files are allowed')
         return
       }
-      if (file.size > 100 * 1024 * 1024) {
-        setError('File size must be under 100MB')
+      if (isPdf && file.size > 100 * 1024 * 1024) {
+        setError('PDF must be under 100MB')
+        return
+      }
+      if (isZip && file.size > 500 * 1024 * 1024) {
+        setError('ZIP must be under 500MB')
         return
       }
     }
@@ -109,11 +123,18 @@ export function AddContentDialog({
 
       const formDataUpload = new FormData()
       formDataUpload.append('file', file)
-      formDataUpload.append('courseId', courseId)
-      formDataUpload.append('lessonId', 'pending') // Will be updated after lesson creation
-      if (duration) formDataUpload.append('duration', duration.toString())
 
-      const response = await fetch('/api/video/upload', {
+      let endpoint: string
+      if (contentType === 'video') {
+        formDataUpload.append('courseId', courseId)
+        formDataUpload.append('lessonId', 'pending') // Will be updated after lesson creation
+        if (duration) formDataUpload.append('duration', duration.toString())
+        endpoint = '/api/video/upload'
+      } else {
+        endpoint = `/api/admin/courses/${courseId}/document/upload`
+      }
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         body: formDataUpload,
       })
@@ -131,6 +152,9 @@ export function AddContentDialog({
         url: data.url || data.path,
         path: data.path,
         duration,
+        documentType: data.documentType,
+        fileName: data.fileName,
+        fileSize: data.fileSize,
       })
       toast.success('File uploaded successfully')
       setStep('details')
@@ -177,7 +201,12 @@ export function AddContentDialog({
           : 0
       } else if (contentType === 'document') {
         lessonData.document_url = uploadedFile?.url || null
-        lessonData.document_type = 'pdf'
+        lessonData.document_type = uploadedFile?.documentType || 'pdf'
+        lessonData.metadata = {
+          ...(lessonData.metadata as Record<string, unknown>),
+          file_name: uploadedFile?.fileName,
+          file_size: uploadedFile?.fileSize,
+        }
       }
 
       // Store video settings in metadata
@@ -288,7 +317,7 @@ export function AddContentDialog({
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">Document</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Upload PDF files</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Upload PDF or ZIP</p>
                 </div>
               </button>
 
@@ -331,7 +360,7 @@ export function AddContentDialog({
                     type="file"
                     id="file-upload"
                     className="hidden"
-                    accept={contentType === 'video' ? 'video/mp4,video/webm,video/quicktime' : 'application/pdf'}
+                    accept={contentType === 'video' ? 'video/mp4,video/webm,video/quicktime' : 'application/pdf,application/zip,application/x-zip-compressed,.pdf,.zip'}
                     onChange={(e) => {
                       const file = e.target.files?.[0]
                       if (file) handleFileUpload(file)
@@ -347,7 +376,7 @@ export function AddContentDialog({
                       Click to select {contentType === 'video' ? 'video' : 'document'}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {contentType === 'video' ? 'MP4, WebM, MOV up to 2GB' : 'PDF up to 100MB'}
+                      {contentType === 'video' ? 'MP4, WebM, MOV up to 2GB' : 'PDF up to 100MB · ZIP up to 500MB'}
                     </p>
                   </label>
                 </div>
@@ -373,7 +402,11 @@ export function AddContentDialog({
                 <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-950">
                   <p className="text-sm font-medium text-green-700 dark:text-green-300">
                     File uploaded successfully
-                    {uploadedFile.duration && ` · Duration: ${Math.floor(uploadedFile.duration / 60)}:${(uploadedFile.duration % 60).toString().padStart(2, '0')}`}
+                    {uploadedFile.duration
+                      ? ` · Duration: ${Math.floor(uploadedFile.duration / 60)}:${(uploadedFile.duration % 60).toString().padStart(2, '0')}`
+                      : uploadedFile.documentType
+                      ? ` · ${uploadedFile.documentType.toUpperCase()}${uploadedFile.fileSize ? ` · ${(uploadedFile.fileSize / (1024 * 1024)).toFixed(1)} MB` : ''}`
+                      : ''}
                   </p>
                 </div>
               )}

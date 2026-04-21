@@ -26,11 +26,34 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { moduleId, lessonIds } = await request.json()
+    const { moduleId, lessonIds, moduleIds } = await request.json()
+
+    if (Array.isArray(moduleIds) && moduleIds.length > 0) {
+      const moduleUpdates = moduleIds.map((id: string, index: number) =>
+        supabase
+          .from('modules')
+          .update({ sort_order: index })
+          .eq('id', id)
+          .eq('course_id', courseId)
+      )
+
+      const results = await Promise.all(moduleUpdates)
+      const failed = results.filter((r: { error: unknown }) => r.error)
+
+      if (failed.length > 0) {
+        console.error('Some module reorder updates failed:', failed.map((f: { error: unknown }) => f.error))
+        return NextResponse.json(
+          { error: 'Some updates failed' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({ success: true })
+    }
 
     if (!moduleId || !Array.isArray(lessonIds) || lessonIds.length === 0) {
       return NextResponse.json(
-        { error: 'moduleId and lessonIds array are required' },
+        { error: 'moduleId and lessonIds array, or moduleIds array, are required' },
         { status: 400 }
       )
     }

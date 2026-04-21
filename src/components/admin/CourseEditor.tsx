@@ -18,9 +18,6 @@ import {
   ImagePlus,
   X,
   Clock,
-  ChevronDown,
-  ChevronRight,
-  Star,
   BookOpen,
   Video,
 } from 'lucide-react'
@@ -51,9 +48,10 @@ import {
 } from '@/components/ui/alert-dialog'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
-import { DraggableLessonCard } from './DraggableLessonCard'
+import { DraggableModuleSection } from './DraggableModuleSection'
 import { AddModuleDialog } from './AddModuleDialog'
 import { AddContentDialog } from './AddContentDialog'
+import { BulkUploadVideosDialog } from './BulkUploadVideosDialog'
 import { EditContentDialog } from './EditContentDialog'
 import { VideoPreview } from './VideoPreview'
 import type { Course, Module, Lesson, Category, DifficultyLevel } from '@/types'
@@ -73,12 +71,17 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
   const [activeTab, setActiveTab] = useState<TabType>('content')
   const [isEditing, setIsEditing] = useState(false)
   const [showAddContent, setShowAddContent] = useState<string | null>(null) // moduleId
+  const [showBulkUpload, setShowBulkUpload] = useState<string | null>(null) // moduleId
   const [showAddModule, setShowAddModule] = useState(false)
   const [previewLesson, setPreviewLesson] = useState<Lesson | null>(null)
+  const [previewVideoSrc, setPreviewVideoSrc] = useState<string | null>(null)
+  const [isResolvingPreview, setIsResolvingPreview] = useState(false)
+  const [previewError, setPreviewError] = useState<string | null>(null)
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null)
   const [deletingLessonId, setDeletingLessonId] = useState<string | null>(null)
   const [modules, setModules] = useState(initialModules)
   const [isReordering, setIsReordering] = useState(false)
+  const [isReorderingModules, setIsReorderingModules] = useState(false)
   const [collapsedModules, setCollapsedModules] = useState<Set<string>>(new Set())
   const [isSaving, setIsSaving] = useState(false)
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(course.thumbnail_url || null)
@@ -127,6 +130,53 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
   useEffect(() => {
     setModules(initialModules)
   }, [initialModules])
+
+  // Resolve preview video src (signed URL for private bucket)
+  useEffect(() => {
+    if (!previewLesson || previewLesson.content_type !== 'video' || !previewLesson.video_url) {
+      setPreviewVideoSrc(null)
+      setPreviewError(null)
+      setIsResolvingPreview(false)
+      return
+    }
+
+    const raw = previewLesson.video_url
+    if (raw.startsWith('http://') || raw.startsWith('https://')) {
+      setPreviewVideoSrc(raw)
+      setPreviewError(null)
+      setIsResolvingPreview(false)
+      return
+    }
+
+    let cancelled = false
+    setIsResolvingPreview(true)
+    setPreviewError(null)
+    setPreviewVideoSrc(null)
+
+    fetch('/api/video/signed-url', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lessonId: previewLesson.id }),
+    })
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(data.error || 'Failed to load video')
+        return data.url as string
+      })
+      .then((url) => {
+        if (!cancelled) setPreviewVideoSrc(url)
+      })
+      .catch((err) => {
+        if (!cancelled) setPreviewError(err instanceof Error ? err.message : 'Failed to load video')
+      })
+      .finally(() => {
+        if (!cancelled) setIsResolvingPreview(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [previewLesson])
 
   // Re-fetch modules from DB (used after CRUD operations)
   const refreshModules = useCallback(async () => {
@@ -338,6 +388,39 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
       toast.error('Failed to delete module')
     } finally {
       setDeletingModuleId(null)
+    }
+  }
+
+  // Handle drag end for module reorder within a course
+  const handleModuleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIndex = modules.findIndex((m) => m.id === active.id)
+    const newIndex = modules.findIndex((m) => m.id === over.id)
+    if (oldIndex === -1 || newIndex === -1) return
+
+    const reordered = arrayMove(modules, oldIndex, newIndex)
+    const previous = modules
+
+    setIsReorderingModules(true)
+    setModules(reordered)
+
+    try {
+      const response = await fetch(`/api/admin/courses/${course.id}/reorder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ moduleIds: reordered.map((m) => m.id) }),
+      })
+
+      if (!response.ok) throw new Error('Failed to update module order')
+      toast.success('Modules reordered')
+    } catch (error) {
+      console.error('Error reordering modules:', error)
+      toast.error('Failed to reorder modules')
+      setModules(previous) // Revert
+    } finally {
+      setIsReorderingModules(false)
     }
   }
 
@@ -760,147 +843,51 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
               </button>
             </div>
           ) : (
-            <div className="space-y-8">
-              {modules.map((mod) => (
-                <section
-                  key={mod.id}
-                  className="overflow-hidden rounded-xl border border-border bg-card shadow-sm"
-                >
-                  {/* Module Header */}
-                  <header
-                    className={`bg-gradient-to-r from-indigo-50 via-purple-50 to-blue-50 px-6 py-5 dark:from-indigo-950/30 dark:via-purple-950/30 dark:to-blue-950/30 ${
-                      collapsedModules.has(mod.id) ? '' : 'border-b border-border'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <button
-                          onClick={() => toggleModule(mod.id)}
-                          className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-lg transition-transform hover:scale-105"
-                          aria-expanded={!collapsedModules.has(mod.id)}
-                          title={collapsedModules.has(mod.id) ? 'Expand module' : 'Collapse module'}
-                        >
-                          {collapsedModules.has(mod.id) ? (
-                            <ChevronRight className="h-5 w-5" />
-                          ) : (
-                            <ChevronDown className="h-5 w-5" />
-                          )}
-                        </button>
-                        <button onClick={() => toggleModule(mod.id)} className="text-left">
-                          <h3 className="text-lg font-bold text-foreground">{mod.title}</h3>
-                          {mod.title_ar && <p className="text-sm text-muted-foreground" dir="rtl">{mod.title_ar}</p>}
-                          <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                            <span className="inline-flex items-center gap-1.5">
-                              <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                              {mod.lessons.length} {mod.lessons.length === 1 ? 'lesson' : 'lessons'}
-                            </span>
-                            {(() => {
-                              const dur = Math.ceil(
-                                mod.lessons
-                                  .filter((l) => l.content_type === 'video' && l.video_duration_seconds)
-                                  .reduce((t, l) => t + (l.video_duration_seconds || 0), 0) / 60
-                              )
-                              return dur > 0 ? (
-                                <>
-                                  <span>·</span>
-                                  <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{dur} min</span>
-                                </>
-                              ) : null
-                            })()}
-                            {(() => {
-                              const req = mod.lessons.filter((l) => l.is_mandatory).length
-                              return req > 0 ? (
-                                <>
-                                  <span>·</span>
-                                  <span className="inline-flex items-center gap-1 font-medium text-orange-700 dark:text-orange-400">
-                                    <Star className="h-3.5 w-3.5" />{req} required
-                                  </span>
-                                </>
-                              ) : null
-                            })()}
-                          </div>
-                        </button>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleModuleDragEnd}
+            >
+              <SortableContext
+                items={modules.map((m) => m.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="relative space-y-8">
+                  {isReorderingModules && (
+                    <div className="absolute inset-0 z-50 flex items-start justify-center pt-4">
+                      <div className="flex items-center gap-2 rounded-lg bg-card px-4 py-2 shadow-lg">
+                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                        <span className="text-sm font-medium">Updating module order...</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setShowAddContent(mod.id)}
-                          className="inline-flex items-center gap-2 rounded-lg bg-card px-4 py-2 text-sm font-semibold text-foreground shadow-sm ring-1 ring-border transition-all hover:bg-muted hover:shadow-md"
-                        >
-                          <Plus className="h-4 w-4" />
-                          <span className="hidden sm:inline">Add Lesson</span>
-                          <span className="sm:hidden">Add</span>
-                        </button>
-                        <button
-                          onClick={() => setDeleteModuleConfirmation({ id: mod.id, title: mod.title, lessonCount: mod.lessons.length })}
-                          disabled={deletingModuleId === mod.id}
-                          className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-card text-red-600 shadow-sm ring-1 ring-border transition-all hover:bg-red-50 hover:text-red-700 hover:shadow-md disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"
-                          title="Delete module"
-                          aria-label="Delete module"
-                        >
-                          {deletingModuleId === mod.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </header>
-
-                  {/* Module Content (collapsible) */}
-                  {!collapsedModules.has(mod.id) && (
-                    <div className="relative">
-                      {mod.lessons.length === 0 ? (
-                        <div className="flex flex-col items-center py-8 text-muted-foreground">
-                          <p className="text-sm">No lessons in this module yet</p>
-                          <button
-                            onClick={() => setShowAddContent(mod.id)}
-                            className="mt-2 text-sm font-medium text-primary hover:underline"
-                          >
-                            Add first lesson
-                          </button>
-                        </div>
-                      ) : (
-                        <DndContext
-                          sensors={sensors}
-                          collisionDetection={closestCenter}
-                          onDragEnd={(event) => handleDragEnd(event, mod.id)}
-                        >
-                          <SortableContext
-                            items={mod.lessons.map((l) => l.id)}
-                            strategy={verticalListSortingStrategy}
-                          >
-                            <div className="grid gap-4 p-6">
-                              {isReordering && (
-                                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-b-xl bg-background/50">
-                                  <div className="flex items-center gap-2 rounded-lg bg-card px-4 py-2 shadow-lg">
-                                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                                    <span className="text-sm font-medium">Updating order...</span>
-                                  </div>
-                                </div>
-                              )}
-                              {mod.lessons.map((lesson, index) => (
-                                <DraggableLessonCard
-                                  key={lesson.id}
-                                  lesson={lesson}
-                                  index={index}
-                                  courseId={course.id}
-                                  onPreview={setPreviewLesson}
-                                  onEdit={setEditingLesson}
-                                  onDelete={(id, title, type) => setDeleteConfirmation({ id, title, type })}
-                                  onVideoUploaded={refreshModules}
-                                  isDeleting={deletingLessonId === lesson.id}
-                                />
-                              ))}
-                            </div>
-                          </SortableContext>
-                        </DndContext>
-                      )}
                     </div>
                   )}
-                </section>
-              ))}
-            </div>
+                  {modules.map((mod) => (
+                    <DraggableModuleSection
+                      key={mod.id}
+                      module={mod}
+                      courseId={course.id}
+                      isCollapsed={collapsedModules.has(mod.id)}
+                      isReorderingLessons={isReordering}
+                      isDeleting={deletingModuleId === mod.id}
+                      deletingLessonId={deletingLessonId}
+                      onToggle={toggleModule}
+                      onAddLesson={(moduleId) => setShowAddContent(moduleId)}
+                      onBulkUpload={(moduleId) => setShowBulkUpload(moduleId)}
+                      onDeleteModule={(id, title, lessonCount) =>
+                        setDeleteModuleConfirmation({ id, title, lessonCount })
+                      }
+                      onLessonDragEnd={handleDragEnd}
+                      onLessonPreview={setPreviewLesson}
+                      onLessonEdit={setEditingLesson}
+                      onLessonDelete={(id, title, type) =>
+                        setDeleteConfirmation({ id, title, type })
+                      }
+                      onVideoUploaded={refreshModules}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           )}
         </section>
       )}
@@ -955,6 +942,19 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
         />
       )}
 
+      {/* Bulk Upload Videos Dialog */}
+      {showBulkUpload && (
+        <BulkUploadVideosDialog
+          courseId={course.id}
+          moduleId={showBulkUpload}
+          existingLessonCount={modules.find((m) => m.id === showBulkUpload)?.lessons.length || 0}
+          onClose={() => setShowBulkUpload(null)}
+          onSuccess={() => {
+            refreshModules()
+          }}
+        />
+      )}
+
       {/* Edit Content Dialog */}
       {editingLesson && (
         <EditContentDialog
@@ -984,7 +984,21 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
               </button>
             </div>
             {previewLesson.content_type === 'video' && previewLesson.video_url ? (
-              <VideoPreview src={previewLesson.video_url} />
+              isResolvingPreview ? (
+                <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-slate-900 text-slate-300">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              ) : previewError ? (
+                <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-slate-900 px-6 text-center text-sm text-red-300">
+                  {previewError}
+                </div>
+              ) : previewVideoSrc ? (
+                <VideoPreview src={previewVideoSrc} />
+              ) : (
+                <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-slate-900 text-slate-400">
+                  No preview available
+                </div>
+              )
             ) : previewLesson.content_type === 'document' && previewLesson.document_url ? (
               <div className="w-full overflow-hidden rounded-lg bg-slate-900" style={{ height: '600px' }}>
                 <iframe src={previewLesson.document_url} className="h-full w-full" title="Document Preview" />
