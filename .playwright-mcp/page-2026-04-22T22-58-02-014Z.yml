@@ -1,0 +1,91 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "VIFM - Virginia Institute of Finance and Management" [ref=e5] [cursor=pointer]:
+          - /url: /en
+          - img "VIFM - Virginia Institute of Finance and Management" [ref=e6]
+        - navigation [ref=e7]:
+          - link "Home" [ref=e9] [cursor=pointer]:
+            - /url: /en
+            - text: Home
+            - img [ref=e10]
+          - link "Courses" [ref=e13] [cursor=pointer]:
+            - /url: /en/courses
+            - text: Courses
+            - img [ref=e14]
+          - link "Certifications" [ref=e17] [cursor=pointer]:
+            - /url: /en/designations
+            - text: Certifications
+            - img [ref=e18]
+          - link "Webinars" [ref=e21] [cursor=pointer]:
+            - /url: /en/webinars
+            - text: Webinars
+            - img [ref=e22]
+          - link "Pricing" [ref=e24] [cursor=pointer]:
+            - /url: /en/pricing
+          - link "About" [ref=e25] [cursor=pointer]:
+            - /url: /en/about
+          - link "Contact" [ref=e26] [cursor=pointer]:
+            - /url: /en/contact
+        - generic [ref=e27]:
+          - button "Search" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+          - button "Switch to Arabic" [ref=e32] [cursor=pointer]:
+            - img [ref=e33]
+            - generic [ref=e36]: العربية
+    - main [ref=e37]
+    - contentinfo [ref=e40]:
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - img "VIFM - Virginia Institute of Finance and Management" [ref=e44]
+            - paragraph [ref=e45]: Virginia Institute of Finance and Management — Professional training and consulting across the GCC region.
+            - generic [ref=e46]:
+              - paragraph [ref=e47]: Get the App
+              - generic [ref=e48]:
+                - generic [ref=e49]:
+                  - img [ref=e50]
+                  - generic [ref=e52]:
+                    - generic [ref=e53]: App Store
+                    - generic [ref=e54]: Coming Soon
+                - generic [ref=e55]:
+                  - img [ref=e56]
+                  - generic [ref=e58]:
+                    - generic [ref=e59]: Google Play
+                    - generic [ref=e60]: Coming Soon
+          - generic [ref=e61]:
+            - heading "Quick Links" [level=4] [ref=e62]
+            - list [ref=e63]:
+              - listitem [ref=e64]:
+                - link "Courses" [ref=e65] [cursor=pointer]:
+                  - /url: /en/courses
+              - listitem [ref=e66]:
+                - link "Webinars" [ref=e67] [cursor=pointer]:
+                  - /url: /en/webinars
+              - listitem [ref=e68]:
+                - link "Pricing" [ref=e69] [cursor=pointer]:
+                  - /url: /en/pricing
+              - listitem [ref=e70]:
+                - link "About" [ref=e71] [cursor=pointer]:
+                  - /url: /en/about
+          - generic [ref=e72]:
+            - heading "Support" [level=4] [ref=e73]
+            - list [ref=e74]:
+              - listitem [ref=e75]:
+                - link "Contact Us" [ref=e76] [cursor=pointer]:
+                  - /url: /en/contact
+              - listitem [ref=e77]:
+                - link "Help Center" [ref=e78] [cursor=pointer]:
+                  - /url: /en/contact
+          - generic [ref=e79]:
+            - heading "Legal" [level=4] [ref=e80]
+            - list [ref=e81]:
+              - listitem [ref=e82]:
+                - link "Privacy Policy" [ref=e83] [cursor=pointer]:
+                  - /url: /en/privacy-policy
+              - listitem [ref=e84]:
+                - link "Terms of Service" [ref=e85] [cursor=pointer]:
+                  - /url: /en/terms-of-service
+        - paragraph [ref=e87]: © 2026 VIFM. All rights reserved.
+  - alert [ref=e88]

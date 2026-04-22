@@ -1,0 +1,129 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "VIFM - Virginia Institute of Finance and Management" [ref=e5] [cursor=pointer]:
+        - /url: /en
+        - img "VIFM - Virginia Institute of Finance and Management" [ref=e6]
+      - navigation [ref=e7]:
+        - link "Home" [ref=e9] [cursor=pointer]:
+          - /url: /en
+          - text: Home
+          - img [ref=e10]
+        - link "Courses" [ref=e13] [cursor=pointer]:
+          - /url: /en/courses
+          - text: Courses
+          - img [ref=e14]
+        - link "Certifications" [ref=e17] [cursor=pointer]:
+          - /url: /en/designations
+          - text: Certifications
+          - img [ref=e18]
+        - link "Webinars" [ref=e21] [cursor=pointer]:
+          - /url: /en/webinars
+          - text: Webinars
+          - img [ref=e22]
+        - link "Pricing" [ref=e24] [cursor=pointer]:
+          - /url: /en/pricing
+        - link "About" [ref=e25] [cursor=pointer]:
+          - /url: /en/about
+        - link "Contact" [ref=e26] [cursor=pointer]:
+          - /url: /en/contact
+      - generic [ref=e27]:
+        - button "Search" [ref=e28] [cursor=pointer]:
+          - img [ref=e29]
+        - button "Switch to Arabic" [ref=e32] [cursor=pointer]:
+          - img [ref=e33]
+          - generic [ref=e36]: العربية
+  - main [ref=e37]:
+    - generic [ref=e38]:
+      - generic [ref=e42]:
+        - generic [ref=e43]: Course Catalog
+        - heading "Level up your career" [level=1] [ref=e45]
+        - paragraph [ref=e46]: Professional courses in Finance, Banking, Data, and Leadership — taught by industry leaders.
+        - generic [ref=e48]:
+          - img [ref=e49]
+          - searchbox "Search courses..." [ref=e52]
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - img [ref=e56]
+            - generic [ref=e58]: —
+            - generic [ref=e59]: Courses
+          - generic [ref=e61]:
+            - img [ref=e63]
+            - generic [ref=e68]: "4"
+            - generic [ref=e69]: Categories
+          - generic [ref=e71]:
+            - img [ref=e73]
+            - generic [ref=e76]: Certified
+            - generic [ref=e77]: Programs
+      - generic [ref=e80]:
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - img [ref=e83]
+            - text: Filter
+          - button "Beginner" [ref=e84] [cursor=pointer]
+          - button "Intermediate" [ref=e85] [cursor=pointer]
+          - button "Advanced" [ref=e86] [cursor=pointer]
+          - button "Expert" [ref=e87] [cursor=pointer]
+          - button "Free" [ref=e89] [cursor=pointer]
+        - generic [ref=e90]:
+          - img [ref=e91]
+          - generic [ref=e94]: Sort by
+          - combobox "Sort by" [ref=e95] [cursor=pointer]:
+            - option "Newest" [selected]
+            - option "Most Popular"
+            - option "Highest Rated"
+            - 'option "Price: Low to High"'
+            - 'option "Price: High to Low"'
+  - contentinfo [ref=e175]:
+    - generic [ref=e176]:
+      - generic [ref=e177]:
+        - generic [ref=e178]:
+          - img "VIFM - Virginia Institute of Finance and Management" [ref=e179]
+          - paragraph [ref=e180]: Virginia Institute of Finance and Management — Professional training and consulting across the GCC region.
+          - generic [ref=e181]:
+            - paragraph [ref=e182]: Get the App
+            - generic [ref=e183]:
+              - generic [ref=e184]:
+                - img [ref=e185]
+                - generic [ref=e187]:
+                  - generic [ref=e188]: App Store
+                  - generic [ref=e189]: Coming Soon
+              - generic [ref=e190]:
+                - img [ref=e191]
+                - generic [ref=e193]:
+                  - generic [ref=e194]: Google Play
+                  - generic [ref=e195]: Coming Soon
+        - generic [ref=e196]:
+          - heading "Quick Links" [level=4] [ref=e197]
+          - list [ref=e198]:
+            - listitem [ref=e199]:
+              - link "Courses" [ref=e200] [cursor=pointer]:
+                - /url: /en/courses
+            - listitem [ref=e201]:
+              - link "Webinars" [ref=e202] [cursor=pointer]:
+                - /url: /en/webinars
+            - listitem [ref=e203]:
+              - link "Pricing" [ref=e204] [cursor=pointer]:
+                - /url: /en/pricing
+            - listitem [ref=e205]:
+              - link "About" [ref=e206] [cursor=pointer]:
+                - /url: /en/about
+        - generic [ref=e207]:
+          - heading "Support" [level=4] [ref=e208]
+          - list [ref=e209]:
+            - listitem [ref=e210]:
+              - link "Contact Us" [ref=e211] [cursor=pointer]:
+                - /url: /en/contact
+            - listitem [ref=e212]:
+              - link "Help Center" [ref=e213] [cursor=pointer]:
+                - /url: /en/contact
+        - generic [ref=e214]:
+          - heading "Legal" [level=4] [ref=e215]
+          - list [ref=e216]:
+            - listitem [ref=e217]:
+              - link "Privacy Policy" [ref=e218] [cursor=pointer]:
+                - /url: /en/privacy-policy
+            - listitem [ref=e219]:
+              - link "Terms of Service" [ref=e220] [cursor=pointer]:
+                - /url: /en/terms-of-service
+      - paragraph [ref=e222]: © 2026 VIFM. All rights reserved.

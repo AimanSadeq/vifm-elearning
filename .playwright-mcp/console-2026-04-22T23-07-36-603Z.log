@@ -1,0 +1,7 @@
+[     530ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:25630
+[    1061ms] [WARNING] Image with src "https://guvjbtepgeivfrjdhldx.supabase.co/storage/v1/object/public/course-assets/courses/9d307a89-b855-4110-94e8-a6b018696e08/thumbnail.png" was detected as the Largest Contentful Paint (LCP). Please add the "priority" property if this image is above the fold.
+Read more: https://nextjs.org/docs/api-reference/next/image#priority @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/shared/lib/utils/warn-once.js:15
+[   15277ms] [WARNING] Image with src "https://guvjbtepgeivfrjdhldx.supabase.co/storage/v1/object/public/course-assets/courses/cef2d517-6cb2-43eb-b911-05a56e809da1/thumbnail.png" was detected as the Largest Contentful Paint (LCP). Please add the "priority" property if this image is above the fold.
+Read more: https://nextjs.org/docs/api-reference/next/image#priority @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/shared/lib/utils/warn-once.js:15
+[  346647ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/hot-reloader/app/hot-reloader-app.js:196
+[  348406ms] [LOG] [Fast Refresh] done in 1760ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/report-hmr-latency.js:13

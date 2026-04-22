@@ -1,0 +1,108 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "VIFM - Virginia Institute of Finance and Management" [ref=e5] [cursor=pointer]:
+        - /url: /en
+        - img "VIFM - Virginia Institute of Finance and Management" [ref=e6]
+      - navigation [ref=e7]:
+        - link "Home" [ref=e9] [cursor=pointer]:
+          - /url: /en
+          - text: Home
+          - img [ref=e10]
+        - link "Courses" [ref=e13] [cursor=pointer]:
+          - /url: /en/courses
+          - text: Courses
+          - img [ref=e14]
+        - link "Certifications" [ref=e17] [cursor=pointer]:
+          - /url: /en/designations
+          - text: Certifications
+          - img [ref=e18]
+        - link "Webinars" [ref=e21] [cursor=pointer]:
+          - /url: /en/webinars
+          - text: Webinars
+          - img [ref=e22]
+        - link "Pricing" [ref=e24] [cursor=pointer]:
+          - /url: /en/pricing
+        - link "About" [ref=e25] [cursor=pointer]:
+          - /url: /en/about
+        - link "Contact" [ref=e26] [cursor=pointer]:
+          - /url: /en/contact
+      - generic [ref=e27]:
+        - button "Search" [ref=e28] [cursor=pointer]:
+          - img [ref=e29]
+        - button "Switch to Arabic" [ref=e32] [cursor=pointer]:
+          - img [ref=e33]
+          - generic [ref=e36]: العربية
+  - main [ref=e37]:
+    - generic [ref=e38]:
+      - generic [ref=e42]:
+        - link "All courses" [ref=e43] [cursor=pointer]:
+          - /url: /en/courses
+          - img [ref=e44]
+          - text: All courses
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - img [ref=e49]
+              - text: Category
+            - heading "finance-banking" [level=1] [ref=e52]
+          - generic [ref=e54]:
+            - img [ref=e56]
+            - generic [ref=e58]: "0"
+            - generic [ref=e59]: Courses
+      - generic [ref=e62]:
+        - img [ref=e63]
+        - searchbox "Search within finance-banking..." [ref=e66]
+  - contentinfo [ref=e146]:
+    - generic [ref=e147]:
+      - generic [ref=e148]:
+        - generic [ref=e149]:
+          - img "VIFM - Virginia Institute of Finance and Management" [ref=e150]
+          - paragraph [ref=e151]: Virginia Institute of Finance and Management — Professional training and consulting across the GCC region.
+          - generic [ref=e152]:
+            - paragraph [ref=e153]: Get the App
+            - generic [ref=e154]:
+              - generic [ref=e155]:
+                - img [ref=e156]
+                - generic [ref=e158]:
+                  - generic [ref=e159]: App Store
+                  - generic [ref=e160]: Coming Soon
+              - generic [ref=e161]:
+                - img [ref=e162]
+                - generic [ref=e164]:
+                  - generic [ref=e165]: Google Play
+                  - generic [ref=e166]: Coming Soon
+        - generic [ref=e167]:
+          - heading "Quick Links" [level=4] [ref=e168]
+          - list [ref=e169]:
+            - listitem [ref=e170]:
+              - link "Courses" [ref=e171] [cursor=pointer]:
+                - /url: /en/courses
+            - listitem [ref=e172]:
+              - link "Webinars" [ref=e173] [cursor=pointer]:
+                - /url: /en/webinars
+            - listitem [ref=e174]:
+              - link "Pricing" [ref=e175] [cursor=pointer]:
+                - /url: /en/pricing
+            - listitem [ref=e176]:
+              - link "About" [ref=e177] [cursor=pointer]:
+                - /url: /en/about
+        - generic [ref=e178]:
+          - heading "Support" [level=4] [ref=e179]
+          - list [ref=e180]:
+            - listitem [ref=e181]:
+              - link "Contact Us" [ref=e182] [cursor=pointer]:
+                - /url: /en/contact
+            - listitem [ref=e183]:
+              - link "Help Center" [ref=e184] [cursor=pointer]:
+                - /url: /en/contact
+        - generic [ref=e185]:
+          - heading "Legal" [level=4] [ref=e186]
+          - list [ref=e187]:
+            - listitem [ref=e188]:
+              - link "Privacy Policy" [ref=e189] [cursor=pointer]:
+                - /url: /en/privacy-policy
+            - listitem [ref=e190]:
+              - link "Terms of Service" [ref=e191] [cursor=pointer]:
+                - /url: /en/terms-of-service
+      - paragraph [ref=e193]: © 2026 VIFM. All rights reserved.

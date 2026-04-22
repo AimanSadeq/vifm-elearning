@@ -1,0 +1,136 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "VIFM - Virginia Institute of Finance and Management" [ref=e5] [cursor=pointer]:
+          - /url: /en
+          - img "VIFM - Virginia Institute of Finance and Management" [ref=e6]
+        - navigation [ref=e7]:
+          - link "Home" [ref=e9] [cursor=pointer]:
+            - /url: /en
+            - text: Home
+            - img [ref=e10]
+          - link "Courses" [ref=e13] [cursor=pointer]:
+            - /url: /en/courses
+            - text: Courses
+            - img [ref=e14]
+          - link "Certifications" [ref=e17] [cursor=pointer]:
+            - /url: /en/designations
+            - text: Certifications
+            - img [ref=e18]
+          - link "Webinars" [ref=e21] [cursor=pointer]:
+            - /url: /en/webinars
+            - text: Webinars
+            - img [ref=e22]
+          - link "Pricing" [ref=e24] [cursor=pointer]:
+            - /url: /en/pricing
+          - link "About" [ref=e25] [cursor=pointer]:
+            - /url: /en/about
+          - link "Contact" [ref=e26] [cursor=pointer]:
+            - /url: /en/contact
+        - generic [ref=e27]:
+          - button "Search" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+          - button "Switch to Arabic" [ref=e32] [cursor=pointer]:
+            - img [ref=e33]
+            - generic [ref=e36]: العربية
+    - main [ref=e37]:
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - generic [ref=e42]: VOL. I
+            - generic [ref=e43]: ❖ · ❖ · ❖
+            - generic [ref=e44]: No. I · APRIL 2026
+          - generic [ref=e45]:
+            - heading "THE VIF REVIEW" [level=1] [ref=e46]
+            - paragraph [ref=e47]: A Quarterly Journal of Professional Training — Finance · Banking · Data · Leadership
+          - generic [ref=e48]:
+            - generic [ref=e49]: "Courses in Print: 0"
+            - generic [ref=e50]: Established MMXXVI
+            - generic [ref=e51]: Open Subscription
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - generic [ref=e55]:
+              - img [ref=e56]
+              - searchbox "Search courses..." [ref=e59]
+            - generic [ref=e61]:
+              - generic [ref=e62]: Sort
+              - combobox "Sort courses" [ref=e63] [cursor=pointer]:
+                - option "Newest" [selected]
+                - option "Most Popular"
+                - option "Highest Rated"
+                - 'option "Price: Low to High"'
+                - 'option "Price: High to Low"'
+            - generic [ref=e64]: 0 Entries
+          - generic [ref=e65]:
+            - generic [ref=e66]: Index —
+            - button "All" [ref=e67] [cursor=pointer]
+            - button "Finance & Banking" [ref=e68] [cursor=pointer]
+            - button "Data Analytics & AI" [ref=e69] [cursor=pointer]
+            - button "Strategy & Leadership" [ref=e70] [cursor=pointer]
+            - button "Compliance & Risk Management" [ref=e71] [cursor=pointer]
+            - button "Beginner" [ref=e73] [cursor=pointer]
+            - button "Intermediate" [ref=e74] [cursor=pointer]
+            - button "Advanced" [ref=e75] [cursor=pointer]
+            - button "Expert" [ref=e76] [cursor=pointer]
+            - button "Free" [ref=e78] [cursor=pointer]
+        - generic [ref=e80]:
+          - heading "Inside This Issue" [level=2] [ref=e81]
+          - generic [ref=e82]: Page 1 of 1
+        - generic [ref=e126]:
+          - paragraph [ref=e127]: ❋ · ❋ · ❋
+          - paragraph [ref=e128]: Set in Fraunces & Noto Serif. Printed on digital paper. Published by VIF Academy, established MMXXVI.
+    - contentinfo [ref=e129]:
+      - generic [ref=e130]:
+        - generic [ref=e131]:
+          - generic [ref=e132]:
+            - img "VIFM - Virginia Institute of Finance and Management" [ref=e133]
+            - paragraph [ref=e134]: Virginia Institute of Finance and Management — Professional training and consulting across the GCC region.
+            - generic [ref=e135]:
+              - paragraph [ref=e136]: Get the App
+              - generic [ref=e137]:
+                - generic [ref=e138]:
+                  - img [ref=e139]
+                  - generic [ref=e141]:
+                    - generic [ref=e142]: App Store
+                    - generic [ref=e143]: Coming Soon
+                - generic [ref=e144]:
+                  - img [ref=e145]
+                  - generic [ref=e147]:
+                    - generic [ref=e148]: Google Play
+                    - generic [ref=e149]: Coming Soon
+          - generic [ref=e150]:
+            - heading "Quick Links" [level=4] [ref=e151]
+            - list [ref=e152]:
+              - listitem [ref=e153]:
+                - link "Courses" [ref=e154] [cursor=pointer]:
+                  - /url: /en/courses
+              - listitem [ref=e155]:
+                - link "Webinars" [ref=e156] [cursor=pointer]:
+                  - /url: /en/webinars
+              - listitem [ref=e157]:
+                - link "Pricing" [ref=e158] [cursor=pointer]:
+                  - /url: /en/pricing
+              - listitem [ref=e159]:
+                - link "About" [ref=e160] [cursor=pointer]:
+                  - /url: /en/about
+          - generic [ref=e161]:
+            - heading "Support" [level=4] [ref=e162]
+            - list [ref=e163]:
+              - listitem [ref=e164]:
+                - link "Contact Us" [ref=e165] [cursor=pointer]:
+                  - /url: /en/contact
+              - listitem [ref=e166]:
+                - link "Help Center" [ref=e167] [cursor=pointer]:
+                  - /url: /en/contact
+          - generic [ref=e168]:
+            - heading "Legal" [level=4] [ref=e169]
+            - list [ref=e170]:
+              - listitem [ref=e171]:
+                - link "Privacy Policy" [ref=e172] [cursor=pointer]:
+                  - /url: /en/privacy-policy
+              - listitem [ref=e173]:
+                - link "Terms of Service" [ref=e174] [cursor=pointer]:
+                  - /url: /en/terms-of-service
+        - paragraph [ref=e176]: © 2026 VIFM. All rights reserved.
+  - alert [ref=e177]
