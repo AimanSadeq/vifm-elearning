@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { Search, BookOpen, Users, Award, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   CourseFilters,
@@ -13,18 +14,40 @@ import { useCourseFacets } from "@/lib/hooks/useCourseFacets";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import { Button } from "@/components/ui/button";
 
+const VALID_SORTS = new Set([
+  "newest",
+  "popular",
+  "highest_rated",
+  "price_asc",
+  "price_desc",
+]);
+const VALID_DIFFICULTIES = new Set(["beginner", "intermediate", "advanced", "expert"]);
+
 export default function CourseCatalogPage() {
   const t = useTranslations("courses");
   const tc = useTranslations("common");
   const locale = useLocale();
+  const searchParams = useSearchParams();
 
-  const [filters, setFilters] = useState<CourseFilterValues>({
-    search: "",
-    category: "all",
-    difficulty: "all",
-    priceRange: "all",
-    sortBy: "newest",
-  });
+  const initialFilters: CourseFilterValues = useMemo(() => {
+    const price = searchParams.get("price");
+    const sort = searchParams.get("sort");
+    const category = searchParams.get("category");
+    const difficulty = searchParams.get("difficulty");
+    const search = searchParams.get("q") ?? searchParams.get("search") ?? "";
+    return {
+      search,
+      category: category || "all",
+      difficulty: difficulty && VALID_DIFFICULTIES.has(difficulty) ? difficulty : "all",
+      priceRange:
+        price === "free" || price === "paid" ? (price as "free" | "paid") : "all",
+      sortBy: sort && VALID_SORTS.has(sort) ? sort : "newest",
+    };
+    // Only read query params once on first render; user interactions take over afterward.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const [filters, setFilters] = useState<CourseFilterValues>(initialFilters);
   const [page, setPage] = useState(1);
 
   const debouncedSearch = useDebounce(filters.search, 300);

@@ -305,8 +305,8 @@ export function Header() {
                               <div className="mt-3 space-y-0.5">
                                 {[
                                   { href: `/${locale}/webinars`, icon: Radio, label: t("webinarMenuAll"), desc: t("webinarMenuAllDesc") },
-                                  { href: `/${locale}/webinars`, icon: Video, label: t("webinarMenuUpcoming"), desc: t("webinarMenuUpcomingDesc") },
-                                  { href: `/${locale}/webinars`, icon: Clock, label: t("webinarMenuPast"), desc: t("webinarMenuPastDesc") },
+                                  { href: `/${locale}/webinars?tab=upcoming`, icon: Video, label: t("webinarMenuUpcoming"), desc: t("webinarMenuUpcomingDesc") },
+                                  { href: `/${locale}/webinars?tab=past`, icon: Clock, label: t("webinarMenuPast"), desc: t("webinarMenuPastDesc") },
                                 ].map((link) => (
                                   <MenuLink key={link.label} href={link.href} onClose={closeMenuNow}>
                                     <MenuIcon className="bg-secondary text-muted-foreground group-hover:text-brand-600">

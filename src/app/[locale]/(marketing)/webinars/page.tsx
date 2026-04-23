@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import {
   Search,
   Radio,
@@ -25,14 +26,39 @@ const PAGE_SIZE = 12;
 export default function WebinarsPage() {
   const tc = useTranslations("common");
   const locale = useLocale();
+  const searchParams = useSearchParams();
+
+  const initialTab: Tab = useMemo(() => {
+    const t = searchParams.get("tab");
+    return t === "past" ? "past" : "upcoming";
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const initialPrice: "all" | "free" | "paid" = useMemo(() => {
+    const p = searchParams.get("price");
+    return p === "free" || p === "paid" ? p : "all";
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const initialSearch = useMemo(
+    () => searchParams.get("q") ?? searchParams.get("search") ?? "",
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  // If the user arrived from "Upcoming Sessions" we respect that even if there
+  // are no upcoming webinars (auto-switch logic below only kicks in when tab is default).
+  const userSpecifiedTab = useMemo(
+    () => searchParams.has("tab"),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   const [upcoming, setUpcoming] = useState<Webinar[]>([]);
   const [past, setPast] = useState<Webinar[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [tab, setTab] = useState<Tab>("upcoming");
-  const [search, setSearch] = useState("");
-  const [priceFilter, setPriceFilter] = useState<"all" | "free" | "paid">("all");
+  const [tab, setTab] = useState<Tab>(initialTab);
+  const [search, setSearch] = useState(initialSearch);
+  const [priceFilter, setPriceFilter] = useState<"all" | "free" | "paid">(initialPrice);
   const [page, setPage] = useState(1);
 
   const debouncedSearch = useDebounce(search, 300);
@@ -66,8 +92,13 @@ export default function WebinarsPage() {
       setPast((pastRes.data as Webinar[]) ?? []);
       setIsLoading(false);
 
-      // Start on "past" if no upcoming
-      if ((upcomingRes.data?.length ?? 0) === 0 && (pastRes.data?.length ?? 0) > 0) {
+      // Auto-switch to "past" only when the user hasn't explicitly picked a tab
+      // via the URL and there's nothing in "upcoming" to show.
+      if (
+        !userSpecifiedTab &&
+        (upcomingRes.data?.length ?? 0) === 0 &&
+        (pastRes.data?.length ?? 0) > 0
+      ) {
         setTab("past");
       }
     }
