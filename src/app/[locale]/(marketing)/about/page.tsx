@@ -11,11 +11,12 @@ import {
   MapPin,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { OFFICES } from "@/lib/site-content";
+import { useSiteSettings } from "@/lib/hooks/useSiteSettings";
 
 export default function AboutPage() {
   const t = useTranslations("about");
   const locale = useLocale();
+  const { offices: rawOffices } = useSiteSettings();
 
   const stats = [
     { icon: Users, label: t("statLearners"), value: "10,000+" },
@@ -24,7 +25,7 @@ export default function AboutPage() {
     { icon: Building2, label: t("statOrganizations"), value: "50+" },
   ];
 
-  const offices = OFFICES.map((o) => ({
+  const offices = rawOffices.map((o) => ({
     key: o.key,
     city: locale === "ar" ? o.cityAr : o.city,
     address: locale === "ar" ? o.addressAr : o.address,

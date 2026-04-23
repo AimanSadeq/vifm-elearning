@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
-import { SUPPORT_EMAIL } from "@/lib/site-content";
+import { useSiteSettings } from "@/lib/hooks/useSiteSettings";
 
 interface DesignationInfo {
   id: string;
@@ -112,6 +112,7 @@ function buildFAQ(
 
 export default function DesignationFAQPage() {
   const locale = useLocale();
+  const { supportEmail } = useSiteSettings();
   const params = useParams();
   const slug = params.slug as string;
 
@@ -239,11 +240,11 @@ export default function DesignationFAQPage() {
             ? "لم تجد إجابتك؟ تواصل معنا"
             : "Didn't find your answer? Get in touch"}
         </p>
-        <a href={`mailto:${SUPPORT_EMAIL}`}>
+        <a href={`mailto:${supportEmail}`}>
           <Button variant="outline">
             {locale === "ar"
-              ? `تواصل مع ${SUPPORT_EMAIL}`
-              : `Contact ${SUPPORT_EMAIL}`}
+              ? `تواصل مع ${supportEmail}`
+              : `Contact ${supportEmail}`}
           </Button>
         </a>
       </div>

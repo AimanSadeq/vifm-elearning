@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { OFFICES } from "@/lib/site-content";
+import { useSiteSettings } from "@/lib/hooks/useSiteSettings";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -25,6 +25,7 @@ type ContactFormData = z.infer<typeof contactSchema>;
 export default function ContactPage() {
   const t = useTranslations("contact");
   const locale = useLocale();
+  const { offices: rawOffices } = useSiteSettings();
   const [submitted, setSubmitted] = useState(false);
 
   const {
@@ -42,7 +43,7 @@ export default function ContactPage() {
     setSubmitted(true);
   };
 
-  const offices = OFFICES.map((o) => ({
+  const offices = rawOffices.map((o) => ({
     key: o.key,
     city: locale === "ar" ? o.cityAr : o.city,
     address: locale === "ar" ? o.addressAr : o.address,
