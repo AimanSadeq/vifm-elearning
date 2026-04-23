@@ -139,6 +139,10 @@ export default function CategoryPage() {
       setCategoryNotFound(false);
       run();
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug]);
 
   // Fetch filtered courses whenever filters/page change

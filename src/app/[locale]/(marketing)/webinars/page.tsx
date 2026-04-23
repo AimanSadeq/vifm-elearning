@@ -23,7 +23,6 @@ type Tab = "upcoming" | "past";
 const PAGE_SIZE = 12;
 
 export default function WebinarsPage() {
-  const t = useTranslations("webinars");
   const tc = useTranslations("common");
   const locale = useLocale();
 
