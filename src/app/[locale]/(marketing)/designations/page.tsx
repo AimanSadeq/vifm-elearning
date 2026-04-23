@@ -1,19 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import Link from "next/link";
-import {
-  Award,
-  ArrowRight,
-  GraduationCap,
-  Briefcase,
-  Crown,
-} from "lucide-react";
+import { Award, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import {
+  DESIGNATION_TIERS,
+  DESIGNATION_TIER_IDS,
+  getDesignationTier,
+} from "@/lib/site-content";
 
 interface Designation {
   id: string;
@@ -28,57 +27,7 @@ interface Designation {
   metadata: { tier_level?: string } | null;
 }
 
-const TIER_CONFIG: Record<
-  string,
-  {
-    label: string;
-    labelAr: string;
-    description: string;
-    descriptionAr: string;
-    icon: typeof Award;
-    color: string;
-    badgeColor: string;
-  }
-> = {
-  gateway: {
-    label: "Gateway Tier",
-    labelAr: "المستوى التأسيسي",
-    description:
-      "Begin your professional certification journey with foundational programs.",
-    descriptionAr:
-      "ابدأ رحلتك في الشهادات المهنية مع البرامج التأسيسية.",
-    icon: GraduationCap,
-    color:
-      "from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30",
-    badgeColor: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
-  },
-  professional: {
-    label: "Professional Tier",
-    labelAr: "المستوى المهني",
-    description:
-      "Advance your career with specialized AI and business certifications.",
-    descriptionAr:
-      "طوّر مسيرتك المهنية مع شهادات متخصصة في الذكاء الاصطناعي والأعمال.",
-    icon: Briefcase,
-    color:
-      "from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30",
-    badgeColor: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  },
-  executive: {
-    label: "Executive Tier",
-    labelAr: "المستوى التنفيذي",
-    description:
-      "Lead with strategic expertise through our most advanced programs.",
-    descriptionAr:
-      "قُد بخبرة استراتيجية من خلال برامجنا الأكثر تقدمًا.",
-    icon: Crown,
-    color:
-      "from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30",
-    badgeColor: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
-  },
-};
-
-const TIER_ORDER = ["gateway", "professional", "executive"];
+const TIER_ORDER = DESIGNATION_TIER_IDS;
 
 export default function DesignationsPage() {
   const locale = useLocale();
@@ -133,24 +82,28 @@ export default function DesignationsPage() {
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-white/80">
             {locale === "ar"
-              ? "اكتشف 15 شهادة مهنية معتمدة عبر ثلاثة مستويات — من التأسيسي إلى التنفيذي — مصممة لتطوير مهاراتك المهنية."
-              : "Discover 15 accredited professional designations across three tiers — from Gateway to Executive — designed to advance your career in finance, AI, and business."}
+              ? `اكتشف ${designations.length} شهادة مهنية معتمدة عبر ثلاثة مستويات — من التأسيسي إلى التنفيذي — مصممة لتطوير مهاراتك المهنية.`
+              : `Discover ${designations.length} accredited professional designations across three tiers — from Gateway to Executive — designed to advance your career in finance, AI, and business.`}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-white/70">
-            <span className="flex items-center gap-1.5">
-              <GraduationCap className="h-4 w-4" />
-              {locale === "ar" ? "4 شهادات تأسيسية" : "4 Gateway"}
-            </span>
-            <span className="hidden sm:inline">·</span>
-            <span className="flex items-center gap-1.5">
-              <Briefcase className="h-4 w-4" />
-              {locale === "ar" ? "7 شهادات مهنية" : "7 Professional"}
-            </span>
-            <span className="hidden sm:inline">·</span>
-            <span className="flex items-center gap-1.5">
-              <Crown className="h-4 w-4" />
-              {locale === "ar" ? "4 شهادات تنفيذية" : "4 Executive"}
-            </span>
+            {DESIGNATION_TIERS.map((tier, i) => {
+              const Icon = tier.icon;
+              const count =
+                grouped.find((g) => g.tier === tier.id)?.items.length ?? 0;
+              const shortLabel =
+                locale === "ar"
+                  ? tier.labelAr.replace("المستوى ", "")
+                  : tier.label.replace(" Tier", "");
+              return (
+                <Fragment key={tier.id}>
+                  {i > 0 && <span className="hidden sm:inline">·</span>}
+                  <span className="flex items-center gap-1.5">
+                    <Icon className="h-4 w-4" />
+                    {count} {shortLabel}
+                  </span>
+                </Fragment>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -158,14 +111,14 @@ export default function DesignationsPage() {
       {/* Tier Sections */}
       <div className="container mx-auto px-4 py-12 space-y-16">
         {grouped.map(({ tier, items }) => {
-          const config = TIER_CONFIG[tier];
+          const config = getDesignationTier(tier);
           if (!config) return null;
           const Icon = config.icon;
 
           return (
             <section key={tier}>
               {/* Tier Header */}
-              <div className={`rounded-2xl bg-gradient-to-r ${config.color} p-6 sm:p-8 mb-6`}>
+              <div className={`rounded-2xl bg-gradient-to-r ${config.gradient} p-6 sm:p-8 mb-6`}>
                 <div className="flex items-center gap-3 mb-2">
                   <Icon className="h-6 w-6 text-foreground" />
                   <h2 className="text-2xl font-bold text-foreground">

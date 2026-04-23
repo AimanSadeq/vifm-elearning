@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { OFFICES } from "@/lib/site-content";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -23,6 +24,7 @@ type ContactFormData = z.infer<typeof contactSchema>;
 
 export default function ContactPage() {
   const t = useTranslations("contact");
+  const locale = useLocale();
   const [submitted, setSubmitted] = useState(false);
 
   const {
@@ -40,26 +42,13 @@ export default function ContactPage() {
     setSubmitted(true);
   };
 
-  const offices = [
-    {
-      city: "Dubai, UAE",
-      address: "DIFC, Gate Village Building 3",
-      phone: "+971 4 123 4567",
-      email: "dubai@vifm.academy",
-    },
-    {
-      city: "Riyadh, KSA",
-      address: "King Fahd Road, Olaya District",
-      phone: "+966 11 234 5678",
-      email: "riyadh@vifm.academy",
-    },
-    {
-      city: "Virginia, USA",
-      address: "Tysons Corner Center",
-      phone: "+1 703 555 0123",
-      email: "info@vifm.academy",
-    },
-  ];
+  const offices = OFFICES.map((o) => ({
+    key: o.key,
+    city: locale === "ar" ? o.cityAr : o.city,
+    address: locale === "ar" ? o.addressAr : o.address,
+    phone: o.phone,
+    email: o.email,
+  }));
 
   return (
     <div className="py-16 px-4 sm:px-6 lg:px-8">
@@ -170,7 +159,7 @@ export default function ContactPage() {
           {/* Office Locations */}
           <div className="lg:col-span-2 space-y-4">
             {offices.map((office) => (
-              <Card key={office.city}>
+              <Card key={office.key}>
                 <CardContent className="p-5 space-y-3">
                   <h3 className="font-semibold">{office.city}</h3>
                   <div className="space-y-2 text-sm text-muted-foreground">

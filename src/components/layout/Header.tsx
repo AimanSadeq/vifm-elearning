@@ -7,11 +7,12 @@ import {
   Menu, X, LogOut, User, LayoutDashboard, Search,
   ChevronDown, BookOpen, Award, Radio, TrendingUp, Building2, Mail,
   Landmark, BrainCircuit, Target, ShieldCheck, ArrowRight,
-  GraduationCap, Briefcase, Crown, Sparkles, Clock, Video,
+  Sparkles, Clock, Video,
 } from "lucide-react";
 import { useState, useRef, useCallback, Fragment } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { CATEGORIES } from "@/lib/utils/constants";
+import { DESIGNATION_TIERS } from "@/lib/site-content";
 import { cn } from "@/lib/utils/cn";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { MobileNav } from "./MobileNav";
@@ -247,21 +248,22 @@ export function Header() {
                             <div className="border-e border-border/50 p-6">
                               <MenuSectionLabel>{t("megaMenuCareer")}</MenuSectionLabel>
                               <div className="mt-3 space-y-0.5">
-                                {[
-                                  { icon: GraduationCap, label: t("certMenuGateway"), desc: t("certMenuGatewayDesc"), color: "#10b981" },
-                                  { icon: Briefcase, label: t("certMenuProfessional"), desc: t("certMenuProfessionalDesc"), color: "#3b82f6" },
-                                  { icon: Crown, label: t("certMenuExecutive"), desc: t("certMenuExecutiveDesc"), color: "#f59e0b" },
-                                ].map((tier) => (
-                                  <MenuLink key={tier.label} href={`/${locale}/designations`} onClose={closeMenuNow}>
-                                    <MenuIcon style={{ backgroundColor: `${tier.color}15` }}>
-                                      <tier.icon className="h-4 w-4" style={{ color: tier.color }} />
-                                    </MenuIcon>
-                                    <div>
-                                      <p className="text-sm font-medium">{tier.label}</p>
-                                      <p className="text-xs text-muted-foreground/70">{tier.desc}</p>
-                                    </div>
-                                  </MenuLink>
-                                ))}
+                                {DESIGNATION_TIERS.map((tier) => {
+                                  const Icon = tier.icon;
+                                  const label = locale === "ar" ? tier.labelAr : tier.label;
+                                  const desc = locale === "ar" ? tier.descriptionAr : tier.description;
+                                  return (
+                                    <MenuLink key={tier.id} href={`/${locale}/designations`} onClose={closeMenuNow}>
+                                      <MenuIcon style={{ backgroundColor: `${tier.accentColor}15` }}>
+                                        <Icon className="h-4 w-4" style={{ color: tier.accentColor }} />
+                                      </MenuIcon>
+                                      <div>
+                                        <p className="text-sm font-medium">{label}</p>
+                                        <p className="text-xs text-muted-foreground/70">{desc}</p>
+                                      </div>
+                                    </MenuLink>
+                                  );
+                                })}
                               </div>
                             </div>
                             <div className="p-6">

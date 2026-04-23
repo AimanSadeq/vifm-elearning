@@ -31,6 +31,7 @@ interface PlanFromDb {
   features: string[];
   features_ar?: string[];
   sort_order: number;
+  metadata?: { is_popular?: boolean } | null;
 }
 
 function getPeriodLabel(type: SubscriptionPlan, locale: string) {
@@ -102,8 +103,9 @@ export default function PricingPage() {
     );
   }
 
-  // Determine which plan is "popular" (annual by convention)
-  const popularType: SubscriptionPlan = "annual";
+  // Plans can be flagged as "popular" via subscription_plans.metadata.is_popular
+  // in the DB. Fallback: if no plan has the flag, mark the annual plan.
+  const hasDbPopular = plans.some((p) => p.metadata?.is_popular === true);
 
   return (
     <div className="py-16 px-4 sm:px-6 lg:px-8">
@@ -132,7 +134,9 @@ export default function PricingPage() {
                 ? plan.features_ar
                 : plan.features;
             const period = getPeriodLabel(plan.plan_type, locale);
-            const isPopular = plan.plan_type === popularType;
+            const isPopular = hasDbPopular
+              ? plan.metadata?.is_popular === true
+              : plan.plan_type === "annual";
 
             return (
               <Card

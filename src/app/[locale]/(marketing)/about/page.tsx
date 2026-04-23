@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Building2,
   Users,
@@ -11,9 +11,11 @@ import {
   MapPin,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { OFFICES } from "@/lib/site-content";
 
 export default function AboutPage() {
   const t = useTranslations("about");
+  const locale = useLocale();
 
   const stats = [
     { icon: Users, label: t("statLearners"), value: "10,000+" },
@@ -22,23 +24,11 @@ export default function AboutPage() {
     { icon: Building2, label: t("statOrganizations"), value: "50+" },
   ];
 
-  const offices = [
-    {
-      city: "Dubai, UAE",
-      cityAr: "دبي، الإمارات",
-      address: "DIFC, Gate Village Building 3",
-    },
-    {
-      city: "Riyadh, KSA",
-      cityAr: "الرياض، المملكة العربية السعودية",
-      address: "King Fahd Road, Olaya District",
-    },
-    {
-      city: "Virginia, USA",
-      cityAr: "فيرجينيا، الولايات المتحدة",
-      address: "Tysons Corner Center",
-    },
-  ];
+  const offices = OFFICES.map((o) => ({
+    key: o.key,
+    city: locale === "ar" ? o.cityAr : o.city,
+    address: locale === "ar" ? o.addressAr : o.address,
+  }));
 
   const domains = [
     { icon: Target, title: t("domainFinance"), description: t("domainFinanceDesc") },
@@ -118,7 +108,7 @@ export default function AboutPage() {
           </h2>
           <div className="grid gap-6 sm:grid-cols-3">
             {offices.map((office) => (
-              <Card key={office.city}>
+              <Card key={office.key}>
                 <CardContent className="flex flex-col items-center p-6 text-center">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-info/10">
                     <MapPin className="h-5 w-5 text-info" />

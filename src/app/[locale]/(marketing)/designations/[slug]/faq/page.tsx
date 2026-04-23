@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import { SUPPORT_EMAIL } from "@/lib/site-content";
 
 interface DesignationInfo {
   id: string;
@@ -238,11 +239,11 @@ export default function DesignationFAQPage() {
             ? "لم تجد إجابتك؟ تواصل معنا"
             : "Didn't find your answer? Get in touch"}
         </p>
-        <a href="mailto:membership@viftraining.com">
+        <a href={`mailto:${SUPPORT_EMAIL}`}>
           <Button variant="outline">
             {locale === "ar"
-              ? "تواصل مع membership@viftraining.com"
-              : "Contact membership@viftraining.com"}
+              ? `تواصل مع ${SUPPORT_EMAIL}`
+              : `Contact ${SUPPORT_EMAIL}`}
           </Button>
         </a>
       </div>
