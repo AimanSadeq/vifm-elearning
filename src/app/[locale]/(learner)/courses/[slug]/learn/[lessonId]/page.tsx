@@ -552,31 +552,120 @@ export default function LessonPage() {
 
             {currentLesson.content_type === "document" && (
               <div className="space-y-4">
-                {/* PDF viewer */}
-                {currentLesson.document_url && (
-                  <div className="space-y-2">
-                    <iframe
-                      src={
-                        currentLesson.document_url.startsWith("http")
-                          ? `https://docs.google.com/gview?url=${encodeURIComponent(currentLesson.document_url)}&embedded=true`
-                          : currentLesson.document_url
-                      }
-                      className="w-full rounded-lg border"
-                      style={{ minHeight: "70vh" }}
-                      title={tp("documentViewer")}
-                    />
-                    <div className="flex justify-end">
-                      <a
-                        href={currentLesson.document_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-primary hover:underline"
-                      >
-                        {tp("openInNewTab")} ↗
-                      </a>
+                {/* Document viewer / download */}
+                {currentLesson.document_url && (() => {
+                  const raw = currentLesson.document_url;
+                  const base = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+                  const resolved = raw.startsWith("http")
+                    ? raw
+                    : `${base}/storage/v1/object/public/course-assets/${raw}`;
+
+                  const docType = (currentLesson.document_type ?? "").toLowerCase();
+                  const ext = raw.split("?")[0].split(".").pop()?.toLowerCase() ?? "";
+                  const isZip = docType === "zip" || ext === "zip";
+                  const isOffice =
+                    docType === "word" ||
+                    docType === "excel" ||
+                    ["doc", "docx", "xls", "xlsx", "ppt", "pptx"].includes(ext);
+                  const isPdf = docType === "pdf" || ext === "pdf";
+
+                  const fileName =
+                    (currentLesson.metadata as { file_name?: string } | null)
+                      ?.file_name ??
+                    raw.split("/").pop() ??
+                    "download";
+                  const fileSize =
+                    (currentLesson.metadata as { file_size?: number } | null)
+                      ?.file_size;
+                  const prettySize =
+                    typeof fileSize === "number"
+                      ? fileSize >= 1024 * 1024
+                        ? `${(fileSize / 1024 / 1024).toFixed(1)} MB`
+                        : `${Math.round(fileSize / 1024)} KB`
+                      : null;
+
+                  // ZIPs can't be previewed inline — show a download card instead.
+                  if (isZip) {
+                    return (
+                      <div className="rounded-xl border bg-card p-8 flex flex-col items-center text-center gap-4">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                          <svg
+                            className="h-7 w-7"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden
+                          >
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-lg">{fileName}</h3>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {locale === "ar"
+                              ? "ملف مضغوط — قم بالتنزيل لاستخدام المحتوى"
+                              : "ZIP archive — download to access the contents"}
+                            {prettySize ? ` · ${prettySize}` : ""}
+                          </p>
+                        </div>
+                        <a
+                          href={resolved}
+                          download={fileName}
+                          className="inline-flex items-center gap-2 rounded-lg bg-brand-600 text-white px-5 py-2.5 text-sm font-medium hover:bg-brand-700 transition-colors"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          {locale === "ar" ? "تنزيل" : "Download"}
+                        </a>
+                      </div>
+                    );
+                  }
+
+                  // PDFs render natively in an iframe; Office docs use Google Docs Viewer.
+                  const iframeSrc = isOffice
+                    ? `https://docs.google.com/gview?url=${encodeURIComponent(resolved)}&embedded=true`
+                    : resolved;
+
+                  return (
+                    <div className="space-y-2">
+                      <iframe
+                        src={iframeSrc}
+                        className="w-full rounded-lg border"
+                        style={{ minHeight: "70vh" }}
+                        title={tp("documentViewer")}
+                      />
+                      <div className="flex items-center justify-between gap-3 flex-wrap">
+                        <span className="text-sm text-muted-foreground">
+                          {fileName}
+                          {prettySize ? ` · ${prettySize}` : ""}
+                        </span>
+                        <div className="flex items-center gap-4">
+                          <a
+                            href={resolved}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-primary hover:underline"
+                          >
+                            {tp("openInNewTab")} ↗
+                          </a>
+                          {(isPdf || isOffice) && (
+                            <a
+                              href={resolved}
+                              download={fileName}
+                              className="text-sm text-primary hover:underline"
+                            >
+                              {locale === "ar" ? "تنزيل" : "Download"} ↓
+                            </a>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 {/* HTML content */}
                 {currentLesson.content_html && (
