@@ -179,7 +179,7 @@ export function WebinarForm({ initialData, mode }: WebinarFormProps) {
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto">
       <Card>
         <CardHeader>
           <CardTitle>

@@ -94,7 +94,7 @@ export function CreateCertificationForm() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto">
       <form
         onSubmit={handleSubmit}
         className="space-y-6 rounded-lg border border-border bg-card p-6"

@@ -147,7 +147,7 @@ export function CreateCourseForm() {
   return (
     <>
       <Toaster position="top-right" richColors />
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto">
         <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border border-border bg-card p-6">
           {/* Title — at least one of EN/AR required */}
           <div className="space-y-2">
