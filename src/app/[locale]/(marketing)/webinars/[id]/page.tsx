@@ -43,14 +43,23 @@ export default function WebinarDetailPage() {
     async function fetchWebinar() {
       const supabase = createClient();
 
+      // Explicit column list — DO NOT include recording_url here. The
+      // recording is fetched on-demand through /api/webinars/[id]/recording
+      // which checks the user's plan-level `webinars` feature.
       const { data } = await supabase
         .from("webinars")
         .select(
-          `*, instructor:profiles!webinars_instructor_id_fkey(full_name, avatar_url)`
+          `id, title, title_ar, description, description_ar, thumbnail_url,
+           instructor_id, category_id, status, scheduled_at, duration_minutes,
+           is_recording_public, max_attendees, is_free, price, currency, tags,
+           metadata, created_at, updated_at, cpe_hours,
+           instructor:profiles!webinars_instructor_id_fkey(full_name, avatar_url)`
         )
         .eq("id", webinarId)
         .single();
 
+      // The Webinar type still has recording_url; we explicitly leave it
+      // unset on the client.
       setWebinar(data as Webinar | null);
 
       // Check registration status
@@ -179,7 +188,7 @@ export default function WebinarDetailPage() {
             </Card>
           )}
 
-          {webinar.status === "completed" && webinar.recording_url && (
+          {webinar.status === "completed" && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -196,14 +205,23 @@ export default function WebinarDetailPage() {
                       : "Checking access…"}
                   </div>
                 ) : hasWebinarFeature ? (
-                  <a
-                    href={webinar.recording_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const res = await fetch(
+                        `/api/webinars/${webinar.id}/recording`
+                      );
+                      const json = await res.json();
+                      if (res.ok && json.data?.url) {
+                        window.open(json.data.url, "_blank", "noopener");
+                      } else {
+                        alert(json.error ?? "Recording not available");
+                      }
+                    }}
                     className="text-brand-600 hover:underline"
                   >
                     {t("watchReplay")}
-                  </a>
+                  </button>
                 ) : (
                   <div className="rounded-lg border bg-muted/30 p-4 flex items-start gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-700">

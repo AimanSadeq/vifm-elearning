@@ -1,4 +1,4 @@
-import { createHmac } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 
 const PAYTABS_SERVER_KEY = process.env.PAYTABS_SERVER_KEY ?? "";
 const PAYTABS_PROFILE_ID = process.env.PAYTABS_PROFILE_ID ?? "";
@@ -81,5 +81,14 @@ export function verifyPayTabsCallback(
     .update(data)
     .digest("hex");
 
-  return signature === expectedSignature;
+  // Timing-safe compare to defeat HMAC oracle attacks
+  if (signature.length !== expectedSignature.length) return false;
+  try {
+    return timingSafeEqual(
+      Buffer.from(signature, "hex"),
+      Buffer.from(expectedSignature, "hex")
+    );
+  } catch {
+    return false;
+  }
 }

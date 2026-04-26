@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/services/stripe";
+import { validatePromoForCheckout } from "@/lib/services/promo";
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,28 +60,15 @@ export async function POST(request: NextRequest) {
     let appliedVoucherId: string | null = null;
 
     if (promoCode) {
-      const { data: promo } = await supabaseAdmin
-        .from("promo_codes")
-        .select("*")
-        .eq("code", promoCode.toUpperCase())
-        .eq("is_active", true)
-        .single();
-
-      if (
-        promo &&
-        (!promo.expires_at || new Date(promo.expires_at) > new Date()) &&
-        (!promo.max_uses || promo.current_uses < promo.max_uses) &&
-        (!promo.applicable_courses ||
-          promo.applicable_courses.length === 0 ||
-          promo.applicable_courses.includes(courseId))
-      ) {
-        promoCodeId = promo.id;
-        if (promo.discount_type === "percentage") {
-          discountAmount = finalPrice * (Number(promo.discount_value) / 100);
-        } else {
-          discountAmount = Number(promo.discount_value);
-        }
-        finalPrice = Math.max(0, finalPrice - discountAmount);
+      const validated = await validatePromoForCheckout(
+        promoCode,
+        finalPrice,
+        { courseId, client: supabaseAdmin }
+      );
+      if (validated) {
+        promoCodeId = validated.promo.id;
+        discountAmount = validated.discountAmount;
+        finalPrice = validated.finalPrice;
       }
     } else if (voucherId) {
       // Apply voucher discount (percentage or fixed_amount — full_access is handled by /api/vouchers/redeem)

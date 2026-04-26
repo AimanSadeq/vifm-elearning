@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/services/stripe";
+import { validatePromoForCheckout } from "@/lib/services/promo";
 
 const INTERVAL_MAP: Record<string, "month" | "year"> = {
   monthly: "month",
@@ -77,35 +78,30 @@ export async function POST(request: NextRequest) {
     let finalPrice = Number(plan.price);
 
     if (promoCode) {
-      const { data: promo } = await supabaseAdmin
-        .from("promo_codes")
-        .select("*")
-        .eq("code", promoCode.toUpperCase())
-        .eq("is_active", true)
-        .maybeSingle();
-
-      if (
-        promo &&
-        (!promo.expires_at || new Date(promo.expires_at) > new Date()) &&
-        (!promo.max_uses || promo.current_uses < promo.max_uses)
-      ) {
-        promoCodeId = promo.id;
-        if (promo.discount_type === "percentage") {
-          discountAmount = finalPrice * (Number(promo.discount_value) / 100);
-        } else {
-          discountAmount = Number(promo.discount_value);
-        }
-        finalPrice = Math.max(0, finalPrice - discountAmount);
+      const validated = await validatePromoForCheckout(
+        promoCode,
+        finalPrice,
+        { planId: plan.id, client: supabaseAdmin }
+      );
+      if (validated) {
+        promoCodeId = validated.promo.id;
+        discountAmount = validated.discountAmount;
+        finalPrice = validated.finalPrice;
 
         // Best-effort: create an ephemeral Stripe coupon so the discount shows
         // on the checkout page itself.
         try {
           const stripe = getStripe();
           const coupon = await stripe.coupons.create(
-            promo.discount_type === "percentage"
-              ? { percent_off: Number(promo.discount_value), duration: "once" }
+            validated.promo.discount_type === "percentage"
+              ? {
+                  percent_off: Number(validated.promo.discount_value),
+                  duration: "once",
+                }
               : {
-                  amount_off: Math.round(Number(promo.discount_value) * 100),
+                  amount_off: Math.round(
+                    Number(validated.promo.discount_value) * 100
+                  ),
                   currency: plan.currency.toLowerCase(),
                   duration: "once",
                 }

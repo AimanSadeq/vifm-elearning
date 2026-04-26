@@ -6,6 +6,7 @@ import {
   updatePaymentStatus,
 } from "@/lib/services/enrollment-service";
 import { verifyPayTabsCallback } from "@/lib/services/paytabs";
+import { incrementPromoUsage } from "@/lib/services/promo";
 
 export async function POST(request: NextRequest) {
   try {
@@ -54,12 +55,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
+    // Idempotency — don't double-provision on retried webhook
+    if (payment.status === "completed") {
+      return NextResponse.json({ received: true, idempotent: true });
+    }
+
     await updatePaymentStatus({
       paymentId: payment.id,
       status: "completed",
       paytabsTransactionRef: tran_ref,
       gatewayResponse: body,
     });
+
+    if (payment.promo_code_id) {
+      try {
+        await incrementPromoUsage(payment.promo_code_id);
+      } catch (e) {
+        console.warn("incrementPromoUsage failed (paytabs):", e);
+      }
+    }
 
     // Branch on payment_type so subs and courses each get the right follow-up.
     if (payment.payment_type === "subscription") {

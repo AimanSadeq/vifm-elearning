@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { validatePromoForCheckout } from "@/lib/services/promo";
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,21 +37,15 @@ export async function POST(request: NextRequest) {
     let promoCodeId: string | null = null;
 
     if (promoCode) {
-      const { data: promo } = await supabaseAdmin
-        .from("promo_codes")
-        .select("*")
-        .eq("code", promoCode.toUpperCase())
-        .eq("is_active", true)
-        .maybeSingle();
-
-      if (promo) {
-        promoCodeId = promo.id;
-        if (promo.discount_type === "percentage") {
-          discountAmount = finalPrice * (Number(promo.discount_value) / 100);
-        } else {
-          discountAmount = Number(promo.discount_value);
-        }
-        finalPrice = Math.max(0, finalPrice - discountAmount);
+      const validated = await validatePromoForCheckout(
+        promoCode,
+        finalPrice,
+        { planId: plan.id, client: supabaseAdmin }
+      );
+      if (validated) {
+        promoCodeId = validated.promo.id;
+        discountAmount = validated.discountAmount;
+        finalPrice = validated.finalPrice;
       }
     }
 

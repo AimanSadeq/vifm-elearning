@@ -9,20 +9,24 @@ import {
   fetchCharge,
   verifyWebhookSignature,
 } from "@/lib/services/mamopay";
+import { incrementPromoUsage } from "@/lib/services/promo";
 
 /**
  * MamoPay webhook handler.
  *
- * Trust model:
- *  - If MAMOPAY_WEBHOOK_SECRET is set, verify the X-Mamo-Signature HMAC.
- *  - Otherwise, re-fetch the charge from MamoPay's API and trust their status.
+ * Trust model — we provision ONLY when we have one of:
+ *   (a) HMAC-SHA256 signature matches MAMOPAY_WEBHOOK_SECRET, OR
+ *   (b) we re-fetch the charge from MamoPay's API and Mamo itself reports
+ *       the charge as successful.
+ *
+ * Anything else is silently dropped (200 received, but no provision) so
+ * the gateway doesn't keep retrying.
  *
  * Configure the webhook URL in MamoPay dashboard → Webhooks:
  *   https://learn.viftraining.com/api/webhooks/mamopay
  */
 export async function POST(request: NextRequest) {
   try {
-    // Read raw body so we can verify signature later
     const rawBody = await request.text();
     const signature = request.headers.get("x-mamo-signature");
 
@@ -36,13 +40,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const verified = verifyWebhookSignature(rawBody, signature);
+    const verifiedBySignature = verifyWebhookSignature(rawBody, signature);
 
-    // The payment we care about: MamoPay returns either a charge or link object
-    // and includes our `external_id` (which is the payments.id we sent).
     const data =
       (payload.data as Record<string, unknown> | undefined) ?? payload;
-
     const externalId =
       (data.external_id as string) ??
       (payload.external_id as string) ??
@@ -52,10 +53,6 @@ export async function POST(request: NextRequest) {
       (payload.id as string) ??
       (data.charge_id as string) ??
       null;
-    const status =
-      ((data.status as string) ?? (payload.status as string) ?? "")
-        .toString()
-        .toLowerCase();
     const event =
       ((payload.event as string) ?? (payload.type as string) ?? "")
         .toString()
@@ -66,24 +63,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
-    // If we couldn't HMAC-verify, do a server-side trust check by re-fetching
-    // the charge from MamoPay (requires MAMOPAY_API_KEY).
-    if (!verified && chargeId) {
+    // Determine the *trusted* status. If signature is good, use the body's
+    // status. Otherwise re-fetch the charge from Mamo and use Mamo's status
+    // — never trust the request body.
+    let trustedStatus: string | null = null;
+
+    if (verifiedBySignature) {
+      const bodyStatus =
+        ((data.status as string) ?? (payload.status as string) ?? "")
+          .toString()
+          .toLowerCase();
+      trustedStatus = bodyStatus || null;
+    } else if (chargeId) {
       const fresh = await fetchCharge(chargeId);
       if (!fresh) {
         console.error(
-          "MamoPay webhook: cannot verify (no signature, fetchCharge failed)"
+          "MamoPay webhook: cannot verify (no signature, fetchCharge failed)",
+          { externalId, chargeId }
         );
         return NextResponse.json({ received: true });
       }
-      // Overlay the canonical status from Mamo onto our local view
-      const freshStatus = (fresh.status as string | undefined)?.toLowerCase();
-      if (freshStatus) {
-        (data as Record<string, unknown>).status = freshStatus;
-      }
+      trustedStatus = ((fresh.status as string) ?? "").toString().toLowerCase();
+    } else {
+      // Neither HMAC nor a chargeId we can re-fetch → can't trust anything.
+      console.error(
+        "MamoPay webhook: unsigned payload with no chargeId — refusing to provision"
+      );
+      return NextResponse.json({ received: true });
     }
 
-    // Locate the payment row. Prefer external_id (our payments.id).
+    // Locate the payment row. Prefer external_id (= our payments.id).
     const { data: payment } = externalId
       ? await supabaseAdmin
           .from("payments")
@@ -105,19 +114,18 @@ export async function POST(request: NextRequest) {
     }
 
     const isSuccess =
-      status === "success" ||
-      status === "succeeded" ||
-      status === "completed" ||
-      status === "paid" ||
-      event.includes("success") ||
-      event.includes("paid");
+      trustedStatus === "success" ||
+      trustedStatus === "succeeded" ||
+      trustedStatus === "completed" ||
+      trustedStatus === "paid" ||
+      (verifiedBySignature && (event.includes("success") || event.includes("paid")));
 
     const isFailure =
-      status === "failed" ||
-      status === "cancelled" ||
-      status === "canceled" ||
-      event.includes("failed") ||
-      event.includes("cancel");
+      trustedStatus === "failed" ||
+      trustedStatus === "cancelled" ||
+      trustedStatus === "canceled" ||
+      (verifiedBySignature &&
+        (event.includes("failed") || event.includes("cancel")));
 
     if (isFailure) {
       await updatePaymentStatus({
@@ -129,21 +137,22 @@ export async function POST(request: NextRequest) {
     }
 
     if (!isSuccess) {
-      // Pending or unknown — record the event but don't provision yet
+      // Pending or unknown — record but don't provision yet
       await supabaseAdmin
         .from("payments")
         .update({
           metadata: {
             ...((payment.metadata as Record<string, unknown> | null) ?? {}),
             last_webhook: payload,
+            last_trusted_status: trustedStatus,
           },
         })
         .eq("id", payment.id);
       return NextResponse.json({ received: true });
     }
 
+    // Idempotency — Mamo retries on transient errors
     if (payment.status === "completed") {
-      // Idempotent: don't double-provision if Mamo retries the webhook
       return NextResponse.json({ received: true, idempotent: true });
     }
 
@@ -152,6 +161,14 @@ export async function POST(request: NextRequest) {
       status: "completed",
       gatewayResponse: payload,
     });
+
+    if (payment.promo_code_id) {
+      try {
+        await incrementPromoUsage(payment.promo_code_id);
+      } catch (e) {
+        console.warn("incrementPromoUsage failed (mamopay):", e);
+      }
+    }
 
     if (payment.payment_type === "subscription") {
       try {

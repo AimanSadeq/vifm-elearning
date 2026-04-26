@@ -6,6 +6,7 @@ import {
   updatePaymentStatus,
 } from "@/lib/services/enrollment-service";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { incrementPromoUsage } from "@/lib/services/promo";
 
 interface RouteParams {
   params: Promise<{ paymentId: string }>;
@@ -62,6 +63,14 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       bankReference:
         transactionId ?? payment.bank_reference ?? `bank-${Date.now()}`,
     });
+
+    if (payment.promo_code_id) {
+      try {
+        await incrementPromoUsage(payment.promo_code_id);
+      } catch (e) {
+        console.warn("incrementPromoUsage failed (admin confirm):", e);
+      }
+    }
 
     if (payment.payment_type === "subscription") {
       const sub = await createSubscriptionFromPayment({ paymentId });

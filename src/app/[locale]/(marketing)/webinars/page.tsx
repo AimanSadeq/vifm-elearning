@@ -73,7 +73,11 @@ export default function WebinarsPage() {
         supabase
           .from("webinars")
           .select(
-            `*, instructor:profiles!webinars_instructor_id_fkey(full_name, full_name_ar)`
+            `id, title, title_ar, description, description_ar, thumbnail_url,
+             instructor_id, category_id, status, scheduled_at, duration_minutes,
+             is_recording_public, max_attendees, is_free, price, currency, tags,
+             metadata, created_at, updated_at, cpe_hours,
+             instructor:profiles!webinars_instructor_id_fkey(full_name, full_name_ar)`
           )
           .in("status", ["scheduled", "live"])
           .gte("scheduled_at", now)
@@ -81,15 +85,19 @@ export default function WebinarsPage() {
         supabase
           .from("webinars")
           .select(
-            `*, instructor:profiles!webinars_instructor_id_fkey(full_name, full_name_ar)`
+            `id, title, title_ar, description, description_ar, thumbnail_url,
+             instructor_id, category_id, status, scheduled_at, duration_minutes,
+             is_recording_public, max_attendees, is_free, price, currency, tags,
+             metadata, created_at, updated_at, cpe_hours,
+             instructor:profiles!webinars_instructor_id_fkey(full_name, full_name_ar)`
           )
           .eq("status", "completed")
           .order("scheduled_at", { ascending: false }),
       ]);
 
       if (cancelled) return;
-      setUpcoming((upcomingRes.data as Webinar[]) ?? []);
-      setPast((pastRes.data as Webinar[]) ?? []);
+      setUpcoming((upcomingRes.data as unknown as Webinar[]) ?? []);
+      setPast((pastRes.data as unknown as Webinar[]) ?? []);
       setIsLoading(false);
 
       // Auto-switch to "past" only when the user hasn't explicitly picked a tab

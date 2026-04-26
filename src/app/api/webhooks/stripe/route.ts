@@ -5,6 +5,7 @@ import {
   updatePaymentStatus,
 } from "@/lib/services/enrollment-service";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { incrementPromoUsage } from "@/lib/services/promo";
 import type Stripe from "stripe";
 
 // ---------------------------------------------------------------------------
@@ -13,8 +14,17 @@ import type Stripe from "stripe";
 async function handleSubscriptionCheckout(
   session: Stripe.Checkout.Session
 ) {
-  const { userId, planId, planType } = session.metadata ?? {};
+  const { userId, planId, planType, promoCodeId } = session.metadata ?? {};
   if (!userId || !planId) return;
+
+  // Bump promo usage on confirmed sub purchase
+  if (promoCodeId) {
+    try {
+      await incrementPromoUsage(promoCodeId);
+    } catch (e) {
+      console.warn("incrementPromoUsage failed:", e);
+    }
+  }
 
   const stripeSubscriptionId =
     typeof session.subscription === "string"
@@ -237,20 +247,7 @@ export async function POST(request: NextRequest) {
           });
 
           if (promoCodeId) {
-            const { data: promo } = await supabaseAdmin
-              .from("promo_codes")
-              .select("current_uses")
-              .eq("id", promoCodeId)
-              .single();
-
-            if (promo) {
-              await supabaseAdmin
-                .from("promo_codes")
-                .update({
-                  current_uses: (promo.current_uses ?? 0) + 1,
-                })
-                .eq("id", promoCodeId);
-            }
+            await incrementPromoUsage(promoCodeId);
           }
         }
       }
