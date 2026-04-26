@@ -263,6 +263,7 @@ export default function AdminInvoicesPage() {
           <DataTable<InvoiceRow>
             data={invoices}
             columns={columns}
+            rowKey={(row) => row.id}
             isLoading={isLoading}
             emptyMessage="No invoices match your filters."
           />
