@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -53,23 +54,47 @@ export default function AdminCertificateTemplatesPage() {
       is_active: data.isActive,
     };
 
-    // If setting as default, unset all others first
-    if (data.isDefault) {
-      await supabase
-        .from("certificate_templates")
-        .update({ is_default: false })
-        .neq("id", editingTemplate?.id ?? "");
-    }
-
+    // Save the template first. Only after the save succeeds do we touch the
+    // other rows' is_default flag — otherwise a save failure could leave the
+    // system with no default template at all.
+    let savedId = editingTemplate?.id;
     if (editingTemplate) {
-      await supabase
+      const { error } = await supabase
         .from("certificate_templates")
         .update(dbData)
         .eq("id", editingTemplate.id);
+      if (error) {
+        setIsSaving(false);
+        toast.error(`Could not update template: ${error.message}`);
+        return;
+      }
     } else {
-      await supabase.from("certificate_templates").insert(dbData);
+      const { data: inserted, error } = await supabase
+        .from("certificate_templates")
+        .insert(dbData)
+        .select("id")
+        .single();
+      if (error) {
+        setIsSaving(false);
+        toast.error(`Could not create template: ${error.message}`);
+        return;
+      }
+      savedId = inserted?.id;
     }
 
+    if (data.isDefault && savedId) {
+      const { error } = await supabase
+        .from("certificate_templates")
+        .update({ is_default: false })
+        .neq("id", savedId);
+      if (error) {
+        toast.error(
+          `Template saved, but could not clear other defaults: ${error.message}`
+        );
+      }
+    }
+
+    toast.success(editingTemplate ? "Template updated" : "Template created");
     setShowForm(false);
     setEditingTemplate(null);
     setIsSaving(false);
@@ -79,16 +104,28 @@ export default function AdminCertificateTemplatesPage() {
   async function handleDelete(id: string) {
     if (!confirm("Delete this certificate template?")) return;
     const supabase = createClient();
-    await supabase.from("certificate_templates").delete().eq("id", id);
+    const { error } = await supabase
+      .from("certificate_templates")
+      .delete()
+      .eq("id", id);
+    if (error) {
+      toast.error(`Could not delete: ${error.message}`);
+      return;
+    }
+    toast.success("Template deleted");
     await fetchTemplates();
   }
 
   async function handleToggleActive(template: CertificateTemplate) {
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("certificate_templates")
       .update({ is_active: !template.is_active })
       .eq("id", template.id);
+    if (error) {
+      toast.error(`Could not update: ${error.message}`);
+      return;
+    }
     await fetchTemplates();
   }
 

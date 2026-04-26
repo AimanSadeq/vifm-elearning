@@ -277,7 +277,7 @@ export default function LearningPathDetailPage() {
               {isEnrolling ? t("enrolling") : t("enrollNow")}
             </Button>
           ) : (
-            <Link href={`/${locale}/auth/login`}>
+            <Link href={`/${locale}/login`}>
               <Button size="lg">{t("loginToEnroll")}</Button>
             </Link>
           )}

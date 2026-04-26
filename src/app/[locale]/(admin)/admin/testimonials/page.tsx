@@ -9,6 +9,7 @@ import {
   Loader2,
   Star,
 } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
@@ -142,17 +143,27 @@ export default function AdminTestimonialsPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!confirm("Delete this testimonial?")) return;
     const supabase = createClient();
-    await supabase.from("testimonials").delete().eq("id", id);
+    const { error } = await supabase.from("testimonials").delete().eq("id", id);
+    if (error) {
+      toast.error(`Could not delete: ${error.message}`);
+      return;
+    }
+    toast.success("Testimonial deleted");
     fetchTestimonials();
   };
 
   const handleToggleActive = async (item: TestimonialRow) => {
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("testimonials")
       .update({ is_active: !item.is_active })
       .eq("id", item.id);
+    if (error) {
+      toast.error(`Could not update: ${error.message}`);
+      return;
+    }
     fetchTestimonials();
   };
 

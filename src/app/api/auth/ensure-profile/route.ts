@@ -45,16 +45,20 @@ export async function POST() {
     return NextResponse.json({ created: false });
   }
 
-  // Create profile — role from app_metadata (set by admin) takes priority
+  // Role MUST come from app_metadata (admin-controlled) only.
+  // user_metadata is user-writable and trusting it = privilege escalation.
   const metadata = user.user_metadata;
   const appRole = user.app_metadata?.role as string | undefined;
+  const allowedRoles = ["learner", "instructor", "admin", "super_admin", "corporate_admin"];
+  const role = appRole && allowedRoles.includes(appRole) ? appRole : "learner";
+
   const { error } = await adminClient.from("profiles").insert({
     id: user.id,
     email: user.email!,
     full_name: metadata?.full_name || user.email!.split("@")[0],
     phone: metadata?.phone || null,
-    language: metadata?.language || "en",
-    role: appRole || metadata?.role || "learner",
+    language: metadata?.language === "ar" ? "ar" : "en",
+    role,
   });
 
   if (error) {

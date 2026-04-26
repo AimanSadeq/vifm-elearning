@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { courseContentRegistry } from "@/data/course-content";
+import { authorizeAdmin, adminOwnsCourse } from "@/lib/services/admin-auth";
 
 /**
  * POST /api/admin/courses/[id]/scaffold
@@ -18,35 +19,16 @@ export async function POST(
   try {
     const { id: courseId } = await params;
 
-    // 1. Auth check
-    const authHeader = request.headers.get("authorization");
-    const token = authHeader?.replace("Bearer ", "");
-
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const auth = await authorizeAdmin(request);
+    if (!auth.ok) {
+      return NextResponse.json({ error: auth.error.error }, { status: auth.error.status });
     }
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabaseAdmin.auth.getUser(token);
-
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // 2. Role check
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || !["super_admin", "instructor"].includes(profile.role)) {
+    if (!(await adminOwnsCourse(auth.admin, courseId))) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // 3. Parse request body
+    // Parse request body
     const body = await request.json();
     const { slug } = body as { slug?: string };
 

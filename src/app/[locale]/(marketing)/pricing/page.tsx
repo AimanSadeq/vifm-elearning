@@ -73,7 +73,7 @@ export default function PricingPage() {
     setSubscribingId(planId);
     if (!user) {
       router.push(
-        `/${locale}/auth/login?redirect=${encodeURIComponent(
+        `/${locale}/login?redirect=${encodeURIComponent(
           `/${locale}/subscription/checkout?plan=${planId}`
         )}`
       );

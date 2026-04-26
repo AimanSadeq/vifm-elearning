@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -123,7 +124,7 @@ export default function AdminLearningPathsPage() {
         .update(dbData)
         .eq("id", editingPath.id);
       if (error) {
-        alert("Failed to update learning path: " + error.message);
+        toast.error(`Could not update learning path: ${error.message}`);
         setIsSaving(false);
         return;
       }
@@ -134,19 +135,27 @@ export default function AdminLearningPathsPage() {
         .select("id")
         .single();
       if (error) {
-        alert("Failed to create learning path: " + error.message);
+        toast.error(`Could not create learning path: ${error.message}`);
         setIsSaving(false);
         return;
       }
       pathId = inserted?.id;
     }
 
-    // Save courses: delete existing, re-insert
+    // Save courses: delete existing, re-insert.
+    // Both operations can silently fail under RLS — surface those to the admin
+    // so they don't think they saved a path with courses that didn't persist.
     if (pathId) {
-      await supabase
+      const { error: deleteErr } = await supabase
         .from("learning_path_courses")
         .delete()
         .eq("learning_path_id", pathId);
+
+      if (deleteErr) {
+        toast.error(`Path saved, but could not refresh courses: ${deleteErr.message}`);
+        setIsSaving(false);
+        return;
+      }
 
       if (data.courses && data.courses.length > 0) {
         const courseRows = data.courses
@@ -159,11 +168,19 @@ export default function AdminLearningPathsPage() {
           }));
 
         if (courseRows.length > 0) {
-          await supabase.from("learning_path_courses").insert(courseRows);
+          const { error: insertErr } = await supabase
+            .from("learning_path_courses")
+            .insert(courseRows);
+          if (insertErr) {
+            toast.error(`Path saved, but adding courses failed: ${insertErr.message}`);
+            setIsSaving(false);
+            return;
+          }
         }
       }
     }
 
+    toast.success(editingPath ? "Learning path updated" : "Learning path created");
     setShowForm(false);
     setEditingPath(null);
     setEditingCourses([]);
@@ -176,9 +193,10 @@ export default function AdminLearningPathsPage() {
     const supabase = createClient();
     const { error } = await supabase.from("learning_paths").delete().eq("id", id);
     if (error) {
-      alert("Failed to delete learning path: " + error.message);
+      toast.error(`Could not delete: ${error.message}`);
       return;
     }
+    toast.success("Learning path deleted");
     await fetchPaths();
   }
 
@@ -189,7 +207,7 @@ export default function AdminLearningPathsPage() {
       .update({ is_published: !path.is_published })
       .eq("id", path.id);
     if (error) {
-      alert("Failed to update learning path: " + error.message);
+      toast.error(`Could not update: ${error.message}`);
       return;
     }
     await fetchPaths();

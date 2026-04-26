@@ -103,6 +103,27 @@ const optionalPositiveNumber = z
     message: "Must be a positive number",
   });
 
+// Same as `optionalPositiveNumber` but allows zero. Use for fields like price
+// where 0 is a valid value but blank inputs should fail validation.
+const requiredNonNegativeNumber = z
+  .union([z.number(), z.nan()])
+  .transform((v) => (Number.isNaN(v) ? undefined : v))
+  .pipe(z.number().min(0, "Must be a non-negative number"));
+
+// Required datetime-local variant — converts the browser-local string ("2026-04-25T10:30")
+// to a canonical ISO timestamp. Empty / invalid values fail validation.
+const datetimeLocalRequired = z
+  .string()
+  .min(1, "Date and time is required")
+  .transform((v, ctx) => {
+    const d = new Date(v);
+    if (isNaN(d.getTime())) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Invalid date/time" });
+      return z.NEVER;
+    }
+    return d.toISOString();
+  });
+
 export const promoCodeSchema = z.object({
   code: z.string().min(3).max(20).toUpperCase(),
   description: z.string().optional(),
@@ -164,10 +185,12 @@ export const organizationSchema = z.object({
   contactPhone: z.string().optional(),
   address: z.string().optional(),
   licenseType: z.enum(["per_seat", "unlimited", "course_bundle"]),
-  maxSeats: z.number().positive().optional(),
-  licenseStartDate: z.string().optional(),
-  licenseEndDate: z.string().optional(),
+  maxSeats: optionalPositiveNumber,
+  licenseStartDate: datetimeLocalOptional,
+  licenseEndDate: datetimeLocalOptional,
 });
+
+export { datetimeLocalOptional, optionalPositiveNumber };
 
 export const quizQuestionSchema = z.object({
   questionText: z.string().min(1, "Question text is required"),
@@ -209,13 +232,24 @@ export const webinarSchema = z.object({
   titleAr: z.string().optional(),
   description: z.string().min(10, "Description must be at least 10 characters"),
   descriptionAr: z.string().optional(),
-  instructorId: z.string().uuid().optional(),
-  categoryId: z.string().uuid().optional(),
-  scheduledAt: z.string().min(1, "Schedule date is required"),
-  durationMinutes: z.number().min(15).max(480),
-  maxAttendees: z.number().min(1).optional(),
+  instructorId: z
+    .string()
+    .uuid()
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+  categoryId: z
+    .string()
+    .uuid()
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+  scheduledAt: datetimeLocalRequired,
+  durationMinutes: z
+    .union([z.number(), z.nan()])
+    .transform((v) => (Number.isNaN(v) ? undefined : v))
+    .pipe(z.number().min(15).max(480)),
+  maxAttendees: optionalPositiveNumber,
   isFree: z.boolean(),
-  price: z.number().min(0),
+  price: requiredNonNegativeNumber,
   currency: z.string(),
   tags: z.array(z.string()).optional(),
 });
@@ -259,15 +293,15 @@ export const learningPathSchema = z.object({
   descriptionAr: z.string().optional(),
   difficultyLevel: z.enum(["beginner", "intermediate", "advanced", "expert"]),
   categoryId: z.preprocess((val) => (val === "" ? undefined : val), z.string().uuid().optional()),
-  estimatedHours: z.number().min(0),
+  estimatedHours: requiredNonNegativeNumber,
   isPublished: z.boolean(),
   isFeatured: z.boolean(),
-  sortOrder: z.number().min(0).default(0),
+  sortOrder: requiredNonNegativeNumber.default(0),
   courses: z
     .array(
       z.object({
-        courseId: z.string().uuid(),
-        sortOrder: z.number().min(0),
+        courseId: z.string().uuid("Pick a course"),
+        sortOrder: requiredNonNegativeNumber,
         isRequired: z.boolean(),
       })
     )
@@ -280,12 +314,12 @@ export const subscriptionPlanSchema = z.object({
   description: z.string().optional(),
   descriptionAr: z.string().optional(),
   planType: z.enum(["monthly", "quarterly", "annual", "lifetime"]),
-  price: z.number().min(0),
+  price: requiredNonNegativeNumber,
   currency: z.string(),
   features: z.array(z.string()).optional(),
   featuresAr: z.array(z.string()).optional(),
   isActive: z.boolean(),
-  sortOrder: z.number().min(0).default(0),
+  sortOrder: requiredNonNegativeNumber.default(0),
 });
 
 const userFormBase = {

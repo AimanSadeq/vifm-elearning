@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -72,34 +73,51 @@ export default function AdminSubscriptionsPage() {
       sort_order: data.sortOrder,
     };
 
-    if (editingPlan) {
-      await supabase
-        .from("subscription_plans")
-        .update(dbData)
-        .eq("id", editingPlan.id);
-    } else {
-      await supabase.from("subscription_plans").insert(dbData);
+    const { error } = editingPlan
+      ? await supabase
+          .from("subscription_plans")
+          .update(dbData)
+          .eq("id", editingPlan.id)
+      : await supabase.from("subscription_plans").insert(dbData);
+
+    setIsSaving(false);
+
+    if (error) {
+      toast.error(`Could not save plan: ${error.message}`);
+      return;
     }
 
+    toast.success(editingPlan ? "Plan updated" : "Plan created");
     setShowForm(false);
     setEditingPlan(null);
-    setIsSaving(false);
     await fetchPlans();
   }
 
   async function handleDeletePlan(id: string) {
     if (!confirm("Delete this subscription plan?")) return;
     const supabase = createClient();
-    await supabase.from("subscription_plans").delete().eq("id", id);
+    const { error } = await supabase
+      .from("subscription_plans")
+      .delete()
+      .eq("id", id);
+    if (error) {
+      toast.error(`Could not delete: ${error.message}`);
+      return;
+    }
+    toast.success("Plan deleted");
     await fetchPlans();
   }
 
   async function handleToggleActive(plan: SubscriptionPlanConfig) {
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("subscription_plans")
       .update({ is_active: !plan.is_active })
       .eq("id", plan.id);
+    if (error) {
+      toast.error(`Could not update: ${error.message}`);
+      return;
+    }
     await fetchPlans();
   }
 

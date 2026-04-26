@@ -26,6 +26,18 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    if (profile.role === 'instructor') {
+      const { data: course } = await supabase
+        .from('courses')
+        .select('instructor_id')
+        .eq('id', courseId)
+        .single()
+
+      if (!course || course.instructor_id !== user.id) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+    }
+
     const { moduleId, lessonIds, moduleIds } = await request.json()
 
     if (Array.isArray(moduleIds) && moduleIds.length > 0) {

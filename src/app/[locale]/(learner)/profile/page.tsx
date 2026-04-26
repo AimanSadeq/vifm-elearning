@@ -93,6 +93,20 @@ export default function ProfilePage() {
     setPasswordSuccess(false);
     const supabase = createClient();
 
+    // Supabase's updateUser doesn't verify the current password, so we
+    // re-authenticate first. If the current password is wrong, refuse the
+    // change — protects against stolen sessions / accidental edits.
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: data.currentPassword,
+    });
+    if (signInError) {
+      setPasswordError(
+        "Current password is incorrect."
+      );
+      return;
+    }
+
     const { error } = await supabase.auth.updateUser({
       password: data.newPassword,
     });
@@ -320,16 +334,27 @@ export default function ProfilePage() {
 
       <Separator />
 
-      {/* Notification Preferences */}
+      {/* Notification Preferences — backend not wired yet */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <BellRing className="h-5 w-5" />
-            Notification Preferences
+          <CardTitle className="flex items-center justify-between gap-2 text-lg">
+            <span className="flex items-center gap-2">
+              <BellRing className="h-5 w-5" />
+              Notification Preferences
+            </span>
+            <span className="rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 px-2 py-0.5 text-[10px] font-semibold">
+              Coming soon
+            </span>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <p className="mb-4 text-sm text-muted-foreground">
+            By default you receive transactional notifications (course
+            enrollment, certificates, password reset). Per-channel preferences
+            are coming soon — for now, contact support to opt out of any
+            specific notifications.
+          </p>
+          <div className="space-y-4 opacity-60">
             {[
               { id: "emailNotifications", label: "Email Notifications", desc: "Receive important updates via email" },
               { id: "webinarReminders", label: "Webinar Reminders", desc: "Get reminded before webinars start" },
@@ -344,7 +369,8 @@ export default function ProfilePage() {
                 <input
                   type="checkbox"
                   defaultChecked={true}
-                  className="h-4 w-4 rounded border-input"
+                  disabled
+                  className="h-4 w-4 rounded border-input cursor-not-allowed"
                 />
               </div>
             ))}

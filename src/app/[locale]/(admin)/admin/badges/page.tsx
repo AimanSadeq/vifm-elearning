@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Trophy, Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
@@ -70,12 +71,18 @@ export default function AdminBadgesPage() {
       criteria: formData.criteria || null,
     };
 
-    if (editingId) {
-      await supabase.from("badges").update(payload).eq("id", editingId);
-    } else {
-      await supabase.from("badges").insert(payload);
+    const { error } = editingId
+      ? await supabase.from("badges").update(payload).eq("id", editingId)
+      : await supabase.from("badges").insert(payload);
+
+    setIsSaving(false);
+
+    if (error) {
+      toast.error(`Could not save badge: ${error.message}`);
+      return;
     }
 
+    toast.success(editingId ? "Badge updated" : "Badge created");
     setShowForm(false);
     setEditingId(null);
     setFormData({
@@ -86,7 +93,6 @@ export default function AdminBadgesPage() {
       icon_url: "",
       criteria: "",
     });
-    setIsSaving(false);
     fetchBadges();
   };
 
@@ -104,8 +110,14 @@ export default function AdminBadgesPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!confirm("Delete this badge?")) return;
     const supabase = createClient();
-    await supabase.from("badges").delete().eq("id", id);
+    const { error } = await supabase.from("badges").delete().eq("id", id);
+    if (error) {
+      toast.error(`Could not delete: ${error.message}`);
+      return;
+    }
+    toast.success("Badge deleted");
     fetchBadges();
   };
 

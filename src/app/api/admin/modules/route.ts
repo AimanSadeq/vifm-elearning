@@ -1,35 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { authorizeAdmin, adminOwnsCourse } from "@/lib/services/admin-auth";
 
 export async function POST(request: NextRequest) {
   try {
-    // Extract Bearer token from Authorization header
-    const authHeader = request.headers.get("authorization");
-    const token = authHeader?.replace("Bearer ", "");
-
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Verify the token using admin client
-    const {
-      data: { user },
-      error: authError,
-    } = await supabaseAdmin.auth.getUser(token);
-
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Verify admin role
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || !["super_admin", "instructor"].includes(profile.role)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const auth = await authorizeAdmin(request);
+    if (!auth.ok) {
+      return NextResponse.json({ error: auth.error.error }, { status: auth.error.status });
     }
 
     const body = await request.json();
@@ -40,6 +17,10 @@ export async function POST(request: NextRequest) {
         { error: "course_id and title are required" },
         { status: 400 }
       );
+    }
+
+    if (!(await adminOwnsCourse(auth.admin, course_id))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { data, error } = await supabaseAdmin

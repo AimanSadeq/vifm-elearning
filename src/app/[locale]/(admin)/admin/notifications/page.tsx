@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Bell, Send, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
@@ -79,43 +80,71 @@ export default function AdminNotificationsPage() {
     setIsSending(true);
     const supabase = createClient();
 
-    // Get target users based on recipient type
     let userIds: string[] = [];
+    let lookupError: string | null = null;
 
     if (recipientType === "all") {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
         .select("id")
         .eq("is_active", true);
+      lookupError = error?.message ?? null;
       userIds = (data ?? []).map((u) => u.id);
     } else if (recipientType === "role") {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
         .select("id")
         .eq("role", recipientRole)
         .eq("is_active", true);
+      lookupError = error?.message ?? null;
       userIds = (data ?? []).map((u) => u.id);
     } else {
-      const { data } = await supabase
+      const email = recipientEmail.trim();
+      if (!email) {
+        setIsSending(false);
+        toast.error("Enter a recipient email address.");
+        return;
+      }
+      const { data, error } = await supabase
         .from("profiles")
         .select("id")
-        .eq("email", recipientEmail.trim());
+        .eq("email", email);
+      lookupError = error?.message ?? null;
       userIds = (data ?? []).map((u) => u.id);
     }
 
-    if (userIds.length > 0) {
-      const records = userIds.map((userId) => ({
-        user_id: userId,
-        channel,
-        status: "sent",
-        title: subject,
-        body: message,
-      }));
-
-      await supabase.from("notifications").insert(records);
+    if (lookupError) {
+      setIsSending(false);
+      toast.error(`Could not look up recipients: ${lookupError}`);
+      return;
     }
 
+    if (userIds.length === 0) {
+      setIsSending(false);
+      toast.error("No matching recipients found — nothing was sent.");
+      return;
+    }
+
+    const records = userIds.map((userId) => ({
+      user_id: userId,
+      channel,
+      status: "sent",
+      title: subject,
+      body: message,
+    }));
+
+    const { error: insertError } = await supabase
+      .from("notifications")
+      .insert(records);
+
     setIsSending(false);
+
+    if (insertError) {
+      toast.error(`Could not send notification: ${insertError.message}`);
+      return;
+    }
+
+    toast.success(`Sent to ${userIds.length} recipient${userIds.length === 1 ? "" : "s"}`);
     setShowCompose(false);
     setSubject("");
     setMessage("");

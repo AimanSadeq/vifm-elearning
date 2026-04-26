@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { authorizeAdmin, adminOwnsLesson } from "@/lib/services/admin-auth";
 
-/**
- * PATCH /api/admin/lessons/[id]/video-url
- *
- * Sets or updates the video_url (and optionally video_duration_seconds)
- * on a lesson. Used for external video URLs that don't go through
- * the file upload pipeline.
- *
- * Body: { video_url: string, video_duration_seconds?: number }
- */
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -17,35 +9,15 @@ export async function PATCH(
   try {
     const { id: lessonId } = await params;
 
-    // 1. Auth check
-    const authHeader = request.headers.get("authorization");
-    const token = authHeader?.replace("Bearer ", "");
-
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const auth = await authorizeAdmin(request);
+    if (!auth.ok) {
+      return NextResponse.json({ error: auth.error.error }, { status: auth.error.status });
     }
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabaseAdmin.auth.getUser(token);
-
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // 2. Role check
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || !["super_admin", "instructor"].includes(profile.role)) {
+    if (!(await adminOwnsLesson(auth.admin, lessonId))) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // 3. Parse body
     const body = await request.json();
     const { video_url, video_duration_seconds } = body as {
       video_url?: string;
@@ -59,7 +31,6 @@ export async function PATCH(
       );
     }
 
-    // 4. Update lesson
     const updateData: Record<string, unknown> = {
       video_url: video_url.trim(),
     };

@@ -27,6 +27,7 @@ export default function ContactPage() {
   const locale = useLocale();
   const { offices: rawOffices } = useSiteSettings();
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -37,10 +38,21 @@ export default function ContactPage() {
   });
 
   const onSubmit = async (data: ContactFormData) => {
-    // In production, this would send to an API endpoint
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Contact form submitted:", data);
-    setSubmitted(true);
+    setSubmitError(null);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload.error || "Could not send message");
+      }
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Could not send message");
+    }
   };
 
   const offices = rawOffices.map((o) => ({
@@ -88,6 +100,11 @@ export default function ContactPage() {
                   onSubmit={handleSubmit(onSubmit)}
                   className="space-y-4"
                 >
+                  {submitError && (
+                    <div className="rounded-md bg-error/10 px-4 py-3 text-sm text-error">
+                      {submitError}
+                    </div>
+                  )}
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="name">{t("name")} *</Label>

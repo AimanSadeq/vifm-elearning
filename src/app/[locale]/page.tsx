@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -14,6 +15,39 @@ import { CertificationProgramsSection } from "@/components/landing/Certification
 import { CTASection } from "@/components/landing/CTASection";
 import { PlatformFeatures } from "@/components/landing/PlatformFeatures";
 import { CareerPathways } from "@/components/landing/CareerPathways";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const isAr = locale === "ar";
+  const title = isAr
+    ? "أكاديمية VIFM — تدريب احترافي وتعلم إلكتروني"
+    : "VIFM Academy — Professional Training & E-Learning";
+  const description = isAr
+    ? "دورات تدريبية احترافية في المالية، تحليلات البيانات، الإستراتيجية والامتثال عبر دول الخليج العربي."
+    : "Professional training in Finance, Data Analytics, Strategy and Compliance across the GCC region.";
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/${locale}`,
+      languages: {
+        en: "/en",
+        ar: "/ar",
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      locale: isAr ? "ar_AE" : "en_US",
+      url: `/${locale}`,
+    },
+  };
+}
 
 export default async function HomePage({
   params,
