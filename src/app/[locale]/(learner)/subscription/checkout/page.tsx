@@ -60,7 +60,7 @@ function CheckoutInner() {
   const [finalPrice, setFinalPrice] = useState(0);
 
   const [selectedMethod, setSelectedMethod] =
-    useState<PaymentMethodType>("stripe");
+    useState<PaymentMethodType>("mamopay");
   const [isProcessing, setIsProcessing] = useState(false);
   const [bankDetails, setBankDetails] = useState<Record<string, string> | null>(
     null
@@ -324,41 +324,14 @@ function CheckoutInner() {
             <CardContent className="space-y-3">
               {([
                 {
-                  id: "stripe" as const,
-                  label: t("payWithCard"),
-                  icon: CreditCard,
-                  hint:
-                    locale === "ar"
-                      ? "Visa · Mastercard · Amex"
-                      : "Visa · Mastercard · Amex",
-                },
-                {
-                  id: "paytabs" as const,
-                  label: t("payWithPayTabs"),
-                  icon: CreditCard,
-                  hint:
-                    locale === "ar"
-                      ? "بطاقات الخليج"
-                      : "GCC payment methods",
-                },
-                {
                   id: "mamopay" as const,
                   label:
                     locale === "ar" ? "الدفع بـ Mamo" : "Pay with Mamo",
                   icon: CreditCard,
                   hint:
                     locale === "ar"
-                      ? "بطاقات الإمارات والخليج"
+                      ? "بطاقات الإمارات والخليج · Apple Pay"
                       : "UAE & GCC cards · Apple Pay",
-                },
-                {
-                  id: "bank_transfer" as const,
-                  label: t("bankTransfer"),
-                  icon: Building2,
-                  hint:
-                    locale === "ar"
-                      ? "تأكيد يدوي خلال يوم عمل"
-                      : "Manual confirmation within 1 business day",
                 },
               ] as const).map((method) => (
                 <button

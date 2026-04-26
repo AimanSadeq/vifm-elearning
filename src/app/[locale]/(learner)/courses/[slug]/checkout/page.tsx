@@ -37,7 +37,7 @@ export default function CheckoutPage() {
   const [promoError, setPromoError] = useState("");
   const [discount, setDiscount] = useState(0);
   const [finalPrice, setFinalPrice] = useState(0);
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethodType>("stripe");
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethodType>("mamopay");
   const [isProcessing, setIsProcessing] = useState(false);
   const [bankDetails, setBankDetails] = useState<Record<string, string> | null>(
     null
@@ -280,25 +280,10 @@ export default function CheckoutPage() {
               {(
                 [
                   {
-                    id: "stripe" as const,
-                    label: t("payWithCard"),
-                    icon: CreditCard,
-                  },
-                  {
-                    id: "paytabs" as const,
-                    label: t("payWithPayTabs"),
-                    icon: CreditCard,
-                  },
-                  {
                     id: "mamopay" as const,
                     label:
                       locale === "ar" ? "الدفع بـ Mamo" : "Pay with Mamo",
                     icon: CreditCard,
-                  },
-                  {
-                    id: "bank_transfer" as const,
-                    label: t("bankTransfer"),
-                    icon: Building2,
                   },
                 ] as const
               ).map((method) => (

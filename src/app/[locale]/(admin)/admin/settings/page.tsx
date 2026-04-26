@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   Settings,
@@ -14,60 +15,89 @@ import {
   XCircle,
   Pencil,
   ArrowRight,
+  Wallet,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
+interface IntegrationStatus {
+  supabase: boolean;
+  stripe: boolean;
+  paytabs: boolean;
+  mamopay: boolean;
+  mamopay_webhook: boolean;
+  mamopay_env: string;
+  zoom: boolean;
+  email: boolean;
+}
 
 interface Integration {
   name: string;
   description: string;
   icon: React.ReactNode;
-  status: "connected" | "not_configured";
+  connected: boolean;
   details?: string;
+  badge?: string;
 }
 
 export default function AdminSettingsPage() {
   const t = useTranslations("admin");
   const locale = useLocale();
 
+  const [status, setStatus] = useState<IntegrationStatus | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/integrations/status")
+      .then((r) => r.json())
+      .then((j) => setStatus(j.data ?? null))
+      .catch(() => setStatus(null));
+  }, []);
+
   const integrations: Integration[] = [
     {
       name: "Supabase",
       description: "Database, Auth & Storage",
       icon: <Database className="h-5 w-5" />,
-      status: process.env.NEXT_PUBLIC_SUPABASE_URL
-        ? "connected"
-        : "not_configured",
+      connected: status?.supabase ?? false,
       details: "PostgreSQL + Row Level Security",
     },
     {
       name: "Stripe",
       description: "Payment processing",
       icon: <CreditCard className="h-5 w-5" />,
-      status: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-        ? "connected"
-        : "not_configured",
+      connected: status?.stripe ?? false,
       details: "Cards, invoices, subscriptions",
     },
     {
       name: "PayTabs",
       description: "Regional payment gateway",
       icon: <CreditCard className="h-5 w-5" />,
-      status: "not_configured",
+      connected: status?.paytabs ?? false,
       details: "GCC payment methods",
+    },
+    {
+      name: "MamoPay",
+      description: "UAE payment gateway",
+      icon: <Wallet className="h-5 w-5" />,
+      connected: status?.mamopay ?? false,
+      details: status?.mamopay
+        ? `Cards · Apple Pay · ${status.mamopay_env === "production" ? "Live" : "Sandbox"}${
+            status.mamopay_webhook ? " · Webhook signed" : " · Webhook unsigned (fallback active)"
+          }`
+        : "Cards · Apple Pay · Tabby — for UAE businesses",
     },
     {
       name: "Zoom",
       description: "Webinar hosting",
       icon: <Video className="h-5 w-5" />,
-      status: "not_configured",
+      connected: status?.zoom ?? false,
       details: "Live webinars & recordings",
     },
     {
       name: "SendGrid / Resend",
       description: "Email delivery",
       icon: <Mail className="h-5 w-5" />,
-      status: "not_configured",
+      connected: status?.email ?? false,
       details: "Transactional & marketing emails",
     },
   ];
@@ -84,7 +114,7 @@ export default function AdminSettingsPage() {
   ];
 
   const platformInfo = [
-    { label: "Framework", value: "Next.js 14 (App Router)" },
+    { label: "Framework", value: "Next.js 15 (App Router)" },
     { label: "Database", value: "Supabase (PostgreSQL)" },
     { label: "Styling", value: "Tailwind CSS" },
     { label: "Auth", value: "Supabase Auth" },
@@ -153,13 +183,13 @@ export default function AdminSettingsPage() {
             {integrations.map((integration) => (
               <div
                 key={integration.name}
-                className="flex items-center justify-between rounded-lg border p-4"
+                className="flex items-center justify-between rounded-lg border p-4 gap-3"
               >
-                <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted">
                     {integration.icon}
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-medium">{integration.name}</p>
                     <p className="text-xs text-muted-foreground">
                       {integration.description}
@@ -172,21 +202,15 @@ export default function AdminSettingsPage() {
                   </div>
                 </div>
                 <Badge
-                  variant={
-                    integration.status === "connected"
-                      ? "success"
-                      : "secondary"
-                  }
-                  className="flex items-center gap-1"
+                  variant={integration.connected ? "success" : "secondary"}
+                  className="flex items-center gap-1 shrink-0"
                 >
-                  {integration.status === "connected" ? (
+                  {integration.connected ? (
                     <CheckCircle className="h-3 w-3" />
                   ) : (
                     <XCircle className="h-3 w-3" />
                   )}
-                  {integration.status === "connected"
-                    ? "Connected"
-                    : "Not Configured"}
+                  {integration.connected ? "Connected" : "Not Configured"}
                 </Badge>
               </div>
             ))}
@@ -210,9 +234,7 @@ export default function AdminSettingsPage() {
                 className="flex items-center justify-between rounded-md border px-4 py-3"
               >
                 <span className="text-sm">{feature.name}</span>
-                <Badge
-                  variant={feature.enabled ? "success" : "secondary"}
-                >
+                <Badge variant={feature.enabled ? "success" : "secondary"}>
                   {feature.enabled ? "On" : "Off"}
                 </Badge>
               </div>
