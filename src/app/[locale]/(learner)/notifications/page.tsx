@@ -102,7 +102,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-bold">{t("title")}</h1>
         {notifications.some((n) => !n.read_at) && (
