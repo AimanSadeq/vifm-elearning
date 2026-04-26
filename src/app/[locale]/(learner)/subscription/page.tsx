@@ -274,7 +274,23 @@ export default function UserSubscriptionPage() {
           )}
 
           {/* Actions */}
-          <div className="flex gap-2 pt-2">
+          <div className="flex flex-wrap gap-2 pt-2">
+            <Button
+              variant="outline"
+              onClick={async () => {
+                const res = await fetch("/api/subscriptions/portal", {
+                  method: "POST",
+                });
+                const json = await res.json();
+                if (res.ok && json.data?.url) {
+                  window.location.href = json.data.url;
+                } else {
+                  alert(json.error ?? "Could not open billing portal");
+                }
+              }}
+            >
+              {locale === "ar" ? "إدارة الفوترة" : "Manage billing"}
+            </Button>
             {!subscription.cancel_at_period_end &&
               subscription.plan !== "lifetime" && (
                 <>

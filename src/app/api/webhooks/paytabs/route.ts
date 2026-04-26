@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import {
   createEnrollmentFromPayment,
+  createSubscriptionFromPayment,
   updatePaymentStatus,
 } from "@/lib/services/enrollment-service";
 import { verifyPayTabsCallback } from "@/lib/services/paytabs";
@@ -27,12 +28,12 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
 
-    // Find the payment by transaction_id
+    // Look up payment by the correct column.
     const { data: payment } = await supabaseAdmin
       .from("payments")
       .select("*")
-      .eq("transaction_id", tran_ref)
-      .single();
+      .eq("paytabs_transaction_ref", tran_ref)
+      .maybeSingle();
 
     if (!payment) {
       console.error("PayTabs callback: payment not found for", tran_ref);
@@ -43,26 +44,40 @@ export async function POST(request: NextRequest) {
       payment_result?.response_status === "A" ||
       payment_result?.response_code === "G00000";
 
-    if (isSuccess) {
-      await updatePaymentStatus({
-        paymentId: payment.id,
-        status: "completed",
-        transactionId: tran_ref,
-        gatewayResponse: body,
-      });
-
-      await createEnrollmentFromPayment({
-        userId: payment.user_id,
-        courseId: payment.course_id,
-        paymentId: payment.id,
-      });
-    } else {
+    if (!isSuccess) {
       await updatePaymentStatus({
         paymentId: payment.id,
         status: "failed",
-        transactionId: tran_ref,
+        paytabsTransactionRef: tran_ref,
         gatewayResponse: body,
       });
+      return NextResponse.json({ received: true });
+    }
+
+    await updatePaymentStatus({
+      paymentId: payment.id,
+      status: "completed",
+      paytabsTransactionRef: tran_ref,
+      gatewayResponse: body,
+    });
+
+    // Branch on payment_type so subs and courses each get the right follow-up.
+    if (payment.payment_type === "subscription") {
+      try {
+        await createSubscriptionFromPayment({ paymentId: payment.id });
+      } catch (e) {
+        console.error("Failed to create subscription from PayTabs payment:", e);
+      }
+    } else if (payment.course_id) {
+      try {
+        await createEnrollmentFromPayment({
+          userId: payment.user_id,
+          courseId: payment.course_id,
+          paymentId: payment.id,
+        });
+      } catch (e) {
+        console.error("Failed to create enrollment from PayTabs payment:", e);
+      }
     }
 
     return NextResponse.json({ received: true });

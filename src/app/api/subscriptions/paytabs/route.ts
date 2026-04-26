@@ -22,35 +22,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { courseId, promoCode } = await request.json();
-    if (!courseId)
+    const { planId, promoCode } = await request.json();
+    if (!planId)
       return NextResponse.json(
-        { error: "courseId is required" },
+        { error: "planId is required" },
         { status: 400 }
       );
 
-    // Fetch course
-    const { data: course } = await supabaseAdmin
-      .from("courses")
+    const { data: plan } = await supabaseAdmin
+      .from("subscription_plans")
       .select("*")
-      .eq("id", courseId)
+      .eq("id", planId)
+      .eq("is_active", true)
       .single();
-
-    if (!course)
+    if (!plan)
       return NextResponse.json(
-        { error: "Course not found" },
+        { error: "Subscription plan not found" },
         { status: 404 }
       );
 
-    // Fetch profile
     const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("full_name, email")
       .eq("id", user.id)
       .single();
 
-    // Calculate price with promo
-    let finalPrice = Number(course.price);
+    let finalPrice = Number(plan.price);
     let discountAmount = 0;
     let promoCodeId: string | null = null;
 
@@ -60,7 +57,7 @@ export async function POST(request: NextRequest) {
         .select("*")
         .eq("code", promoCode.toUpperCase())
         .eq("is_active", true)
-        .single();
+        .maybeSingle();
 
       if (promo) {
         promoCodeId = promo.id;
@@ -73,19 +70,22 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Insert pending payment first
     const { data: payment, error: paymentError } = await supabaseAdmin
       .from("payments")
       .insert({
         user_id: user.id,
-        course_id: courseId,
         amount: finalPrice,
-        currency: course.currency,
+        currency: plan.currency,
         status: "pending",
         payment_method: "paytabs",
         promo_code_id: promoCodeId,
         discount_amount: discountAmount,
-        payment_type: "course_purchase",
+        payment_type: "subscription",
+        metadata: {
+          plan_id: plan.id,
+          plan_type: plan.plan_type,
+          plan_name: plan.name,
+        },
       })
       .select()
       .single();
@@ -96,26 +96,28 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://academy.vifm.ae";
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ?? "https://learn.viftraining.com";
 
     const result = await createPaymentPage({
       amount: finalPrice,
-      currency: course.currency,
+      currency: plan.currency,
       orderId: payment.id,
-      description: `Enrollment: ${course.title}`,
+      description: `Subscription: ${plan.name}`,
       customerEmail: profile?.email ?? user.email ?? "",
-      customerName: profile?.full_name ?? "Learner",
+      customerName: profile?.full_name ?? "Subscriber",
       callbackUrl: `${baseUrl}/api/webhooks/paytabs`,
-      returnUrl: `${baseUrl}/payment/success?payment_id=${payment.id}`,
+      returnUrl: `${baseUrl}/subscription?success=true&payment_id=${payment.id}`,
     });
 
-    // Update payment with transaction ref
     await supabaseAdmin
       .from("payments")
       .update({
         paytabs_transaction_ref: result.tran_ref,
         metadata: {
-          ...(payment.metadata as Record<string, unknown> | null ?? {}),
+          plan_id: plan.id,
+          plan_type: plan.plan_type,
+          plan_name: plan.name,
           gateway_response: result,
         },
       })
@@ -125,9 +127,9 @@ export async function POST(request: NextRequest) {
       data: { url: result.redirect_url, paymentId: payment.id },
     });
   } catch (err) {
-    console.error("PayTabs checkout error:", err);
+    console.error("Subscription PayTabs error:", err);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Failed to start PayTabs checkout. Please try again." },
       { status: 500 }
     );
   }

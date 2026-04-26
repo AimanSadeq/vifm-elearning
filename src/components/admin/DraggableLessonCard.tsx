@@ -15,6 +15,8 @@ interface DraggableLessonCardProps {
   onVideoUploaded?: () => void
   courseId: string
   isDeleting: boolean
+  isSelected?: boolean
+  onSelectChange?: (checked: boolean) => void
 }
 
 function getContentIcon(type: ContentType) {
@@ -54,6 +56,8 @@ export function DraggableLessonCard({
   onVideoUploaded,
   courseId,
   isDeleting,
+  isSelected,
+  onSelectChange,
 }: DraggableLessonCardProps) {
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -115,9 +119,30 @@ export function DraggableLessonCard({
       </button>
 
       {/* Card */}
-      <div className="ml-12 rounded-lg border border-border bg-card p-4 transition-shadow hover:shadow-md">
+      <div
+        className={`ml-12 rounded-lg border bg-card p-4 transition-all hover:shadow-md ${
+          isSelected
+            ? 'border-brand-500 ring-2 ring-brand-500/20'
+            : 'border-border'
+        }`}
+      >
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 min-w-0 flex-1">
+            {/* Selection checkbox */}
+            {onSelectChange && (
+              <label
+                className="flex h-10 w-5 flex-shrink-0 items-center justify-center cursor-pointer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <input
+                  type="checkbox"
+                  checked={!!isSelected}
+                  onChange={(e) => onSelectChange(e.target.checked)}
+                  className="h-4 w-4 rounded border-border text-brand-600 focus:ring-brand-500 cursor-pointer"
+                  aria-label={`Select lesson ${lesson.title}`}
+                />
+              </label>
+            )}
             {/* Content type badge */}
             <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg ${getContentColor(lesson.content_type)}`}>
               {getContentIcon(lesson.content_type)}

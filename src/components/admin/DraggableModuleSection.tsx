@@ -46,6 +46,9 @@ interface DraggableModuleSectionProps {
   onLessonEdit: (lesson: Lesson) => void
   onLessonDelete: (id: string, title: string, type: string) => void
   onVideoUploaded: () => void
+  selectedLessonIds: Set<string>
+  onLessonSelectChange: (id: string, checked: boolean) => void
+  onToggleAllInModule: (moduleId: string, allLessonIds: string[]) => void
 }
 
 export function DraggableModuleSection({
@@ -64,7 +67,13 @@ export function DraggableModuleSection({
   onLessonEdit,
   onLessonDelete,
   onVideoUploaded,
+  selectedLessonIds,
+  onLessonSelectChange,
+  onToggleAllInModule,
 }: DraggableModuleSectionProps) {
+  const moduleLessonIds = mod.lessons.map((l) => l.id)
+  const selectedInModule = moduleLessonIds.filter((id) => selectedLessonIds.has(id)).length
+  const allSelected = moduleLessonIds.length > 0 && selectedInModule === moduleLessonIds.length
   const {
     attributes,
     listeners,
@@ -162,6 +171,21 @@ export function DraggableModuleSection({
             </button>
           </div>
           <div className="flex items-center gap-2">
+            {mod.lessons.length > 0 && (
+              <label
+                className="inline-flex items-center gap-2 rounded-lg bg-card px-3 py-2 text-xs font-medium text-muted-foreground shadow-sm ring-1 ring-border cursor-pointer hover:bg-muted"
+                title={allSelected ? 'Clear selection' : 'Select all in module'}
+              >
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={() => onToggleAllInModule(mod.id, moduleLessonIds)}
+                  className="h-3.5 w-3.5 rounded border-border text-brand-600 focus:ring-brand-500"
+                  aria-label="Select all lessons in module"
+                />
+                {selectedInModule > 0 ? `${selectedInModule}/${mod.lessons.length}` : 'Select'}
+              </label>
+            )}
             <button
               onClick={() => onAddLesson(mod.id)}
               className="inline-flex items-center gap-2 rounded-lg bg-card px-4 py-2 text-sm font-semibold text-foreground shadow-sm ring-1 ring-border transition-all hover:bg-muted hover:shadow-md"
@@ -239,6 +263,8 @@ export function DraggableModuleSection({
                       onDelete={onLessonDelete}
                       onVideoUploaded={onVideoUploaded}
                       isDeleting={deletingLessonId === lesson.id}
+                      isSelected={selectedLessonIds.has(lesson.id)}
+                      onSelectChange={(checked) => onLessonSelectChange(lesson.id, checked)}
                     />
                   ))}
                 </div>

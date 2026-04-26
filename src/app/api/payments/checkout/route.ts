@@ -146,14 +146,14 @@ export async function POST(request: NextRequest) {
       amount: finalPrice,
       currency: course.currency,
       status: "pending",
-      method: appliedVoucherId ? "voucher" : "stripe",
-      transaction_id: session.id,
+      payment_method: appliedVoucherId ? "voucher" : "stripe",
+      stripe_session_id: session.id,
       promo_code_id: promoCodeId,
       discount_amount: discountAmount,
-      gateway_response: { sessionId: session.id },
+      payment_type: "course_purchase",
       metadata: appliedVoucherId
-        ? { voucher_id: appliedVoucherId }
-        : {},
+        ? { voucher_id: appliedVoucherId, gateway_response: { sessionId: session.id } }
+        : { gateway_response: { sessionId: session.id } },
     });
 
     return NextResponse.json({
@@ -161,8 +161,22 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     console.error("Checkout error:", err);
+    if (err instanceof Error && err.message.includes("STRIPE_SECRET_KEY")) {
+      return NextResponse.json(
+        {
+          error:
+            "Card payments are not configured yet. Please pick a different payment method or contact support.",
+        },
+        { status: 503 }
+      );
+    }
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error:
+          err instanceof Error
+            ? `Checkout failed: ${err.message}`
+            : "Internal server error",
+      },
       { status: 500 }
     );
   }

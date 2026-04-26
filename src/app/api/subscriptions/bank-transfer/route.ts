@@ -11,28 +11,27 @@ export async function POST(request: NextRequest) {
     if (!user)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { courseId, promoCode } = await request.json();
-    if (!courseId)
+    const { planId, promoCode } = await request.json();
+    if (!planId)
       return NextResponse.json(
-        { error: "courseId is required" },
+        { error: "planId is required" },
         { status: 400 }
       );
 
-    // Fetch course
-    const { data: course } = await supabaseAdmin
-      .from("courses")
+    const { data: plan } = await supabaseAdmin
+      .from("subscription_plans")
       .select("*")
-      .eq("id", courseId)
+      .eq("id", planId)
+      .eq("is_active", true)
       .single();
 
-    if (!course)
+    if (!plan)
       return NextResponse.json(
-        { error: "Course not found" },
+        { error: "Subscription plan not found" },
         { status: 404 }
       );
 
-    // Calculate price with promo
-    let finalPrice = Number(course.price);
+    let finalPrice = Number(plan.price);
     let discountAmount = 0;
     let promoCodeId: string | null = null;
 
@@ -42,7 +41,7 @@ export async function POST(request: NextRequest) {
         .select("*")
         .eq("code", promoCode.toUpperCase())
         .eq("is_active", true)
-        .single();
+        .maybeSingle();
 
       if (promo) {
         promoCodeId = promo.id;
@@ -55,7 +54,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const reference = `VIFM-${Date.now()}`;
+    const reference = `VIFM-SUB-${Date.now()}`;
     const bankDetails = {
       bankName: "First Abu Dhabi Bank (FAB)",
       accountName: "Virginia Institute of Finance and Management",
@@ -64,21 +63,24 @@ export async function POST(request: NextRequest) {
       reference,
     };
 
-    // Create pending payment
     const { data: payment, error } = await supabaseAdmin
       .from("payments")
       .insert({
         user_id: user.id,
-        course_id: courseId,
         amount: finalPrice,
-        currency: course.currency,
+        currency: plan.currency,
         status: "pending",
         payment_method: "bank_transfer",
         bank_reference: reference,
         promo_code_id: promoCodeId,
         discount_amount: discountAmount,
-        payment_type: "course_purchase",
-        metadata: { bankDetails },
+        payment_type: "subscription",
+        metadata: {
+          plan_id: plan.id,
+          plan_type: plan.plan_type,
+          plan_name: plan.name,
+          bankDetails,
+        },
       })
       .select()
       .single();
@@ -90,13 +92,14 @@ export async function POST(request: NextRequest) {
       data: {
         paymentId: payment.id,
         amount: finalPrice,
-        currency: course.currency,
+        currency: plan.currency,
         bankDetails,
         message:
-          "Please transfer the amount to the bank account below and use the reference number. Your enrollment will be activated once we confirm the transfer.",
+          "Please transfer the amount to the bank account below using the reference number. Your subscription will be activated once we confirm the transfer.",
       },
     });
-  } catch {
+  } catch (err) {
+    console.error("Subscription bank-transfer error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

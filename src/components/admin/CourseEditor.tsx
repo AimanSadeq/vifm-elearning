@@ -93,6 +93,10 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     type: string
   } | null>(null)
 
+  const [selectedLessonIds, setSelectedLessonIds] = useState<Set<string>>(new Set())
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false)
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false)
+
   const [deleteModuleConfirmation, setDeleteModuleConfirmation] = useState<{
     id: string
     title: string
@@ -362,12 +366,62 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
 
       toast.success('Lesson deleted successfully')
       setDeleteConfirmation(null)
+      setSelectedLessonIds((prev) => {
+        const next = new Set(prev)
+        next.delete(lessonId)
+        return next
+      })
       refreshModules()
     } catch (error) {
       console.error('Error deleting lesson:', error)
       toast.error('Failed to delete lesson')
     } finally {
       setDeletingLessonId(null)
+    }
+  }
+
+  // Bulk lesson selection helpers
+  const handleLessonSelectChange = (lessonId: string, checked: boolean) => {
+    setSelectedLessonIds((prev) => {
+      const next = new Set(prev)
+      if (checked) next.add(lessonId)
+      else next.delete(lessonId)
+      return next
+    })
+  }
+
+  const handleToggleAllInModule = (_moduleId: string, lessonIds: string[]) => {
+    setSelectedLessonIds((prev) => {
+      const next = new Set(prev)
+      const allSelected = lessonIds.every((id) => next.has(id))
+      if (allSelected) {
+        for (const id of lessonIds) next.delete(id)
+      } else {
+        for (const id of lessonIds) next.add(id)
+      }
+      return next
+    })
+  }
+
+  const clearSelection = () => setSelectedLessonIds(new Set())
+
+  const handleBulkDeleteLessons = async () => {
+    const ids = Array.from(selectedLessonIds)
+    if (ids.length === 0) return
+    setIsBulkDeleting(true)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from('lessons').delete().in('id', ids)
+      if (error) throw error
+      toast.success(`Deleted ${ids.length} lesson${ids.length === 1 ? '' : 's'}`)
+      setBulkDeleteOpen(false)
+      clearSelection()
+      refreshModules()
+    } catch (error) {
+      console.error('Error bulk deleting lessons:', error)
+      toast.error('Failed to delete lessons')
+    } finally {
+      setIsBulkDeleting(false)
     }
   }
 
@@ -883,6 +937,9 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                         setDeleteConfirmation({ id, title, type })
                       }
                       onVideoUploaded={refreshModules}
+                      selectedLessonIds={selectedLessonIds}
+                      onLessonSelectChange={handleLessonSelectChange}
+                      onToggleAllInModule={handleToggleAllInModule}
                     />
                   ))}
                 </div>
@@ -1023,6 +1080,71 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
           </div>
         </div>
       )}
+
+      {/* Floating bulk-action bar */}
+      {selectedLessonIds.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2">
+          <div className="flex items-center gap-3 rounded-full border border-border bg-card px-4 py-2 shadow-lg">
+            <span className="text-sm font-medium">
+              {selectedLessonIds.size} lesson{selectedLessonIds.size === 1 ? '' : 's'} selected
+            </span>
+            <span className="h-5 w-px bg-border" />
+            <button
+              onClick={clearSelection}
+              className="rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => setBulkDeleteOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 transition-colors"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Delete selected
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Confirmation */}
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={(open) => !isBulkDeleting && setBulkDeleteOpen(open)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+              <Trash2 className="h-5 w-5" />
+              Delete {selectedLessonIds.size} lesson{selectedLessonIds.size === 1 ? '' : 's'}?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3 pt-2">
+              <p className="text-muted-foreground">
+                This will permanently delete the selected lessons across all modules. Learners will lose access immediately.
+              </p>
+              <p className="flex items-center gap-2 text-sm font-semibold text-red-600 dark:text-red-400">
+                This action cannot be undone.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault()
+                handleBulkDeleteLessons()
+              }}
+              disabled={isBulkDeleting}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              {isBulkDeleting ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Deleting...
+                </span>
+              ) : (
+                `Delete ${selectedLessonIds.size} lesson${selectedLessonIds.size === 1 ? '' : 's'}`
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteConfirmation} onOpenChange={() => setDeleteConfirmation(null)}>

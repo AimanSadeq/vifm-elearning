@@ -33,13 +33,32 @@ async function handleSubscriptionCheckout(
     .eq("id", planId)
     .single();
 
+  // Mark the matching pending payment row (if any) as completed and stash IDs.
+  const { data: pendingPayment } = await supabaseAdmin
+    .from("payments")
+    .select("id")
+    .eq("stripe_session_id", session.id)
+    .maybeSingle();
+  if (pendingPayment) {
+    await updatePaymentStatus({
+      paymentId: pendingPayment.id,
+      status: "completed",
+      stripePaymentIntentId: (session.payment_intent as string) ?? undefined,
+      gatewayResponse: {
+        sessionId: session.id,
+        subscriptionId: stripeSubscriptionId,
+        customerId: stripeCustomerId,
+      },
+    });
+  }
+
   // Idempotent: check for existing subscription record
   if (stripeSubscriptionId) {
     const { data: existing } = await supabaseAdmin
       .from("subscriptions")
       .select("id")
       .eq("stripe_subscription_id", stripeSubscriptionId)
-      .single();
+      .maybeSingle();
     if (existing) return;
   }
 
@@ -197,14 +216,14 @@ export async function POST(request: NextRequest) {
         const { data: payment } = await supabaseAdmin
           .from("payments")
           .select("id")
-          .eq("transaction_id", session.id)
-          .single();
+          .eq("stripe_session_id", session.id)
+          .maybeSingle();
 
         if (payment) {
           await updatePaymentStatus({
             paymentId: payment.id,
             status: "completed",
-            transactionId: session.payment_intent as string,
+            stripePaymentIntentId: session.payment_intent as string,
             gatewayResponse: {
               sessionId: session.id,
               paymentIntent: session.payment_intent,

@@ -69,30 +69,17 @@ export default function PricingPage() {
     fetchPlans();
   }, []);
 
-  async function handleSubscribe(planId: string) {
+  function handleSubscribe(planId: string) {
+    setSubscribingId(planId);
     if (!user) {
-      router.push(`/${locale}/auth/login`);
+      router.push(
+        `/${locale}/auth/login?redirect=${encodeURIComponent(
+          `/${locale}/subscription/checkout?plan=${planId}`
+        )}`
+      );
       return;
     }
-
-    setSubscribingId(planId);
-    try {
-      const res = await fetch("/api/subscriptions/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planId }),
-      });
-      const json = await res.json();
-
-      if (res.ok && json.data?.url) {
-        window.location.href = json.data.url;
-      } else {
-        alert(json.error || "Failed to start checkout");
-      }
-    } catch {
-      alert("Something went wrong");
-    }
-    setSubscribingId(null);
+    router.push(`/${locale}/subscription/checkout?plan=${planId}`);
   }
 
   if (isLoading) {

@@ -141,8 +141,22 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     console.error("Subscription create error:", err);
+    if (err instanceof Error && err.message.includes("STRIPE_SECRET_KEY")) {
+      return NextResponse.json(
+        {
+          error:
+            "Card payments are not configured yet. Please use the in-app checkout (/subscription/checkout) and pick a different payment method.",
+        },
+        { status: 503 }
+      );
+    }
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error:
+          err instanceof Error
+            ? `Checkout failed: ${err.message}`
+            : "Internal server error",
+      },
       { status: 500 }
     );
   }
