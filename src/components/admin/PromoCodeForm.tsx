@@ -49,6 +49,21 @@ export function PromoCodeForm({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {Object.keys(errors).length > 0 && (
+            <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+              <p className="font-semibold">Please fix the issues below:</p>
+              <ul className="mt-1 list-disc ps-5">
+                {Object.entries(errors).map(([field, err]) => (
+                  <li key={field}>
+                    <span className="font-medium">{field}:</span>{" "}
+                    {err && typeof err === "object" && "message" in err
+                      ? String((err as { message?: string }).message ?? "Invalid value")
+                      : "Invalid value"}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="code">Code</Label>

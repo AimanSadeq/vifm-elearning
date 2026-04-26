@@ -13,17 +13,11 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { formatCurrency, formatDate } from "@/lib/utils/formatters";
 import type { Payment } from "@/types";
 import { OFFICES, SUPPORT_EMAIL } from "@/lib/site-content";
+import { computeInvoiceNumber } from "@/lib/utils/invoice";
 
 interface InvoiceData extends Payment {
   user?: { full_name?: string; email?: string } | null;
   course?: { title?: string; price?: number; currency?: string } | null;
-}
-
-function computeInvoiceNumber(p: Payment): string {
-  if (p.invoice_number) return p.invoice_number;
-  const year = new Date(p.paid_at ?? p.created_at).getFullYear();
-  const tail = p.id.replace(/-/g, "").slice(-8).toUpperCase();
-  return `INV-${year}-${tail}`;
 }
 
 export default function AdminInvoiceDetailPage() {
@@ -34,7 +28,12 @@ export default function AdminInvoiceDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!paymentId) return;
     let cancelled = false;
+    // Reset state so navigating between invoice IDs doesn't briefly show
+    // the previous one while the new fetch is in flight.
+    setIsLoading(true);
+    setPayment(null);
     async function load() {
       const supabase = createClient();
       const { data } = await supabase
@@ -48,7 +47,7 @@ export default function AdminInvoiceDetailPage() {
       setPayment(data as InvoiceData | null);
       setIsLoading(false);
     }
-    if (paymentId) load();
+    load();
     return () => {
       cancelled = true;
     };
@@ -78,13 +77,16 @@ export default function AdminInvoiceDetailPage() {
 
   const invoiceNumber = computeInvoiceNumber(payment);
   const issuedAt = payment.paid_at ?? payment.created_at;
-  const isSubscription = payment.payment_type === "subscription";
-  const itemName = isSubscription
-    ? `Subscription: ${
-        (payment.metadata as { plan_name?: string } | null)?.plan_name ??
-        "Plan"
-      }`
-    : payment.course?.title ?? "Course";
+  const meta = (payment.metadata ?? {}) as {
+    plan_name?: string;
+    designation_name?: string;
+  };
+  const itemName =
+    payment.payment_type === "subscription"
+      ? `Subscription: ${meta.plan_name ?? "Plan"}`
+      : payment.payment_type === "designation_renewal"
+        ? `Designation renewal: ${meta.designation_name ?? "Certification"}`
+        : payment.course?.title ?? "Course";
   const subtotal = Number(payment.amount) + Number(payment.discount_amount ?? 0);
   const office = OFFICES[0]; // Primary billing office (Dubai)
 

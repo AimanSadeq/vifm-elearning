@@ -80,16 +80,42 @@ export const quizSchema = z.object({
   showCorrectAnswers: z.boolean(),
 });
 
+// Helper for `<input type="datetime-local">` which yields strings like
+// "2026-04-25T10:30" — strict z.datetime() rejects those because it requires
+// a timezone offset. Coerce to a real Date and back to ISO so downstream
+// consumers always see a canonical timestamp; treat empty / invalid as undefined.
+const datetimeLocalOptional = z
+  .union([z.string(), z.literal("")])
+  .optional()
+  .transform((v) => {
+    if (!v) return undefined;
+    const d = new Date(v);
+    return isNaN(d.getTime()) ? undefined : d.toISOString();
+  });
+
+// Number fields fed by `<input type="number" {...register(..., { valueAsNumber: true })}>`
+// emit NaN when the input is blank. Treat NaN as undefined for optional fields.
+const optionalPositiveNumber = z
+  .union([z.number(), z.nan()])
+  .optional()
+  .transform((v) => (v === undefined || Number.isNaN(v) ? undefined : v))
+  .refine((v) => v === undefined || v > 0, {
+    message: "Must be a positive number",
+  });
+
 export const promoCodeSchema = z.object({
   code: z.string().min(3).max(20).toUpperCase(),
   description: z.string().optional(),
   discountType: z.enum(["percentage", "fixed"]),
   discountValue: z.number().positive(),
   currency: z.string(),
-  maxUses: z.number().positive().optional(),
-  minPurchaseAmount: z.number().min(0),
-  startsAt: z.string().datetime().optional(),
-  expiresAt: z.string().datetime().optional(),
+  maxUses: optionalPositiveNumber,
+  minPurchaseAmount: z
+    .union([z.number(), z.nan()])
+    .transform((v) => (Number.isNaN(v) ? 0 : v))
+    .pipe(z.number().min(0)),
+  startsAt: datetimeLocalOptional,
+  expiresAt: datetimeLocalOptional,
 });
 
 export const voucherSchema = z
@@ -97,13 +123,13 @@ export const voucherSchema = z
     code: z.string().min(3).max(30).toUpperCase(),
     description: z.string().optional(),
     voucherType: z.enum(["full_access", "percentage", "fixed_amount"]),
-    discountValue: z.number().positive().optional(),
+    discountValue: optionalPositiveNumber,
     currency: z.string().default("USD"),
-    maxUses: z.number().positive().optional(),
+    maxUses: optionalPositiveNumber,
     isSingleUse: z.boolean().default(true),
     applicableCourses: z.array(z.string().uuid()).optional(),
-    startsAt: z.string().optional(),
-    expiresAt: z.string().optional(),
+    startsAt: datetimeLocalOptional,
+    expiresAt: datetimeLocalOptional,
   })
   .refine(
     (data) => {

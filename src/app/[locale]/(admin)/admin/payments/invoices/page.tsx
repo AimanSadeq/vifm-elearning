@@ -20,6 +20,7 @@ import { useDebounce } from "@/lib/hooks/useDebounce";
 import { formatCurrency, formatDate } from "@/lib/utils/formatters";
 import type { Payment } from "@/types";
 import { useLocale } from "next-intl";
+import { computeInvoiceNumber } from "@/lib/utils/invoice";
 
 type InvoiceRow = Payment & {
   user?: { full_name: string; email?: string };
@@ -27,18 +28,6 @@ type InvoiceRow = Payment & {
 };
 
 const PAGE_SIZE = 50;
-
-/**
- * Deterministic invoice number from a payment row.
- * Format: INV-YYYY-XXXXXXXX (last 8 chars of the UUID, uppercased).
- * If `invoice_number` is already set on the row, use that instead.
- */
-function computeInvoiceNumber(p: Payment): string {
-  if (p.invoice_number) return p.invoice_number;
-  const year = new Date(p.paid_at ?? p.created_at).getFullYear();
-  const tail = p.id.replace(/-/g, "").slice(-8).toUpperCase();
-  return `INV-${year}-${tail}`;
-}
 
 export default function AdminInvoicesPage() {
   const locale = useLocale();
@@ -52,8 +41,10 @@ export default function AdminInvoicesPage() {
   const debouncedSearch = useDebounce(search, 300);
 
   useEffect(() => {
+    let cancelled = false;
+    setIsLoading(true);
+
     async function fetchInvoices() {
-      setIsLoading(true);
       const supabase = createClient();
 
       const from = page * PAGE_SIZE;
@@ -86,12 +77,17 @@ export default function AdminInvoicesPage() {
       }
 
       const { data, count } = await query;
+      // Discard if a newer fetch has superseded this one (rapid filter changes)
+      if (cancelled) return;
       setInvoices((data as InvoiceRow[]) ?? []);
       setTotalCount(count ?? 0);
       setIsLoading(false);
     }
 
     fetchInvoices();
+    return () => {
+      cancelled = true;
+    };
   }, [page, debouncedSearch, methodFilter, typeFilter]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -135,16 +131,27 @@ export default function AdminInvoicesPage() {
       key: "item",
       header: "Item",
       render: (row) => {
+        const meta = (row.metadata ?? {}) as {
+          plan_name?: string;
+          designation_name?: string;
+        };
         if (row.payment_type === "subscription") {
-          const planName =
-            (row.metadata as { plan_name?: string } | null)?.plan_name ??
-            "Subscription";
           return (
             <span className="text-sm">
               <span className="rounded bg-brand-50 text-brand-700 px-1.5 py-0.5 text-[10px] font-semibold mr-2">
                 SUB
               </span>
-              {planName}
+              {meta.plan_name ?? "Subscription"}
+            </span>
+          );
+        }
+        if (row.payment_type === "designation_renewal") {
+          return (
+            <span className="text-sm">
+              <span className="rounded bg-amber-50 text-amber-700 px-1.5 py-0.5 text-[10px] font-semibold mr-2">
+                CERT
+              </span>
+              {meta.designation_name ?? "Designation renewal"}
             </span>
           );
         }
@@ -240,6 +247,7 @@ export default function AdminInvoicesPage() {
                 <option value="all">All types</option>
                 <option value="course_purchase">Course</option>
                 <option value="subscription">Subscription</option>
+                <option value="designation_renewal">Designation renewal</option>
               </select>
               <select
                 value={methodFilter}

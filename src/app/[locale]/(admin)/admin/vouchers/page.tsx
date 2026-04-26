@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -54,34 +55,52 @@ export default function AdminVouchersPage() {
       is_active: true,
     };
 
-    if (editingVoucher) {
-      await supabase
-        .from("vouchers")
-        .update(dbData)
-        .eq("id", editingVoucher.id);
-    } else {
-      await supabase.from("vouchers").insert(dbData);
+    const { error } = editingVoucher
+      ? await supabase
+          .from("vouchers")
+          .update(dbData)
+          .eq("id", editingVoucher.id)
+      : await supabase.from("vouchers").insert(dbData);
+
+    setIsSaving(false);
+
+    if (error) {
+      const friendly =
+        error.code === "23505"
+          ? "A voucher with this code already exists."
+          : error.message;
+      toast.error(`Could not save voucher: ${friendly}`);
+      return;
     }
 
     setShowForm(false);
     setEditingVoucher(null);
-    setIsSaving(false);
+    toast.success(editingVoucher ? "Voucher updated" : "Voucher created");
     await fetchVouchers();
   }
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this voucher?")) return;
     const supabase = createClient();
-    await supabase.from("vouchers").delete().eq("id", id);
+    const { error } = await supabase.from("vouchers").delete().eq("id", id);
+    if (error) {
+      toast.error(`Could not delete: ${error.message}`);
+      return;
+    }
+    toast.success("Voucher deleted");
     await fetchVouchers();
   }
 
   async function handleToggleActive(voucher: Voucher) {
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("vouchers")
       .update({ is_active: !voucher.is_active })
       .eq("id", voucher.id);
+    if (error) {
+      toast.error(`Could not update: ${error.message}`);
+      return;
+    }
     await fetchVouchers();
   }
 

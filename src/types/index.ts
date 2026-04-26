@@ -363,8 +363,15 @@ export interface Payment {
   currency: string;
   status: PaymentStatus;
   payment_method: PaymentMethod;
-  /** "course_purchase" | "subscription" — distinguishes course vs sub payments */
-  payment_type?: "course_purchase" | "subscription" | null;
+  /**
+   * Distinguishes the *thing* being paid for. Each value is provisioned by
+   * a different webhook handler / admin confirm path.
+   */
+  payment_type?:
+    | "course_purchase"
+    | "subscription"
+    | "designation_renewal"
+    | null;
   stripe_payment_intent_id?: string | null;
   stripe_session_id?: string | null;
   paytabs_transaction_ref?: string | null;

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -70,34 +71,55 @@ export default function AdminPromoCodesPage() {
       is_active: true,
     };
 
-    if (editingPromo) {
-      await supabase
-        .from("promo_codes")
-        .update(dbData)
-        .eq("id", editingPromo.id);
-    } else {
-      await supabase.from("promo_codes").insert(dbData);
+    const { error } = editingPromo
+      ? await supabase
+          .from("promo_codes")
+          .update(dbData)
+          .eq("id", editingPromo.id)
+      : await supabase.from("promo_codes").insert(dbData);
+
+    setIsSaving(false);
+
+    if (error) {
+      const friendly =
+        error.code === "23505"
+          ? `A promo code with this code already exists.`
+          : error.message;
+      toast.error(`Could not save promo code: ${friendly}`);
+      return;
     }
 
     setShowForm(false);
     setEditingPromo(null);
-    setIsSaving(false);
+    toast.success(editingPromo ? "Promo code updated" : "Promo code created");
     await fetchPromoCodes();
   }
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this promo code?")) return;
     const supabase = createClient();
-    await supabase.from("promo_codes").delete().eq("id", id);
+    const { error } = await supabase
+      .from("promo_codes")
+      .delete()
+      .eq("id", id);
+    if (error) {
+      toast.error(`Could not delete: ${error.message}`);
+      return;
+    }
+    toast.success("Promo code deleted");
     await fetchPromoCodes();
   }
 
   async function handleToggleActive(promo: PromoCode) {
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("promo_codes")
       .update({ is_active: !promo.is_active })
       .eq("id", promo.id);
+    if (error) {
+      toast.error(`Could not update: ${error.message}`);
+      return;
+    }
     await fetchPromoCodes();
   }
 

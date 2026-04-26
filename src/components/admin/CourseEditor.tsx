@@ -20,6 +20,7 @@ import {
   Clock,
   BookOpen,
   Video,
+  AlertTriangle,
 } from 'lucide-react'
 import {
   DndContext,
@@ -124,6 +125,10 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     status: course.status,
   })
 
+  // Local mirror of the persisted status — kept in sync after every save so
+  // the publish-guard doesn't read stale `course.status` from props.
+  const [persistedStatus, setPersistedStatus] = useState(course.status)
+
   // DnD sensors
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -222,12 +227,63 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
 
   const totalLessons = useMemo(() => modules.reduce((sum, m) => sum + m.lessons.length, 0), [modules])
 
+  // Validation — what's blocking this course from going live?
+  const validationIssues = useMemo(() => {
+    const issues: { level: 'error' | 'warning'; message: string }[] = []
+
+    if (modules.length === 0) {
+      issues.push({ level: 'error', message: 'Add at least one module to organize lessons.' })
+    }
+    if (totalLessons === 0) {
+      issues.push({ level: 'error', message: 'Add at least one lesson — the course is currently empty.' })
+    }
+
+    // Modules with zero lessons
+    const emptyModules = modules.filter((m) => m.lessons.length === 0)
+    if (emptyModules.length > 0) {
+      issues.push({
+        level: 'warning',
+        message: `${emptyModules.length} module${emptyModules.length === 1 ? '' : 's'} have no lessons (${emptyModules.map((m) => m.title).slice(0, 3).join(', ')}${emptyModules.length > 3 ? '…' : ''}).`,
+      })
+    }
+
+    // Video lessons with no video uploaded
+    const videoLessons = modules.flatMap((m) => m.lessons).filter((l) => l.content_type === 'video')
+    const missingVideos = videoLessons.filter((l) => !l.video_url)
+    if (missingVideos.length > 0) {
+      issues.push({
+        level: 'warning',
+        message: `${missingVideos.length} of ${videoLessons.length} video lesson${videoLessons.length === 1 ? '' : 's'} have no video file uploaded yet.`,
+      })
+    }
+
+    // Document lessons with no file
+    const docLessons = modules.flatMap((m) => m.lessons).filter((l) => l.content_type === 'document')
+    const missingDocs = docLessons.filter((l) => !l.document_url)
+    if (missingDocs.length > 0) {
+      issues.push({
+        level: 'warning',
+        message: `${missingDocs.length} document lesson${missingDocs.length === 1 ? '' : 's'} have no file attached.`,
+      })
+    }
+
+    return issues
+  }, [modules, totalLessons])
+
+  const blockingIssues = validationIssues.filter((i) => i.level === 'error')
+  const canPublish = blockingIssues.length === 0
+
   // Save course details
   const handleSaveCourse = async () => {
     const hasEn = (courseForm.title ?? '').trim().length > 0
     const hasAr = (courseForm.title_ar ?? '').trim().length > 0
     if (!hasEn && !hasAr) {
       toast.error('Provide a course title in English or Arabic — at least one is required')
+      return
+    }
+    // Block publishing an incomplete course
+    if (courseForm.status === 'published' && persistedStatus !== 'published' && !canPublish) {
+      toast.error('Cannot publish — fix the blocking issues listed at the top of the page first.')
       return
     }
     setIsSaving(true)
@@ -262,6 +318,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
       if (error) throw error
 
       setIsEditing(false)
+      setPersistedStatus(courseForm.status)
       router.refresh()
       toast.success('Course updated successfully')
     } catch (error) {
@@ -616,6 +673,58 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
         </div>
       </div>
 
+      {/* Validation banner — surfaces issues that block publishing */}
+      {validationIssues.length > 0 && (
+        <div
+          className={`rounded-lg border p-4 ${
+            blockingIssues.length > 0
+              ? 'border-red-300 bg-red-50 dark:border-red-900/50 dark:bg-red-950/20'
+              : 'border-amber-300 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20'
+          }`}
+          role="alert"
+        >
+          <div className="flex items-start gap-3">
+            <AlertTriangle
+              className={`h-5 w-5 shrink-0 mt-0.5 ${
+                blockingIssues.length > 0
+                  ? 'text-red-600 dark:text-red-400'
+                  : 'text-amber-600 dark:text-amber-400'
+              }`}
+            />
+            <div className="min-w-0 flex-1">
+              <p
+                className={`text-sm font-semibold ${
+                  blockingIssues.length > 0
+                    ? 'text-red-900 dark:text-red-100'
+                    : 'text-amber-900 dark:text-amber-100'
+                }`}
+              >
+                {blockingIssues.length > 0
+                  ? `Course is incomplete — fix ${blockingIssues.length} issue${blockingIssues.length === 1 ? '' : 's'} before publishing`
+                  : 'Course has missing content — review before publishing'}
+              </p>
+              <ul className="mt-2 space-y-1 text-sm">
+                {validationIssues.map((issue, i) => (
+                  <li
+                    key={i}
+                    className={
+                      issue.level === 'error'
+                        ? 'text-red-800 dark:text-red-200'
+                        : 'text-amber-800 dark:text-amber-200'
+                    }
+                  >
+                    <span className="font-mono mr-2">
+                      {issue.level === 'error' ? '✗' : '!'}
+                    </span>
+                    {issue.message}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Course Header */}
       <div className="rounded-lg border border-border bg-card p-6">
         <div className="flex items-start justify-between">
@@ -835,9 +944,16 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                   <label className="block text-sm font-medium text-foreground">Status</label>
                   <select value={courseForm.status} onChange={(e) => setCourseForm({ ...courseForm, status: e.target.value as 'draft' | 'published' | 'archived' })} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                     <option value="draft">Draft</option>
-                    <option value="published">Published</option>
+                    <option value="published" disabled={!canPublish && persistedStatus !== 'published'}>
+                      Published{!canPublish && persistedStatus !== 'published' ? ' (fix issues above to enable)' : ''}
+                    </option>
                     <option value="archived">Archived</option>
                   </select>
+                  {!canPublish && persistedStatus !== 'published' && (
+                    <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                      Add at least one module and one lesson before publishing.
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground">Price</label>
