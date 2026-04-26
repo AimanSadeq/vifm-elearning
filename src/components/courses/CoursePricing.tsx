@@ -35,30 +35,34 @@ export function CoursePricing({ course, enrollment }: CoursePricingProps) {
       return;
     }
 
-    // Admins bypass checkout and enroll directly
-    const isAdmin = user.role === "super_admin";
+    // Try to enroll. The API allows enrollment for:
+    //   - free courses
+    //   - admins
+    //   - users with an active subscription
+    // It returns 400 with "requires payment" otherwise — in that case we
+    // fall through to the per-course checkout.
+    setIsEnrolling(true);
+    try {
+      const res = await fetch("/api/enrollments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId: course.id }),
+      });
+      const { error } = await res.json();
 
-    if (course.is_free || isAdmin) {
-      // Enroll directly (free course or admin bypass)
-      setIsEnrolling(true);
-      try {
-        const res = await fetch("/api/enrollments", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ courseId: course.id }),
-        });
-        const { error } = await res.json();
-        if (error) {
-          alert(error);
-          return;
-        }
+      if (res.ok) {
         router.push(`/${locale}/courses/${course.slug}/learn`);
-      } finally {
-        setIsEnrolling(false);
+        return;
       }
-    } else {
-      // Redirect to checkout for paid course
+
+      // Paid course + no sub → checkout
       router.push(`/${locale}/courses/${course.slug}/checkout`);
+      // Surface non-payment errors (e.g. course not published) instead of silently redirecting
+      if (error && !error.toLowerCase().includes("payment")) {
+        alert(error);
+      }
+    } finally {
+      setIsEnrolling(false);
     }
   };
 

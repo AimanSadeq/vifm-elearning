@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { userHasActiveSubscription } from "@/lib/services/access";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
 
-    // Verify course exists, is free, and is published
+    // Verify course exists and is published
     const { data: course } = await supabase
       .from("courses")
       .select("id, is_free, status")
@@ -30,14 +31,7 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
 
-    // Admins can enroll in any course without payment
     const isAdmin = user.app_metadata?.role === "super_admin";
-
-    if (!course.is_free && !isAdmin)
-      return NextResponse.json(
-        { error: "This course requires payment" },
-        { status: 400 }
-      );
 
     if (course.status !== "published" && !isAdmin)
       return NextResponse.json(
@@ -45,19 +39,29 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
 
-    // Check if already enrolled
+    // Free / admin / paid → always allowed
+    // Paid → also allowed if the user has an active subscription
+    if (!course.is_free && !isAdmin) {
+      const hasSub = await userHasActiveSubscription(user.id, supabase);
+      if (!hasSub)
+        return NextResponse.json(
+          { error: "This course requires payment or an active subscription" },
+          { status: 400 }
+        );
+    }
+
+    // Idempotent: return existing enrollment if any
     const { data: existing } = await supabase
       .from("enrollments")
       .select("id")
       .eq("user_id", user.id)
       .eq("course_id", courseId)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       return NextResponse.json({ data: existing }, { status: 200 });
     }
 
-    // Create enrollment
     const { data: enrollment, error: enrollError } = await supabase
       .from("enrollments")
       .insert({
@@ -65,6 +69,9 @@ export async function POST(request: NextRequest) {
         course_id: courseId,
         status: "active",
         enrolled_at: new Date().toISOString(),
+        metadata: !course.is_free && !isAdmin
+          ? { source: "subscription" }
+          : {},
       })
       .select()
       .single();

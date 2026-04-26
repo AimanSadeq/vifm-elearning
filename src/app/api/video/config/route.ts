@@ -8,6 +8,7 @@ import {
   VIDEO_DEFAULT_ALLOW_SKIPPING,
   VIDEO_DEFAULT_FORCE_WATCH_FIRST,
 } from "@/lib/utils/constants";
+import { userHasCourseAccess } from "@/lib/services/access";
 
 export async function GET(request: NextRequest) {
   try {
@@ -48,23 +49,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Admins can access all video configs without enrollment
-    const isAdmin = user.app_metadata?.role === "super_admin";
-
-    // Verify enrollment unless this is a preview lesson or user is admin
-    if (!lesson.is_preview && !isAdmin) {
+    // Preview lessons are always accessible. Otherwise check access:
+    // admin → free course → instructor → enrolled → active subscription.
+    if (!lesson.is_preview) {
       const courseId = (lesson.module as unknown as { course_id: string })?.course_id;
       if (courseId) {
-        const { data: enrollment } = await supabase
-          .from("enrollments")
-          .select("id")
-          .eq("user_id", user.id)
-          .eq("course_id", courseId)
-          .single();
-
-        if (!enrollment) {
+        const allowed = await userHasCourseAccess(user.id, courseId, {
+          authMetadata: user.app_metadata as { role?: string } | null,
+        });
+        if (!allowed) {
           return NextResponse.json(
-            { error: "Not enrolled in this course" },
+            { error: "You don't have access to this course" },
             { status: 403 }
           );
         }

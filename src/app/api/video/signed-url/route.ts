@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { SIGNED_URL_EXPIRY } from "@/lib/utils/constants";
 import { createCourseVideoSignedUrl } from "@/lib/supabase/video-storage";
+import { userHasCourseAccess } from "@/lib/services/access";
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,22 +41,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Admins can access all videos without enrollment
-    const isAdmin = user.app_metadata?.role === "super_admin";
-
-    // If not preview and not admin, verify enrollment
-    if (!lesson.is_preview && !isAdmin) {
-      const { data: enrollment } = await supabase
-        .from("enrollments")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("course_id", lesson.course_id)
-        .eq("status", "active")
-        .single();
-
-      if (!enrollment) {
+    // Preview lessons are always accessible. Otherwise check access:
+    // admin → free course → instructor → enrolled → active subscription.
+    if (!lesson.is_preview) {
+      const allowed = await userHasCourseAccess(user.id, lesson.course_id, {
+        authMetadata: user.app_metadata as { role?: string } | null,
+      });
+      if (!allowed) {
         return NextResponse.json(
-          { error: "Not enrolled in this course" },
+          { error: "You don't have access to this course" },
           { status: 403 }
         );
       }

@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Calendar, Clock, Users, Video, CheckCircle, Loader2 } from "lucide-react";
+import { Calendar, Clock, Users, Video, CheckCircle, Loader2, Lock, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +26,18 @@ export default function WebinarDetailPage() {
   const [isRegistered, setIsRegistered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [hasWebinarFeature, setHasWebinarFeature] = useState<boolean | null>(
+    null
+  );
+
+  useEffect(() => {
+    fetch("/api/account/features")
+      .then((r) => r.json())
+      .then((j) =>
+        setHasWebinarFeature(Boolean(j.data?.features?.webinars))
+      )
+      .catch(() => setHasWebinarFeature(false));
+  }, [user]);
 
   useEffect(() => {
     async function fetchWebinar() {
@@ -175,14 +188,66 @@ export default function WebinarDetailPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <a
-                  href={webinar.recording_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-brand-600 hover:underline"
-                >
-                  {t("watchReplay")}
-                </a>
+                {hasWebinarFeature === null ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {locale === "ar"
+                      ? "جارٍ التحقق من الوصول…"
+                      : "Checking access…"}
+                  </div>
+                ) : hasWebinarFeature ? (
+                  <a
+                    href={webinar.recording_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand-600 hover:underline"
+                  >
+                    {t("watchReplay")}
+                  </a>
+                ) : (
+                  <div className="rounded-lg border bg-muted/30 p-4 flex items-start gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-700">
+                      <Lock className="h-4 w-4" />
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">
+                        {!user
+                          ? locale === "ar"
+                            ? "سجّل الدخول للوصول إلى التسجيلات"
+                            : "Sign in to access recordings"
+                          : locale === "ar"
+                            ? "ميزة التسجيلات متاحة في الباقة الفصلية وما فوق"
+                            : "Recording access is included with Quarterly, Annual, and Lifetime plans"}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {!user
+                          ? locale === "ar"
+                            ? "سجّل الدخول أو اشترك للمشاهدة."
+                            : "Log in or subscribe to watch."
+                          : locale === "ar"
+                            ? "ترقية باقتك لتشاهد كل تسجيلات الندوات."
+                            : "Upgrade your plan to watch this and every other past webinar."}
+                      </p>
+                      <Link
+                        href={
+                          !user
+                            ? `/${locale}/login?redirect=/${locale}/webinars/${webinar.id}`
+                            : `/${locale}/pricing`
+                        }
+                        className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700 transition-colors"
+                      >
+                        <Sparkles className="h-3.5 w-3.5" />
+                        {!user
+                          ? locale === "ar"
+                            ? "تسجيل الدخول"
+                            : "Sign in"
+                          : locale === "ar"
+                            ? "ترقية الباقة"
+                            : "Upgrade plan"}
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
