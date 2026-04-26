@@ -20,7 +20,7 @@ import { Separator } from "@/components/ui/separator";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { formatCurrency } from "@/lib/utils/formatters";
 
-type PaymentMethodType = "stripe" | "paytabs" | "bank_transfer";
+type PaymentMethodType = "stripe" | "paytabs" | "mamopay" | "bank_transfer";
 
 interface Plan {
   id: string;
@@ -154,7 +154,9 @@ function CheckoutInner() {
       const endpoint =
         selectedMethod === "stripe"
           ? "/api/subscriptions/checkout"
-          : "/api/subscriptions/paytabs";
+          : selectedMethod === "paytabs"
+            ? "/api/subscriptions/paytabs"
+            : "/api/subscriptions/mamopay";
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -338,6 +340,16 @@ function CheckoutInner() {
                     locale === "ar"
                       ? "بطاقات الخليج"
                       : "GCC payment methods",
+                },
+                {
+                  id: "mamopay" as const,
+                  label:
+                    locale === "ar" ? "الدفع بـ Mamo" : "Pay with Mamo",
+                  icon: CreditCard,
+                  hint:
+                    locale === "ar"
+                      ? "بطاقات الإمارات والخليج"
+                      : "UAE & GCC cards · Apple Pay",
                 },
                 {
                   id: "bank_transfer" as const,

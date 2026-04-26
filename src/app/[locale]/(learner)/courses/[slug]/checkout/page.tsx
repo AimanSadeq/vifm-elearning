@@ -21,7 +21,7 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { formatCurrency } from "@/lib/utils/formatters";
 import type { Course, VoucherType } from "@/types";
 
-type PaymentMethodType = "stripe" | "paytabs" | "bank_transfer";
+type PaymentMethodType = "stripe" | "paytabs" | "mamopay" | "bank_transfer";
 
 export default function CheckoutPage() {
   const params = useParams();
@@ -165,7 +165,9 @@ export default function CheckoutPage() {
         const endpoint =
           selectedMethod === "stripe"
             ? "/api/payments/checkout"
-            : "/api/payments/paytabs";
+            : selectedMethod === "paytabs"
+              ? "/api/payments/paytabs"
+              : "/api/payments/mamopay";
 
         const res = await fetch(endpoint, {
           method: "POST",
@@ -285,6 +287,12 @@ export default function CheckoutPage() {
                   {
                     id: "paytabs" as const,
                     label: t("payWithPayTabs"),
+                    icon: CreditCard,
+                  },
+                  {
+                    id: "mamopay" as const,
+                    label:
+                      locale === "ar" ? "الدفع بـ Mamo" : "Pay with Mamo",
                     icon: CreditCard,
                   },
                   {
