@@ -126,15 +126,22 @@ export async function incrementPromoUsage(
   promoCodeId: string,
   client: SupabaseClient = supabaseAdmin
 ) {
-  // Try the RPC first
+  // Try the RPC first — atomic, no race
   const { error: rpcError } = await client.rpc("increment_promo_usage", {
     promo_id: promoCodeId,
   });
 
   if (!rpcError) return;
 
-  // Fallback: read-update-write (race-prone, but keeps behavior on platforms
-  // where the RPC isn't deployed yet)
+  // Fallback: racy read-modify-write. If we hit this in production it means
+  // the migration `20260424_increment_promo_usage.sql` hasn't been applied
+  // — log loudly so it doesn't quietly under-count promo redemptions.
+  console.warn(
+    "[promo] increment_promo_usage RPC missing — falling back to non-atomic update.",
+    "Apply supabase/migrations/20260424_increment_promo_usage.sql.",
+    rpcError
+  );
+
   const { data: existing } = await client
     .from("promo_codes")
     .select("current_uses")

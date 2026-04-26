@@ -17,15 +17,6 @@ async function handleSubscriptionCheckout(
   const { userId, planId, planType, promoCodeId } = session.metadata ?? {};
   if (!userId || !planId) return;
 
-  // Bump promo usage on confirmed sub purchase
-  if (promoCodeId) {
-    try {
-      await incrementPromoUsage(promoCodeId);
-    } catch (e) {
-      console.warn("incrementPromoUsage failed:", e);
-    }
-  }
-
   const stripeSubscriptionId =
     typeof session.subscription === "string"
       ? session.subscription
@@ -35,6 +26,26 @@ async function handleSubscriptionCheckout(
     typeof session.customer === "string"
       ? session.customer
       : (session.customer as Stripe.Customer | null)?.id ?? null;
+
+  // Idempotency — check BEFORE any side effects (sub insert, promo bump,
+  // pending-payment update). Stripe retries this event on transient errors.
+  if (stripeSubscriptionId) {
+    const { data: existing } = await supabaseAdmin
+      .from("subscriptions")
+      .select("id")
+      .eq("stripe_subscription_id", stripeSubscriptionId)
+      .maybeSingle();
+    if (existing) return;
+  }
+  // For lifetime (mode: payment, no subscription id) — idempotency by session
+  if (!stripeSubscriptionId) {
+    const { data: priorPayment } = await supabaseAdmin
+      .from("payments")
+      .select("status")
+      .eq("stripe_session_id", session.id)
+      .maybeSingle();
+    if (priorPayment?.status === "completed") return;
+  }
 
   // Fetch plan details for price
   const { data: plan } = await supabaseAdmin
@@ -62,14 +73,13 @@ async function handleSubscriptionCheckout(
     });
   }
 
-  // Idempotent: check for existing subscription record
-  if (stripeSubscriptionId) {
-    const { data: existing } = await supabaseAdmin
-      .from("subscriptions")
-      .select("id")
-      .eq("stripe_subscription_id", stripeSubscriptionId)
-      .maybeSingle();
-    if (existing) return;
+  // Bump promo usage AFTER idempotency — only on the first delivered event
+  if (promoCodeId) {
+    try {
+      await incrementPromoUsage(promoCodeId);
+    } catch (e) {
+      console.warn("incrementPromoUsage failed:", e);
+    }
   }
 
   const now = new Date().toISOString();

@@ -43,23 +43,16 @@ export default function WebinarDetailPage() {
     async function fetchWebinar() {
       const supabase = createClient();
 
-      // Explicit column list — DO NOT include recording_url here. The
-      // recording is fetched on-demand through /api/webinars/[id]/recording
-      // which checks the user's plan-level `webinars` feature.
+      // recording_url has been moved to a separately-RLS'd table; fetched
+      // on-demand via /api/webinars/[id]/recording after a plan check.
       const { data } = await supabase
         .from("webinars")
         .select(
-          `id, title, title_ar, description, description_ar, thumbnail_url,
-           instructor_id, category_id, status, scheduled_at, duration_minutes,
-           is_recording_public, max_attendees, is_free, price, currency, tags,
-           metadata, created_at, updated_at, cpe_hours,
-           instructor:profiles!webinars_instructor_id_fkey(full_name, avatar_url)`
+          `*, instructor:profiles!webinars_instructor_id_fkey(full_name, avatar_url)`
         )
         .eq("id", webinarId)
         .single();
 
-      // The Webinar type still has recording_url; we explicitly leave it
-      // unset on the client.
       setWebinar(data as Webinar | null);
 
       // Check registration status

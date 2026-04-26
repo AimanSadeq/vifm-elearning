@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 
 export interface CourseFacets {
@@ -22,6 +23,7 @@ const EMPTY: CourseFacets = {
 };
 
 export function useCourseFacets(): CourseFacets {
+  const locale = useLocale();
   const [state, setState] = useState<CourseFacets>(EMPTY);
 
   useEffect(() => {
@@ -30,11 +32,19 @@ export function useCourseFacets(): CourseFacets {
     async function run() {
       const supabase = createClient();
 
+      // Restrict facet counts to courses available in the active locale.
+      let coursesQ = supabase
+        .from("courses")
+        .select("difficulty_level, is_free")
+        .eq("status", "published");
+      if (locale === "ar") {
+        coursesQ = coursesQ.not("title_ar", "is", null).neq("title_ar", "");
+      } else {
+        coursesQ = coursesQ.not("title", "is", null).neq("title", "");
+      }
+
       const [{ data: courses }, { count: categoryCount }] = await Promise.all([
-        supabase
-          .from("courses")
-          .select("difficulty_level, is_free")
-          .eq("status", "published"),
+        coursesQ,
         supabase
           .from("categories")
           .select("*", { count: "exact", head: true }),
@@ -71,7 +81,7 @@ export function useCourseFacets(): CourseFacets {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [locale]);
 
   return state;
 }

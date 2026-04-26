@@ -31,7 +31,14 @@ export function CourseDetail({ course, modules }: CourseDetailProps) {
   const t = useTranslations("courses");
   const locale = useLocale();
 
-  const title = locale === "ar" && course.title_ar ? course.title_ar : course.title;
+  // If the course has only the *other* language filled in, fall back to it
+  // rather than rendering null. This handles people landing on /en for an
+  // Arabic-only course (which the catalog wouldn't link to, but URLs can be shared).
+  const title =
+    (locale === "ar" ? course.title_ar : course.title) ??
+    course.title ??
+    course.title_ar ??
+    "(Untitled)";
   const description =
     locale === "ar" && course.description_ar
       ? course.description_ar

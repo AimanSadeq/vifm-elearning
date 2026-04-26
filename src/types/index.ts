@@ -391,7 +391,11 @@ export interface Webinar {
   meeting_id?: string | null;
   scheduled_at: string;
   duration_minutes: number;
-  recording_url?: string | null;
+  /**
+   * Recording URLs no longer live on the webinars row; they're fetched
+   * through `/api/webinars/[id]/recording` after a plan-feature check.
+   * The flag below stays on this row for "recording available" badges.
+   */
   is_recording_public: boolean;
   max_attendees?: number | null;
   is_free: boolean;

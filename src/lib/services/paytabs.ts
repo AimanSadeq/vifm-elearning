@@ -81,13 +81,14 @@ export function verifyPayTabsCallback(
     .update(data)
     .digest("hex");
 
-  // Timing-safe compare to defeat HMAC oracle attacks
-  if (signature.length !== expectedSignature.length) return false;
+  // Timing-safe compare to defeat HMAC oracle attacks. Decode both sides
+  // first and compare their byte lengths — string-length is unreliable when
+  // either side contains non-hex characters.
   try {
-    return timingSafeEqual(
-      Buffer.from(signature, "hex"),
-      Buffer.from(expectedSignature, "hex")
-    );
+    const sigBuf = Buffer.from(signature, "hex");
+    const expBuf = Buffer.from(expectedSignature, "hex");
+    if (sigBuf.length !== expBuf.length) return false;
+    return timingSafeEqual(sigBuf, expBuf);
   } catch {
     return false;
   }

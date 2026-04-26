@@ -224,18 +224,24 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
 
   // Save course details
   const handleSaveCourse = async () => {
+    const hasEn = (courseForm.title ?? '').trim().length > 0
+    const hasAr = (courseForm.title_ar ?? '').trim().length > 0
+    if (!hasEn && !hasAr) {
+      toast.error('Provide a course title in English or Arabic — at least one is required')
+      return
+    }
     setIsSaving(true)
     try {
       const supabase = createClient()
       const { error } = await supabase
         .from('courses')
         .update({
-          title: courseForm.title,
-          title_ar: courseForm.title_ar || null,
-          description: courseForm.description || null,
-          description_ar: courseForm.description_ar || null,
-          short_description: courseForm.short_description || null,
-          short_description_ar: courseForm.short_description_ar || null,
+          title: courseForm.title?.trim() || null,
+          title_ar: courseForm.title_ar?.trim() || null,
+          description: courseForm.description?.trim() || null,
+          description_ar: courseForm.description_ar?.trim() || null,
+          short_description: courseForm.short_description?.trim() || null,
+          short_description_ar: courseForm.short_description_ar?.trim() || null,
           category_id: courseForm.category_id,
           instructor_id: courseForm.instructor_id || null,
           difficulty_level: courseForm.difficulty_level as DifficultyLevel,
@@ -773,9 +779,15 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
 
             {isEditing ? (
               <form className="grid gap-6 sm:grid-cols-2" onSubmit={(e) => { e.preventDefault(); handleSaveCourse() }}>
+                <div className="sm:col-span-2 -mb-3">
+                  <p className="text-xs text-muted-foreground">
+                    Fill in at least one title — EN-only courses appear on the
+                    English catalog, AR-only on the Arabic one, both = both.
+                  </p>
+                </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground">Title (EN) *</label>
-                  <input type="text" required value={courseForm.title} onChange={(e) => setCourseForm({ ...courseForm, title: e.target.value })} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                  <label className="block text-sm font-medium text-foreground">Title (EN)</label>
+                  <input type="text" value={courseForm.title} onChange={(e) => setCourseForm({ ...courseForm, title: e.target.value })} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground">Title (AR)</label>

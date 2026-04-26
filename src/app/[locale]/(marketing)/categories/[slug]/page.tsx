@@ -168,6 +168,13 @@ export default function CategoryPage() {
         .eq("status", "published")
         .eq("category_id", category.id);
 
+      // Locale gate — only show courses available in the active language
+      if (locale === "ar") {
+        query = query.not("title_ar", "is", null).neq("title_ar", "");
+      } else {
+        query = query.not("title", "is", null).neq("title", "");
+      }
+
       if (effectiveSearch) {
         const s = escapeIlike(effectiveSearch);
         query = query.or(
@@ -225,6 +232,7 @@ export default function CategoryPage() {
     filters.priceRange,
     filters.sortBy,
     page,
+    locale,
   ]);
 
   // Not found

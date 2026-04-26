@@ -11,8 +11,9 @@ interface RouteParams {
  * Returns the webinar recording URL — but only to users whose active
  * subscription grants the `webinars` feature (Quarterly / Annual / Lifetime).
  *
- * The `recording_url` column is NEVER sent to the client through the regular
- * webinar select; it lives only here, behind this gate.
+ * The URL lives in the `webinar_recordings` table whose RLS allows only
+ * super_admin to SELECT. We use the service-role client here, which bypasses
+ * RLS, AFTER confirming feature access via the user's plan.
  */
 export async function GET(_req: Request, { params }: RouteParams) {
   const { id } = await params;
@@ -42,9 +43,11 @@ export async function GET(_req: Request, { params }: RouteParams) {
       );
   }
 
+  // Confirm the parent webinar exists + is completed (cheap check on the
+  // public-readable webinars table).
   const { data: webinar } = await supabaseAdmin
     .from("webinars")
-    .select("id, status, recording_url, is_recording_public")
+    .select("id, status")
     .eq("id", id)
     .maybeSingle();
 
@@ -54,11 +57,24 @@ export async function GET(_req: Request, { params }: RouteParams) {
       { status: 404 }
     );
 
-  if (webinar.status !== "completed" || !webinar.recording_url)
+  if (webinar.status !== "completed")
     return NextResponse.json(
       { error: "Recording is not available yet" },
       { status: 404 }
     );
 
-  return NextResponse.json({ data: { url: webinar.recording_url } });
+  // Fetch the URL from the locked-down recordings table via service role
+  const { data: recording } = await supabaseAdmin
+    .from("webinar_recordings")
+    .select("url")
+    .eq("webinar_id", id)
+    .maybeSingle();
+
+  if (!recording?.url)
+    return NextResponse.json(
+      { error: "Recording is not available yet" },
+      { status: 404 }
+    );
+
+  return NextResponse.json({ data: { url: recording.url } });
 }

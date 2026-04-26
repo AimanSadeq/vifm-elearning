@@ -15,6 +15,9 @@ export function CreateCourseForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [instructors, setInstructors] = useState<{ id: string; full_name: string }[]>([])
+  // Tracks whether the slug has been edited by the user; once true, we stop
+  // overwriting it from the title.
+  const [slugTouched, setSlugTouched] = useState(false)
 
   const [form, setForm] = useState({
     title: '',
@@ -61,24 +64,36 @@ export function CreateCourseForm() {
     fetchData()
   }, [])
 
-  // Auto-generate slug from title
+  // Auto-generate slug from the English title — but only while the user
+  // hasn't manually edited the slug field. If they clear the EN title we
+  // leave the slug as-is so they can submit Arabic-only courses without
+  // re-typing.
   useEffect(() => {
-    if (form.title) {
-      const slug = form.title
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .trim()
-      setForm((prev) => ({ ...prev, slug }))
-    }
-  }, [form.title])
+    if (slugTouched) return
+    if (!form.title) return
+    const slug = form.title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim()
+    setForm((prev) => ({ ...prev, slug }))
+  }, [form.title, slugTouched])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!form.title.trim()) {
-      toast.error('Course title is required')
+    const hasEn = form.title.trim().length > 0
+    const hasAr = form.title_ar.trim().length > 0
+
+    if (!hasEn && !hasAr) {
+      toast.error(
+        'Provide a course title in English or Arabic — at least one is required'
+      )
+      return
+    }
+    if (!form.slug.trim()) {
+      toast.error('Slug is required (auto-generated from English title; type one manually for Arabic-only courses)')
       return
     }
     if (!form.category_id) {
@@ -94,7 +109,7 @@ export function CreateCourseForm() {
       const { data, error } = await supabase
         .from('courses')
         .insert({
-          title: form.title.trim(),
+          title: form.title.trim() || null,
           title_ar: form.title_ar.trim() || null,
           slug: form.slug.trim(),
           description: form.description.trim() || null,
@@ -134,29 +149,33 @@ export function CreateCourseForm() {
       <Toaster position="top-right" richColors />
       <div className="mx-auto max-w-3xl">
         <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border border-border bg-card p-6">
-          {/* Title */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium text-foreground">Course Title (English) *</label>
-              <input
-                type="text"
-                required
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                placeholder="e.g., Introduction to Risk Management"
-                className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground">Course Title (Arabic)</label>
-              <input
-                type="text"
-                dir="rtl"
-                value={form.title_ar}
-                onChange={(e) => setForm({ ...form, title_ar: e.target.value })}
-                placeholder="مقدمة لإدارة المخاطر"
-                className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-              />
+          {/* Title — at least one of EN/AR required */}
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">
+              <span className="font-semibold text-foreground">Course title</span> — fill in the language(s) you want this course to appear in. At least one is required. Arabic-only courses will only appear on the Arabic catalog; English-only on the English catalog.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-foreground">Course Title (English)</label>
+                <input
+                  type="text"
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  placeholder="e.g., Introduction to Risk Management"
+                  className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground">Course Title (Arabic)</label>
+                <input
+                  type="text"
+                  dir="rtl"
+                  value={form.title_ar}
+                  onChange={(e) => setForm({ ...form, title_ar: e.target.value })}
+                  placeholder="مقدمة لإدارة المخاطر"
+                  className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
             </div>
           </div>
 
@@ -167,7 +186,10 @@ export function CreateCourseForm() {
               type="text"
               required
               value={form.slug}
-              onChange={(e) => setForm({ ...form, slug: e.target.value })}
+              onChange={(e) => {
+                setSlugTouched(true)
+                setForm({ ...form, slug: e.target.value })
+              }}
               className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
             <p className="mt-1 text-xs text-muted-foreground">Auto-generated from title. Must be unique.</p>

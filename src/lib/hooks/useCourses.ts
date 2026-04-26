@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useLocale } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import type { Course } from "@/types";
 import type { CourseFilterValues } from "@/components/courses/CourseFilters";
@@ -24,12 +25,14 @@ export function useCoursesCatalog({
   page = 1,
   pageSize = 12,
 }: UseCoursesCatalogOptions): UseCoursesCatalogResult {
+  const locale = useLocale();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
 
-  // Serialize filters to a stable string to avoid re-fetching on every render
-  const filterKey = JSON.stringify(filters);
+  // Serialize filters to a stable string to avoid re-fetching on every render.
+  // Include locale so switching language refetches.
+  const filterKey = JSON.stringify({ ...filters, locale });
   const prevFilterKey = useRef(filterKey);
   const isFirstRender = useRef(true);
 
@@ -46,6 +49,18 @@ export function useCoursesCatalog({
     async function fetchCourses() {
       const supabase = createClient();
 
+      // PostgREST can't filter parent rows by joined-table columns directly,
+      // so resolve the category slug → id once before composing the query.
+      let categoryId: string | null = null;
+      if (filters.category && filters.category !== "all") {
+        const { data: cat } = await supabase
+          .from("categories")
+          .select("id")
+          .eq("slug", filters.category)
+          .maybeSingle();
+        categoryId = cat?.id ?? "__no_match__";
+      }
+
       let query = supabase
         .from("courses")
         .select(
@@ -58,16 +73,25 @@ export function useCoursesCatalog({
         )
         .eq("status", "published");
 
+      // Locale gate: a course only appears in a language catalog if it has a
+      // non-empty title in that language. Admins can fill English-only or
+      // Arabic-only or both.
+      if (locale === "ar") {
+        query = query.not("title_ar", "is", null).neq("title_ar", "");
+      } else {
+        query = query.not("title", "is", null).neq("title", "");
+      }
+
       // Apply filters
       if (filters.search) {
         const s = escapeIlike(filters.search);
         query = query.or(
-          `title.ilike.%${s}%,title_ar.ilike.%${s}%,description.ilike.%${s}%`
+          `title.ilike.%${s}%,title_ar.ilike.%${s}%,description.ilike.%${s}%,description_ar.ilike.%${s}%`
         );
       }
 
-      if (filters.category && filters.category !== "all") {
-        query = query.eq("category:categories.slug", filters.category);
+      if (categoryId) {
+        query = query.eq("category_id", categoryId);
       }
 
       if (filters.difficulty && filters.difficulty !== "all") {
@@ -138,6 +162,7 @@ export function useCoursesCatalog({
 }
 
 export function useFeaturedCourses() {
+  const locale = useLocale();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -146,7 +171,7 @@ export function useFeaturedCourses() {
 
     async function fetchFeatured() {
       const supabase = createClient();
-      const { data, error } = await supabase
+      let query = supabase
         .from("courses")
         .select(
           `
@@ -156,7 +181,15 @@ export function useFeaturedCourses() {
         `
         )
         .eq("status", "published")
-        .eq("is_featured", true)
+        .eq("is_featured", true);
+
+      if (locale === "ar") {
+        query = query.not("title_ar", "is", null).neq("title_ar", "");
+      } else {
+        query = query.not("title", "is", null).neq("title", "");
+      }
+
+      const { data, error } = await query
         .order("created_at", { ascending: false })
         .limit(6);
 
@@ -175,7 +208,7 @@ export function useFeaturedCourses() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [locale]);
 
   return { courses, isLoading };
 }
