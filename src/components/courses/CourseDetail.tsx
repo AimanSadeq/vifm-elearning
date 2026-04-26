@@ -219,7 +219,9 @@ export function CourseDetail({ course, modules }: CourseDetailProps) {
             )}
 
             {/* Syllabus */}
-            {modules.length > 0 && <CourseSyllabus modules={modules} />}
+            {modules.length > 0 && (
+              <CourseSyllabus modules={modules} courseSlug={course.slug} />
+            )}
 
             {/* Course info row */}
             <div className="grid gap-4 sm:grid-cols-3">
