@@ -49,13 +49,13 @@ export async function POST(
     return NextResponse.json({ error: "Webinar is cancelled" }, { status: 400 });
   }
 
-  // Check if already registered
+  // Check if already registered. maybeSingle — single() returns 406 on 0 rows.
   const { data: existing } = await supabase
     .from("webinar_registrations")
     .select("id")
     .eq("webinar_id", webinarId)
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   if (existing) {
     return NextResponse.json({ message: "Already registered" }, { status: 200 });

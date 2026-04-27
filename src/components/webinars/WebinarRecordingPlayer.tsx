@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { AlertCircle, Loader2, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -38,6 +39,7 @@ export function WebinarRecordingPlayer({
   posterUrl,
   className,
 }: WebinarRecordingPlayerProps) {
+  const t = useTranslations("webinars");
   const [state, setState] = useState<PlayerState>({ kind: "idle" });
 
   const endpoint = fetchUrl ?? `/api/webinars/${webinarId}/recording`;
@@ -50,13 +52,13 @@ export function WebinarRecordingPlayer({
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.data?.url) {
-        throw new Error(json.error || "Recording not available");
+        throw new Error(json.error || t("playerError"));
       }
       setState({ kind: "ready", url: json.data.url });
     } catch (err) {
       setState({
         kind: "error",
-        message: err instanceof Error ? err.message : "Could not load recording",
+        message: err instanceof Error ? err.message : t("playerNetworkError"),
       });
     }
   }
@@ -76,7 +78,7 @@ export function WebinarRecordingPlayer({
       >
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
-          Loading recording…
+          {t("playerLoading")}
         </div>
       </div>
     );
@@ -90,7 +92,7 @@ export function WebinarRecordingPlayer({
         <AlertCircle className="h-8 w-8 text-amber-600 dark:text-amber-400" />
         <p className="text-sm text-muted-foreground">{state.message}</p>
         <Button type="button" variant="outline" size="sm" onClick={load}>
-          Try again
+          {t("playerRetry")}
         </Button>
       </div>
     );
@@ -103,7 +105,7 @@ export function WebinarRecordingPlayer({
       >
         <Button type="button" onClick={load} className="gap-2">
           <PlayCircle className="h-4 w-4" />
-          Load recording
+          {t("playerLoad")}
         </Button>
       </div>
     );
@@ -117,8 +119,10 @@ export function WebinarRecordingPlayer({
       poster={posterUrl ?? undefined}
       className={`w-full rounded-lg bg-black aspect-video ${className ?? ""}`}
     >
-      <source src={state.url} />
-      Your browser doesn&apos;t support inline video playback.
+      {/* type hint helps Safari pick the right decoder; Supabase recordings
+          are mp4 in this codebase. */}
+      <source src={state.url} type="video/mp4" />
+      {t("playerUnsupported")}
     </video>
   );
 }

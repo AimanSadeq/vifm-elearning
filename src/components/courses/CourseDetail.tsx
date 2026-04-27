@@ -3,16 +3,16 @@
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import {
-  Clock,
-  Users,
-  BarChart3,
-  Globe,
   Award,
+  BarChart3,
   CheckCircle2,
-  Calendar,
+  Clock,
+  Globe,
+  GraduationCap,
+  Star,
+  Video,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { StarRating } from "@/components/shared/StarRating";
+import { Card, CardContent } from "@/components/ui/card";
 import { CourseSyllabus } from "./CourseSyllabus";
 import { CoursePricing } from "./CoursePricing";
 import {
@@ -27,13 +27,65 @@ interface CourseDetailProps {
   modules: Module[];
 }
 
+interface DifficultyMeta {
+  label: string;
+  ribbonClasses: string;
+  stripeClasses: string;
+  pillClasses: string;
+}
+
+function getDifficultyMeta(
+  level: string | null | undefined,
+  labelMap: Record<string, string>
+): DifficultyMeta {
+  // Difficulty tones map to VIFM brand-blue intensity progression — lighter
+  // brand for beginner, deepest for expert. Keeps the page on-brand while
+  // still giving each level a visually distinct ribbon.
+  switch (level) {
+    case "beginner":
+      return {
+        label: labelMap.beginner ?? "Beginner",
+        ribbonClasses: "from-brand-300/30 via-transparent",
+        stripeClasses: "from-brand-300 to-brand-500",
+        pillClasses: "border-brand-200/60 bg-brand-300/15 text-brand-50",
+      };
+    case "intermediate":
+      return {
+        label: labelMap.intermediate ?? "Intermediate",
+        ribbonClasses: "from-brand-400/30 via-transparent",
+        stripeClasses: "from-brand-400 to-brand-600",
+        pillClasses: "border-brand-300/60 bg-brand-400/15 text-brand-100",
+      };
+    case "advanced":
+      return {
+        label: labelMap.advanced ?? "Advanced",
+        ribbonClasses: "from-brand-600/40 via-transparent",
+        stripeClasses: "from-brand-600 to-brand-800",
+        pillClasses: "border-brand-400/60 bg-brand-500/20 text-brand-100",
+      };
+    case "expert":
+      return {
+        label: labelMap.expert ?? "Expert",
+        ribbonClasses: "from-brand-800/40 via-transparent",
+        stripeClasses: "from-brand-800 to-brand-950",
+        pillClasses: "border-brand-500/60 bg-brand-700/30 text-brand-50",
+      };
+    default:
+      return {
+        label: level ?? "",
+        ribbonClasses: "from-brand-500/30 via-transparent",
+        stripeClasses: "from-brand-500 to-brand-700",
+        pillClasses: "border-brand-300/60 bg-brand-400/15 text-brand-100",
+      };
+  }
+}
+
 export function CourseDetail({ course, modules }: CourseDetailProps) {
   const t = useTranslations("courses");
   const locale = useLocale();
 
-  // If the course has only the *other* language filled in, fall back to it
-  // rather than rendering null. This handles people landing on /en for an
-  // Arabic-only course (which the catalog wouldn't link to, but URLs can be shared).
+  // Bilingual fallbacks: prefer locale's value, fall back to the other language
+  // so AR-only courses render in EN locale and vice versa.
   const title =
     (locale === "ar" ? course.title_ar : course.title) ??
     course.title ??
@@ -62,224 +114,404 @@ export function CourseDetail({ course, modules }: CourseDetailProps) {
     advanced: t("advanced"),
     expert: t("expert"),
   };
+  const difficulty = getDifficultyMeta(course.difficulty_level, difficultyLabels);
+
+  const totalLessons = modules.reduce((acc, m) => acc + (m.lessons?.length ?? 0), 0);
+
+  // Section index keeps numbered headings in order whether or not optional
+  // sections (prerequisites, syllabus) are present.
+  let sectionIndex = 0;
+  const nextIndex = () => String(++sectionIndex).padStart(2, "0");
 
   return (
-    <div>
-      {/* Hero Banner */}
-      <div className="bg-brand-900 text-white">
-        <div className="container mx-auto px-4 py-10">
-          <div className="grid gap-8 lg:grid-cols-3">
-            {/* Left: Course Info */}
-            <div className="lg:col-span-2">
-              {/* Breadcrumbs */}
-              <div className="mb-4 flex items-center gap-2 text-sm text-brand-200">
-                {categoryName && <span>{categoryName}</span>}
-                {course.difficulty_level && (
-                  <>
-                    <span>·</span>
-                    <span>
-                      {difficultyLabels[course.difficulty_level] ??
-                        course.difficulty_level}
-                    </span>
-                  </>
-                )}
-              </div>
+    <div className="bg-background">
+      {/* ============================================================
+          HERO — gradient mesh on dark, with a featured glance tile
+          ============================================================ */}
+      <section className="relative isolate overflow-hidden bg-brand-950 text-white">
+        <div
+          className={`absolute inset-0 -z-10 bg-gradient-to-br ${difficulty.ribbonClasses} to-transparent`}
+        />
+        <div
+          aria-hidden
+          className="absolute -left-32 top-[-120px] -z-10 h-[420px] w-[420px] rounded-full bg-brand-400/30 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="absolute right-[-180px] bottom-[-160px] -z-10 h-[480px] w-[480px] rounded-full bg-brand-600/30 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_75%)]"
+        />
 
-              <h1 className="font-heading text-3xl font-bold lg:text-4xl">
-                {title}
+        <div className="container mx-auto px-4 pt-12 pb-16 sm:pt-16 sm:pb-20">
+          {/* Eyebrow + difficulty pill */}
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.18em] text-white/50">
+              <span className="hidden sm:inline">VIFM</span>
+              <span className="hidden h-px w-8 bg-white/20 sm:block" />
+              <span>{categoryName ?? t("catalog")}</span>
+            </div>
+            {course.difficulty_level && (
+              <div
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-wider backdrop-blur-md ${difficulty.pillClasses}`}
+              >
+                <BarChart3 className="h-3.5 w-3.5" />
+                {difficulty.label}
+              </div>
+            )}
+          </div>
+
+          <div className="grid gap-12 lg:grid-cols-12 lg:items-end">
+            {/* Left — title + description + instructor + tags */}
+            <div className="lg:col-span-8">
+              <h1
+                className="font-heading text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.5rem]"
+                dir={locale === "ar" ? "rtl" : undefined}
+              >
+                <span className="bg-gradient-to-br from-white via-white to-white/60 bg-clip-text text-transparent">
+                  {title}
+                </span>
               </h1>
 
               {description && (
-                <p className="mt-4 text-lg text-brand-100">{description}</p>
+                <p
+                  className="mt-6 max-w-2xl text-lg leading-relaxed text-white/70"
+                  dir={locale === "ar" ? "rtl" : undefined}
+                >
+                  {description}
+                </p>
               )}
-
-              {/* Meta info */}
-              <div className="mt-6 flex flex-wrap items-center gap-4 text-sm">
-                {course.average_rating > 0 && (
-                  <div className="flex items-center gap-1">
-                    <StarRating rating={course.average_rating} size="sm" />
-                    <span className="font-medium">
-                      {course.average_rating.toFixed(1)}
-                    </span>
-                    <span className="text-brand-200">
-                      ({formatNumber(course.rating_count, locale)} {t("reviews")})
-                    </span>
-                  </div>
-                )}
-
-                {course.enrollment_count > 0 && (
-                  <div className="flex items-center gap-1.5 text-brand-200">
-                    <Users className="h-4 w-4" />
-                    <span>
-                      {formatNumber(course.enrollment_count, locale)}{" "}
-                      {t("students")}
-                    </span>
-                  </div>
-                )}
-
-                {course.duration_hours != null && course.duration_hours > 0 && (
-                  <div className="flex items-center gap-1.5 text-brand-200">
-                    <Clock className="h-4 w-4" />
-                    <span>{formatDuration(course.duration_hours * 60)}</span>
-                  </div>
-                )}
-
-                {course.difficulty_level && (
-                  <div className="flex items-center gap-1.5 text-brand-200">
-                    <BarChart3 className="h-4 w-4" />
-                    <span>
-                      {difficultyLabels[course.difficulty_level] ??
-                        course.difficulty_level}
-                    </span>
-                  </div>
-                )}
-              </div>
 
               {/* Instructor */}
               {instructorName && (
-                <div className="mt-4 flex items-center gap-3">
+                <div className="mt-8 flex items-center gap-4">
                   {course.instructor?.avatar_url ? (
+                    // Stable URL on Supabase storage; let Next.js optimise it.
                     <Image
                       src={course.instructor.avatar_url}
                       alt={instructorName}
-                      width={36}
-                      height={36}
-                      className="rounded-full"
+                      width={52}
+                      height={52}
+                      className="h-13 w-13 rounded-full ring-2 ring-white/20"
                     />
                   ) : (
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-700 text-sm font-semibold">
+                    <div className="flex h-13 w-13 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-brand-700 text-base font-bold ring-2 ring-white/20">
                       {instructorName.charAt(0)}
                     </div>
                   )}
                   <div>
-                    <p className="text-xs text-brand-200">{t("instructor")}</p>
-                    <p className="font-medium">{instructorName}</p>
+                    <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/50">
+                      {t("instructor")}
+                    </p>
+                    <p
+                      className="text-base font-semibold"
+                      dir={locale === "ar" ? "rtl" : undefined}
+                    >
+                      {instructorName}
+                    </p>
                   </div>
                 </div>
               )}
 
               {/* Tags */}
               {course.tags && course.tags.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-6 flex flex-wrap gap-2">
                   {course.tags.map((tag) => (
-                    <Badge
+                    <span
                       key={tag}
-                      variant="outline"
-                      className="border-brand-600 text-brand-200"
+                      className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-white/70"
                     >
                       {tag}
-                    </Badge>
+                    </span>
                   ))}
                 </div>
               )}
 
-              {/* Published date */}
+              {/* Last updated */}
               {course.published_at && (
-                <p className="mt-4 flex items-center gap-1.5 text-xs text-brand-300">
-                  <Calendar className="h-3.5 w-3.5" />
-                  {t("lastUpdated")} {formatDate(course.published_at, locale)}
+                <p className="mt-6 text-[11px] uppercase tracking-[0.15em] text-white/40">
+                  {t("lastUpdated")} · {formatDate(course.published_at, locale)}
                 </p>
               )}
             </div>
 
-            {/* Right: Pricing Card (desktop) */}
-            <div className="hidden lg:block">
-              <CoursePricing course={course} />
+            {/* Right — featured "At a glance" tile */}
+            <div className="lg:col-span-4">
+              <div className="relative">
+                <div
+                  aria-hidden
+                  className={`absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br ${difficulty.stripeClasses} opacity-30 blur-2xl`}
+                />
+                <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl">
+                  <div className="p-6">
+                    <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/50">
+                      {t("atAGlance")}
+                    </p>
+
+                    {/* Hours hero stat */}
+                    {course.duration_hours != null && course.duration_hours > 0 ? (
+                      <div className="mt-2">
+                        <p className="font-heading text-5xl font-bold leading-none">
+                          {Number.isInteger(course.duration_hours)
+                            ? course.duration_hours
+                            : course.duration_hours.toFixed(1)}
+                          <span className="ms-1 text-2xl font-semibold text-white/60">
+                            {t("hours")}
+                          </span>
+                        </p>
+                        <p className="mt-1 text-xs text-white/60">
+                          {t("ofExpertContent")}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="mt-2 font-heading text-3xl font-bold">
+                        {totalLessons}{" "}
+                        <span className="text-base font-semibold text-white/60">
+                          {t("lessons")}
+                        </span>
+                      </p>
+                    )}
+
+                    {/* Stat strip — rating + students + lessons */}
+                    <div className="mt-5 grid grid-cols-2 gap-4 border-t border-white/10 pt-4">
+                      {course.average_rating > 0 && (
+                        <div>
+                          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/50">
+                            {t("rating")}
+                          </p>
+                          <p className="mt-0.5 flex items-center gap-1 text-sm font-semibold">
+                            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                            {course.average_rating.toFixed(1)}
+                            <span className="text-white/50">
+                              ({formatNumber(course.rating_count, locale)})
+                            </span>
+                          </p>
+                        </div>
+                      )}
+                      {course.enrollment_count > 0 && (
+                        <div>
+                          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/50">
+                            {t("students")}
+                          </p>
+                          <p className="mt-0.5 text-sm font-semibold">
+                            {formatNumber(course.enrollment_count, locale)}
+                          </p>
+                        </div>
+                      )}
+                      {modules.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/50">
+                            {t("modules")}
+                          </p>
+                          <p className="mt-0.5 text-sm font-semibold">
+                            {modules.length}
+                          </p>
+                        </div>
+                      )}
+                      {totalLessons > 0 && (
+                        <div>
+                          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/50">
+                            {t("lessons")}
+                          </p>
+                          <p className="mt-0.5 text-sm font-semibold">
+                            {totalLessons}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Content Section */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-8">
-            {/* Learning Outcomes */}
+      {/* ============================================================
+          BODY
+          ============================================================ */}
+      <section className="container mx-auto px-4 py-12 lg:py-16">
+        <div className="grid gap-10 lg:grid-cols-3 lg:gap-12">
+          <div className="space-y-12 lg:col-span-2">
+            {/* Learning outcomes */}
             {learningOutcomes && learningOutcomes.length > 0 && (
-              <div className="rounded-lg border p-6">
-                <h2 className="mb-4 font-heading text-xl font-bold">
-                  {t("learningOutcomes")}
-                </h2>
-                <div className="grid gap-3 sm:grid-cols-2">
+              <Section index={nextIndex()} title={t("whatYoullMaster")}>
+                <div className="grid gap-4 sm:grid-cols-2">
                   {learningOutcomes.map((outcome, i) => (
-                    <div key={i} className="flex items-start gap-2">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-                      <span className="text-sm">{outcome}</span>
-                    </div>
+                    <Benefit
+                      key={i}
+                      label={outcome}
+                      Icon={CheckCircle2}
+                      highlight={i === 0}
+                    />
                   ))}
                 </div>
-              </div>
+              </Section>
+            )}
+
+            {/* Curriculum / syllabus */}
+            {modules.length > 0 && (
+              <Section index={nextIndex()} title={t("curriculum")}>
+                <CourseSyllabus modules={modules} courseSlug={course.slug} />
+              </Section>
             )}
 
             {/* Prerequisites */}
             {course.prerequisites && course.prerequisites.length > 0 && (
-              <div>
-                <h2 className="mb-3 font-heading text-xl font-bold">
-                  {t("prerequisites")}
-                </h2>
-                <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                  {course.prerequisites.map((prereq, i) => (
-                    <li key={i}>{prereq}</li>
-                  ))}
-                </ul>
+              <Section index={nextIndex()} title={t("prerequisites")}>
+                <Card>
+                  <CardContent className="p-6">
+                    <ul className="space-y-2 text-sm">
+                      {course.prerequisites.map((prereq, i) => (
+                        <li key={i} className="flex items-start gap-2.5">
+                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" />
+                          <span className="text-muted-foreground">{prereq}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </Section>
+            )}
+
+            {/* Details info row */}
+            <Section index={nextIndex()} title={t("details")}>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <InfoCard
+                  Icon={Globe}
+                  label={t("language")}
+                  value={t("languageValue")}
+                />
+                {course.certificate_enabled && (
+                  <InfoCard
+                    Icon={Award}
+                    label={t("certificate")}
+                    value={t("certificateIncluded")}
+                  />
+                )}
+                {course.passing_score > 0 && (
+                  <InfoCard
+                    Icon={GraduationCap}
+                    label={t("passingScore")}
+                    value={`${course.passing_score}%`}
+                  />
+                )}
+                {course.duration_hours != null && course.duration_hours > 0 && (
+                  <InfoCard
+                    Icon={Clock}
+                    label={t("duration")}
+                    value={formatDuration(course.duration_hours * 60)}
+                  />
+                )}
+                {course.difficulty_level && (
+                  <InfoCard
+                    Icon={BarChart3}
+                    label={t("level")}
+                    value={difficulty.label}
+                  />
+                )}
+                {totalLessons > 0 && (
+                  <InfoCard
+                    Icon={Video}
+                    label={t("lessons")}
+                    value={String(totalLessons)}
+                  />
+                )}
               </div>
-            )}
-
-            {/* Syllabus */}
-            {modules.length > 0 && (
-              <CourseSyllabus modules={modules} courseSlug={course.slug} />
-            )}
-
-            {/* Course info row */}
-            <div className="grid gap-4 sm:grid-cols-3">
-              <InfoItem
-                icon={Globe}
-                label="Language"
-                value="English & Arabic"
-              />
-              {course.certificate_enabled && (
-                <InfoItem
-                  icon={Award}
-                  label="Certificate"
-                  value="Included"
-                />
-              )}
-              {course.passing_score > 0 && (
-                <InfoItem
-                  icon={BarChart3}
-                  label="Passing Score"
-                  value={`${course.passing_score}%`}
-                />
-              )}
-            </div>
+            </Section>
           </div>
 
-          {/* Right: Pricing Card (mobile) */}
-          <div className="lg:hidden">
+          {/* Right rail — pricing card */}
+          <aside className="lg:col-span-1">
             <CoursePricing course={course} />
-          </div>
+          </aside>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
 
-function InfoItem({
-  icon: Icon,
+// ----------------- helper components -----------------
+
+function Section({
+  index,
+  title,
+  children,
+}: {
+  index: string;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <div className="mb-5 flex items-baseline gap-3">
+        <span className="font-heading text-sm font-medium text-brand-600/80 tabular-nums">
+          {index}
+        </span>
+        <span className="h-px w-6 bg-border" />
+        <h2 className="font-heading text-2xl font-bold tracking-tight">
+          {title}
+        </h2>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function Benefit({
+  label,
+  Icon,
+  highlight = false,
+}: {
+  label: string;
+  Icon: React.ElementType;
+  highlight?: boolean;
+}) {
+  return (
+    <div
+      className={`group relative flex items-start gap-4 rounded-xl border p-5 transition-all hover:-translate-y-0.5 hover:shadow-md ${
+        highlight
+          ? "border-brand-200 bg-gradient-to-br from-brand-50 to-transparent dark:border-brand-900/40 dark:from-brand-950/30"
+          : "bg-card"
+      }`}
+    >
+      <span
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+          highlight
+            ? "bg-brand-600 text-white"
+            : "bg-brand-50 text-brand-600 dark:bg-brand-950/40"
+        }`}
+      >
+        <Icon className="h-5 w-5" />
+      </span>
+      <p className="pt-1.5 text-sm font-medium leading-relaxed">{label}</p>
+    </div>
+  );
+}
+
+function InfoCard({
+  Icon,
   label,
   value,
 }: {
-  icon: React.ElementType;
+  Icon: React.ElementType;
   label: string;
   value: string;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-lg border p-4">
-      <Icon className="h-5 w-5 text-brand-600" />
-      <div>
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="font-medium">{value}</p>
+    <div className="group flex items-center gap-3 rounded-xl border bg-card p-4 transition-all hover:-translate-y-0.5 hover:shadow-md">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-950/40">
+        <Icon className="h-5 w-5" />
+      </span>
+      <div className="min-w-0">
+        <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          {label}
+        </p>
+        <p className="truncate text-sm font-semibold">{value}</p>
       </div>
     </div>
   );
 }
+

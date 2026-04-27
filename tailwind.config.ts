@@ -75,6 +75,9 @@ const config: Config = {
       spacing: {
         sidebar: "280px",
         "sidebar-collapsed": "80px",
+        // Fills the gap between Tailwind's default h-12 / h-14. Used by the
+        // header logo and instructor avatars on the detail pages.
+        "13": "3.25rem",
       },
       borderRadius: {
         lg: "var(--radius)",

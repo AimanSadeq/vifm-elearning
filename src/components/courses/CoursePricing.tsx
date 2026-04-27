@@ -1,11 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { ShieldCheck, Award, Clock, BookOpen, Loader2 } from "lucide-react";
+import {
+  Award,
+  BookOpen,
+  Clock,
+  Globe,
+  Loader2,
+  PlayCircle,
+  ShieldCheck,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils/formatters";
 import { useAuth } from "@/lib/hooks/useAuth";
 import type { Course, Enrollment } from "@/types";
@@ -30,17 +38,12 @@ export function CoursePricing({ course, enrollment }: CoursePricingProps) {
     }
 
     if (enrollment) {
-      // Already enrolled — go to course
       router.push(`/${locale}/courses/${course.slug}/learn`);
       return;
     }
 
-    // Try to enroll. The API allows enrollment for:
-    //   - free courses
-    //   - admins
-    //   - users with an active subscription
-    // It returns 400 with "requires payment" otherwise — in that case we
-    // fall through to the per-course checkout.
+    // The API allows enrollment for free courses, admins, and active
+    // subscribers. Paid + no sub returns 400 — fall through to checkout.
     setIsEnrolling(true);
     try {
       const res = await fetch("/api/enrollments", {
@@ -54,10 +57,7 @@ export function CoursePricing({ course, enrollment }: CoursePricingProps) {
         router.push(`/${locale}/courses/${course.slug}/learn`);
         return;
       }
-
-      // Paid course + no sub → checkout
       router.push(`/${locale}/courses/${course.slug}/checkout`);
-      // Surface non-payment errors (e.g. course not published) instead of silently redirecting
       if (error && !error.toLowerCase().includes("payment")) {
         alert(error);
       }
@@ -66,68 +66,115 @@ export function CoursePricing({ course, enrollment }: CoursePricingProps) {
     }
   };
 
-  const buttonText = enrollment
-    ? t("continueLearning")
-    : course.is_free
-      ? tc("enrollNow")
-      : tc("enrollNow");
+  const buttonText = enrollment ? t("continueLearning") : tc("enrollNow");
 
   return (
-    <Card className="sticky top-20">
-      <CardContent className="p-6">
-        {/* Price */}
-        <div className="mb-4 text-center">
-          {course.is_free ? (
-            <span className="text-3xl font-bold text-success">{t("free")}</span>
+    <div className="lg:sticky lg:top-24">
+      <div className="overflow-hidden rounded-2xl border bg-card shadow-lg ring-1 ring-black/5">
+        {/* Cover thumbnail — sits at the top of the card. Falls back to a
+            gradient + course-initial placeholder when no thumbnail is set. */}
+        <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-brand-100 to-brand-50 dark:from-brand-900/40 dark:to-brand-950/30">
+          {course.thumbnail_url ? (
+            // Lazy-loaded — the pricing card stacks below the content on
+            // mobile, so this image is rarely the LCP and shouldn't compete
+            // with the hero for connection priority.
+            <Image
+              src={course.thumbnail_url}
+              alt={course.title ?? "Course"}
+              fill
+              sizes="(min-width: 1024px) 33vw, 100vw"
+              className="object-cover"
+              unoptimized
+            />
           ) : (
-            <span className="text-3xl font-bold">
-              {formatCurrency(course.price, course.currency, locale)}
-            </span>
+            <div className="flex h-full w-full items-center justify-center">
+              <PlayCircle className="h-12 w-12 text-brand-300/80 dark:text-brand-200/30" />
+            </div>
           )}
         </div>
 
-        {/* Enroll button */}
-        <Button
-          className="w-full"
-          size="lg"
-          onClick={handleEnroll}
-          disabled={isEnrolling}
-        >
-          {isEnrolling && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
-          {buttonText}
-        </Button>
+        <div className="p-6">
+          {/* Eyebrow */}
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            {course.is_free ? t("free") : tc("enrollNow")}
+          </p>
 
-        {/* Course includes */}
-        <div className="mt-6 space-y-3">
-          <p className="text-sm font-medium">This course includes:</p>
-
-          {course.duration_hours != null && course.duration_hours > 0 && (
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <Clock className="h-4 w-4 shrink-0" />
-              <span>
-                {course.duration_hours} {t("hours")} of content
+          {/* Price */}
+          <div className="mt-1 flex items-baseline gap-2">
+            {course.is_free ? (
+              <span className="font-heading text-4xl font-bold leading-none text-emerald-600 dark:text-emerald-400">
+                {t("free")}
               </span>
-            </div>
-          )}
-
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            <BookOpen className="h-4 w-4 shrink-0" />
-            <span>Full lifetime access</span>
+            ) : (
+              <span className="font-heading text-4xl font-bold leading-none">
+                {formatCurrency(course.price, course.currency, locale)}
+              </span>
+            )}
           </div>
 
-          {course.certificate_enabled && (
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <Award className="h-4 w-4 shrink-0" />
-              <span>Certificate of completion</span>
-            </div>
-          )}
+          {/* Primary CTA */}
+          <div className="mt-5">
+            <Button
+              className="w-full shadow-md"
+              size="lg"
+              onClick={handleEnroll}
+              disabled={isEnrolling}
+            >
+              {isEnrolling && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
+              {buttonText}
+            </Button>
+          </div>
 
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            <ShieldCheck className="h-4 w-4 shrink-0" />
-            <span>30-day money-back guarantee</span>
+          {/* Includes — refined list with icon plates */}
+          <div className="mt-6 space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              {t("includes")}
+            </p>
+
+            {course.duration_hours != null && course.duration_hours > 0 && (
+              <IncludeRow
+                Icon={Clock}
+                label={`${course.duration_hours} ${t("hours")} ${t("ofExpertContent")}`}
+              />
+            )}
+            <IncludeRow Icon={BookOpen} label={t("lifetimeAccess")} />
+            {course.certificate_enabled && (
+              <IncludeRow Icon={Award} label={t("certificateIncluded")} />
+            )}
+            <IncludeRow Icon={Globe} label={t("languageValue")} muted />
+            <IncludeRow Icon={ShieldCheck} label={t("moneyBack")} muted />
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
+  );
+}
+
+function IncludeRow({
+  Icon,
+  label,
+  muted = false,
+}: {
+  Icon: React.ElementType;
+  label: string;
+  muted?: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-3 py-1">
+      <span
+        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${
+          muted
+            ? "bg-muted text-muted-foreground"
+            : "bg-brand-50 text-brand-600 dark:bg-brand-950/40"
+        }`}
+      >
+        <Icon className="h-3.5 w-3.5" />
+      </span>
+      <span
+        className={`text-sm ${muted ? "text-muted-foreground" : "text-foreground"}`}
+      >
+        {label}
+      </span>
+    </div>
   );
 }
