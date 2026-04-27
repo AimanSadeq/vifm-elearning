@@ -15,6 +15,7 @@ import { CertificationProgramsSection } from "@/components/landing/Certification
 import { CTASection } from "@/components/landing/CTASection";
 import { PlatformFeatures } from "@/components/landing/PlatformFeatures";
 import { CareerPathways } from "@/components/landing/CareerPathways";
+import { SectionMarker } from "@/components/landing/SectionMarker";
 
 export async function generateMetadata({
   params,
@@ -90,8 +91,9 @@ export default async function HomePage({
     <>
       <Header />
       <main>
-        {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 text-white min-h-[90vh] flex flex-col justify-center">
+        {/* Hero — solid brand-950 lets the animated orbs in HeroBackground
+            do the gradient work without muddying with a static 3-stop. */}
+        <section className="relative overflow-hidden bg-brand-950 text-white min-h-[88vh] flex flex-col justify-center">
           <HeroBackground />
           {/* Stats ticker at top */}
           <div className="container relative z-10 mx-auto px-4 pt-16 lg:pt-24 flex justify-center">
@@ -113,31 +115,57 @@ export default async function HomePage({
         {/* Categories Section */}
         <section className="py-16 lg:py-24">
           <div className="container mx-auto px-4">
+            <SectionMarker
+              index="01"
+              eyebrow={t("categoriesSubtitle")}
+              title={t("categoriesTitle")}
+              align="center"
+            />
             <CategoriesGrid
               categories={categories}
               locale={locale}
-              title={t("categoriesTitle")}
-              subtitle={t("categoriesSubtitle")}
+              title=""
+              subtitle=""
             />
           </div>
         </section>
 
-        {/* Featured Courses */}
+        {/* Featured Courses — marker rendered as a standalone div above the
+            section, since FeaturedCoursesSection brings its own <section>
+            wrapper with vertical padding. */}
         {featuredCourses && featuredCourses.length > 0 && (
-          <FeaturedCoursesSection
-            courses={featuredCourses}
-            locale={locale}
-            sectionTitle={t("featuredCoursesTitle")}
-            sectionSubtitle={t("featuredCoursesSubtitle")}
-            viewAllText={t("viewAllCourses")}
-            viewAllHref={`/${locale}/courses`}
-          />
+          <>
+            <div className="container mx-auto px-4 pt-16 lg:pt-20">
+              <SectionMarker
+                index="02"
+                eyebrow={t("featuredCoursesSubtitle")}
+                title={t("featuredCoursesTitle")}
+                align="center"
+              />
+            </div>
+            <FeaturedCoursesSection
+              courses={featuredCourses}
+              locale={locale}
+              sectionTitle=""
+              sectionSubtitle=""
+              viewAllText={t("viewAllCourses")}
+              viewAllHref={`/${locale}/courses`}
+            />
+          </>
         )}
 
         {/* Platform Features — Immersive Learning Showcase */}
+        <div className="container mx-auto px-4 pt-16 lg:pt-20">
+          <SectionMarker
+            index="03"
+            eyebrow={t("platformFeaturesSubtitle")}
+            title={t("platformFeaturesTitle")}
+            align="center"
+          />
+        </div>
         <PlatformFeatures
-          sectionTitle={t("platformFeaturesTitle")}
-          sectionSubtitle={t("platformFeaturesSubtitle")}
+          sectionTitle=""
+          sectionSubtitle=""
           features={[
             { id: "bilingual", title: t("pfBilingualTitle"), description: t("pfBilingualDesc"), highlights: [t("pfBilingualH1"), t("pfBilingualH2"), t("pfBilingualH3")] },
             { id: "videoLearning", title: t("pfVideoTitle"), description: t("pfVideoDesc"), highlights: [t("pfVideoH1"), t("pfVideoH2"), t("pfVideoH3")] },
@@ -151,8 +179,10 @@ export default async function HomePage({
         {/* Social Proof */}
         <SocialProof sectionTitle={t("trustedBy")} stats={stats} sectionSubtitle={t("socialProofLabel")} />
 
-        {/* Career Pathways */}
+        {/* Career Pathways — dark section, marker rendered inside the
+            component on its own brand-950 canvas to keep contrast clean. */}
         <CareerPathways
+          markerIndex="04"
           sectionTitle={t("careerPathwaysTitle")}
           sectionSubtitle={t("careerPathwaysSubtitle")}
           ctaText={t("careerCTA")}
@@ -184,14 +214,24 @@ export default async function HomePage({
 
         {/* Certification Programs */}
         {designations && designations.length > 0 && (
-          <CertificationProgramsSection
-            designations={designations}
-            locale={locale}
-            sectionTitle={t("certificationProgramsTitle")}
-            sectionSubtitle={t("certificationProgramsSubtitle")}
-            viewAllText={t("viewAllCertifications")}
-            viewAllHref={`/${locale}/designations`}
-          />
+          <>
+            <div className="container mx-auto px-4 pt-16 lg:pt-20">
+              <SectionMarker
+                index="05"
+                eyebrow={t("certificationProgramsSubtitle")}
+                title={t("certificationProgramsTitle")}
+                align="center"
+              />
+            </div>
+            <CertificationProgramsSection
+              designations={designations}
+              locale={locale}
+              sectionTitle=""
+              sectionSubtitle=""
+              viewAllText={t("viewAllCertifications")}
+              viewAllHref={`/${locale}/designations`}
+            />
+          </>
         )}
 
         {/* Testimonials */}

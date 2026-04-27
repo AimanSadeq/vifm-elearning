@@ -123,20 +123,23 @@ export function PlatformFeatures({
   const ActiveIcon = activeFeature.icon;
 
   return (
-    <section className="py-16 lg:py-24">
+    <section className={sectionTitle ? "py-16 lg:py-24" : "pb-16 lg:pb-24"}>
       <div className="container mx-auto px-4">
-        <AnimatedSection>
-          <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-widest text-brand-400">
-              {sectionSubtitle}
-            </p>
-            <h2 className="mt-3 font-heading text-3xl font-bold lg:text-4xl xl:text-5xl">
-              {sectionTitle}
-            </h2>
-          </div>
-        </AnimatedSection>
+        {/* Internal header — skipped when the parent renders a SectionMarker */}
+        {sectionTitle && (
+          <AnimatedSection>
+            <div className="text-center">
+              <p className="text-sm font-semibold uppercase tracking-widest text-brand-400">
+                {sectionSubtitle}
+              </p>
+              <h2 className="mt-3 font-heading text-3xl font-bold lg:text-4xl xl:text-5xl">
+                {sectionTitle}
+              </h2>
+            </div>
+          </AnimatedSection>
+        )}
 
-        <div className="mt-14 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1.2fr] lg:gap-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1.2fr] lg:gap-12">
           {/* Feature selector — left column */}
           <motion.div
             ref={ref}

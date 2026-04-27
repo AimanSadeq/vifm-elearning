@@ -28,37 +28,37 @@ export function CTASection({ title, subtitle, ctaText, ctaHref }: CTASectionProp
   const animate = mounted && !prefersReducedMotion;
 
   return (
-    <section className="relative overflow-hidden py-24 lg:py-32">
-      {/* Animated gradient background */}
+    <section className="relative isolate overflow-hidden bg-brand-950 py-24 lg:py-32">
+      {/* Brand-blue gradient mesh — pure CSS, matches the detail pages' hero
+          treatment so the home and detail pages read as one design system. */}
       <div
-        className={`absolute inset-0 bg-gradient-to-br from-brand-800 via-brand-600 to-brand-400 ${
-          animate ? "animate-gradient-shift" : ""
-        }`}
+        aria-hidden
+        className="absolute inset-0 -z-10 bg-gradient-to-br from-brand-500/30 via-transparent to-transparent"
       />
-
-      {/* Decorative elements */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <motion.div
-          className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-white/10 blur-3xl"
-          animate={animate ? { scale: [1, 1.2, 1], opacity: [0.1, 0.15, 0.1] } : undefined}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-white/10 blur-3xl"
-          animate={animate ? { scale: [1, 1.15, 1], opacity: [0.08, 0.12, 0.08] } : undefined}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        />
-        {/* Dot pattern */}
-        <div className="absolute inset-0 opacity-[0.05]" style={{
-          backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
-          backgroundSize: "32px 32px",
-        }} />
-      </div>
+      <motion.div
+        aria-hidden
+        className="absolute -top-40 -right-32 -z-10 h-[480px] w-[480px] rounded-full bg-brand-400/30 blur-3xl"
+        animate={animate ? { scale: [1, 1.15, 1], opacity: [0.25, 0.4, 0.25] } : undefined}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        aria-hidden
+        className="absolute -bottom-40 -left-32 -z-10 h-[440px] w-[440px] rounded-full bg-brand-600/30 blur-3xl"
+        animate={animate ? { scale: [1, 1.12, 1], opacity: [0.2, 0.35, 0.2] } : undefined}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+      />
+      {/* Subtle grid overlay, masked at the edges */}
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_75%)]"
+      />
 
       <div className="container relative z-10 mx-auto px-4 text-center text-white">
         <AnimatedSection>
-          <h2 className="font-heading text-3xl font-bold lg:text-5xl xl:text-6xl">
-            {title}
+          <h2 className="font-heading text-3xl font-bold tracking-tight lg:text-5xl xl:text-6xl">
+            <span className="bg-gradient-to-br from-white via-white to-white/60 bg-clip-text text-transparent">
+              {title}
+            </span>
           </h2>
         </AnimatedSection>
         <AnimatedSection delay={0.1}>

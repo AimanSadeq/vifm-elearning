@@ -28,6 +28,10 @@ interface CareerPathwaysProps {
   tiers: TierData[];
   ctaText: string;
   ctaHref: string;
+  /** Numbered index ("04") rendered as a dark-themed SectionMarker inside
+   *  this component, since the section's bg-brand-950 canvas would clash
+   *  with a light-background marker placed above it. */
+  markerIndex?: string;
 }
 
 const TIER_VISUAL: Record<
@@ -82,6 +86,7 @@ const containerVariants = {
 };
 
 export function CareerPathways({
+  markerIndex,
   sectionTitle,
   sectionSubtitle,
   tiers,
@@ -114,16 +119,28 @@ export function CareerPathways({
       />
 
       <div className="container relative mx-auto px-4">
-        <AnimatedSection>
-          <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-widest text-brand-400">
-              {sectionSubtitle}
-            </p>
-            <h2 className="mt-3 font-heading text-3xl font-bold lg:text-4xl xl:text-5xl">
-              {sectionTitle}
-            </h2>
-          </div>
-        </AnimatedSection>
+        {/* Dark-themed marker — renders the same numbered editorial header
+            as SectionMarker but tuned for white-on-brand-950 contrast. */}
+        {markerIndex && (
+          <AnimatedSection>
+            <div className="mx-auto mb-12 max-w-2xl text-center">
+              <div className="flex items-baseline justify-center gap-3">
+                <span className="font-heading text-sm font-medium tabular-nums text-white/40">
+                  {markerIndex}
+                </span>
+                <span className="h-px w-6 bg-white/20" />
+                <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-300">
+                  {sectionSubtitle}
+                </span>
+              </div>
+              <h2 className="mt-4 font-heading text-3xl font-bold tracking-tight lg:text-4xl xl:text-5xl">
+                <span className="bg-gradient-to-br from-white via-white to-white/60 bg-clip-text text-transparent">
+                  {sectionTitle}
+                </span>
+              </h2>
+            </div>
+          </AnimatedSection>
+        )}
 
         {/* Timeline */}
         <motion.div

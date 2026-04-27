@@ -115,15 +115,19 @@ export function CertificationProgramsSection({
       <div className="container mx-auto px-4">
         <AnimatedSection>
           <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-widest text-brand-400">
-              {sectionSubtitle}
-            </p>
-            <h2 className="mt-3 font-heading text-3xl font-bold lg:text-4xl xl:text-5xl">
-              {sectionTitle}
-            </h2>
+            {sectionTitle && (
+              <>
+                <p className="text-sm font-semibold uppercase tracking-widest text-brand-400">
+                  {sectionSubtitle}
+                </p>
+                <h2 className="mt-3 font-heading text-3xl font-bold lg:text-4xl xl:text-5xl">
+                  {sectionTitle}
+                </h2>
+              </>
+            )}
             <Link
               href={viewAllHref}
-              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors"
             >
               {viewAllText}
               <ArrowRight className="h-4 w-4 rtl:rotate-180" />

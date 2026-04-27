@@ -41,27 +41,30 @@ export function CategoriesGrid({ categories, locale, title, subtitle }: Categori
 
   return (
     <div>
-      <AnimatedSection>
-        <div className="text-center">
-          {subtitle && (
-            <p className="text-sm font-semibold uppercase tracking-widest text-brand-400">
-              {subtitle}
-            </p>
-          )}
-          <h2 className="mt-3 font-heading text-3xl font-bold lg:text-4xl xl:text-5xl">
-            {title}
-          </h2>
-        </div>
-      </AnimatedSection>
+      {/* Internal header — skipped when the parent renders a SectionMarker */}
+      {title && (
+        <AnimatedSection>
+          <div className="text-center">
+            {subtitle && (
+              <p className="text-sm font-semibold uppercase tracking-widest text-brand-400">
+                {subtitle}
+              </p>
+            )}
+            <h2 className="mt-3 font-heading text-3xl font-bold lg:text-4xl xl:text-5xl">
+              {title}
+            </h2>
+          </div>
+        </AnimatedSection>
+      )}
 
       <motion.div
         ref={ref}
-        className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
+        className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
         variants={prefersReducedMotion ? undefined : containerVariants}
         initial="hidden"
         animate={isInView ? "visible" : "hidden"}
       >
-        {categories.map((cat) => (
+        {categories.map((cat, i) => (
           <CategoryCard
             key={cat.slug}
             name={cat.name}
@@ -69,6 +72,7 @@ export function CategoriesGrid({ categories, locale, title, subtitle }: Categori
             slug={cat.slug}
             iconName={cat.iconName}
             color={cat.color}
+            index={i + 1}
             locale={locale}
           />
         ))}

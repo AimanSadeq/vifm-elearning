@@ -99,19 +99,24 @@ export function FeaturedCoursesSection({
   if (courses.length === 0) return null;
 
   return (
-    <section className="py-20 lg:py-28">
+    <section className={sectionTitle ? "py-20 lg:py-28" : "pb-20 lg:pb-28"}>
       <div className="container mx-auto px-4">
         <AnimatedSection>
           <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-widest text-brand-400">
-              {sectionSubtitle}
-            </p>
-            <h2 className="mt-3 font-heading text-3xl font-bold lg:text-4xl xl:text-5xl">
-              {sectionTitle}
-            </h2>
+            {/* Internal header — skipped when the parent renders a SectionMarker */}
+            {sectionTitle && (
+              <>
+                <p className="text-sm font-semibold uppercase tracking-widest text-brand-400">
+                  {sectionSubtitle}
+                </p>
+                <h2 className="mt-3 font-heading text-3xl font-bold lg:text-4xl xl:text-5xl">
+                  {sectionTitle}
+                </h2>
+              </>
+            )}
             <Link
               href={viewAllHref}
-              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors"
             >
               {viewAllText}
               <ArrowRight className="h-4 w-4 rtl:rotate-180" />
