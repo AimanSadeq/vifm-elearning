@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { userHasFeature } from "@/lib/services/access";
+import { isStaff } from "@/lib/services/role";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -29,9 +30,7 @@ export async function GET(_req: Request, { params }: RouteParams) {
       { status: 401 }
     );
 
-  const isAdmin = user.app_metadata?.role === "super_admin";
-
-  if (!isAdmin) {
+  if (!isStaff(user)) {
     const allowed = await userHasFeature(user.id, "webinars");
     if (!allowed)
       return NextResponse.json(
