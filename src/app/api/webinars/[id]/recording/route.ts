@@ -3,6 +3,9 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { userHasFeature } from "@/lib/services/access";
 import { isStaff } from "@/lib/services/role";
+import { createCourseVideoSignedUrl } from "@/lib/supabase/video-storage";
+
+const SIGNED_URL_TTL_SECONDS = 60 * 60; // 1 hour — long enough to watch a webinar recording end-to-end.
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -75,5 +78,25 @@ export async function GET(_req: Request, { params }: RouteParams) {
       { status: 404 }
     );
 
-  return NextResponse.json({ data: { url: recording.url } });
+  // The stored value is either a Storage path (when uploaded through the
+  // admin panel) or a full external URL (legacy/manual entries via SQL).
+  // Treat anything starting with http(s):// as already-signed; otherwise
+  // mint a short-lived signed URL against the course-videos bucket.
+  const isAbsoluteUrl = /^https?:\/\//i.test(recording.url);
+  if (isAbsoluteUrl) {
+    return NextResponse.json({ data: { url: recording.url } });
+  }
+
+  const { url, error } = await createCourseVideoSignedUrl(
+    recording.url,
+    SIGNED_URL_TTL_SECONDS
+  );
+  if (error || !url) {
+    console.error("[recording] sign error:", error);
+    return NextResponse.json(
+      { error: "Recording is temporarily unavailable" },
+      { status: 500 }
+    );
+  }
+  return NextResponse.json({ data: { url } });
 }

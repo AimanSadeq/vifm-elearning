@@ -101,3 +101,35 @@ export async function directUpload(
   await putToSignedUrl(ticket.signedUrl, file, onProgress)
   return ticket
 }
+
+/**
+ * Same direct-upload pattern, but for webinar recordings.
+ * Hits /api/admin/webinars/[id]/upload-url and uploads a single video file.
+ * Returns the storage path that should be saved into webinar_recordings.url.
+ */
+export async function uploadWebinarRecording(
+  webinarId: string,
+  file: File,
+  authToken: string,
+  onProgress?: (percent: number) => void
+): Promise<UploadTicket> {
+  const res = await fetch(`/api/admin/webinars/${webinarId}/upload-url`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({
+      fileName: file.name,
+      fileSize: file.size,
+      mimeType: file.type,
+    }),
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.error || `Failed to prepare upload (${res.status})`)
+  }
+  const ticket = (await res.json()) as UploadTicket
+  await putToSignedUrl(ticket.signedUrl, file, onProgress)
+  return ticket
+}
