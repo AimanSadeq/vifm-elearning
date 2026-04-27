@@ -102,6 +102,17 @@ export async function directUpload(
   return ticket
 }
 
+function isUploadTicket(value: unknown): value is UploadTicket {
+  if (!value || typeof value !== 'object') return false
+  const v = value as Record<string, unknown>
+  return (
+    typeof v.bucket === 'string' &&
+    typeof v.path === 'string' &&
+    typeof v.signedUrl === 'string' &&
+    typeof v.token === 'string'
+  )
+}
+
 /**
  * Same direct-upload pattern, but for webinar recordings.
  * Hits /api/admin/webinars/[id]/upload-url and uploads a single video file.
@@ -129,7 +140,12 @@ export async function uploadWebinarRecording(
     const data = await res.json().catch(() => ({}))
     throw new Error(data.error || `Failed to prepare upload (${res.status})`)
   }
-  const ticket = (await res.json()) as UploadTicket
+  const ticket = await res.json()
+  // Runtime validation — guards against an endpoint contract drift where the
+  // shape changes but TypeScript can't see it (server/client decoupling).
+  if (!isUploadTicket(ticket)) {
+    throw new Error('Upload endpoint returned an unexpected response shape')
+  }
   await putToSignedUrl(ticket.signedUrl, file, onProgress)
   return ticket
 }

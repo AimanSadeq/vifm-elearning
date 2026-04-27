@@ -17,9 +17,11 @@ const bodySchema = z.object({
     .max(500)
     // Lock the path prefix so an admin can't make a webinar serve a course
     // video. The upload-url endpoint always emits webinars/<webinarId>/...
+    // Block `..` and `//` segments — Storage doesn't resolve them but they
+    // pollute the bucket and confuse downstream cleanup tooling.
     .regex(
-      /^webinars\/[0-9a-f-]{36}\//i,
-      "Path must be under webinars/<webinar-id>/"
+      /^webinars\/[0-9a-f-]{36}\/[^./][^/]*$/i,
+      "Path must be webinars/<webinar-id>/<filename> with no .. or / segments after the prefix"
     ),
   is_public: z.boolean().optional().default(false),
   // Optional: also flip the parent webinar's status. Webinar status is
@@ -108,21 +110,35 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   }
 
   // The path must be scoped to this specific webinar — defence-in-depth so a
-  // crafted PUT can't link recording from another webinar's folder.
+  // crafted PUT can't link a recording from another webinar's folder. Also
+  // reject path-traversal *segments* and empty segments; Storage doesn't
+  // resolve `..` but malformed keys pollute the bucket. Note we look for
+  // `/../`, `/..` at end, and `//` rather than naive `includes('..')` so
+  // filenames like `foo..bar.mp4` are still allowed.
   const expectedPrefix = `webinars/${id}/`;
-  if (!parsed.data.path.startsWith(expectedPrefix)) {
+  const path = parsed.data.path;
+  const hasTraversal = path.includes("/../") || path.endsWith("/..") || path.includes("//");
+  if (!path.startsWith(expectedPrefix) || hasTraversal) {
     return NextResponse.json(
-      { error: `Path must start with ${expectedPrefix}` },
+      { error: `Path must start with ${expectedPrefix} and contain no traversal segments` },
       { status: 400 }
     );
   }
+
+  // Read the previous storage path so we can clean it up after the upsert.
+  // Without this every "Replace recording" leaks the prior MP4 in the bucket.
+  const { data: previous } = await supabaseAdmin
+    .from("webinar_recordings")
+    .select("url")
+    .eq("webinar_id", id)
+    .maybeSingle();
 
   const { error: upsertError } = await supabaseAdmin
     .from("webinar_recordings")
     .upsert(
       {
         webinar_id: id,
-        url: parsed.data.path, // stored as a Storage path; signed on demand at fetch time
+        url: path, // stored as a Storage path; signed on demand at fetch time
         is_public: parsed.data.is_public,
         updated_at: new Date().toISOString(),
       },
@@ -135,6 +151,24 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       { error: `Could not save recording: ${upsertError.message}` },
       { status: 500 }
     );
+  }
+
+  // Best-effort: if we replaced an old Supabase-Storage path with a new one,
+  // delete the old object. Skip absolute URLs (legacy entries) and skip when
+  // the path didn't actually change (visibility-only PUT).
+  if (
+    previous?.url &&
+    previous.url.startsWith(expectedPrefix) &&
+    previous.url !== path
+  ) {
+    const { error: removeErr } = await supabaseAdmin.storage
+      .from("course-videos")
+      .remove([previous.url]);
+    if (removeErr) {
+      // Don't fail the request — the new recording is live; the orphan is
+      // recoverable later by a cleanup script.
+      console.error("[recording] orphan cleanup error:", removeErr);
+    }
   }
 
   if (parsed.data.mark_completed) {

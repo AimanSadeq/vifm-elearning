@@ -2,10 +2,14 @@ import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { userHasFeature } from "@/lib/services/access";
-import { isStaff } from "@/lib/services/role";
+import { isSuperAdmin } from "@/lib/services/role";
 import { createCourseVideoSignedUrl } from "@/lib/supabase/video-storage";
 
-const SIGNED_URL_TTL_SECONDS = 60 * 60; // 1 hour — long enough to watch a webinar recording end-to-end.
+// Long enough to outlast a single watch session including pauses and dinner
+// breaks. The <video> tag never re-fetches its source mid-playback, so a TTL
+// shorter than the realistic watch window causes "SignatureExpired" errors
+// with no recovery path. Six hours is a forgiving balance.
+const SIGNED_URL_TTL_SECONDS = 6 * 60 * 60;
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -33,7 +37,9 @@ export async function GET(_req: Request, { params }: RouteParams) {
       { status: 401 }
     );
 
-  if (!isStaff(user)) {
+  // Recording URL is data egress: only super_admin gets the role bypass.
+  // Instructors aren't admins of this resource, even if they teach courses.
+  if (!isSuperAdmin(user)) {
     const allowed = await userHasFeature(user.id, "webinars");
     if (!allowed)
       return NextResponse.json(

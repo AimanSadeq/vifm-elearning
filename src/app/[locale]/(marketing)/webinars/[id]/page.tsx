@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import { WebinarRecordingPlayer } from "@/components/webinars/WebinarRecordingPlayer";
 import { formatCurrency, formatDate, formatDuration } from "@/lib/utils/formatters";
 import type { Webinar } from "@/types";
 
@@ -198,23 +199,10 @@ export default function WebinarDetailPage() {
                       : "Checking access…"}
                   </div>
                 ) : hasWebinarFeature ? (
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      const res = await fetch(
-                        `/api/webinars/${webinar.id}/recording`
-                      );
-                      const json = await res.json();
-                      if (res.ok && json.data?.url) {
-                        window.open(json.data.url, "_blank", "noopener");
-                      } else {
-                        alert(json.error ?? "Recording not available");
-                      }
-                    }}
-                    className="text-brand-600 hover:underline"
-                  >
-                    {t("watchReplay")}
-                  </button>
+                  <WebinarRecordingPlayer
+                    webinarId={webinar.id}
+                    posterUrl={webinar.thumbnail_url}
+                  />
                 ) : (
                   <div className="rounded-lg border bg-muted/30 p-4 flex items-start gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-700">

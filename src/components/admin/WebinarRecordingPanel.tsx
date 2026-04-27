@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CheckCircle2,
   Loader2,
@@ -13,6 +13,7 @@ import {
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { uploadWebinarRecording } from "@/lib/uploads/direct-upload";
+import { WebinarRecordingPlayer } from "@/components/webinars/WebinarRecordingPlayer";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,7 +50,7 @@ export function WebinarRecordingPanel({ webinarId }: WebinarRecordingPanelProps)
     return session?.access_token ?? null;
   }
 
-  async function load() {
+  const load = useCallback(async () => {
     setIsLoading(true);
     const token = await getToken();
     if (!token) {
@@ -74,12 +75,11 @@ export function WebinarRecordingPanel({ webinarId }: WebinarRecordingPanelProps)
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [webinarId]);
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [webinarId]);
+  }, [load]);
 
   function handlePickFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -152,6 +152,11 @@ export function WebinarRecordingPanel({ webinarId }: WebinarRecordingPanelProps)
       toast.error("Sign in again to save.");
       return;
     }
+
+    // Optimistic update — flip the checkbox immediately for snappy UX.
+    const previousValue = state.isPublic;
+    setState({ ...state, isPublic: nextValue });
+
     const res = await fetch(`/api/admin/webinars/${webinarId}/recording`, {
       method: "PUT",
       headers: {
@@ -166,10 +171,13 @@ export function WebinarRecordingPanel({ webinarId }: WebinarRecordingPanelProps)
     });
     if (!res.ok) {
       const json = await res.json().catch(() => ({}));
+      // Revert the optimistic flip and re-load — the row may have been
+      // deleted by another admin, in which case the local `storedPath` is
+      // stale and the UI should reflect the new server truth.
+      setState({ ...state, isPublic: previousValue });
       toast.error(json.error || "Could not update visibility");
-      return;
+      void load();
     }
-    setState({ ...state, isPublic: nextValue });
   }
 
   async function handleDelete() {
@@ -225,16 +233,22 @@ export function WebinarRecordingPanel({ webinarId }: WebinarRecordingPanelProps)
               )}
             </div>
 
-            {/* Existing recording state */}
+            {/* Existing recording — show inline preview + path */}
             {state.hasExisting && !pendingFile && !isUploading && (
-              <div className="flex items-start gap-3 rounded-md border bg-emerald-50 dark:bg-emerald-950/30 p-3">
-                <CheckCircle2 className="h-5 w-5 mt-0.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">Recording uploaded</p>
-                  <p className="text-xs text-muted-foreground truncate" title={state.storedPath}>
-                    {state.storedPath}
-                  </p>
+              <div className="space-y-2">
+                <div className="flex items-start gap-3 rounded-md border bg-emerald-50 dark:bg-emerald-950/30 p-3">
+                  <CheckCircle2 className="h-5 w-5 mt-0.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">Recording uploaded</p>
+                    <p className="text-xs text-muted-foreground truncate" title={state.storedPath}>
+                      {state.storedPath}
+                    </p>
+                  </div>
                 </div>
+                {/* Reuse the public player — super_admin gets a signed URL via
+                    the same gated endpoint, so admins can verify the upload
+                    actually plays before asking learners to watch it. */}
+                <WebinarRecordingPlayer webinarId={webinarId} />
               </div>
             )}
 

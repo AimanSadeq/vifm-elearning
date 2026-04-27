@@ -1,15 +1,17 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getActiveSubscription } from "@/lib/services/access";
-import { isStaff } from "@/lib/services/role";
+import { isSuperAdmin } from "@/lib/services/role";
 
 /**
  * Return the current user's plan-level feature flags. Used by the marketing
  * pages to decide what to gate ("Watch replay" vs "Upgrade to view").
  *
  * Anonymous users get an empty feature map.
- * Platform staff (super_admin / instructor) bypass the plan gate — admins
- * shouldn't see "Upgrade plan" prompts on their own platform.
+ * super_admin bypasses the plan gate — admins shouldn't see "Upgrade plan"
+ * prompts on their own platform. Instructors are NOT bypassed here: they
+ * only have elevated access to the courses/webinars they author, not a
+ * blanket entitlement to consume paid features.
  */
 export async function GET() {
   const supabase = await createServerSupabase();
@@ -27,14 +29,14 @@ export async function GET() {
       },
     });
 
-  if (isStaff(user)) {
-    // Staff get every feature flag granted. Keep this in sync with the
+  if (isSuperAdmin(user)) {
+    // Admins get every feature flag granted. Keep this in sync with the
     // recording-fetch endpoint, which short-circuits the same way.
     return NextResponse.json({
       data: {
         authenticated: true,
         hasActiveSubscription: false,
-        planType: "staff",
+        planType: "admin",
         features: {
           webinars: true,
           courses: true,
