@@ -79,7 +79,9 @@ export function LessonPreviewDialog({
   if (!lesson) return null;
 
   const title =
-    locale === "ar" && lesson.title_ar ? lesson.title_ar : lesson.title;
+    locale === "ar"
+      ? lesson.title_ar || lesson.title || ""
+      : lesson.title || lesson.title_ar || "";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

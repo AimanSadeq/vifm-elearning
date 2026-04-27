@@ -79,7 +79,7 @@ function LessonRow({
 
       if (error) throw error;
 
-      toast.success(`Video uploaded for "${lesson.title}"`);
+      toast.success(`Video uploaded for "${(lesson.title ?? lesson.title_ar ?? "Untitled lesson")}"`);
       onVideoUpdated();
     } catch (err) {
       toast.error(
@@ -120,7 +120,7 @@ function LessonRow({
         throw new Error(err.error || "Failed to save URL");
       }
 
-      toast.success(`URL saved for "${lesson.title}"`);
+      toast.success(`URL saved for "${(lesson.title ?? lesson.title_ar ?? "Untitled lesson")}"`);
       setShowUrlInput(false);
       setExternalUrl("");
       onVideoUpdated();
@@ -141,8 +141,8 @@ function LessonRow({
           <Video className="h-4 w-4 text-muted-foreground" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium">{lesson.title}</p>
-          {lesson.title_ar && (
+          <p className="truncate text-sm font-medium">{lesson.title ?? lesson.title_ar ?? "Untitled lesson"}</p>
+          {lesson.title_ar && lesson.title && (
             <p className="truncate text-xs text-muted-foreground" dir="rtl">
               {lesson.title_ar}
             </p>

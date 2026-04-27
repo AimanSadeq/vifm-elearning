@@ -22,7 +22,7 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
   const [uploadProgress, setUploadProgress] = useState(0)
 
   const [formData, setFormData] = useState({
-    title: lesson.title,
+    title: lesson.title ?? '',
     title_ar: lesson.title_ar || '',
     description: lesson.description || '',
     description_ar: lesson.description_ar || '',
@@ -72,6 +72,12 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!formData.title.trim() && !formData.title_ar.trim()) {
+      setError('Provide a lesson title in English or Arabic — at least one is required')
+      return
+    }
+
     setIsLoading(true)
     setError('')
 
@@ -79,7 +85,7 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
       const supabase = createClient()
 
       const updateData: Record<string, unknown> = {
-        title: formData.title.trim(),
+        title: formData.title.trim() || null,
         title_ar: formData.title_ar.trim() || null,
         description: formData.description.trim() || null,
         description_ar: formData.description_ar.trim() || null,
@@ -145,14 +151,19 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Titles */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium text-foreground">Title (English) *</label>
-              <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground">Title (Arabic)</label>
-              <input type="text" dir="rtl" value={formData.title_ar} onChange={(e) => setFormData({ ...formData, title_ar: e.target.value })} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">
+              Fill in at least one language — Arabic-only lessons appear in the Arabic version of the course only, and vice versa.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-foreground">Title (English)</label>
+                <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground">Title (Arabic)</label>
+                <input type="text" dir="rtl" value={formData.title_ar} onChange={(e) => setFormData({ ...formData, title_ar: e.target.value })} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+              </div>
             </div>
           </div>
 

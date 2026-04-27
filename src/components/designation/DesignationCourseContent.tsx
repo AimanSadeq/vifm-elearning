@@ -214,16 +214,16 @@ function dbModulesToCourseModules(
   return modules.map((mod, i) => ({
     id: i + 1,
     title: {
-      en: mod.title,
-      ar: mod.title_ar || mod.title,
+      en: mod.title || mod.title_ar || "",
+      ar: mod.title_ar || mod.title || "",
     },
     videos: mod.lessons
       .filter((l) => l.content_type === "video")
       .map((l, j) => ({
         num: `${i + 1}.${j + 1}`,
         title: {
-          en: l.title,
-          ar: l.title_ar || l.title,
+          en: l.title || l.title_ar || "",
+          ar: l.title_ar || l.title || "",
         },
         desc: {
           en: l.description || "",

@@ -204,7 +204,7 @@ export function DraggableModuleSection({
               <span className="sm:hidden">Bulk</span>
             </button>
             <button
-              onClick={() => onDeleteModule(mod.id, mod.title, mod.lessons.length)}
+              onClick={() => onDeleteModule(mod.id, mod.title ?? mod.title_ar ?? "Untitled module", mod.lessons.length)}
               disabled={isDeleting}
               className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-card text-red-600 shadow-sm ring-1 ring-border transition-all hover:bg-red-50 hover:text-red-700 hover:shadow-md disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"
               title="Delete module"

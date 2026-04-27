@@ -482,9 +482,9 @@ export default function LessonPage() {
                       nextLesson
                         ? {
                             title:
-                              locale === "ar" && nextLesson.title_ar
-                                ? nextLesson.title_ar
-                                : nextLesson.title,
+                              (locale === "ar"
+                                ? nextLesson.title_ar || nextLesson.title
+                                : nextLesson.title || nextLesson.title_ar) ?? "",
                             onPlay: navigateToNext,
                           }
                         : null

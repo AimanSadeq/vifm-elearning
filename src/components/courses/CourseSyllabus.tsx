@@ -91,8 +91,12 @@ export function CourseSyllabus({ modules, courseSlug }: CourseSyllabusProps) {
       <div className="divide-y rounded-lg border">
         {modules.map((module, index) => {
           const isExpanded = expandedModules.has(module.id);
+          // Prefer the active locale's title; fall back to the other language
+          // so AR-only modules still render in EN locale (and vice versa).
           const moduleTitle =
-            locale === "ar" && module.title_ar ? module.title_ar : module.title;
+            locale === "ar"
+              ? module.title_ar || module.title || ""
+              : module.title || module.title_ar || "";
 
           return (
             <div key={module.id}>
@@ -163,7 +167,9 @@ function LessonItem({
 }) {
   const Icon = contentIcons[lesson.content_type] ?? FileText;
   const title =
-    locale === "ar" && lesson.title_ar ? lesson.title_ar : lesson.title;
+    locale === "ar"
+      ? lesson.title_ar || lesson.title || ""
+      : lesson.title || lesson.title_ar || "";
 
   // Preview lessons are clickable; locked ones are not
   if (lesson.is_preview) {

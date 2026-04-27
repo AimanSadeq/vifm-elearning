@@ -241,7 +241,7 @@ export function DraggableLessonCard({
               <Edit className="h-4 w-4" />
             </button>
             <button
-              onClick={() => onDelete(lesson.id, lesson.title, lesson.content_type)}
+              onClick={() => onDelete(lesson.id, lesson.title ?? lesson.title_ar ?? "Untitled lesson", lesson.content_type)}
               disabled={isDeleting}
               className="rounded-lg p-2 text-muted-foreground hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 disabled:opacity-50"
               title="Delete"

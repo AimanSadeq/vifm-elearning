@@ -84,7 +84,7 @@ export function ContentSidebar({
     return modules
       .map((mod) => {
         const filteredLessons = (mod.lessons ?? []).filter((lesson) => {
-          const titleEn = lesson.title.toLowerCase();
+          const titleEn = lesson.title?.toLowerCase() ?? "";
           const titleAr = lesson.title_ar?.toLowerCase() ?? "";
           const type = lesson.content_type.toLowerCase();
           return (
@@ -317,9 +317,9 @@ export function ContentSidebar({
                     const isInProgress = watchPct > 0 && !isCompleted;
                     const lessonNumber = `${mi + 1}.${li + 1}`;
                     const lessonTitle =
-                      locale === "ar" && lesson.title_ar
-                        ? lesson.title_ar
-                        : lesson.title;
+                      locale === "ar"
+                        ? lesson.title_ar || lesson.title || ""
+                        : lesson.title || lesson.title_ar || "";
                     const badgeClass = contentTypeBadgeClass[lesson.content_type];
                     const badgeLabelKey = contentTypeLabelKey[lesson.content_type];
 

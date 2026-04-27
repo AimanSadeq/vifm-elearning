@@ -134,7 +134,7 @@ export interface Course {
 export interface Module {
   id: string;
   course_id: string;
-  title: string;
+  title: string | null;
   title_ar?: string | null;
   description?: string | null;
   description_ar?: string | null;
@@ -151,7 +151,7 @@ export interface Lesson {
   id: string;
   module_id: string;
   course_id: string;
-  title: string;
+  title: string | null;
   title_ar?: string | null;
   description?: string | null;
   description_ar?: string | null;
