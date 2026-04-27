@@ -65,20 +65,28 @@ export function CreateCourseForm() {
   }, [])
 
   // Auto-generate slug from the English title — but only while the user
-  // hasn't manually edited the slug field. If they clear the EN title we
-  // leave the slug as-is so they can submit Arabic-only courses without
-  // re-typing.
+  // hasn't manually edited the slug field. For Arabic-only courses (no EN
+  // title) we generate a `course-<random>` placeholder so admins aren't
+  // blocked by the required-slug rule; they can edit it manually if they
+  // care, but the form now submits without an extra step.
   useEffect(() => {
     if (slugTouched) return
-    if (!form.title) return
-    const slug = form.title
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim()
-    setForm((prev) => ({ ...prev, slug }))
-  }, [form.title, slugTouched])
+    if (form.title) {
+      const slug = form.title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim()
+      setForm((prev) => ({ ...prev, slug }))
+      return
+    }
+    if (form.title_ar && !form.slug) {
+      // Generate once on first AR keystroke; subsequent edits don't replace it.
+      const placeholder = `course-${Math.random().toString(36).slice(2, 8)}`
+      setForm((prev) => ({ ...prev, slug: placeholder }))
+    }
+  }, [form.title, form.title_ar, form.slug, slugTouched])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

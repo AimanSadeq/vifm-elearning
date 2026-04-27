@@ -158,6 +158,12 @@ export default function AdminLearningPathsPage() {
       }
 
       if (data.courses && data.courses.length > 0) {
+        const skipped = data.courses.filter((c) => !c.courseId).length;
+        if (skipped > 0) {
+          toast.warning(
+            `${skipped} row${skipped === 1 ? "" : "s"} had no course selected and were skipped.`
+          );
+        }
         const courseRows = data.courses
           .filter((c) => c.courseId)
           .map((c) => ({

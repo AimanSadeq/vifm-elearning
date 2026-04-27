@@ -29,57 +29,66 @@ export const profileSchema = z.object({
 
 // Bilingual title rule: at least one of title (EN) or titleAr is required.
 // We use this for courses, modules, and lessons so admins can publish content
-// in either language without the other.
+// in either language without the other. The error is attached to BOTH paths so
+// admins filling only the Arabic field see the message under the Arabic input
+// rather than under a blank EN field they're choosing not to use.
 const bilingualTitleRefine = (data: { title?: string; titleAr?: string }) =>
-  (data.title && data.title.trim().length >= 2) ||
-  (data.titleAr && data.titleAr.trim().length >= 2);
+  (!!data.title && data.title.trim().length >= 2) ||
+  (!!data.titleAr && data.titleAr.trim().length >= 2);
 const bilingualTitleMessage = "Provide a title in English or Arabic (min 2 chars).";
 
-export const courseSchema = z
-  .object({
-    title: z.string().optional(),
-    titleAr: z.string().optional(),
-    description: z.string().optional(),
-    descriptionAr: z.string().optional(),
-    shortDescription: z.string().max(200).optional(),
-    shortDescriptionAr: z.string().max(200).optional(),
-    categoryId: z.string().uuid(),
-    instructorId: z.preprocess((val) => (val === "" ? undefined : val), z.string().uuid().optional()),
-    difficultyLevel: z.enum(["beginner", "intermediate", "advanced", "expert"]),
-    price: z.number().min(0),
-    currency: z.string(),
-    isFree: z.boolean(),
-    isFeatured: z.boolean(),
-    certificateEnabled: z.boolean(),
-    certificateTemplateId: z.string().uuid().optional().or(z.literal("")),
-    passingScore: z.number().min(0).max(100),
-    learningOutcomes: z.array(z.string()).optional(),
-    learningOutcomesAr: z.array(z.string()).optional(),
-    tags: z.array(z.string()).optional(),
-  })
-  .refine(bilingualTitleRefine, { message: bilingualTitleMessage, path: ["title"] })
-  .refine(
-    (data) =>
-      (data.description && data.description.trim().length >= 10) ||
-      (data.descriptionAr && data.descriptionAr.trim().length >= 10),
-    {
-      message: "Provide a description in English or Arabic (min 10 chars).",
-      path: ["description"],
-    }
-  );
+function applyBilingualTitleRefine<T extends z.ZodTypeAny>(schema: T) {
+  return schema
+    .refine(bilingualTitleRefine, { message: bilingualTitleMessage, path: ["title"] })
+    .refine(bilingualTitleRefine, { message: bilingualTitleMessage, path: ["titleAr"] });
+}
 
-export const moduleSchema = z
-  .object({
+export const courseSchema = applyBilingualTitleRefine(
+  z
+    .object({
+      title: z.string().optional(),
+      titleAr: z.string().optional(),
+      description: z.string().optional(),
+      descriptionAr: z.string().optional(),
+      shortDescription: z.string().max(200).optional(),
+      shortDescriptionAr: z.string().max(200).optional(),
+      categoryId: z.string().uuid(),
+      instructorId: z.preprocess((val) => (val === "" ? undefined : val), z.string().uuid().optional()),
+      difficultyLevel: z.enum(["beginner", "intermediate", "advanced", "expert"]),
+      price: z.number().min(0),
+      currency: z.string(),
+      isFree: z.boolean(),
+      isFeatured: z.boolean(),
+      certificateEnabled: z.boolean(),
+      certificateTemplateId: z.string().uuid().optional().or(z.literal("")),
+      passingScore: z.number().min(0).max(100),
+      learningOutcomes: z.array(z.string()).optional(),
+      learningOutcomesAr: z.array(z.string()).optional(),
+      tags: z.array(z.string()).optional(),
+    })
+    .refine(
+      (data) =>
+        (!!data.description && data.description.trim().length >= 10) ||
+        (!!data.descriptionAr && data.descriptionAr.trim().length >= 10),
+      {
+        message: "Provide a description in English or Arabic (min 10 chars).",
+        path: ["description"],
+      }
+    )
+);
+
+export const moduleSchema = applyBilingualTitleRefine(
+  z.object({
     title: z.string().optional(),
     titleAr: z.string().optional(),
     description: z.string().optional(),
     descriptionAr: z.string().optional(),
     isPreview: z.boolean(),
   })
-  .refine(bilingualTitleRefine, { message: bilingualTitleMessage, path: ["title"] });
+);
 
-export const lessonSchema = z
-  .object({
+export const lessonSchema = applyBilingualTitleRefine(
+  z.object({
     title: z.string().optional(),
     titleAr: z.string().optional(),
     contentType: z.enum(["video", "document", "quiz", "assignment"]),
@@ -89,7 +98,7 @@ export const lessonSchema = z
     isMandatory: z.boolean(),
     durationMinutes: z.number().min(0).optional(),
   })
-  .refine(bilingualTitleRefine, { message: bilingualTitleMessage, path: ["title"] });
+);
 
 export const quizSchema = z.object({
   title: z.string().min(2),

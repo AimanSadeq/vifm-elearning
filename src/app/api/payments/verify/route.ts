@@ -41,13 +41,11 @@ export async function GET(request: NextRequest) {
 
   const { data: payment, error } = await query.maybeSingle();
 
-  if (error || !payment) {
+  // Collapse "not found" and "found-but-not-yours" into the same 404 so this
+  // endpoint can't be used to enumerate which payment IDs / Stripe sessions
+  // exist on the platform.
+  if (error || !payment || payment.user_id !== user.id) {
     return NextResponse.json({ error: "Payment not found" }, { status: 404 });
-  }
-
-  // The payment row must belong to the requesting user — never reveal others' status.
-  if (payment.user_id !== user.id) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   let courseSlug: string | null = null;

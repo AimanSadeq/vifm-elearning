@@ -105,10 +105,12 @@ export default function AdminNotificationsPage() {
         toast.error("Enter a recipient email address.");
         return;
       }
+      // ilike is case-insensitive — admins routinely paste mixed-case
+      // addresses; storing always-lowercase isn't enforced.
       const { data, error } = await supabase
         .from("profiles")
         .select("id")
-        .eq("email", email);
+        .ilike("email", email);
       lookupError = error?.message ?? null;
       userIds = (data ?? []).map((u) => u.id);
     }

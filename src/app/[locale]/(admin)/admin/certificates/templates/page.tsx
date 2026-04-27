@@ -40,6 +40,26 @@ export default function AdminCertificateTemplatesPage() {
     setIsSaving(true);
     const supabase = createClient();
 
+    // Refuse to un-mark the only existing default. Without this guard an admin
+    // can leave the system with no default template, which then breaks
+    // certificate generation for every course that doesn't pin a template.
+    if (
+      editingTemplate?.is_default &&
+      !data.isDefault
+    ) {
+      const { count } = await supabase
+        .from("certificate_templates")
+        .select("id", { count: "exact", head: true })
+        .eq("is_default", true);
+      if ((count ?? 0) <= 1) {
+        setIsSaving(false);
+        toast.error(
+          "Cannot remove default — set another template as default first."
+        );
+        return;
+      }
+    }
+
     const dbData = {
       name: data.name,
       name_ar: data.nameAr || null,

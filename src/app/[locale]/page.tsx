@@ -22,31 +22,8 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const isAr = locale === "ar";
-  const title = isAr
-    ? "أكاديمية VIFM — تدريب احترافي وتعلم إلكتروني"
-    : "VIFM Academy — Professional Training & E-Learning";
-  const description = isAr
-    ? "دورات تدريبية احترافية في المالية، تحليلات البيانات، الإستراتيجية والامتثال عبر دول الخليج العربي."
-    : "Professional training in Finance, Data Analytics, Strategy and Compliance across the GCC region.";
-
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: `/${locale}`,
-      languages: {
-        en: "/en",
-        ar: "/ar",
-      },
-    },
-    openGraph: {
-      title,
-      description,
-      locale: isAr ? "ar_AE" : "en_US",
-      url: `/${locale}`,
-    },
-  };
+  const { pageMetadata } = await import("@/lib/seo/page-metadata");
+  return pageMetadata({ locale, key: "home", pathname: "" });
 }
 
 export default async function HomePage({

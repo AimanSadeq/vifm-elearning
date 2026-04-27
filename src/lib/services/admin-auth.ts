@@ -40,7 +40,7 @@ export async function authorizeAdmin(
     .from("profiles")
     .select("role")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   if (!profile || !["super_admin", "instructor"].includes(profile.role)) {
     return { ok: false, error: { error: "Forbidden", status: 403 } };
@@ -66,7 +66,7 @@ export async function adminOwnsCourse(
     .from("courses")
     .select("instructor_id")
     .eq("id", courseId)
-    .single();
+    .maybeSingle();
 
   return !!course && course.instructor_id === admin.userId;
 }
@@ -84,7 +84,7 @@ export async function adminOwnsLesson(
     .from("lessons")
     .select("course_id")
     .eq("id", lessonId)
-    .single();
+    .maybeSingle();
 
   if (!lesson?.course_id) return false;
   return adminOwnsCourse(admin, lesson.course_id);

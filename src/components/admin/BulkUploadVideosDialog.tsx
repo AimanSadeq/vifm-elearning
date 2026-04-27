@@ -28,6 +28,7 @@ interface Row {
   id: string
   file: File
   title: string
+  title_ar: string
   sizeMb: number
   status: RowStatus
   progress: number
@@ -92,6 +93,7 @@ export function BulkUploadVideosDialog({
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
         file,
         title: titleFromFileName(file.name),
+        title_ar: '',
         sizeMb: file.size / (1024 * 1024),
         status: 'pending',
         progress: 0,
@@ -121,6 +123,15 @@ export function BulkUploadVideosDialog({
   ): Promise<{ ok: boolean; error?: string }> => {
     const supabase = createClient()
 
+    const titleEn = row.title.trim()
+    const titleAr = row.title_ar.trim()
+
+    if (!titleEn && !titleAr) {
+      const message = 'Provide a title in English or Arabic — at least one is required'
+      updateRow(row.id, { status: 'error', progress: 0, error: message })
+      return { ok: false, error: message }
+    }
+
     updateRow(row.id, { status: 'uploading', progress: 0, error: undefined })
 
     try {
@@ -133,7 +144,8 @@ export function BulkUploadVideosDialog({
       const lessonData = {
         course_id: courseId,
         module_id: moduleId,
-        title: row.title.trim() || titleFromFileName(row.file.name),
+        title: titleEn || null,
+        title_ar: titleAr || null,
         content_type: 'video' as const,
         sort_order: sortOrder,
         is_mandatory: true,
@@ -168,7 +180,24 @@ export function BulkUploadVideosDialog({
     setIsUploading(true)
     setGlobalError(null)
 
-    let sortOrder = existingLessonCount + rows.filter((r) => r.status === 'done').length
+    // Get the actual max sort_order from the DB rather than trusting the
+    // `existingLessonCount` prop, which is stale once the dialog has been
+    // open across multiple partial-success uploads.
+    let sortOrder = existingLessonCount
+    try {
+      const supabase = createClient()
+      const { data: maxRow } = await supabase
+        .from('lessons')
+        .select('sort_order')
+        .eq('module_id', moduleId)
+        .order('sort_order', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      sortOrder = ((maxRow?.sort_order ?? -1) as number) + 1
+    } catch {
+      // Fall back to the prop-based count if the lookup fails.
+    }
+
     let successes = 0
     let failures = 0
 
@@ -220,7 +249,7 @@ export function BulkUploadVideosDialog({
           <div>
             <h2 className="text-xl font-semibold text-foreground">Bulk Upload Videos</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Pick multiple video files. Titles are generated from filenames — edit before uploading.
+              Pick multiple video files. English titles are generated from filenames — edit before uploading. Add Arabic if needed (at least one language is required per row).
             </p>
           </div>
           <button
@@ -274,29 +303,55 @@ export function BulkUploadVideosDialog({
                   <tr>
                     <th className="px-3 py-2 w-10">#</th>
                     <th className="px-3 py-2">Title (English)</th>
-                    <th className="px-3 py-2 w-28">Size</th>
+                    <th className="px-3 py-2">Title (Arabic)</th>
+                    <th className="px-3 py-2 w-24">Size</th>
                     <th className="px-3 py-2 w-40">Status</th>
                     <th className="px-3 py-2 w-10"></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((row, i) => (
+                  {rows.map((row, i) => {
+                    const hasNeither =
+                      !row.title.trim() && !row.title_ar.trim()
+                    const inputBase =
+                      'block w-full rounded-md border bg-card px-2 py-1.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-70'
+                    const inputClass =
+                      hasNeither && row.status !== 'done' && row.status !== 'uploading'
+                        ? `${inputBase} border-amber-300`
+                        : `${inputBase} border-border`
+                    return (
                     <tr key={row.id} className="border-t border-border">
-                      <td className="px-3 py-2 text-muted-foreground">
+                      <td className="px-3 py-2 text-muted-foreground align-top pt-3">
                         {existingLessonCount + i + 1}
                       </td>
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-2 align-top">
                         <input
                           type="text"
                           value={row.title}
                           onChange={(e) => updateRow(row.id, { title: e.target.value })}
                           disabled={row.status === 'uploading' || row.status === 'done'}
-                          className="block w-full rounded-md border border-border bg-card px-2 py-1.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-70"
-                          placeholder="Lesson title"
+                          className={inputClass}
+                          placeholder="English title (optional if Arabic is filled)"
                         />
                         <p className="mt-0.5 text-xs text-muted-foreground truncate" title={row.file.name}>
                           {row.file.name}
                         </p>
+                      </td>
+                      <td className="px-3 py-2 align-top">
+                        <input
+                          type="text"
+                          dir="rtl"
+                          value={row.title_ar}
+                          onChange={(e) => updateRow(row.id, { title_ar: e.target.value })}
+                          disabled={row.status === 'uploading' || row.status === 'done'}
+                          className={inputClass}
+                          placeholder="العنوان بالعربية (اختياري إذا تم تعبئة الإنجليزية)"
+                        />
+                        {hasNeither && row.status !== 'done' && row.status !== 'uploading' && (
+                          <p className="mt-0.5 text-xs text-amber-700 dark:text-amber-400">
+                            Fill English or Arabic
+                          </p>
+                        )}
                       </td>
                       <td className="px-3 py-2 text-muted-foreground">
                         {row.sizeMb.toFixed(1)} MB
@@ -349,7 +404,8 @@ export function BulkUploadVideosDialog({
                         )}
                       </td>
                     </tr>
-                  ))}
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

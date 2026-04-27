@@ -22,7 +22,7 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
   const [uploadProgress, setUploadProgress] = useState(0)
 
   const [formData, setFormData] = useState({
-    title: lesson.title ?? '',
+    title: lesson.title || '',
     title_ar: lesson.title_ar || '',
     description: lesson.description || '',
     description_ar: lesson.description_ar || '',

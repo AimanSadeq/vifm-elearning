@@ -106,7 +106,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
   const [deletingModuleId, setDeletingModuleId] = useState<string | null>(null)
 
   const [courseForm, setCourseForm] = useState({
-    title: course.title,
+    title: course.title ?? '',
     title_ar: course.title_ar || '',
     description: course.description || '',
     description_ar: course.description_ar || '',
@@ -243,7 +243,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     if (emptyModules.length > 0) {
       issues.push({
         level: 'warning',
-        message: `${emptyModules.length} module${emptyModules.length === 1 ? '' : 's'} have no lessons (${emptyModules.map((m) => m.title).slice(0, 3).join(', ')}${emptyModules.length > 3 ? '…' : ''}).`,
+        message: `${emptyModules.length} module${emptyModules.length === 1 ? '' : 's'} have no lessons (${emptyModules.map((m) => m.title || m.title_ar || 'Untitled').slice(0, 3).join(', ')}${emptyModules.length > 3 ? '…' : ''}).`,
       })
     }
 
@@ -524,9 +524,16 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     setModules(reordered)
 
     try {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) throw new Error('Not authenticated')
+
       const response = await fetch(`/api/admin/courses/${course.id}/reorder`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({ moduleIds: reordered.map((m) => m.id) }),
       })
 
@@ -564,9 +571,16 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     )
 
     try {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) throw new Error('Not authenticated')
+
       const response = await fetch(`/api/admin/courses/${course.id}/reorder`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({
           moduleId,
           lessonIds: reordered.map((l) => l.id),
@@ -821,7 +835,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                 {thumbnailUrl ? (
                   <Image
                     src={thumbnailUrl}
-                    alt={course.title}
+                    alt={course.title ?? course.title_ar ?? "Course thumbnail"}
                     fill
                     className="object-cover"
                     sizes="256px"

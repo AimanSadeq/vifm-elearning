@@ -70,13 +70,21 @@ export async function POST(
     let totalLessons = 0;
 
     for (const mod of registryData.modules) {
-      // Insert module
+      // Future-proof against AR-only registry entries: coerce blanks to null
+      // so the courses_bilingual_title CHECK can fail loudly if both are
+      // missing rather than inserting an empty-string title.
+      const modTitleEn = mod.title.en?.trim() || null;
+      const modTitleAr = mod.title.ar?.trim() || null;
+      if (!modTitleEn && !modTitleAr) {
+        console.error(`[scaffold] Skipping module with no title (en or ar)`, mod);
+        continue;
+      }
       const { data: newModule, error: modError } = await supabaseAdmin
         .from("modules")
         .insert({
           course_id: courseId,
-          title: mod.title.en,
-          title_ar: mod.title.ar,
+          title: modTitleEn,
+          title_ar: modTitleAr,
           sort_order: mod.id - 1, // 0-indexed
         })
         .select("id")
@@ -90,26 +98,35 @@ export async function POST(
       totalModules++;
 
       // Insert lessons for each video in this module
-      const lessonInserts = mod.videos.map((video, videoIndex) => {
-        // Parse duration string like "25 min" or "30 min"
-        const durationMatch = video.duration.match(/(\d+)/);
-        const durationMinutes = durationMatch ? parseInt(durationMatch[1], 10) : 0;
+      const lessonInserts = mod.videos
+        .map((video, videoIndex) => {
+          // Parse duration string like "25 min" or "30 min"
+          const durationMatch = video.duration.match(/(\d+)/);
+          const durationMinutes = durationMatch ? parseInt(durationMatch[1], 10) : 0;
 
-        return {
-          module_id: newModule.id,
-          course_id: courseId,
-          title: video.title.en,
-          title_ar: video.title.ar,
-          description: video.desc.en || null,
-          description_ar: video.desc.ar || null,
-          content_type: "video" as const,
-          sort_order: videoIndex,
-          duration_minutes: durationMinutes,
-          is_preview: false,
-          is_mandatory: true,
-          video_url: null,
-        };
-      });
+          const titleEn = video.title.en?.trim() || null;
+          const titleAr = video.title.ar?.trim() || null;
+          if (!titleEn && !titleAr) {
+            console.error(`[scaffold] Skipping lesson with no title (en or ar)`, video);
+            return null;
+          }
+
+          return {
+            module_id: newModule.id,
+            course_id: courseId,
+            title: titleEn,
+            title_ar: titleAr,
+            description: video.desc.en || null,
+            description_ar: video.desc.ar || null,
+            content_type: "video" as const,
+            sort_order: videoIndex,
+            duration_minutes: durationMinutes,
+            is_preview: false,
+            is_mandatory: true,
+            video_url: null,
+          };
+        })
+        .filter((l): l is NonNullable<typeof l> => l !== null);
 
       if (lessonInserts.length > 0) {
         const { error: lessonsError } = await supabaseAdmin

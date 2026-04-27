@@ -90,7 +90,7 @@ export interface Category {
 
 export interface Course {
   id: string;
-  title: string;
+  title: string | null;
   title_ar?: string | null;
   slug: string;
   description?: string | null;

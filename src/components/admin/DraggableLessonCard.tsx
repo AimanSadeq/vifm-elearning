@@ -113,7 +113,7 @@ export function DraggableLessonCard({
         {...listeners}
         className="absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-lg bg-card border border-border shadow-sm hover:bg-muted cursor-grab active:cursor-grabbing touch-none"
         title="Drag to reorder"
-        aria-label={`Drag to reorder ${lesson.title}`}
+        aria-label={`Drag to reorder ${lesson.title ?? lesson.title_ar ?? "lesson"}`}
       >
         <GripVertical className="h-5 w-5 text-muted-foreground" />
       </button>
@@ -139,7 +139,7 @@ export function DraggableLessonCard({
                   checked={!!isSelected}
                   onChange={(e) => onSelectChange(e.target.checked)}
                   className="h-4 w-4 rounded border-border text-brand-600 focus:ring-brand-500 cursor-pointer"
-                  aria-label={`Select lesson ${lesson.title}`}
+                  aria-label={`Select lesson ${lesson.title ?? lesson.title_ar ?? "lesson"}`}
                 />
               </label>
             )}
@@ -154,10 +154,11 @@ export function DraggableLessonCard({
                   #{index + 1}
                 </span>
                 <h4 className="font-medium text-foreground truncate">
-                  {lesson.title}
+                  {lesson.title || lesson.title_ar || "Untitled lesson"}
                 </h4>
               </div>
-              {lesson.title_ar && (
+              {/* Show the other-language title as a secondary line whenever both exist */}
+              {lesson.title && lesson.title_ar && (
                 <p className="text-sm text-muted-foreground truncate" dir="rtl">
                   {lesson.title_ar}
                 </p>

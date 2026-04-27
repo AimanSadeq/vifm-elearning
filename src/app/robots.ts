@@ -9,7 +9,20 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/admin/", "/en/admin/", "/ar/admin/"],
+        // Block admin routes under any locale prefix. The wildcard pattern is
+        // honored by the major crawlers (Google/Bing) and survives any new
+        // locale being added without revisiting this file.
+        disallow: [
+          "/api/",
+          "/admin/",
+          "/*/admin/",
+          "/my-courses/",
+          "/*/my-courses/",
+          "/profile/",
+          "/*/profile/",
+          "/payment/",
+          "/*/payment/",
+        ],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

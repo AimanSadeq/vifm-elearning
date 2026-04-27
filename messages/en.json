@@ -818,5 +818,35 @@
     "perQuarter": "/quarter",
     "perYear": "/year",
     "oneTime": "one-time"
+  },
+  "metadata": {
+    "home": {
+      "title": "VIFM Academy — Professional Training & E-Learning",
+      "description": "Professional training in Finance, Data Analytics, Strategy and Compliance across the GCC region."
+    },
+    "courses": {
+      "title": "All Courses",
+      "description": "Browse VIFM's complete catalog of professional courses in Finance, Data Analytics, Strategy and Compliance."
+    },
+    "webinars": {
+      "title": "Webinars",
+      "description": "Live and on-demand webinars from industry experts in Finance, Business and Compliance."
+    },
+    "learningPaths": {
+      "title": "Learning Paths",
+      "description": "Curated, sequential course paths that take you from beginner to expert in each specialty."
+    },
+    "pricing": {
+      "title": "Pricing & Subscriptions",
+      "description": "Pick a subscription plan for unlimited access to VIFM's courses, webinars and certifications."
+    },
+    "about": {
+      "title": "About VIFM Academy",
+      "description": "Learn about the Virginia Institute of Finance and Management — our mission, faculty, and offices across the GCC."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "Get in touch with the VIFM Academy team for course enquiries, corporate training, or technical support."
+    }
   }
 }

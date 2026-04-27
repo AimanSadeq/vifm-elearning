@@ -12,9 +12,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { course_id, title, title_ar, description, description_ar, sort_order } = body;
 
-    if (!course_id || !title) {
+    const titleEn = typeof title === "string" ? title.trim() : "";
+    const titleArVal = typeof title_ar === "string" ? title_ar.trim() : "";
+
+    if (!course_id || (!titleEn && !titleArVal)) {
       return NextResponse.json(
-        { error: "course_id and title are required" },
+        { error: "course_id and at least one of title/title_ar are required" },
         { status: 400 }
       );
     }
@@ -27,8 +30,8 @@ export async function POST(request: NextRequest) {
       .from("modules")
       .insert({
         course_id,
-        title: title.trim(),
-        title_ar: title_ar?.trim() || null,
+        title: titleEn || null,
+        title_ar: titleArVal || null,
         description: description?.trim() || null,
         description_ar: description_ar?.trim() || null,
         sort_order: sort_order ?? 0,

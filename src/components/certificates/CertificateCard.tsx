@@ -10,7 +10,7 @@ import type { Certificate } from "@/types";
 
 interface CertificateCardProps {
   certificate: Certificate & {
-    course?: { title: string; title_ar?: string | null; slug?: string };
+    course?: { title: string | null; title_ar?: string | null; slug?: string };
   };
 }
 

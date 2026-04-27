@@ -74,7 +74,9 @@ export function ContentSidebar({
   });
 
   const courseTitle =
-    locale === "ar" && course.title_ar ? course.title_ar : course.title;
+    (locale === "ar"
+      ? course.title_ar || course.title
+      : course.title || course.title_ar) ?? "";
 
   // Filter lessons by search query
   const filteredModules = useMemo(() => {
@@ -244,7 +246,9 @@ export function ContentSidebar({
         {filteredModules.map((mod, mi) => {
           const isExpanded = expandedModules.has(mod.id);
           const moduleTitle =
-            locale === "ar" && mod.title_ar ? mod.title_ar : mod.title;
+            (locale === "ar"
+              ? mod.title_ar || mod.title
+              : mod.title || mod.title_ar) ?? "";
           const { completed, total } = getModuleProgress(mod);
           const progressPct = total > 0 ? Math.round((completed / total) * 100) : 0;
           const isComplete = completed === total && total > 0;

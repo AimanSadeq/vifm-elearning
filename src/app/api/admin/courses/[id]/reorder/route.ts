@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
+import { authorizeAdmin, adminOwnsCourse } from '@/lib/services/admin-auth'
 
 export async function POST(
   request: NextRequest,
@@ -7,42 +8,21 @@ export async function POST(
 ) {
   try {
     const { id: courseId } = await params
-    const supabase = await createServerSupabase()
 
-    // Verify auth
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await authorizeAdmin(request)
+    if (!auth.ok) {
+      return NextResponse.json({ error: auth.error.error }, { status: auth.error.status })
     }
 
-    // Verify admin role
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || !['super_admin', 'instructor'].includes(profile.role)) {
+    if (!(await adminOwnsCourse(auth.admin, courseId))) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
-    if (profile.role === 'instructor') {
-      const { data: course } = await supabase
-        .from('courses')
-        .select('instructor_id')
-        .eq('id', courseId)
-        .single()
-
-      if (!course || course.instructor_id !== user.id) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-      }
     }
 
     const { moduleId, lessonIds, moduleIds } = await request.json()
 
     if (Array.isArray(moduleIds) && moduleIds.length > 0) {
       const moduleUpdates = moduleIds.map((id: string, index: number) =>
-        supabase
+        supabaseAdmin
           .from('modules')
           .update({ sort_order: index })
           .eq('id', id)
@@ -53,11 +33,11 @@ export async function POST(
       const failed = results.filter((r: { error: unknown }) => r.error)
 
       if (failed.length > 0) {
-        console.error('Some module reorder updates failed:', failed.map((f: { error: unknown }) => f.error))
-        return NextResponse.json(
-          { error: 'Some updates failed' },
-          { status: 500 }
+        console.error(
+          'Some module reorder updates failed:',
+          failed.map((f: { error: unknown }) => f.error)
         )
+        return NextResponse.json({ error: 'Some updates failed' }, { status: 500 })
       }
 
       return NextResponse.json({ success: true })
@@ -70,9 +50,10 @@ export async function POST(
       )
     }
 
-    // Update sort_order for each lesson
+    // Scope every update by both module_id and course_id so a malformed payload
+    // can't reorder lessons across courses.
     const updates = lessonIds.map((lessonId: string, index: number) =>
-      supabase
+      supabaseAdmin
         .from('lessons')
         .update({ sort_order: index })
         .eq('id', lessonId)
@@ -84,19 +65,16 @@ export async function POST(
     const failed = results.filter((r: { error: unknown }) => r.error)
 
     if (failed.length > 0) {
-      console.error('Some reorder updates failed:', failed.map((f: { error: unknown }) => f.error))
-      return NextResponse.json(
-        { error: 'Some updates failed' },
-        { status: 500 }
+      console.error(
+        'Some reorder updates failed:',
+        failed.map((f: { error: unknown }) => f.error)
       )
+      return NextResponse.json({ error: 'Some updates failed' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Reorder error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

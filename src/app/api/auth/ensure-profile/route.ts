@@ -52,12 +52,25 @@ export async function POST() {
   const allowedRoles = ["learner", "instructor", "admin", "super_admin", "corporate_admin"];
   const role = appRole && allowedRoles.includes(appRole) ? appRole : "learner";
 
+  // user_metadata is user-writable, so anything we copy from it must be size-
+  // capped and (where applicable) shape-validated. Otherwise an attacker can
+  // stuff XSS-friendly markup into full_name, bloat the row with megabytes
+  // of phone, etc., and we'd render that into admin dashboards.
+  const safeFullName =
+    typeof metadata?.full_name === "string" && metadata.full_name.trim()
+      ? metadata.full_name.trim().slice(0, 200)
+      : user.email!.split("@")[0];
+  const phoneRaw = typeof metadata?.phone === "string" ? metadata.phone.trim() : "";
+  // Permissive phone shape: digits, spaces, +, -, parentheses; max 32 chars.
+  const phoneOk = phoneRaw && /^[+\d\s().-]{4,32}$/.test(phoneRaw);
+  const language = metadata?.language === "ar" ? "ar" : "en";
+
   const { error } = await adminClient.from("profiles").insert({
     id: user.id,
     email: user.email!,
-    full_name: metadata?.full_name || user.email!.split("@")[0],
-    phone: metadata?.phone || null,
-    language: metadata?.language === "ar" ? "ar" : "en",
+    full_name: safeFullName,
+    phone: phoneOk ? phoneRaw : null,
+    language,
     role,
   });
 

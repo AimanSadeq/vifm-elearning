@@ -60,10 +60,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .select("slug, updated_at")
         .eq("is_active", true)
         .limit(200),
+      // Drop "ended" webinars — keeping them produces stale URLs in the
+      // sitemap that 404 once recordings are pruned.
       supabase
         .from("webinars")
         .select("id, updated_at")
-        .in("status", ["scheduled", "live", "ended"])
+        .in("status", ["scheduled", "live"])
         .limit(500),
     ]);
 

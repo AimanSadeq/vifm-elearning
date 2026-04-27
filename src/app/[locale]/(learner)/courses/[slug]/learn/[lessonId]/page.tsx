@@ -386,9 +386,9 @@ export default function LessonPage() {
   const currentLessonLocked = isLocked(lessonId);
 
   const lessonTitle =
-    locale === "ar" && currentLesson.title_ar
-      ? currentLesson.title_ar
-      : currentLesson.title;
+    (locale === "ar"
+      ? currentLesson.title_ar || currentLesson.title
+      : currentLesson.title || currentLesson.title_ar) ?? "";
   const lessonDescription =
     locale === "ar" && currentLesson.description_ar
       ? currentLesson.description_ar

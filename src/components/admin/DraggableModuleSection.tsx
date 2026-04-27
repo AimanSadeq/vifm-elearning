@@ -120,7 +120,7 @@ export function DraggableModuleSection({
               {...listeners}
               className="flex h-10 w-10 items-center justify-center rounded-lg bg-card text-muted-foreground shadow-sm ring-1 ring-border transition-all hover:bg-muted hover:text-foreground cursor-grab active:cursor-grabbing touch-none"
               title="Drag to reorder module"
-              aria-label={`Drag to reorder ${mod.title}`}
+              aria-label={`Drag to reorder ${mod.title ?? mod.title_ar ?? "module"}`}
             >
               <GripVertical className="h-5 w-5" />
             </button>
@@ -137,8 +137,9 @@ export function DraggableModuleSection({
               )}
             </button>
             <button onClick={() => onToggle(mod.id)} className="text-left">
-              <h3 className="text-lg font-bold text-foreground">{mod.title}</h3>
-              {mod.title_ar && (
+              <h3 className="text-lg font-bold text-foreground">{mod.title || mod.title_ar || "Untitled module"}</h3>
+              {/* Secondary line shows the other language only when both exist */}
+              {mod.title && mod.title_ar && (
                 <p className="text-sm text-muted-foreground" dir="rtl">
                   {mod.title_ar}
                 </p>

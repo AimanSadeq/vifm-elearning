@@ -17,7 +17,9 @@ export function CourseCard({ course }: CourseCardProps) {
   const locale = useLocale();
 
   const title =
-    locale === "ar" && course.title_ar ? course.title_ar : course.title;
+    (locale === "ar"
+      ? course.title_ar || course.title
+      : course.title || course.title_ar) ?? "";
   const description =
     locale === "ar" && course.short_description_ar
       ? course.short_description_ar

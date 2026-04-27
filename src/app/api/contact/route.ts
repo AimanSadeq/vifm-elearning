@@ -10,7 +10,66 @@ const contactSchema = z.object({
   message: z.string().trim().min(10).max(5000),
 });
 
+// Per-IP throttle. In-memory only — fine for a single Next.js process and good
+// enough to stop casual abuse. Behind multiple instances or a serverless
+// platform this needs replacing with Redis/KV. Numbers picked for genuine
+// human use: a person filling the form may submit twice if the first
+// network call hangs, but should never need 6 attempts in a minute.
+type WindowRecord = { count: number; firstAt: number };
+const SHORT_LIMIT = 5;
+const SHORT_WINDOW_MS = 60_000; // 1 minute
+const LONG_LIMIT = 30;
+const LONG_WINDOW_MS = 60 * 60_000; // 1 hour
+const shortBuckets = new Map<string, WindowRecord>();
+const longBuckets = new Map<string, WindowRecord>();
+
+function checkBucket(
+  bucket: Map<string, WindowRecord>,
+  ip: string,
+  limit: number,
+  windowMs: number,
+  now: number
+): boolean {
+  const rec = bucket.get(ip);
+  if (!rec || now - rec.firstAt > windowMs) {
+    bucket.set(ip, { count: 1, firstAt: now });
+    return true;
+  }
+  if (rec.count >= limit) return false;
+  rec.count += 1;
+  return true;
+}
+
+function pruneStale(bucket: Map<string, WindowRecord>, windowMs: number, now: number) {
+  if (bucket.size < 1000) return; // cheap fast path
+  for (const [ip, rec] of bucket) {
+    if (now - rec.firstAt > windowMs) bucket.delete(ip);
+  }
+}
+
 export async function POST(request: NextRequest) {
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
+
+  const now = Date.now();
+  pruneStale(shortBuckets, SHORT_WINDOW_MS, now);
+  pruneStale(longBuckets, LONG_WINDOW_MS, now);
+
+  if (!checkBucket(shortBuckets, ip, SHORT_LIMIT, SHORT_WINDOW_MS, now)) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a minute and try again." },
+      { status: 429, headers: { "Retry-After": "60" } }
+    );
+  }
+  if (!checkBucket(longBuckets, ip, LONG_LIMIT, LONG_WINDOW_MS, now)) {
+    return NextResponse.json(
+      { error: "Hourly limit reached. Please try again later." },
+      { status: 429, headers: { "Retry-After": "3600" } }
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
@@ -32,10 +91,6 @@ export async function POST(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    null;
   const userAgent = request.headers.get("user-agent")?.slice(0, 500) || null;
 
   const { error } = await supabaseAdmin.from("contact_submissions").insert({
@@ -44,7 +99,7 @@ export async function POST(request: NextRequest) {
     subject: parsed.data.subject,
     message: parsed.data.message,
     user_id: user?.id ?? null,
-    ip_address: ip,
+    ip_address: ip === "unknown" ? null : ip,
     user_agent: userAgent,
   });
 
