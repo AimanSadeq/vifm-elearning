@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { WebinarForm } from "@/components/admin/WebinarForm";
+import { WebinarRecordingPanel } from "@/components/admin/WebinarRecordingPanel";
 import type { WebinarInput } from "@/lib/utils/validators";
 
 export default function EditWebinarPage() {
@@ -71,6 +72,7 @@ export default function EditWebinarPage() {
     <div className="space-y-6">
       <h1 className="font-heading text-2xl font-bold">Edit Webinar</h1>
       <WebinarForm initialData={initialData} mode="edit" />
+      <WebinarRecordingPanel webinarId={webinarId} />
     </div>
   );
 }
