@@ -109,7 +109,7 @@ export function WebinarPricing({
                 {isLive ? t("joinLive") : t("registerNow")}
               </Button>
             ) : isCompleted ? (
-              hasWebinarFeature ? (
+              (webinar.is_free ? Boolean(user) : hasWebinarFeature) ? (
                 <div className="rounded-lg border bg-muted/40 p-3 text-center text-sm text-muted-foreground">
                   {t("airedWithRecording")}
                 </div>
@@ -142,7 +142,7 @@ export function WebinarPricing({
               <IncludeRow Icon={Radio} label={t("liveSession")} />
             )}
             {isCompleted &&
-              (hasWebinarFeature ? (
+              ((webinar.is_free ? Boolean(user) : hasWebinarFeature) ? (
                 <IncludeRow Icon={Video} label={t("recordingAccess")} />
               ) : (
                 <IncludeRow Icon={Lock} label={t("recordingLockedShort")} muted />

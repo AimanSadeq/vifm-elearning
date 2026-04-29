@@ -75,15 +75,28 @@ export function GlobalSearchOverlay({
         const escaped = q.replace(/[%_\\]/g, "\\$&");
         const searchTerm = `%${escaped}%`;
 
+        let courseQ = supabase
+          .from("courses")
+          .select(
+            "id, title, title_ar, slug, short_description, short_description_ar"
+          )
+          .eq("status", "published")
+          .or(`title.ilike.${searchTerm},title_ar.ilike.${searchTerm}`);
+
+        if (locale === "ar") {
+          courseQ = courseQ
+            .not("title_ar", "is", null)
+            .neq("title_ar", "")
+            .filter("title_ar", "match", "[؀-ۿ]");
+        } else {
+          courseQ = courseQ
+            .not("title", "is", null)
+            .neq("title", "")
+            .filter("title", "match", "[A-Za-z]");
+        }
+
         const [coursesRes, designationsRes] = await Promise.all([
-          supabase
-            .from("courses")
-            .select(
-              "id, title, title_ar, slug, short_description, short_description_ar"
-            )
-            .eq("status", "published")
-            .or(`title.ilike.${searchTerm},title_ar.ilike.${searchTerm}`)
-            .limit(5),
+          courseQ.limit(5),
           supabase
             .from("designations")
             .select("id, name, name_ar, slug, abbreviation")

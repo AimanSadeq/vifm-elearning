@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { CATEGORIES } from "@/lib/utils/constants";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { HeroBackground } from "@/components/landing/HeroBackground";
 import { HeroContent } from "@/components/landing/HeroContent";
@@ -36,21 +35,6 @@ export default async function HomePage({
   setRequestLocale(locale);
   const t = await getTranslations("landing");
 
-  const CAT_DESCRIPTIONS: Record<string, string> = {
-    "finance-banking": t("catFinanceDesc"),
-    "data-analytics-ai": t("catDataDesc"),
-    "strategy-leadership": t("catStrategyDesc"),
-    "compliance-risk": t("catComplianceDesc"),
-  };
-
-  const categories = CATEGORIES.map((cat) => ({
-    iconName: cat.icon,
-    name: locale === "ar" ? cat.nameAr : cat.name,
-    description: CAT_DESCRIPTIONS[cat.slug],
-    color: cat.color,
-    slug: cat.slug,
-  }));
-
   const stats = [
     { value: 500, suffix: "+", label: t("statProfessionals") },
     { value: 50, suffix: "+", label: t("statCourses") },
@@ -67,6 +51,29 @@ export default async function HomePage({
     .eq("is_active", true)
     .order("sort_order");
 
+  // Fetch active categories from the DB so admin edits flow straight to the
+  // landing page. Falls back to an empty list, in which case the categories
+  // section is suppressed below.
+  const { data: dbCategories } = await supabase
+    .from("categories")
+    .select("name, name_ar, slug, description, description_ar, icon, color")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+
+  const categories = (dbCategories ?? []).map((cat) => ({
+    iconName: cat.icon ?? "",
+    name:
+      locale === "ar"
+        ? (cat.name_ar?.trim() ? cat.name_ar : cat.name)
+        : cat.name,
+    description:
+      locale === "ar"
+        ? (cat.description_ar?.trim() ? cat.description_ar : cat.description) ?? undefined
+        : cat.description ?? undefined,
+    color: cat.color ?? "#1E3A5F",
+    slug: cat.slug,
+  }));
+
   // Fetch active designations
   const { data: designations } = await supabase
     .from("designations")
@@ -74,8 +81,9 @@ export default async function HomePage({
     .eq("is_active", true)
     .order("name");
 
-  // Fetch featured courses
-  const { data: featuredCourses } = await supabase
+  // Fetch featured courses — gate by locale so an Arabic-only course doesn't
+  // leak onto the EN homepage and vice versa.
+  let featuredQ = supabase
     .from("courses")
     .select(`
       *,
@@ -83,7 +91,21 @@ export default async function HomePage({
       instructor:profiles!courses_instructor_id_fkey(full_name, full_name_ar, avatar_url)
     `)
     .eq("status", "published")
-    .eq("is_featured", true)
+    .eq("is_featured", true);
+
+  if (locale === "ar") {
+    featuredQ = featuredQ
+      .not("title_ar", "is", null)
+      .neq("title_ar", "")
+      .filter("title_ar", "match", "[؀-ۿ]");
+  } else {
+    featuredQ = featuredQ
+      .not("title", "is", null)
+      .neq("title", "")
+      .filter("title", "match", "[A-Za-z]");
+  }
+
+  const { data: featuredCourses } = await featuredQ
     .order("created_at", { ascending: false })
     .limit(9);
 
@@ -113,22 +135,24 @@ export default async function HomePage({
         </section>
 
         {/* Categories Section */}
-        <section className="py-16 lg:py-24">
-          <div className="container mx-auto px-4">
-            <SectionMarker
-              index="01"
-              eyebrow={t("categoriesSubtitle")}
-              title={t("categoriesTitle")}
-              align="center"
-            />
-            <CategoriesGrid
-              categories={categories}
-              locale={locale}
-              title=""
-              subtitle=""
-            />
-          </div>
-        </section>
+        {categories.length > 0 && (
+          <section className="py-16 lg:py-24">
+            <div className="container mx-auto px-4">
+              <SectionMarker
+                index="01"
+                eyebrow={t("categoriesSubtitle")}
+                title={t("categoriesTitle")}
+                align="center"
+              />
+              <CategoriesGrid
+                categories={categories}
+                locale={locale}
+                title=""
+                subtitle=""
+              />
+            </div>
+          </section>
+        )}
 
         {/* Featured Courses — marker rendered as a standalone div above the
             section, since FeaturedCoursesSection brings its own <section>
@@ -245,6 +269,26 @@ export default async function HomePage({
           subtitle={t("joinLearners")}
           ctaText={t("getStarted")}
           ctaHref={`/${locale}/register`}
+          tagline={t("ctaTagline")}
+          secondaryCtaText={t("ctaSecondary")}
+          secondaryCtaHref={`/${locale}/pricing`}
+          highlights={[
+            {
+              icon: "courses",
+              value: t("ctaHighlightCoursesValue"),
+              label: t("ctaHighlightCoursesLabel"),
+            },
+            {
+              icon: "bilingual",
+              value: t("ctaHighlightBilingualValue"),
+              label: t("ctaHighlightBilingualLabel"),
+            },
+            {
+              icon: "region",
+              value: t("ctaHighlightRegionValue"),
+              label: t("ctaHighlightRegionLabel"),
+            },
+          ]}
         />
       </main>
       <Footer />

@@ -170,7 +170,7 @@ export default function DashboardPage() {
 
       // Fetch recommendations
       try {
-        const res = await fetch("/api/recommendations?limit=4");
+        const res = await fetch(`/api/recommendations?limit=4&locale=${locale}`);
         if (res.ok) {
           const { data: recs } = await res.json();
           setRecommendations(recs ?? []);

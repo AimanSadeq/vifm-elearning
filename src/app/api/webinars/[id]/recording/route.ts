@@ -16,12 +16,15 @@ interface RouteParams {
 }
 
 /**
- * Returns the webinar recording URL — but only to users whose active
- * subscription grants the `webinars` feature (Quarterly / Annual / Lifetime).
+ * Returns the webinar recording URL.
+ *
+ * - Free webinars: any authenticated user can watch.
+ * - Paid webinars: requires the `webinars` plan feature (Quarterly / Annual /
+ *   Lifetime), with super_admin bypassing the check.
  *
  * The URL lives in the `webinar_recordings` table whose RLS allows only
  * super_admin to SELECT. We use the service-role client here, which bypasses
- * RLS, AFTER confirming feature access via the user's plan.
+ * RLS, AFTER confirming the access conditions above.
  */
 export async function GET(_req: Request, { params }: RouteParams) {
   const { id } = await params;
@@ -37,25 +40,11 @@ export async function GET(_req: Request, { params }: RouteParams) {
       { status: 401 }
     );
 
-  // Recording URL is data egress: only super_admin gets the role bypass.
-  // Instructors aren't admins of this resource, even if they teach courses.
-  if (!isSuperAdmin(user)) {
-    const allowed = await userHasFeature(user.id, "webinars");
-    if (!allowed)
-      return NextResponse.json(
-        {
-          error:
-            "Recording access is included with Quarterly, Annual, and Lifetime plans",
-        },
-        { status: 403 }
-      );
-  }
-
   // Confirm the parent webinar exists + is completed (cheap check on the
   // public-readable webinars table).
   const { data: webinar } = await supabaseAdmin
     .from("webinars")
-    .select("id, status")
+    .select("id, status, is_free")
     .eq("id", id)
     .maybeSingle();
 
@@ -70,6 +59,20 @@ export async function GET(_req: Request, { params }: RouteParams) {
       { error: "Recording is not available yet" },
       { status: 404 }
     );
+
+  // Free webinars only require an authenticated user. Paid webinars still
+  // require the `webinars` plan feature; super_admin bypasses both.
+  if (!webinar.is_free && !isSuperAdmin(user)) {
+    const allowed = await userHasFeature(user.id, "webinars");
+    if (!allowed)
+      return NextResponse.json(
+        {
+          error:
+            "Recording access is included with Quarterly, Annual, and Lifetime plans",
+        },
+        { status: 403 }
+      );
+  }
 
   // Fetch the URL from the locked-down recordings table via service role
   const { data: recording } = await supabaseAdmin

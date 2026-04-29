@@ -345,35 +345,26 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
 
     setIsUploadingThumbnail(true)
     try {
-      const supabase = createClient()
-      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-      const filePath = `courses/${course.id}/thumbnail.${fileExt}`
+      const formData = new FormData()
+      formData.append('file', file)
 
-      const { error: uploadError } = await supabase.storage
-        .from('course-assets')
-        .upload(filePath, file, { upsert: true, contentType: file.type })
+      const res = await fetch(`/api/admin/courses/${course.id}/thumbnail`, {
+        method: 'POST',
+        body: formData,
+      })
 
-      if (uploadError) throw uploadError
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new Error(json?.error || 'Upload failed')
+      }
 
-      const { data: urlData } = supabase.storage
-        .from('course-assets')
-        .getPublicUrl(filePath)
-
-      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`
-
-      const { error: updateError } = await supabase
-        .from('courses')
-        .update({ thumbnail_url: urlData.publicUrl })
-        .eq('id', course.id)
-
-      if (updateError) throw updateError
-
-      setThumbnailUrl(publicUrl)
+      setThumbnailUrl(`${json.thumbnail_url}?t=${Date.now()}`)
       toast.success('Thumbnail uploaded successfully')
       router.refresh()
     } catch (error) {
       console.error('Error uploading thumbnail:', error)
-      toast.error('Failed to upload thumbnail')
+      const message = error instanceof Error ? error.message : 'Failed to upload thumbnail'
+      toast.error(message)
     } finally {
       setIsUploadingThumbnail(false)
       e.target.value = ''
@@ -384,35 +375,22 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
   const handleThumbnailRemove = async () => {
     setIsUploadingThumbnail(true)
     try {
-      const supabase = createClient()
+      const res = await fetch(`/api/admin/courses/${course.id}/thumbnail`, {
+        method: 'DELETE',
+      })
 
-      // Try to delete from storage (ignore errors if file doesn't exist)
-      const { data: files } = await supabase.storage
-        .from('course-assets')
-        .list(`courses/${course.id}`)
-
-      if (files) {
-        const thumbnailFiles = files.filter((f) => f.name.startsWith('thumbnail'))
-        if (thumbnailFiles.length > 0) {
-          await supabase.storage
-            .from('course-assets')
-            .remove(thumbnailFiles.map((f) => `courses/${course.id}/${f.name}`))
-        }
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new Error(json?.error || 'Remove failed')
       }
-
-      const { error } = await supabase
-        .from('courses')
-        .update({ thumbnail_url: null })
-        .eq('id', course.id)
-
-      if (error) throw error
 
       setThumbnailUrl(null)
       toast.success('Thumbnail removed')
       router.refresh()
     } catch (error) {
       console.error('Error removing thumbnail:', error)
-      toast.error('Failed to remove thumbnail')
+      const message = error instanceof Error ? error.message : 'Failed to remove thumbnail'
+      toast.error(message)
     } finally {
       setIsUploadingThumbnail(false)
     }
@@ -744,11 +722,21 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="mb-3 flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-foreground">{course.title}</h1>
+              <h1 className="text-2xl font-bold text-foreground">
+                {locale === 'ar'
+                  ? course.title_ar || course.title || '—'
+                  : course.title || course.title_ar || '—'}
+              </h1>
               {getStatusBadge(course.status)}
             </div>
-            {course.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2">{course.description}</p>
+            {(locale === 'ar'
+              ? course.description_ar || course.description
+              : course.description || course.description_ar) && (
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {locale === 'ar'
+                  ? course.description_ar || course.description
+                  : course.description || course.description_ar}
+              </p>
             )}
           </div>
         </div>

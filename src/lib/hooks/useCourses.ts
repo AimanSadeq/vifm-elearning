@@ -73,13 +73,20 @@ export function useCoursesCatalog({
         )
         .eq("status", "published");
 
-      // Locale gate: a course only appears in a language catalog if it has a
-      // non-empty title in that language. Admins can fill English-only or
-      // Arabic-only or both.
+      // Locale gate: a course only appears in a language catalog if its title
+      // actually contains that language's script. Just checking for a
+      // non-empty title isn't enough — older imports sometimes stored Arabic
+      // text inside the `title` column, which then leaked onto the EN catalog.
       if (locale === "ar") {
-        query = query.not("title_ar", "is", null).neq("title_ar", "");
+        query = query
+          .not("title_ar", "is", null)
+          .neq("title_ar", "")
+          .filter("title_ar", "match", "[؀-ۿ]");
       } else {
-        query = query.not("title", "is", null).neq("title", "");
+        query = query
+          .not("title", "is", null)
+          .neq("title", "")
+          .filter("title", "match", "[A-Za-z]");
       }
 
       // Apply filters
@@ -184,9 +191,15 @@ export function useFeaturedCourses() {
         .eq("is_featured", true);
 
       if (locale === "ar") {
-        query = query.not("title_ar", "is", null).neq("title_ar", "");
+        query = query
+          .not("title_ar", "is", null)
+          .neq("title_ar", "")
+          .filter("title_ar", "match", "[؀-ۿ]");
       } else {
-        query = query.not("title", "is", null).neq("title", "");
+        query = query
+          .not("title", "is", null)
+          .neq("title", "")
+          .filter("title", "match", "[A-Za-z]");
       }
 
       const { data, error } = await query

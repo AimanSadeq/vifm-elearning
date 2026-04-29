@@ -9,9 +9,9 @@ import {
   Landmark, BrainCircuit, Target, ShieldCheck, ArrowRight,
   Sparkles, Clock, Video,
 } from "lucide-react";
-import { useState, useRef, useCallback, Fragment } from "react";
+import { useState, useRef, useCallback, useEffect, Fragment } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { CATEGORIES } from "@/lib/utils/constants";
+import { createClient } from "@/lib/supabase/client";
 import { DESIGNATION_TIERS } from "@/lib/site-content";
 import { cn } from "@/lib/utils/cn";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -28,6 +28,16 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
   "shield-check": ShieldCheck,
 };
 
+interface HeaderCategory {
+  name: string;
+  nameAr: string;
+  description: string;
+  descriptionAr: string;
+  slug: string;
+  icon: string;
+  color: string;
+}
+
 export function Header() {
   const t = useTranslations("common");
   const locale = useLocale();
@@ -35,8 +45,36 @@ export function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<MenuId>(null);
+  const [categories, setCategories] = useState<HeaderCategory[]>([]);
   const menuTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { user, signOut, isLoading } = useAuth();
+
+  useEffect(() => {
+    let cancelled = false;
+    const supabase = createClient();
+    supabase
+      .from("categories")
+      .select("name, name_ar, description, description_ar, slug, icon, color")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+        setCategories(
+          data.map((c) => ({
+            name: c.name,
+            nameAr: c.name_ar?.trim() ? c.name_ar : c.name,
+            description: c.description ?? "",
+            descriptionAr: c.description_ar?.trim() ? c.description_ar : c.description ?? "",
+            slug: c.slug,
+            icon: c.icon ?? "",
+            color: c.color ?? "#1E3A5F",
+          }))
+        );
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const openMenu = useCallback((id: MenuId) => {
     if (menuTimer.current) clearTimeout(menuTimer.current);
@@ -134,7 +172,7 @@ export function Header() {
                     <div className="absolute start-0 top-full z-50 hidden pt-1 md:block">
                       <div className="rounded-xl border bg-background shadow-xl overflow-hidden">
                         {menuId === "home" && (
-                          <div className="grid grid-cols-[240px_240px_340px]">
+                          <div className="grid grid-cols-[220px_300px_300px]">
                             <BrandedPanel
                               tagline={t("megaMenuTagline")}
                               title="VIFM Academy"
@@ -146,14 +184,26 @@ export function Header() {
                             <div className="border-e border-border/50 p-6">
                               <MenuSectionLabel>{t("megaMenuCategories")}</MenuSectionLabel>
                               <div className="mt-3 space-y-0.5">
-                                {CATEGORIES.map((cat) => {
-                                  const Icon = CATEGORY_ICONS[cat.icon] || Landmark;
+                                {categories.map((cat) => {
+                                  const Icon = cat.icon in CATEGORY_ICONS ? CATEGORY_ICONS[cat.icon] : null;
+                                  const desc = locale === "ar" ? cat.descriptionAr : cat.description;
                                   return (
                                     <MenuLink key={cat.slug} href={`/${locale}/categories/${cat.slug}`} onClose={closeMenuNow}>
                                       <MenuIcon style={{ backgroundColor: `${cat.color}15` }}>
-                                        <Icon className="h-4 w-4" style={{ color: cat.color }} />
+                                        {Icon ? (
+                                          <Icon className="h-4 w-4" style={{ color: cat.color }} />
+                                        ) : cat.icon ? (
+                                          <span className="text-base leading-none" aria-hidden>{cat.icon}</span>
+                                        ) : (
+                                          <Landmark className="h-4 w-4" style={{ color: cat.color }} />
+                                        )}
                                       </MenuIcon>
-                                      <span className="text-sm font-medium">{locale === "ar" ? cat.nameAr : cat.name}</span>
+                                      <div className="min-w-0">
+                                        <p className="truncate text-sm font-medium">{locale === "ar" ? cat.nameAr : cat.name}</p>
+                                        {desc && (
+                                          <p className="truncate text-xs text-muted-foreground/70">{desc}</p>
+                                        )}
+                                      </div>
                                     </MenuLink>
                                   );
                                 })}
@@ -161,7 +211,7 @@ export function Header() {
                             </div>
                             <div className="p-6">
                               <MenuSectionLabel>{t("megaMenuQuickLinks")}</MenuSectionLabel>
-                              <div className="mt-3 grid grid-cols-2 gap-0.5">
+                              <div className="mt-3 space-y-0.5">
                                 {[
                                   { href: `/${locale}/courses`, icon: BookOpen, label: t("megaMenuCourses"), desc: t("megaMenuCoursesDesc") },
                                   { href: `/${locale}/designations`, icon: Award, label: t("megaMenuCertifications"), desc: t("megaMenuCertificationsDesc") },
@@ -174,9 +224,9 @@ export function Header() {
                                     <MenuIcon className="bg-secondary text-muted-foreground group-hover:text-brand-600">
                                       <link.icon className="h-4 w-4" />
                                     </MenuIcon>
-                                    <div>
-                                      <p className="text-sm font-medium">{link.label}</p>
-                                      <p className="text-xs text-muted-foreground/70">{link.desc}</p>
+                                    <div className="min-w-0">
+                                      <p className="truncate text-sm font-medium">{link.label}</p>
+                                      <p className="truncate text-xs text-muted-foreground/70">{link.desc}</p>
                                     </div>
                                   </MenuLink>
                                 ))}
@@ -186,7 +236,7 @@ export function Header() {
                         )}
 
                         {menuId === "courses" && (
-                          <div className="grid grid-cols-[240px_240px_300px]">
+                          <div className="grid grid-cols-[220px_300px_280px]">
                             <BrandedPanel
                               tagline={t("courseMenuTagline")}
                               title={t("courses")}
@@ -198,14 +248,26 @@ export function Header() {
                             <div className="border-e border-border/50 p-6">
                               <MenuSectionLabel>{t("megaMenuCategories")}</MenuSectionLabel>
                               <div className="mt-3 space-y-0.5">
-                                {CATEGORIES.map((cat) => {
-                                  const Icon = CATEGORY_ICONS[cat.icon] || Landmark;
+                                {categories.map((cat) => {
+                                  const Icon = cat.icon in CATEGORY_ICONS ? CATEGORY_ICONS[cat.icon] : null;
+                                  const desc = locale === "ar" ? cat.descriptionAr : cat.description;
                                   return (
                                     <MenuLink key={cat.slug} href={`/${locale}/categories/${cat.slug}`} onClose={closeMenuNow}>
                                       <MenuIcon style={{ backgroundColor: `${cat.color}15` }}>
-                                        <Icon className="h-4 w-4" style={{ color: cat.color }} />
+                                        {Icon ? (
+                                          <Icon className="h-4 w-4" style={{ color: cat.color }} />
+                                        ) : cat.icon ? (
+                                          <span className="text-base leading-none" aria-hidden>{cat.icon}</span>
+                                        ) : (
+                                          <Landmark className="h-4 w-4" style={{ color: cat.color }} />
+                                        )}
                                       </MenuIcon>
-                                      <span className="text-sm font-medium">{locale === "ar" ? cat.nameAr : cat.name}</span>
+                                      <div className="min-w-0">
+                                        <p className="truncate text-sm font-medium">{locale === "ar" ? cat.nameAr : cat.name}</p>
+                                        {desc && (
+                                          <p className="truncate text-xs text-muted-foreground/70">{desc}</p>
+                                        )}
+                                      </div>
                                     </MenuLink>
                                   );
                                 })}
@@ -224,9 +286,9 @@ export function Header() {
                                     <MenuIcon className="bg-secondary text-muted-foreground group-hover:text-brand-600">
                                       <link.icon className="h-4 w-4" />
                                     </MenuIcon>
-                                    <div>
-                                      <p className="text-sm font-medium">{link.label}</p>
-                                      <p className="text-xs text-muted-foreground/70">{link.desc}</p>
+                                    <div className="min-w-0">
+                                      <p className="truncate text-sm font-medium">{link.label}</p>
+                                      <p className="truncate text-xs text-muted-foreground/70">{link.desc}</p>
                                     </div>
                                   </MenuLink>
                                 ))}
@@ -257,9 +319,9 @@ export function Header() {
                                       <MenuIcon style={{ backgroundColor: `${tier.accentColor}15` }}>
                                         <Icon className="h-4 w-4" style={{ color: tier.accentColor }} />
                                       </MenuIcon>
-                                      <div>
-                                        <p className="text-sm font-medium">{label}</p>
-                                        <p className="text-xs text-muted-foreground/70">{desc}</p>
+                                      <div className="min-w-0">
+                                        <p className="truncate text-sm font-medium">{label}</p>
+                                        <p className="truncate text-xs text-muted-foreground/70">{desc}</p>
                                       </div>
                                     </MenuLink>
                                   );
@@ -273,18 +335,18 @@ export function Header() {
                                   <MenuIcon className="bg-secondary text-muted-foreground group-hover:text-brand-600">
                                     <Award className="h-4 w-4" />
                                   </MenuIcon>
-                                  <div>
-                                    <p className="text-sm font-medium">{t("certMenuAllCerts")}</p>
-                                    <p className="text-xs text-muted-foreground/70">{t("certMenuAllCertsDesc")}</p>
+                                  <div className="min-w-0">
+                                    <p className="truncate text-sm font-medium">{t("certMenuAllCerts")}</p>
+                                    <p className="truncate text-xs text-muted-foreground/70">{t("certMenuAllCertsDesc")}</p>
                                   </div>
                                 </MenuLink>
                                 <MenuLink href={`/${locale}/courses`} onClose={closeMenuNow}>
                                   <MenuIcon className="bg-secondary text-muted-foreground group-hover:text-brand-600">
                                     <BookOpen className="h-4 w-4" />
                                   </MenuIcon>
-                                  <div>
-                                    <p className="text-sm font-medium">{t("megaMenuCourses")}</p>
-                                    <p className="text-xs text-muted-foreground/70">{t("megaMenuCoursesDesc")}</p>
+                                  <div className="min-w-0">
+                                    <p className="truncate text-sm font-medium">{t("megaMenuCourses")}</p>
+                                    <p className="truncate text-xs text-muted-foreground/70">{t("megaMenuCoursesDesc")}</p>
                                   </div>
                                 </MenuLink>
                               </div>
@@ -314,9 +376,9 @@ export function Header() {
                                     <MenuIcon className="bg-secondary text-muted-foreground group-hover:text-brand-600">
                                       <link.icon className="h-4 w-4" />
                                     </MenuIcon>
-                                    <div>
-                                      <p className="text-sm font-medium">{link.label}</p>
-                                      <p className="text-xs text-muted-foreground/70">{link.desc}</p>
+                                    <div className="min-w-0">
+                                      <p className="truncate text-sm font-medium">{link.label}</p>
+                                      <p className="truncate text-xs text-muted-foreground/70">{link.desc}</p>
                                     </div>
                                   </MenuLink>
                                 ))}
@@ -499,7 +561,7 @@ function MenuLink({
     <Link
       href={href}
       onClick={onClose}
-      className="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-secondary"
+      className="group flex items-center gap-3 rounded-lg px-3 py-1.5 transition-colors hover:bg-secondary"
     >
       {children}
       <ArrowRight className="ms-auto h-3.5 w-3.5 shrink-0 text-muted-foreground/40 opacity-0 transition-all group-hover:opacity-100 rtl:rotate-180" />

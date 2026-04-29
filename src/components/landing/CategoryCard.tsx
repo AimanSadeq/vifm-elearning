@@ -18,6 +18,13 @@ const ICON_MAP: Record<string, LucideIcon> = {
   "shield-check": ShieldCheck,
 };
 
+// The admin's category form auto-generates an emoji like 🏦 / 📊 — anything
+// that isn't a known lucide key falls back to text rendering so the chosen
+// glyph still shows up.
+function isLucideKey(name: string): name is keyof typeof ICON_MAP {
+  return name in ICON_MAP;
+}
+
 interface CategoryCardProps {
   name: string;
   description?: string;
@@ -43,7 +50,7 @@ export function CategoryCard({
   index,
   locale,
 }: CategoryCardProps) {
-  const Icon = ICON_MAP[iconName] || Landmark;
+  const Icon = isLucideKey(iconName) ? ICON_MAP[iconName] : null;
 
   return (
     <motion.div variants={cardVariants}>
@@ -69,7 +76,15 @@ export function CategoryCard({
           <div className="relative flex h-full flex-col">
             {/* Icon plate — brand-tinted, matches the detail-page benefit cards */}
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition-all duration-300 group-hover:bg-brand-600 group-hover:text-white dark:bg-brand-950/40 dark:text-brand-300 dark:group-hover:bg-brand-500">
-              <Icon className="h-6 w-6" />
+              {Icon ? (
+                <Icon className="h-6 w-6" />
+              ) : iconName ? (
+                <span className="text-2xl leading-none" aria-hidden>
+                  {iconName}
+                </span>
+              ) : (
+                <Landmark className="h-6 w-6" />
+              )}
             </div>
 
             <h3 className="mt-5 font-heading text-xl font-bold tracking-tight">

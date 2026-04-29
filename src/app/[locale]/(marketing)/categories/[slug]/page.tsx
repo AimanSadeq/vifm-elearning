@@ -168,11 +168,19 @@ export default function CategoryPage() {
         .eq("status", "published")
         .eq("category_id", category.id);
 
-      // Locale gate — only show courses available in the active language
+      // Locale gate — only show courses whose title actually contains the
+      // active language's script (older imports sometimes stored Arabic text
+      // in the `title` column, which then leaked onto the EN catalog).
       if (locale === "ar") {
-        query = query.not("title_ar", "is", null).neq("title_ar", "");
+        query = query
+          .not("title_ar", "is", null)
+          .neq("title_ar", "")
+          .filter("title_ar", "match", "[؀-ۿ]");
       } else {
-        query = query.not("title", "is", null).neq("title", "");
+        query = query
+          .not("title", "is", null)
+          .neq("title", "")
+          .filter("title", "match", "[A-Za-z]");
       }
 
       if (effectiveSearch) {

@@ -349,54 +349,64 @@ export function WebinarDetail({
             {/* --- Recording (only when completed) --- */}
             {isCompleted && (
               <Section index="01" title={t("recording")}>
-                {hasWebinarFeature === null ? (
-                  <div className="flex aspect-video w-full items-center justify-center rounded-2xl border bg-muted/30">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      {t("checkingAccess")}
+                {(() => {
+                  // Free webinars only need a logged-in user. Paid webinars
+                  // still gate on the plan feature.
+                  const canWatch = webinar.is_free
+                    ? Boolean(user)
+                    : hasWebinarFeature === true;
+                  const stillResolving = webinar.is_free
+                    ? isAuthLoading
+                    : hasWebinarFeature === null;
+                  return stillResolving ? (
+                    <div className="flex aspect-video w-full items-center justify-center rounded-2xl border bg-muted/30">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        {t("checkingAccess")}
+                      </div>
                     </div>
-                  </div>
-                ) : hasWebinarFeature ? (
-                  <div className="overflow-hidden rounded-2xl border bg-black shadow-xl ring-1 ring-black/5">
-                    <WebinarRecordingPlayer
-                      webinarId={webinar.id}
-                      posterUrl={webinar.thumbnail_url}
-                    />
-                  </div>
-                ) : (
-                  <Card className="overflow-hidden border-amber-200 dark:border-amber-900/50">
-                    <div className="bg-gradient-to-br from-amber-50 via-amber-50/60 to-transparent dark:from-amber-950/40 dark:to-amber-950/10">
-                      <CardContent className="flex flex-col items-start gap-5 p-6 sm:flex-row sm:items-center sm:p-8">
-                        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-700 ring-1 ring-amber-500/20 dark:text-amber-300">
-                          <Lock className="h-6 w-6" />
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-base font-semibold">
-                            {!user
-                              ? t("lockedTitleAnon")
-                              : t("lockedTitleSubscriber")}
-                          </p>
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            {!user
-                              ? t("lockedDescAnon")
-                              : t("lockedDescSubscriber")}
-                          </p>
-                        </div>
-                        <Link
-                          href={
-                            !user
-                              ? `/${locale}/login?redirect=/${locale}/webinars/${webinar.id}`
-                              : `/${locale}/pricing`
-                          }
-                          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-gradient-to-br from-brand-600 to-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5"
-                        >
-                          {!user ? t("signIn") : t("upgradePlan")}
-                          <ArrowUpRight className="h-4 w-4" />
-                        </Link>
-                      </CardContent>
+                  ) : canWatch ? (
+                    <div className="overflow-hidden rounded-2xl border bg-black shadow-xl ring-1 ring-black/5">
+                      <WebinarRecordingPlayer
+                        webinarId={webinar.id}
+                        posterUrl={webinar.thumbnail_url}
+                      />
                     </div>
-                  </Card>
-                )}
+                  ) : (
+                    <Card className="overflow-hidden border-amber-200 dark:border-amber-900/50">
+                      <div className="bg-gradient-to-br from-amber-50 via-amber-50/60 to-transparent dark:from-amber-950/40 dark:to-amber-950/10">
+                        <CardContent className="flex flex-col items-start gap-5 p-6 sm:flex-row sm:items-center sm:p-8">
+                          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-700 ring-1 ring-amber-500/20 dark:text-amber-300">
+                            <Lock className="h-6 w-6" />
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-base font-semibold">
+                              {!user
+                                ? t("lockedTitleAnon")
+                                : t("lockedTitleSubscriber")}
+                            </p>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                              {!user
+                                ? t("lockedDescAnon")
+                                : t("lockedDescSubscriber")}
+                            </p>
+                          </div>
+                          <Link
+                            href={
+                              !user
+                                ? `/${locale}/login?redirect=/${locale}/webinars/${webinar.id}`
+                                : `/${locale}/pricing`
+                            }
+                            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-gradient-to-br from-brand-600 to-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5"
+                          >
+                            {!user ? t("signIn") : t("upgradePlan")}
+                            <ArrowUpRight className="h-4 w-4" />
+                          </Link>
+                        </CardContent>
+                      </div>
+                    </Card>
+                  );
+                })()}
               </Section>
             )}
 

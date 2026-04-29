@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const limit = parseInt(searchParams.get("limit") || "4");
+  const locale = searchParams.get("locale") === "ar" ? "ar" : "en";
 
   const cookieStore = await cookies();
   const supabase = createServerClient(
@@ -38,13 +39,28 @@ export async function GET(request: Request) {
 
   const enrolledCourseIds = (enrollments ?? []).map((e) => e.course_id);
 
-  // Get popular published courses the user hasn't enrolled in
-  const { data: courses } = await supabase
+  // Get popular published courses the user hasn't enrolled in (locale-gated
+  // so an Arabic-only course doesn't recommend on the EN dashboard).
+  let recQ = supabase
     .from("courses")
     .select(
       "id, title, title_ar, slug, thumbnail_url, price, currency, is_free, average_rating, enrollment_count"
     )
-    .eq("status", "published")
+    .eq("status", "published");
+
+  if (locale === "ar") {
+    recQ = recQ
+      .not("title_ar", "is", null)
+      .neq("title_ar", "")
+      .filter("title_ar", "match", "[؀-ۿ]");
+  } else {
+    recQ = recQ
+      .not("title", "is", null)
+      .neq("title", "")
+      .filter("title", "match", "[A-Za-z]");
+  }
+
+  const { data: courses } = await recQ
     .order("enrollment_count", { ascending: false })
     .limit(limit + enrolledCourseIds.length);
 

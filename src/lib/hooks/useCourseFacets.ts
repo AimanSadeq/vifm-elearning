@@ -38,9 +38,15 @@ export function useCourseFacets(): CourseFacets {
         .select("difficulty_level, is_free")
         .eq("status", "published");
       if (locale === "ar") {
-        coursesQ = coursesQ.not("title_ar", "is", null).neq("title_ar", "");
+        coursesQ = coursesQ
+          .not("title_ar", "is", null)
+          .neq("title_ar", "")
+          .filter("title_ar", "match", "[؀-ۿ]");
       } else {
-        coursesQ = coursesQ.not("title", "is", null).neq("title", "");
+        coursesQ = coursesQ
+          .not("title", "is", null)
+          .neq("title", "")
+          .filter("title", "match", "[A-Za-z]");
       }
 
       const [{ data: courses }, { count: categoryCount }] = await Promise.all([

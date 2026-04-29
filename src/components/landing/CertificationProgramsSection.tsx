@@ -110,33 +110,47 @@ export function CertificationProgramsSection({
     items: designations.filter((d) => d.metadata?.tier_level === tier),
   })).filter((g) => g.items.length > 0);
 
+  // When the parent renders a SectionMarker above, sectionTitle is "" — in
+  // that case skip our own header to avoid 200px of dead space and trim the
+  // top padding accordingly.
+  const hasOwnHeader = Boolean(sectionTitle);
+
   return (
-    <section className="py-20 lg:py-28 bg-secondary/30">
+    <section
+      className={cn(
+        "bg-secondary/30",
+        hasOwnHeader ? "py-20 lg:py-28" : "pb-16 pt-6 lg:pb-24 lg:pt-8"
+      )}
+    >
       <div className="container mx-auto px-4">
-        <AnimatedSection>
-          <div className="text-center">
-            {sectionTitle && (
-              <>
-                <p className="text-sm font-semibold uppercase tracking-widest text-brand-400">
-                  {sectionSubtitle}
-                </p>
-                <h2 className="mt-3 font-heading text-3xl font-bold lg:text-4xl xl:text-5xl">
-                  {sectionTitle}
-                </h2>
-              </>
-            )}
-            <Link
-              href={viewAllHref}
-              className="inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors"
-            >
-              {viewAllText}
-              <ArrowRight className="h-4 w-4 rtl:rotate-180" />
-            </Link>
-          </div>
-        </AnimatedSection>
+        {hasOwnHeader && (
+          <AnimatedSection>
+            <div className="text-center">
+              <p className="text-sm font-semibold uppercase tracking-widest text-brand-400">
+                {sectionSubtitle}
+              </p>
+              <h2 className="mt-3 font-heading text-3xl font-bold lg:text-4xl xl:text-5xl">
+                {sectionTitle}
+              </h2>
+              <Link
+                href={viewAllHref}
+                className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors"
+              >
+                {viewAllText}
+                <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+              </Link>
+            </div>
+          </AnimatedSection>
+        )}
 
         {/* Tier groups */}
-        <div ref={ref} className="mt-14 space-y-10">
+        <div
+          ref={ref}
+          className={cn(
+            "space-y-10",
+            hasOwnHeader ? "mt-14" : "mt-2"
+          )}
+        >
           {grouped.map(({ tier, items }) => {
             const config = TIER_CONFIG[tier];
             if (!config) return null;
@@ -278,6 +292,20 @@ export function CertificationProgramsSection({
             );
           })}
         </div>
+
+        {/* When the parent renders the section title above (hasOwnHeader=false),
+            the "View all" link lives at the bottom right so it isn't orphaned. */}
+        {!hasOwnHeader && (
+          <div className="mt-10 flex justify-center">
+            <Link
+              href={viewAllHref}
+              className="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors"
+            >
+              {viewAllText}
+              <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );
