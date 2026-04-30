@@ -123,16 +123,31 @@ export default function AdminCoursesPage() {
     {
       key: "title",
       header: "Course",
-      render: (item) => (
-        <div>
-          <Link href={`/${locale}/admin/courses/${item.id}/edit`} className="font-medium hover:text-primary hover:underline line-clamp-1">
-            {item.title}
-          </Link>
-          <p className="text-xs text-muted-foreground line-clamp-1">
-            {(item.category as unknown as { name: string })?.name ?? "—"}
-          </p>
-        </div>
-      ),
+      render: (item) => {
+        // The schema allows EN-only or AR-only courses (one title may be
+        // null). Without a fallback the table cell renders empty for
+        // Arabic-only rows, even though the row exists in the catalog.
+        // Browsers handle Arabic glyphs correctly inside an LTR container
+        // via Unicode BiDi, so we deliberately don't set `dir` here —
+        // doing so would right-align the title and break the column flow.
+        const displayTitle =
+          (locale === "ar"
+            ? item.title_ar || item.title
+            : item.title || item.title_ar) || "(Untitled)";
+        return (
+          <div>
+            <Link
+              href={`/${locale}/admin/courses/${item.id}/edit`}
+              className="font-medium hover:text-primary hover:underline line-clamp-1"
+            >
+              {displayTitle}
+            </Link>
+            <p className="text-xs text-muted-foreground line-clamp-1">
+              {(item.category as unknown as { name: string })?.name ?? "—"}
+            </p>
+          </div>
+        );
+      },
     },
     {
       key: "status",
