@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { generateCertificatePdf, type TemplateConfig } from "./certificate-generator";
+import { generateCertificateFile, type TemplateConfig } from "./certificate-generator";
 import type { Certificate } from "@/types";
 
 interface IssueCertificateParams {
@@ -31,7 +31,7 @@ export async function issueCertificate({
   const certificateNumber =
     certNumResult ?? `VIFM-${Date.now()}`;
 
-  // Get user, course info, and certificate template
+  // Get user, course info, and certificate template.
   const [{ data: profile }, { data: course }] = await Promise.all([
     supabaseAdmin
       .from("profiles")
@@ -66,6 +66,10 @@ export async function issueCertificate({
         accentColor: template.accent_color,
         logoUrl: template.logo_url,
         organizationName: template.organization_name,
+        pptxPath: (template as { pptx_path?: string | null }).pptx_path ?? null,
+        placeholderValues:
+          ((template as { placeholder_values?: Record<string, string> | null })
+            .placeholder_values) ?? null,
       };
     }
   }
@@ -86,6 +90,12 @@ export async function issueCertificate({
         accentColor: defaultTemplate.accent_color,
         logoUrl: defaultTemplate.logo_url,
         organizationName: defaultTemplate.organization_name,
+        pptxPath:
+          (defaultTemplate as { pptx_path?: string | null }).pptx_path ?? null,
+        placeholderValues:
+          ((defaultTemplate as {
+            placeholder_values?: Record<string, string> | null;
+          }).placeholder_values) ?? null,
       };
     }
   }
@@ -112,8 +122,8 @@ export async function issueCertificate({
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://academy.vifm.ae";
   const verificationUrl = `${baseUrl}/verify/${verificationCode}`;
 
-  // Generate PDF with template
-  const pdfBuffer = await generateCertificatePdf(
+  // Generate certificate file from the VIFM .pptx template (mirrors OpsSys).
+  const { buffer, mimeType, extension } = await generateCertificateFile(
     {
       userName,
       courseName,
@@ -125,16 +135,16 @@ export async function issueCertificate({
   );
 
   // Upload to Supabase Storage
-  const filePath = `${userId}/${cert.id}.pdf`;
+  const filePath = `${userId}/${cert.id}.${extension}`;
   const { error: uploadError } = await supabaseAdmin.storage
     .from("certificates")
-    .upload(filePath, pdfBuffer, {
-      contentType: "application/pdf",
+    .upload(filePath, buffer, {
+      contentType: mimeType,
       upsert: true,
     });
 
   if (uploadError) {
-    console.error("Certificate PDF upload failed:", uploadError);
+    console.error("Certificate upload failed:", uploadError);
     // Non-fatal — certificate record still exists
     return cert as Certificate;
   }

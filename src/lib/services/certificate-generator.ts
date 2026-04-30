@@ -1,5 +1,6 @@
-import { jsPDF } from "jspdf";
-import QRCode from "qrcode";
+import PizZip from "pizzip";
+import { DYNAMIC_PLACEHOLDERS } from "@/lib/cert-layout/discover-placeholders";
+import { loadActiveTemplate } from "@/lib/cert-layout/load-template";
 import type { CertificateTemplateKey } from "@/types";
 
 interface CertificateData {
@@ -10,6 +11,8 @@ interface CertificateData {
   verificationUrl: string;
 }
 
+// Kept for compatibility with the existing API surface; the visual design
+// now lives inside the .pptx file, so most fields are unused.
 export interface TemplateConfig {
   templateKey: CertificateTemplateKey;
   primaryColor: string;
@@ -17,444 +20,140 @@ export interface TemplateConfig {
   accentColor: string;
   logoUrl?: string | null;
   organizationName: string;
+  /** Optional Storage path of an admin-uploaded .pptx — overrides bundled. */
+  pptxPath?: string | null;
+  /**
+   * Static `{{TOKEN}}` substitutions chosen by the admin (e.g.
+   * `{ CITY: "Riyadh", INSTRUCTOR_NAME: "Dr Smith" }`). Merged with the
+   * dynamic per-cert values below; any leftover placeholders in the .pptx
+   * are blanked out so learners never see a literal `{{X}}`.
+   */
+  placeholderValues?: Record<string, string> | null;
 }
 
-const DEFAULT_CONFIG: TemplateConfig = {
-  templateKey: "classic",
-  primaryColor: "#1A3A5F",
-  secondaryColor: "#D4AF37",
-  accentColor: "#646464",
-  organizationName: "Virginia Institute of Finance and Management",
-};
-
-function hexToRgb(hex: string): [number, number, number] {
-  const h = hex.replace("#", "");
-  return [
-    parseInt(h.substring(0, 2), 16),
-    parseInt(h.substring(2, 4), 16),
-    parseInt(h.substring(4, 6), 16),
-  ];
+function escapeXml(value: string): string {
+  if (!value) return "";
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
 }
 
-// ---------------------------------------------------------------------------
-// CLASSIC — Double navy border, gold decorative line, centered layout
-// ---------------------------------------------------------------------------
-function renderClassicTemplate(
-  doc: jsPDF,
-  data: CertificateData,
-  config: TemplateConfig
-) {
-  const width = doc.internal.pageSize.getWidth();
-  const primary = hexToRgb(config.primaryColor);
-  const secondary = hexToRgb(config.secondaryColor);
-  const accent = hexToRgb(config.accentColor);
-
-  // Double border
-  doc.setDrawColor(...primary);
-  doc.setLineWidth(2);
-  doc.rect(10, 10, width - 20, doc.internal.pageSize.getHeight() - 20);
-  doc.setLineWidth(0.5);
-  doc.rect(14, 14, width - 28, doc.internal.pageSize.getHeight() - 28);
-
-  // Header
-  doc.setFontSize(14);
-  doc.setTextColor(...primary);
-  doc.text(config.organizationName.toUpperCase(), width / 2, 35, {
-    align: "center",
-  });
-
-  // Title
-  doc.setFontSize(32);
-  doc.setTextColor(...primary);
-  doc.text("Certificate of Completion", width / 2, 55, { align: "center" });
-
-  // Gold decorative line
-  doc.setDrawColor(...secondary);
-  doc.setLineWidth(1);
-  doc.line(width / 2 - 60, 62, width / 2 + 60, 62);
-
-  // Body
-  doc.setFontSize(14);
-  doc.setTextColor(...accent);
-  doc.text("This is to certify that", width / 2, 80, { align: "center" });
-
-  doc.setFontSize(26);
-  doc.setTextColor(...primary);
-  doc.text(data.userName, width / 2, 95, { align: "center" });
-
-  doc.setFontSize(14);
-  doc.setTextColor(...accent);
-  doc.text("has successfully completed the course", width / 2, 112, {
-    align: "center",
-  });
-
-  doc.setFontSize(20);
-  doc.setTextColor(...primary);
-  doc.text(data.courseName, width / 2, 127, { align: "center" });
-
-  // Date
-  const issuedDate = new Date(data.issuedAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-  doc.setFontSize(12);
-  doc.setTextColor(...accent);
-  doc.text(`Issued on ${issuedDate}`, width / 2, 145, { align: "center" });
-
-  // Certificate number
-  doc.setFontSize(10);
-  doc.text(`Certificate No: ${data.certificateNumber}`, width / 2, 155, {
-    align: "center",
-  });
-}
-
-// ---------------------------------------------------------------------------
-// MODERN — Left color sidebar, clean minimal right-side content
-// ---------------------------------------------------------------------------
-function renderModernTemplate(
-  doc: jsPDF,
-  data: CertificateData,
-  config: TemplateConfig
-) {
-  const height = doc.internal.pageSize.getHeight();
-  const primary = hexToRgb(config.primaryColor);
-  const secondary = hexToRgb(config.secondaryColor);
-  const accent = hexToRgb(config.accentColor);
-
-  // Left sidebar
-  doc.setFillColor(...primary);
-  doc.rect(0, 0, 45, height, "F");
-
-  // Sidebar accent strip
-  doc.setFillColor(...secondary);
-  doc.rect(42, 0, 3, height, "F");
-
-  // Sidebar text (vertical)
-  doc.setFontSize(9);
-  doc.setTextColor(255, 255, 255);
-  doc.text(config.organizationName, 22, height / 2, {
-    align: "center",
-    angle: 90,
-  });
-
-  // Content area
-  const contentX = 65;
-
-  // Title
-  doc.setFontSize(28);
-  doc.setTextColor(...primary);
-  doc.text("Certificate", contentX, 40);
-  doc.setFontSize(16);
-  doc.setTextColor(...accent);
-  doc.text("of Completion", contentX, 52);
-
-  // Horizontal accent line
-  doc.setDrawColor(...secondary);
-  doc.setLineWidth(2);
-  doc.line(contentX, 58, contentX + 100, 58);
-
-  // Presented to
-  doc.setFontSize(11);
-  doc.setTextColor(...accent);
-  doc.text("This certificate is presented to", contentX, 75);
-
-  // Name
-  doc.setFontSize(28);
-  doc.setTextColor(...primary);
-  doc.text(data.userName, contentX, 92);
-
-  // Thin line under name
-  doc.setDrawColor(...secondary);
-  doc.setLineWidth(0.5);
-  doc.line(contentX, 96, contentX + 150, 96);
-
-  // Course text
-  doc.setFontSize(11);
-  doc.setTextColor(...accent);
-  doc.text("for successfully completing", contentX, 110);
-
-  doc.setFontSize(18);
-  doc.setTextColor(...primary);
-  doc.text(data.courseName, contentX, 124);
-
-  // Date and certificate number
-  const issuedDate = new Date(data.issuedAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-  doc.setFontSize(10);
-  doc.setTextColor(...accent);
-  doc.text(issuedDate, contentX, 148);
-  doc.setFontSize(9);
-  doc.text(`No: ${data.certificateNumber}`, contentX, 156);
-}
-
-// ---------------------------------------------------------------------------
-// CORPORATE — Full-width header band, two-column footer, formal layout
-// ---------------------------------------------------------------------------
-function renderCorporateTemplate(
-  doc: jsPDF,
-  data: CertificateData,
-  config: TemplateConfig
-) {
-  const width = doc.internal.pageSize.getWidth();
-  const height = doc.internal.pageSize.getHeight();
-  const primary = hexToRgb(config.primaryColor);
-  const secondary = hexToRgb(config.secondaryColor);
-  const accent = hexToRgb(config.accentColor);
-
-  // Top header band
-  doc.setFillColor(...primary);
-  doc.rect(0, 0, width, 40, "F");
-
-  // Header accent stripe
-  doc.setFillColor(...secondary);
-  doc.rect(0, 40, width, 4, "F");
-
-  // Organization name in header
-  doc.setFontSize(16);
-  doc.setTextColor(255, 255, 255);
-  doc.text(config.organizationName.toUpperCase(), width / 2, 25, {
-    align: "center",
-  });
-
-  // Bottom band
-  doc.setFillColor(...primary);
-  doc.rect(0, height - 25, width, 25, "F");
-  doc.setFillColor(...secondary);
-  doc.rect(0, height - 25, width, 3, "F");
-
-  // Bottom text
-  doc.setFontSize(8);
-  doc.setTextColor(255, 255, 255);
-  doc.text(`Certificate No: ${data.certificateNumber}`, 20, height - 10);
-
-  // Title
-  doc.setFontSize(30);
-  doc.setTextColor(...primary);
-  doc.text("Certificate of Completion", width / 2, 65, { align: "center" });
-
-  // Body
-  doc.setFontSize(12);
-  doc.setTextColor(...accent);
-  doc.text("This is to certify that", width / 2, 82, { align: "center" });
-
-  // Name with underline
-  doc.setFontSize(26);
-  doc.setTextColor(...primary);
-  doc.text(data.userName, width / 2, 98, { align: "center" });
-  doc.setDrawColor(...secondary);
-  doc.setLineWidth(0.8);
-  const nameWidth = doc.getTextWidth(data.userName);
-  doc.line(
-    width / 2 - nameWidth / 2,
-    102,
-    width / 2 + nameWidth / 2,
-    102
-  );
-
-  // Course
-  doc.setFontSize(12);
-  doc.setTextColor(...accent);
-  doc.text("has successfully completed the course", width / 2, 116, {
-    align: "center",
-  });
-
-  doc.setFontSize(20);
-  doc.setTextColor(...primary);
-  doc.text(data.courseName, width / 2, 132, { align: "center" });
-
-  // Two-column footer area
-  const issuedDate = new Date(data.issuedAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-  doc.setFontSize(10);
-  doc.setTextColor(...accent);
-  doc.text(`Date: ${issuedDate}`, 30, 160);
-  doc.text("Authorized Signature", width - 30, 160, { align: "right" });
-
-  // Signature line
-  doc.setDrawColor(...accent);
-  doc.setLineWidth(0.3);
-  doc.line(width - 90, 155, width - 30, 155);
-}
-
-// ---------------------------------------------------------------------------
-// ELEGANT — Decorative corners, centered script-style, circular seal element
-// ---------------------------------------------------------------------------
-function renderElegantTemplate(
-  doc: jsPDF,
-  data: CertificateData,
-  config: TemplateConfig
-) {
-  const width = doc.internal.pageSize.getWidth();
-  const height = doc.internal.pageSize.getHeight();
-  const primary = hexToRgb(config.primaryColor);
-  const secondary = hexToRgb(config.secondaryColor);
-  const accent = hexToRgb(config.accentColor);
-
-  // Outer thin border
-  doc.setDrawColor(...accent);
-  doc.setLineWidth(0.5);
-  doc.rect(8, 8, width - 16, height - 16);
-
-  // Corner ornaments (L-shapes)
-  const cornerSize = 20;
-  doc.setDrawColor(...secondary);
-  doc.setLineWidth(1.5);
-  // Top-left
-  doc.line(15, 15, 15 + cornerSize, 15);
-  doc.line(15, 15, 15, 15 + cornerSize);
-  // Top-right
-  doc.line(width - 15, 15, width - 15 - cornerSize, 15);
-  doc.line(width - 15, 15, width - 15, 15 + cornerSize);
-  // Bottom-left
-  doc.line(15, height - 15, 15 + cornerSize, height - 15);
-  doc.line(15, height - 15, 15, height - 15 - cornerSize);
-  // Bottom-right
-  doc.line(width - 15, height - 15, width - 15 - cornerSize, height - 15);
-  doc.line(width - 15, height - 15, width - 15, height - 15 - cornerSize);
-
-  // Organization name
-  doc.setFontSize(11);
-  doc.setTextColor(...accent);
-  doc.text(config.organizationName, width / 2, 32, { align: "center" });
-
-  // Top decorative line
-  doc.setDrawColor(...secondary);
-  doc.setLineWidth(0.5);
-  doc.line(width / 2 - 50, 37, width / 2 + 50, 37);
-
-  // Title
-  doc.setFontSize(36);
-  doc.setTextColor(...primary);
-  doc.text("Certificate", width / 2, 56, { align: "center" });
-
-  doc.setFontSize(14);
-  doc.setTextColor(...accent);
-  doc.text("OF COMPLETION", width / 2, 65, { align: "center" });
-
-  // Two decorative lines around "presented to"
-  doc.setDrawColor(...secondary);
-  doc.setLineWidth(0.3);
-  doc.line(width / 2 - 80, 73, width / 2 - 30, 73);
-  doc.line(width / 2 + 30, 73, width / 2 + 80, 73);
-
-  doc.setFontSize(10);
-  doc.setTextColor(...accent);
-  doc.text("Presented to", width / 2, 76, { align: "center" });
-
-  // Name — large elegant text
-  doc.setFontSize(30);
-  doc.setTextColor(...primary);
-  doc.text(data.userName, width / 2, 95, { align: "center" });
-
-  // Decorative line under name
-  doc.setDrawColor(...secondary);
-  doc.setLineWidth(0.8);
-  doc.line(width / 2 - 70, 100, width / 2 + 70, 100);
-
-  // Course text
-  doc.setFontSize(11);
-  doc.setTextColor(...accent);
-  doc.text("for the successful completion of", width / 2, 113, {
-    align: "center",
-  });
-
-  doc.setFontSize(18);
-  doc.setTextColor(...primary);
-  doc.text(data.courseName, width / 2, 127, { align: "center" });
-
-  // Date
-  const issuedDate = new Date(data.issuedAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-  doc.setFontSize(10);
-  doc.setTextColor(...accent);
-  doc.text(`Issued on ${issuedDate}`, width / 2, 145, { align: "center" });
-
-  // Circular seal element (bottom-left)
-  doc.setDrawColor(...secondary);
-  doc.setLineWidth(1);
-  doc.circle(50, height - 45, 12);
-  doc.circle(50, height - 45, 10);
-  doc.setFontSize(7);
-  doc.setTextColor(...secondary);
-  doc.text("CERTIFIED", 50, height - 44, { align: "center" });
-
-  // Certificate number
-  doc.setFontSize(9);
-  doc.setTextColor(...accent);
-  doc.text(
-    `Certificate No: ${data.certificateNumber}`,
-    width / 2,
-    height - 30,
-    { align: "center" }
+function isReplaceableXml(filename: string): boolean {
+  // We only touch the parts of the .pptx where text lives. Skipping
+  // _rels / theme / etc keeps us safe from accidentally rewriting refs.
+  return (
+    filename.endsWith(".xml") &&
+    (filename.includes("ppt/slides/") ||
+      filename.includes("ppt/slideLayouts/") ||
+      filename.includes("ppt/slideMasters/") ||
+      filename.includes("ppt/notesSlides/"))
   );
 }
 
-// ---------------------------------------------------------------------------
-// QR Code — shared across all templates (positioned at bottom-right)
-// ---------------------------------------------------------------------------
-async function renderQrCode(
-  doc: jsPDF,
-  verificationUrl: string,
-  config: TemplateConfig
-) {
-  const width = doc.internal.pageSize.getWidth();
-  const height = doc.internal.pageSize.getHeight();
-  const accent = hexToRgb(config.accentColor);
-
-  const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
-    width: 200,
-    margin: 1,
-  });
-  doc.addImage(qrDataUrl, "PNG", width - 55, height - 55, 30, 30);
-
-  doc.setFontSize(7);
-  doc.setTextColor(...accent);
-  doc.text("Scan to verify", width - 40, height - 22, { align: "center" });
-}
-
-// ---------------------------------------------------------------------------
-// MAIN EXPORT — dispatcher
-// ---------------------------------------------------------------------------
-export async function generateCertificatePdf(
+/**
+ * Builds a personalized certificate as a .pptx Buffer. Returns the file
+ * (along with the mime type and extension) so callers can store it as-is.
+ * PDF conversion is intentionally out-of-scope — wire up CloudConvert / a
+ * LibreOffice runner in a separate step if PDF output is needed.
+ *
+ * `config` is read for `organizationName` (mapped to `{{CLIENT_NAME}}`) so
+ * admins can override the institute label without re-uploading the .pptx.
+ */
+export async function generateCertificateFile(
   data: CertificateData,
-  template?: TemplateConfig
-): Promise<Buffer> {
-  const doc = new jsPDF({
-    orientation: "landscape",
-    unit: "mm",
-    format: "a4",
-  });
-  const config = template ?? DEFAULT_CONFIG;
+  config?: TemplateConfig
+): Promise<{ buffer: Buffer; mimeType: string; extension: "pptx" }> {
+  const templateBuffer = await loadActiveTemplate(config?.pptxPath);
+  const zip = new PizZip(templateBuffer);
 
-  switch (config.templateKey) {
-    case "modern":
-      renderModernTemplate(doc, data, config);
-      break;
-    case "corporate":
-      renderCorporateTemplate(doc, data, config);
-      break;
-    case "elegant":
-      renderElegantTemplate(doc, data, config);
-      break;
-    case "classic":
-    default:
-      renderClassicTemplate(doc, data, config);
-      break;
+  const formattedDate = new Date(data.issuedAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const clientName = config?.organizationName?.trim() || "VIFM Academy";
+
+  // Merged value map: static admin-set values first (so dynamic ones
+  // override), then dynamic per-cert values. Any token in the .pptx that's
+  // not in this map gets blanked out — preferable to shipping a literal
+  // `{{X}}` to the learner. Only the well-known dynamic tokens are *required*
+  // to be present; everything else is optional / admin-controlled.
+  const values: Record<string, string> = {
+    ...(config?.placeholderValues ?? {}),
+    ATTENDEE_NAME: data.userName,
+    COURSE_TITLE: data.courseName,
+    DATE: formattedDate,
+    DATE_RANGE: formattedDate,
+    CODE: data.certificateNumber,
+    CLIENT_NAME: clientName,
+    VERIFICATION_URL: data.verificationUrl,
+  };
+
+  // Track tokens we encountered + tokens still unresolved post-substitution
+  // (latter only happens if PowerPoint split a token across XML runs).
+  const tokensSeen = new Set<string>();
+  const stillUnresolved = new Set<string>();
+  const tokenRegex = /\{\{([A-Z][A-Z0-9_]*)\}\}/g;
+
+  for (const filename of Object.keys(zip.files)) {
+    if (!isReplaceableXml(filename)) continue;
+    const original = zip.files[filename].asText();
+    const updated = original.replace(tokenRegex, (_, name: string) => {
+      tokensSeen.add(name);
+      // Unknown placeholder → blank string (not the literal {{X}} text).
+      const raw = name in values ? values[name] : "";
+      return escapeXml(raw);
+    });
+    if (updated !== original) zip.file(filename, updated);
+
+    // Re-scan the updated XML for any leftover {{X}} (split-tag cases).
+    let m: RegExpExecArray | null;
+    while ((m = tokenRegex.exec(updated)) !== null) {
+      stillUnresolved.add(m[0]);
+    }
   }
 
-  // QR code is shared across all templates
-  await renderQrCode(doc, data.verificationUrl, config);
+  // Only fail loudly when one of the *required dynamic* tokens is still
+  // unresolved — that means the admin's .pptx has a split-tag the regex
+  // couldn't reach AND the field is something learners need (their name,
+  // course, etc). Custom static placeholders that the admin forgot to set
+  // are merely blank, which is recoverable.
+  const blockingMissing = Array.from(stillUnresolved).filter((tok) => {
+    const name = tok.replace(/[{}]/g, "");
+    return DYNAMIC_PLACEHOLDERS.has(name);
+  });
+  if (blockingMissing.length > 0) {
+    throw new Error(
+      `[certificate-generator] required placeholders unresolved: ${blockingMissing.join(", ")}. ` +
+        `PowerPoint may have split the token across runs — open the .pptx, delete and retype the affected text, and re-upload.`
+    );
+  }
 
-  const arrayBuffer = doc.output("arraybuffer");
-  return Buffer.from(arrayBuffer);
+  const pptxBuffer = zip.generate({
+    type: "nodebuffer",
+    compression: "DEFLATE",
+  });
+
+  return {
+    buffer: pptxBuffer,
+    mimeType:
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    extension: "pptx",
+  };
+}
+
+/**
+ * Backwards-compatible wrapper for older callers that expect a Buffer of the
+ * final file. Returns the .pptx Buffer (no longer a PDF).
+ */
+export async function generateCertificatePdf(
+  data: CertificateData,
+  config?: TemplateConfig
+): Promise<Buffer> {
+  const { buffer } = await generateCertificateFile(data, config);
+  return buffer;
 }

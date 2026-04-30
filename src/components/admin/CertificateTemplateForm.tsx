@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { CertificatePreview } from "./CertificatePreview";
 
 interface CertificateTemplateFormProps {
   initialData?: Partial<CertificateTemplateInput> & { id?: string };
@@ -28,7 +27,6 @@ export function CertificateTemplateForm({
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<CertificateTemplateInput>({
     resolver: zodResolver(certificateTemplateSchema),
@@ -49,11 +47,6 @@ export function CertificateTemplateForm({
     },
   });
 
-  const templateKey = watch("templateKey");
-  const primaryColor = watch("primaryColor");
-  const secondaryColor = watch("secondaryColor");
-  const accentColor = watch("accentColor");
-  const organizationName = watch("organizationName");
 
   return (
     <Card>
@@ -130,89 +123,7 @@ export function CertificateTemplateForm({
             </div>
           </div>
 
-          {/* Row 3: Colors */}
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div className="space-y-2">
-              <Label htmlFor="primaryColor">Primary Color</Label>
-              <div className="flex gap-2">
-                <input
-                  type="color"
-                  {...register("primaryColor")}
-                  className="h-10 w-12 cursor-pointer rounded border border-input"
-                />
-                <Input
-                  id="primaryColor"
-                  {...register("primaryColor")}
-                  placeholder="#1A3A5F"
-                  className="flex-1"
-                />
-              </div>
-              {errors.primaryColor && (
-                <p className="text-sm text-destructive">
-                  {errors.primaryColor.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="secondaryColor">Secondary Color</Label>
-              <div className="flex gap-2">
-                <input
-                  type="color"
-                  {...register("secondaryColor")}
-                  className="h-10 w-12 cursor-pointer rounded border border-input"
-                />
-                <Input
-                  id="secondaryColor"
-                  {...register("secondaryColor")}
-                  placeholder="#D4AF37"
-                  className="flex-1"
-                />
-              </div>
-              {errors.secondaryColor && (
-                <p className="text-sm text-destructive">
-                  {errors.secondaryColor.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="accentColor">Accent Color</Label>
-              <div className="flex gap-2">
-                <input
-                  type="color"
-                  {...register("accentColor")}
-                  className="h-10 w-12 cursor-pointer rounded border border-input"
-                />
-                <Input
-                  id="accentColor"
-                  {...register("accentColor")}
-                  placeholder="#646464"
-                  className="flex-1"
-                />
-              </div>
-              {errors.accentColor && (
-                <p className="text-sm text-destructive">
-                  {errors.accentColor.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Row 4: Logo URL */}
-          <div className="space-y-2">
-            <Label htmlFor="logoUrl">
-              Logo URL{" "}
-              <span className="text-xs text-muted-foreground">(optional)</span>
-            </Label>
-            <Input
-              id="logoUrl"
-              {...register("logoUrl")}
-              placeholder="https://example.com/logo.png"
-            />
-          </div>
-
-          {/* Row 5: Toggles */}
+          {/* Row 3: Toggles */}
           <div className="flex items-center gap-6">
             <label className="flex items-center gap-2 text-sm">
               <input
@@ -231,18 +142,6 @@ export function CertificateTemplateForm({
               />
               Active
             </label>
-          </div>
-
-          {/* Live Preview */}
-          <div className="space-y-2">
-            <Label>Preview</Label>
-            <CertificatePreview
-              templateKey={templateKey}
-              primaryColor={primaryColor}
-              secondaryColor={secondaryColor}
-              accentColor={accentColor}
-              organizationName={organizationName}
-            />
           </div>
 
           {/* Actions */}

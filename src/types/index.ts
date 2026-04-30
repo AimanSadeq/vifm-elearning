@@ -341,6 +341,13 @@ export interface Certificate {
   certificate_number: string;
   verification_code: string;
   verification_url?: string | null;
+  /**
+   * Public URL of the issued certificate file in Supabase Storage. The column
+   * name is historical: certificates issued before the .pptx pipeline was
+   * introduced point to a `.pdf`; certificates issued after point to a
+   * `.pptx`. Consumers should not assume MIME from the column name — read
+   * the file extension if you need to branch on type.
+   */
   pdf_url?: string | null;
   status: CertificateStatus;
   issued_at: string;

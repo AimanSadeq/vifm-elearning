@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { Plus, Pencil, Palette, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,9 @@ import type { CertificateTemplateInput } from "@/lib/utils/validators";
 import type { CertificateTemplate, CertificateTemplateKey } from "@/types";
 
 export default function AdminCertificateTemplatesPage() {
+  const router = useRouter();
+  const params = useParams();
+  const locale = (params.locale as string) ?? "en";
   const [templates, setTemplates] = useState<CertificateTemplate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -239,8 +243,22 @@ export default function AdminCertificateTemplatesPage() {
               setEditingTemplate(item);
               setShowForm(true);
             }}
+            title="Edit template details"
           >
             <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={() =>
+              router.push(
+                `/${locale}/admin/certificates/templates/${item.id}/edit`
+              )
+            }
+            title="Open layout editor"
+          >
+            <Palette className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
