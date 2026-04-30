@@ -45,6 +45,17 @@ export default async function HomePage({
 
   // Fetch active testimonials
   const supabase = await createServerSupabase();
+
+  // If the visitor is already signed in, the "Get Started" CTAs should
+  // shortcut into the dashboard instead of bouncing them to /register —
+  // showing the registration form to a logged-in user is a dead end.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const getStartedHref = user
+    ? `/${locale}/dashboard`
+    : `/${locale}/register`;
+
   const { data: testimonials } = await supabase
     .from("testimonials")
     .select("*")
@@ -128,7 +139,7 @@ export default async function HomePage({
               exploreCTA={t("exploreCourses")}
               getStartedCTA={t("getStarted")}
               exploreHref={`/${locale}/courses`}
-              getStartedHref={`/${locale}/register`}
+              getStartedHref={getStartedHref}
               badgeText={t("heroBadge")}
             />
           </div>
@@ -268,7 +279,7 @@ export default async function HomePage({
           title={t("readyToStart")}
           subtitle={t("joinLearners")}
           ctaText={t("getStarted")}
-          ctaHref={`/${locale}/register`}
+          ctaHref={getStartedHref}
           tagline={t("ctaTagline")}
           secondaryCtaText={t("ctaSecondary")}
           secondaryCtaHref={`/${locale}/pricing`}

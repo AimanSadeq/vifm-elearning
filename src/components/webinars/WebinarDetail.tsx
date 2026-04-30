@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import {
   Calendar,
-  Clock,
   Users,
   Globe,
   Video,
@@ -13,10 +12,8 @@ import {
   CalendarClock,
   CalendarCheck,
   CalendarX,
-  CheckCircle2,
   Loader2,
   Lock,
-  Sparkles,
   ArrowUpRight,
 } from "lucide-react";
 import Link from "next/link";
@@ -424,37 +421,9 @@ export function WebinarDetail({
               </Section>
             )}
 
-            {/* --- What you'll get — bento grid --- */}
-            <Section
-              index={isCompleted ? "03" : description ? "02" : "01"}
-              title={t("whatYoullGet")}
-            >
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Benefit
-                  highlight
-                  label={t("benefitLiveQA")}
-                  Icon={Radio}
-                />
-                <Benefit
-                  label={t("benefitExpertInsights")}
-                  Icon={Sparkles}
-                />
-                <Benefit
-                  label={
-                    isCompleted ? t("benefitWatchAnytime") : t("benefitInteractive")
-                  }
-                  Icon={isCompleted ? Video : Users}
-                />
-                <Benefit
-                  label={t("benefitProfessional")}
-                  Icon={CheckCircle2}
-                />
-              </div>
-            </Section>
-
             {/* --- Info row --- */}
             <Section
-              index={isCompleted ? "04" : description ? "03" : "02"}
+              index={isCompleted ? "03" : description ? "02" : "01"}
               title={t("details")}
             >
               <div className="grid gap-4 sm:grid-cols-3">
@@ -518,37 +487,6 @@ function Section({
         </h2>
       </div>
       {children}
-    </div>
-  );
-}
-
-function Benefit({
-  label,
-  Icon,
-  highlight = false,
-}: {
-  label: string;
-  Icon: React.ElementType;
-  highlight?: boolean;
-}) {
-  return (
-    <div
-      className={`group relative flex items-start gap-4 rounded-xl border p-5 transition-all hover:-translate-y-0.5 hover:shadow-md ${
-        highlight
-          ? "border-brand-200 bg-gradient-to-br from-brand-50 to-transparent dark:border-brand-900/40 dark:from-brand-950/30"
-          : "bg-card"
-      }`}
-    >
-      <span
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-          highlight
-            ? "bg-brand-600 text-white"
-            : "bg-brand-50 text-brand-600 dark:bg-brand-950/40"
-        }`}
-      >
-        <Icon className="h-5 w-5" />
-      </span>
-      <p className="pt-1.5 text-sm font-medium leading-relaxed">{label}</p>
     </div>
   );
 }
