@@ -326,6 +326,8 @@ export default function AdminCategoriesPage() {
             setFormData({
               name: "",
               name_ar: "",
+              description: "",
+              description_ar: "",
               slug: "",
               icon: "",
               color: "",
