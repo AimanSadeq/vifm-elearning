@@ -103,6 +103,8 @@ export interface Course {
   instructor_id?: string | null;
   status: CourseStatus;
   difficulty_level?: DifficultyLevel | null;
+  /** Course tier — Gateway / Professional / Executive. NULL = untiered. */
+  tier_level?: "gateway" | "professional" | "executive" | null;
   duration_hours?: number | null;
   price: number;
   currency: string;

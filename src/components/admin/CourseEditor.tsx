@@ -115,6 +115,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     category_id: course.category_id,
     instructor_id: course.instructor_id || '',
     difficulty_level: course.difficulty_level || 'beginner',
+    tier_level: (course as { tier_level?: string | null }).tier_level ?? '',
     price: course.price?.toString() || '0',
     currency: course.currency || 'USD',
     is_free: course.is_free,
@@ -301,6 +302,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
           category_id: courseForm.category_id,
           instructor_id: courseForm.instructor_id || null,
           difficulty_level: courseForm.difficulty_level as DifficultyLevel,
+          tier_level: courseForm.tier_level || null,
           price: parseFloat(courseForm.price) || 0,
           currency: courseForm.currency,
           is_free: courseForm.is_free,
@@ -942,6 +944,15 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                     <option value="intermediate">Intermediate</option>
                     <option value="advanced">Advanced</option>
                     <option value="expert">Expert</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground">Tier</label>
+                  <select value={courseForm.tier_level} onChange={(e) => setCourseForm({ ...courseForm, tier_level: e.target.value })} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                    <option value="">— Untiered —</option>
+                    <option value="gateway">Gateway</option>
+                    <option value="professional">Professional</option>
+                    <option value="executive">Executive</option>
                   </select>
                 </div>
                 <div>
