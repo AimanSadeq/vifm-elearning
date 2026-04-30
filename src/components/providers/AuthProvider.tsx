@@ -3,6 +3,11 @@
 import { useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/stores/auth-store";
+import {
+  EXPLICIT_SIGNOUT_FLAG,
+  isProtectedPath,
+  getLocale,
+} from "@/lib/utils/protected-paths";
 import type { Profile } from "@/types";
 
 /**
@@ -119,6 +124,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }, 0);
       } else {
         setUser(null);
+        // Session ended (refresh-token expired, server-side revocation, etc).
+        // Skip the redirect when the user *deliberately* signed out — useAuth
+        // sets a sentinel before calling signOut() and handles the navigation
+        // itself, so a duplicate redirect here would clobber the destination.
+        if (event !== "SIGNED_OUT" || typeof window === "undefined") return;
+        const isExplicit =
+          sessionStorage.getItem(EXPLICIT_SIGNOUT_FLAG) === "1";
+        if (isExplicit) {
+          sessionStorage.removeItem(EXPLICIT_SIGNOUT_FLAG);
+          return;
+        }
+        if (window.location.pathname.includes("/login")) return;
+        if (!isProtectedPath(window.location.pathname)) return;
+
+        const currentPath = window.location.pathname + window.location.search;
+        const locale = getLocale(window.location.pathname);
+        // Hard nav so middleware re-runs and the stale shell unmounts cleanly.
+        window.location.href =
+          `/${locale}/login?redirect=${encodeURIComponent(currentPath)}`;
       }
     });
 

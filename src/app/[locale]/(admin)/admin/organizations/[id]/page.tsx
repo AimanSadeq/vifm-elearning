@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { OrganizationForm } from "@/components/admin/OrganizationForm";
 import type { OrganizationInput } from "@/lib/utils/validators";
 
@@ -19,12 +20,17 @@ export default function EditOrganizationPage() {
   useEffect(() => {
     async function fetchOrg() {
       const supabase = createClient();
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("organizations")
         .select("*")
         .eq("id", orgId)
         .single();
 
+      if (error) {
+        reportSupabaseError(error, "Could not load organization");
+        setIsLoading(false);
+        return;
+      }
       if (data) {
         setInitialData({
           id: data.id,

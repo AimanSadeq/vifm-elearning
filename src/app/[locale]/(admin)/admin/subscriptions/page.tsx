@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -46,12 +47,17 @@ export default function AdminSubscriptionsPage() {
   async function fetchPlans() {
     setPlansLoading(true);
     const supabase = createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("subscription_plans")
       .select("*")
       .order("sort_order", { ascending: true });
 
-    setPlans((data as SubscriptionPlanConfig[]) ?? []);
+    if (error) {
+      reportSupabaseError(error, "Could not load subscription plans");
+      setPlans([]);
+    } else {
+      setPlans((data as SubscriptionPlanConfig[]) ?? []);
+    }
     setPlansLoading(false);
   }
 
@@ -125,7 +131,7 @@ export default function AdminSubscriptionsPage() {
   async function fetchSubscriptions() {
     setSubsLoading(true);
     const supabase = createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("subscriptions")
       .select(
         `
@@ -135,6 +141,12 @@ export default function AdminSubscriptionsPage() {
       `
       )
       .order("created_at", { ascending: false });
+
+    if (error) {
+      reportSupabaseError(error, "Could not load subscriptions");
+      setSubsLoading(false);
+      return;
+    }
 
     const mapped = (data ?? []).map((s: Record<string, unknown>) => {
       const profile = s.profiles as Record<string, string> | null;

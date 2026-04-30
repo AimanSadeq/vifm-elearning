@@ -12,6 +12,7 @@ import {
   Download,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { StatCard } from "@/components/analytics/StatCard";
 import { RevenueLineChart } from "@/components/analytics/charts/RevenueLineChart";
 import { EnrollmentBarChart } from "@/components/analytics/charts/EnrollmentBarChart";
@@ -73,11 +74,15 @@ export default function AnalyticsOverviewPage() {
           status: string | null;
         }> = [];
         for (let from = 0; ; from += pageSize) {
-          const { data } = await supabase
+          const { data, error } = await supabase
             .from("payments")
             .select("amount, payment_method, paid_at, created_at, status")
             .eq("status", "completed")
             .range(from, from + pageSize - 1);
+          if (error) {
+            reportSupabaseError(error, "Could not load payments");
+            return all;
+          }
           if (!data || data.length === 0) break;
           all.push(...(data as typeof all));
           if (data.length < pageSize) break;

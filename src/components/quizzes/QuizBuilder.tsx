@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, GripVertical, Pencil } from "lucide-react";
+import dynamic from "next/dynamic";
+import { Plus, Trash2, GripVertical, Pencil, Upload } from "lucide-react";
 import { QuizForm } from "./QuizForm";
 import { QuestionForm } from "./QuestionForm";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Quiz, QuizQuestion } from "@/types";
 import type { QuizInput } from "@/lib/utils/validators";
+
+// Defer the dialog (and its ~1MB xlsx dependency) until the admin actually
+// clicks "Bulk upload". Without this, every quiz editor load pulls xlsx in.
+const BulkQuestionUploadDialog = dynamic(
+  () =>
+    import("./BulkQuestionUploadDialog").then((m) => m.BulkQuestionUploadDialog),
+  { ssr: false }
+);
 
 interface QuizBuilderProps {
   courseId: string;
@@ -20,6 +29,7 @@ export function QuizBuilder({ courseId, quizId }: QuizBuilderProps) {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [showQuestionForm, setShowQuestionForm] = useState(false);
+  const [showBulkUpload, setShowBulkUpload] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(
     null
   );
@@ -177,6 +187,15 @@ export function QuizBuilder({ courseId, quizId }: QuizBuilderProps) {
                 </Button>
               )}
               <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowBulkUpload(true)}
+                disabled={!quizId && !quiz}
+              >
+                <Upload className="h-4 w-4 me-1" />
+                Bulk upload
+              </Button>
+              <Button
                 size="sm"
                 onClick={() => {
                   setEditingQuestion(null);
@@ -188,6 +207,16 @@ export function QuizBuilder({ courseId, quizId }: QuizBuilderProps) {
               </Button>
             </div>
           </div>
+
+          {showBulkUpload && (quizId || quiz) && (
+            <BulkQuestionUploadDialog
+              quizId={(quizId ?? quiz?.id) as string}
+              onClose={() => setShowBulkUpload(false)}
+              onComplete={() => {
+                fetchQuestions();
+              }}
+            />
+          )}
 
           {/* Question form */}
           {showQuestionForm && (

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { StatCard } from "@/components/analytics/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
@@ -73,11 +74,15 @@ export default function AdminDashboardPage() {
         const pageSize = 1000;
         let total = 0;
         for (let from = 0; ; from += pageSize) {
-          const { data } = await supabase
+          const { data, error } = await supabase
             .from("payments")
             .select("amount")
             .eq("status", "completed")
             .range(from, from + pageSize - 1);
+          if (error) {
+            reportSupabaseError(error, "Could not load payments");
+            return total;
+          }
           if (!data || data.length === 0) break;
           for (const p of data) total += Number(p.amount ?? 0);
           if (data.length < pageSize) break;

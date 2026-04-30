@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -27,12 +28,17 @@ export default function AdminVouchersPage() {
   async function fetchVouchers() {
     setIsLoading(true);
     const supabase = createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("vouchers")
       .select("*")
       .order("created_at", { ascending: false });
 
-    setVouchers((data as Voucher[]) ?? []);
+    if (error) {
+      reportSupabaseError(error, "Could not load vouchers");
+      setVouchers([]);
+    } else {
+      setVouchers((data as Voucher[]) ?? []);
+    }
     setIsLoading(false);
   }
 

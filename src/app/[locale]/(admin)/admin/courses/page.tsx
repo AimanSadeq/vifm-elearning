@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { Plus, Eye, Pencil, Trash2, ClipboardCheck, ToggleLeft, ToggleRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { escapeIlike } from "@/lib/utils/escape-search";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -52,8 +53,13 @@ export default function AdminCoursesPage() {
         );
       }
 
-      const { data } = await query;
-      setCourses((data as Course[]) ?? []);
+      const { data, error } = await query;
+      if (error) {
+        reportSupabaseError(error, "Could not load courses");
+        setCourses([]);
+      } else {
+        setCourses((data as Course[]) ?? []);
+      }
       setIsLoading(false);
     }
 

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -45,7 +46,7 @@ export default function AdminLearningPathsPage() {
   async function fetchPaths() {
     setIsLoading(true);
     const supabase = createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("learning_paths")
       .select(
         `
@@ -55,6 +56,13 @@ export default function AdminLearningPathsPage() {
       `
       )
       .order("sort_order", { ascending: true });
+
+    if (error) {
+      reportSupabaseError(error, "Could not load learning paths");
+      setPaths([]);
+      setIsLoading(false);
+      return;
+    }
 
     const mapped: LearningPathWithCourseCount[] = (data ?? []).map(
       (p: Record<string, unknown>) => ({

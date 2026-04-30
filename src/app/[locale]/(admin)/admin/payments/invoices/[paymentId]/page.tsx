@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { useLocale } from "next-intl";
 import { ArrowLeft, Printer, Download } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +37,7 @@ export default function AdminInvoiceDetailPage() {
     setPayment(null);
     async function load() {
       const supabase = createClient();
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("payments")
         .select(
           "*, user:profiles!payments_user_id_fkey(full_name, email), course:courses(title, price, currency)"
@@ -44,6 +45,9 @@ export default function AdminInvoiceDetailPage() {
         .eq("id", paymentId)
         .maybeSingle();
       if (cancelled) return;
+      if (error) {
+        reportSupabaseError(error, "Could not load invoice");
+      }
       setPayment(data as InvoiceData | null);
       setIsLoading(false);
     }

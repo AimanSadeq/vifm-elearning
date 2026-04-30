@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -45,12 +46,17 @@ export default function AdminPromoCodesPage() {
   async function fetchPromoCodes() {
     setIsLoading(true);
     const supabase = createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("promo_codes")
       .select("*")
       .order("created_at", { ascending: false });
 
-    setPromoCodes((data as PromoCode[]) ?? []);
+    if (error) {
+      reportSupabaseError(error, "Could not load promo codes");
+      setPromoCodes([]);
+    } else {
+      setPromoCodes((data as PromoCode[]) ?? []);
+    }
     setIsLoading(false);
   }
 

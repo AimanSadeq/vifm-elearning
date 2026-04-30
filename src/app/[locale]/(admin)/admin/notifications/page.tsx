@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Bell, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
@@ -46,13 +47,20 @@ export default function AdminNotificationsPage() {
 
   const fetchNotifications = async () => {
     const supabase = createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("notifications")
       .select(
         "id, title, body, channel, status, created_at, user:profiles!notifications_user_id_fkey(full_name)"
       )
       .order("created_at", { ascending: false })
       .limit(50);
+
+    if (error) {
+      reportSupabaseError(error, "Could not load notifications");
+      setNotifications([]);
+      setIsLoading(false);
+      return;
+    }
 
     const mapped: SentNotification[] = (data ?? []).map(
       (n: Record<string, unknown>) => ({

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { CertificateTemplateForm } from "@/components/admin/CertificateTemplateForm";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import type { CertificateTemplateInput } from "@/lib/utils/validators";
 import type { CertificateTemplate, CertificateTemplateKey } from "@/types";
 
@@ -31,12 +32,17 @@ export default function AdminCertificateTemplatesPage() {
   async function fetchTemplates() {
     setIsLoading(true);
     const supabase = createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("certificate_templates")
       .select("*")
       .order("created_at", { ascending: false });
 
-    setTemplates((data as CertificateTemplate[]) ?? []);
+    if (error) {
+      reportSupabaseError(error, "Could not load templates");
+      setTemplates([]);
+    } else {
+      setTemplates((data as CertificateTemplate[]) ?? []);
+    }
     setIsLoading(false);
   }
 

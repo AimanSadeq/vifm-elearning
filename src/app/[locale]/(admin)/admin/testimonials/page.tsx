@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
@@ -65,12 +66,17 @@ export default function AdminTestimonialsPage() {
 
   const fetchTestimonials = async () => {
     const supabase = createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("testimonials")
       .select("*")
       .order("sort_order");
 
-    setTestimonials((data ?? []) as TestimonialRow[]);
+    if (error) {
+      reportSupabaseError(error, "Could not load testimonials");
+      setTestimonials([]);
+    } else {
+      setTestimonials((data ?? []) as TestimonialRow[]);
+    }
     setIsLoading(false);
   };
 

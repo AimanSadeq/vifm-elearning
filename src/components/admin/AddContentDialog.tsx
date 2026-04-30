@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useLocale } from 'next-intl'
 import { X, Save, Loader2, Video, FileText, ClipboardList } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
@@ -22,6 +24,8 @@ export function AddContentDialog({
   onClose,
   onSuccess,
 }: AddContentDialogProps) {
+  const router = useRouter()
+  const locale = useLocale()
   const [step, setStep] = useState<'type' | 'upload' | 'details'>('type')
   const [contentType, setContentType] = useState<ContentType | null>(null)
   const [uploadedFile, setUploadedFile] = useState<{
@@ -202,8 +206,52 @@ export function AddContentDialog({
         }
       }
 
-      const { error: insertError } = await supabase.from('lessons').insert(lessonData)
+      const { data: insertedLesson, error: insertError } = await supabase
+        .from('lessons')
+        .insert(lessonData)
+        .select('id')
+        .single()
       if (insertError) throw insertError
+
+      // Quiz lessons need a paired `quizzes` row, otherwise learners hitting
+      // the lesson see "No quiz found". Auto-create one and link it. If the
+      // quiz POST fails, *roll back the lesson insert* — leaving an orphan
+      // lesson is exactly the broken state we're trying to prevent.
+      if (contentType === 'quiz' && insertedLesson?.id) {
+        const quizTitle =
+          formData.title.trim() || formData.title_ar.trim() || 'New Quiz'
+        const quizRes = await fetch('/api/quizzes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            courseId,
+            lessonId: insertedLesson.id,
+            title: quizTitle,
+            titleAr: formData.title_ar.trim() || undefined,
+            description: formData.description.trim() || undefined,
+            passingScore: 70,
+            maxAttempts: 3,
+            shuffleQuestions: false,
+            showCorrectAnswers: true,
+            isFinalExam: false,
+          }),
+        })
+        const quizJson = await quizRes.json().catch(() => ({}))
+        if (!quizRes.ok) {
+          // Roll back the lesson so we don't leave a content_type='quiz'
+          // row pointing at nothing.
+          await supabase.from('lessons').delete().eq('id', insertedLesson.id)
+          throw new Error(
+            `Could not auto-create the quiz (${quizJson?.error ?? quizRes.status}). Lesson rolled back — try again.`
+          )
+        }
+        toast.success('Quiz lesson created — add questions next')
+        onSuccess()
+        router.push(
+          `/${locale}/admin/courses/${courseId}/quizzes/${quizJson.data.id}`
+        )
+        return
+      }
 
       toast.success('Lesson added successfully')
       onSuccess()

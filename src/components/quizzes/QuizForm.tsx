@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -22,6 +23,7 @@ export function QuizForm({ initialData, onSubmit, isLoading }: QuizFormProps) {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<QuizInput>({
     resolver: zodResolver(quizSchema),
@@ -37,6 +39,29 @@ export function QuizForm({ initialData, onSubmit, isLoading }: QuizFormProps) {
       showCorrectAnswers: initialData?.showCorrectAnswers ?? true,
     },
   });
+
+  // The parent fetches the quiz async, so `initialData` is undefined on
+  // first mount and arrives a tick later. `defaultValues` only run once on
+  // mount, so without this `reset()` the title/description stay blank even
+  // though the row has data. Watching the JSON shape (rather than the prop
+  // identity) avoids a reset loop when the parent re-renders with the same
+  // values during normal interaction.
+  const initialKey = initialData ? JSON.stringify(initialData) : "";
+  useEffect(() => {
+    if (!initialData) return;
+    reset({
+      title: initialData.title ?? "",
+      titleAr: initialData.titleAr ?? "",
+      description: initialData.description ?? "",
+      isFinalExam: initialData.isFinalExam ?? false,
+      passingScore: initialData.passingScore ?? 70,
+      timeLimitMinutes: initialData.timeLimitMinutes ?? null,
+      maxAttempts: initialData.maxAttempts ?? 3,
+      shuffleQuestions: initialData.shuffleQuestions ?? false,
+      showCorrectAnswers: initialData.showCorrectAnswers ?? true,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialKey]);
 
   return (
     <Card>

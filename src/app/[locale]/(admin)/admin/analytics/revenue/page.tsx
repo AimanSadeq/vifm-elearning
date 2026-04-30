@@ -8,6 +8,7 @@ import {
   Download,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { StatCard } from "@/components/analytics/StatCard";
 import { RevenueLineChart } from "@/components/analytics/charts/RevenueLineChart";
 import { PaymentMethodPieChart } from "@/components/analytics/charts/PaymentMethodPieChart";
@@ -62,11 +63,15 @@ export default function RevenueAnalyticsPage() {
           created_at: string | null;
         }> = [];
         for (let from = 0; ; from += pageSize) {
-          const { data } = await supabase
+          const { data, error } = await supabase
             .from("payments")
             .select("amount, payment_method, paid_at, created_at")
             .eq("status", "completed")
             .range(from, from + pageSize - 1);
+          if (error) {
+            reportSupabaseError(error, "Could not load revenue data");
+            return all;
+          }
           if (!data || data.length === 0) break;
           all.push(...(data as typeof all));
           if (data.length < pageSize) break;

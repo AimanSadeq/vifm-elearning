@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { escapeIlike } from "@/lib/utils/escape-search";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
@@ -106,9 +107,15 @@ export default function AdminUsersPage() {
       );
     }
 
-    const { data, count } = await query;
-    setUsers((data as UserRow[]) ?? []);
-    setTotalCount(count ?? 0);
+    const { data, count, error } = await query;
+    if (error) {
+      reportSupabaseError(error, "Could not load users");
+      setUsers([]);
+      setTotalCount(0);
+    } else {
+      setUsers((data as UserRow[]) ?? []);
+      setTotalCount(count ?? 0);
+    }
     setIsLoading(false);
   }, [debouncedSearch, roleFilter, page]);
 

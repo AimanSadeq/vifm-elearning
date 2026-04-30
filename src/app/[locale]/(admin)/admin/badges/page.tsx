@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Trophy, Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
@@ -45,12 +46,17 @@ export default function AdminBadgesPage() {
 
   const fetchBadges = async () => {
     const supabase = createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("badges")
       .select("*")
       .order("created_at", { ascending: false });
 
-    setBadges((data as BadgeRow[]) ?? []);
+    if (error) {
+      reportSupabaseError(error, "Could not load badges");
+      setBadges([]);
+    } else {
+      setBadges((data as BadgeRow[]) ?? []);
+    }
     setIsLoading(false);
   };
 

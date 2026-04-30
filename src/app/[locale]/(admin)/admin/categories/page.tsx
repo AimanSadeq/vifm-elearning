@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { FolderOpen, Plus, Pencil, Trash2, Loader2, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
@@ -121,10 +122,17 @@ export default function AdminCategoriesPage() {
 
   const fetchCategories = async () => {
     const supabase = createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("categories")
       .select("*, courses(count)")
       .order("sort_order");
+
+    if (error) {
+      reportSupabaseError(error, "Could not load categories");
+      setCategories([]);
+      setIsLoading(false);
+      return;
+    }
 
     const mapped: CategoryRow[] = (data ?? []).map(
       (c: Record<string, unknown>) => ({

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { WebinarForm } from "@/components/admin/WebinarForm";
 import { WebinarRecordingPanel } from "@/components/admin/WebinarRecordingPanel";
 import type { WebinarInput } from "@/lib/utils/validators";
@@ -20,12 +21,17 @@ export default function EditWebinarPage() {
   useEffect(() => {
     async function fetchWebinar() {
       const supabase = createClient();
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("webinars")
         .select("*")
         .eq("id", webinarId)
         .single();
 
+      if (error) {
+        reportSupabaseError(error, "Could not load webinar");
+        setIsLoading(false);
+        return;
+      }
       if (data) {
         setInitialData({
           id: data.id,

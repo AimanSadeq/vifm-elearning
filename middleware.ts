@@ -3,51 +3,15 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
+import {
+  PROTECTED_PREFIXES,
+  PROTECTED_PATTERNS,
+  getLocale,
+  hasValidLocale,
+  stripLocale,
+} from "@/lib/utils/protected-paths";
 
 const intlMiddleware = createMiddleware(routing);
-
-const validLocales = routing.locales as readonly string[];
-
-const protectedPrefixes = [
-  "/dashboard",
-  "/my-courses",
-  "/my-learning-paths",
-  "/certificates",
-  "/forums",
-  "/profile",
-  "/notifications",
-  "/payment",
-  "/subscription",
-  "/admin",
-  "/instructor",
-  "/corporate",
-];
-
-const protectedPatterns = [
-  /^\/courses\/[^/]+\/learn/,
-  /^\/courses\/[^/]+\/checkout/,
-];
-
-function stripLocale(pathname: string): string {
-  const segments = pathname.split("/");
-  if (segments.length > 1 && validLocales.includes(segments[1] as "en" | "ar")) {
-    return "/" + segments.slice(2).join("/") || "/";
-  }
-  return pathname;
-}
-
-function hasValidLocale(pathname: string): boolean {
-  const segments = pathname.split("/");
-  return segments.length > 1 && validLocales.includes(segments[1] as "en" | "ar");
-}
-
-function getLocale(pathname: string): string {
-  const segments = pathname.split("/");
-  if (segments.length > 1 && validLocales.includes(segments[1] as "en" | "ar")) {
-    return segments[1];
-  }
-  return routing.defaultLocale;
-}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -99,8 +63,8 @@ export async function middleware(request: NextRequest) {
   const cleanPath = stripLocale(pathname);
 
   const isProtected =
-    protectedPrefixes.some((prefix) => cleanPath.startsWith(prefix)) ||
-    protectedPatterns.some((pattern) => pattern.test(cleanPath));
+    PROTECTED_PREFIXES.some((prefix) => cleanPath.startsWith(prefix)) ||
+    PROTECTED_PATTERNS.some((pattern) => pattern.test(cleanPath));
 
   // Not protected → run intl middleware and return
   if (!isProtected) return withAuthCookies(intlMiddleware(request));
