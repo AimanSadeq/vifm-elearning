@@ -145,6 +145,7 @@ export default function DesignationLandingPage() {
   const [cpeCategories, setCpeCategories] = useState<CPECategory[]>([]);
   const [resources, setResources] = useState<DesignationResource[]>([]);
   const [holderCount, setHolderCount] = useState(0);
+  const [primaryCourseSlug, setPrimaryCourseSlug] = useState<string | null>(null);
   const [hasAccess, setHasAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -196,6 +197,17 @@ export default function DesignationLandingPage() {
           .select("id", { count: "exact", head: true })
           .eq("designation_id", desig.id)
           .in("status", ["active", "grace_period"]),
+        // Primary course for this designation, if linked. Drives the
+        // "Get Certified" CTA — when present, the button deep-links to the
+        // course detail page instead of dumping the visitor in the catalog.
+        supabase
+          .from("courses")
+          .select("slug")
+          .eq("designation_id", desig.id)
+          .eq("status", "published")
+          .order("created_at", { ascending: true })
+          .limit(1)
+          .maybeSingle(),
       ];
 
       // Check if logged-in user holds this designation
@@ -213,16 +225,25 @@ export default function DesignationLandingPage() {
       }
 
       const results = await Promise.all(promises);
-      const [docsRes, catsRes, resourcesRes, holderCountRes, userHolderRes] =
-        results as { data: unknown[] | null; count?: number | null }[];
+      const [
+        docsRes,
+        catsRes,
+        resourcesRes,
+        holderCountRes,
+        primaryCourseRes,
+        userHolderRes,
+      ] = results as { data: unknown; count?: number | null }[];
 
       setDocuments((docsRes.data ?? []) as DesignationDocument[]);
       setCpeCategories((catsRes.data ?? []) as CPECategory[]);
       setResources((resourcesRes.data ?? []) as DesignationResource[]);
       setHolderCount(holderCountRes?.count ?? 0);
+      setPrimaryCourseSlug(
+        (primaryCourseRes?.data as { slug: string } | null)?.slug ?? null
+      );
       setHasAccess(
         authUser?.app_metadata?.role === "super_admin" ||
-          (userHolderRes?.data ?? []).length > 0
+          ((userHolderRes?.data ?? []) as unknown[]).length > 0
       );
       setIsLoading(false);
     }
@@ -269,6 +290,12 @@ export default function DesignationLandingPage() {
       ? tierRaw
       : null;
 
+  // Designations can opt out of the Overview / Course Website tab strip via
+  // metadata. When hidden, the page renders the Overview body inline with no
+  // tab nav and the gated Course Website panel is suppressed.
+  const hideTabs = meta.hide_tabs === true;
+  const effectiveTab = hideTabs ? "overview" : activeTab;
+
   return (
     <div className="pb-0">
       {/* Hero */}
@@ -285,17 +312,20 @@ export default function DesignationLandingPage() {
         cpeHours={cpeHours}
         cpeCycleYears={renderCycleYears}
         holderCount={holderCount}
+        primaryCourseSlug={primaryCourseSlug}
       />
 
       {/* Tab Navigation */}
-      <DesignationTabs
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        locale={locale}
-      />
+      {!hideTabs && (
+        <DesignationTabs
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          locale={locale}
+        />
+      )}
 
       {/* Tab Content */}
-      {activeTab === "overview" ? (
+      {effectiveTab === "overview" ? (
         <div className="space-y-16 py-16">
           <div className="container mx-auto px-4">
             <DesignationOverview
@@ -323,7 +353,11 @@ export default function DesignationLandingPage() {
           </div>
 
           <div className="container mx-auto px-4">
-            <DesignationSteps abbreviation={d.abbreviation} locale={locale} />
+            <DesignationSteps
+              abbreviation={d.abbreviation}
+              locale={locale}
+              primaryCourseSlug={primaryCourseSlug}
+            />
           </div>
 
           {cpeCategories.length > 0 && (
@@ -347,6 +381,7 @@ export default function DesignationLandingPage() {
             abbreviation={d.abbreviation}
             slug={slug}
             locale={locale}
+            primaryCourseSlug={primaryCourseSlug}
           />
         </div>
       ) : (

@@ -15,6 +15,9 @@ import { AnimatedSection } from "@/components/landing/AnimatedSection";
 interface DesignationStepsProps {
   abbreviation: string;
   locale: string;
+  /** Deep-link target for the "Start Your Journey" CTA. Falls back to the
+   *  catalog when the designation has no 1:1 backing course. */
+  primaryCourseSlug?: string | null;
 }
 
 const containerVariants = {
@@ -35,7 +38,11 @@ const cardVariants = {
 export function DesignationSteps({
   abbreviation,
   locale,
+  primaryCourseSlug,
 }: DesignationStepsProps) {
+  const startHref = primaryCourseSlug
+    ? `/${locale}/courses/${primaryCourseSlug}`
+    : `/${locale}/courses`;
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
   const prefersReducedMotion = useReducedMotion();
@@ -133,7 +140,7 @@ export function DesignationSteps({
       <AnimatedSection delay={0.3}>
         <div className="mt-10 text-center">
           <Link
-            href={`/${locale}/courses`}
+            href={startHref}
             className="group inline-flex items-center gap-2 rounded-full bg-brand-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 transition-colors hover:bg-brand-700"
           >
             {locale === "ar" ? "ابدأ رحلتك" : "Start Your Journey"}

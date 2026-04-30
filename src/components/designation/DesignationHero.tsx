@@ -26,6 +26,9 @@ interface DesignationHeroProps {
   cpeHours?: number;
   cpeCycleYears?: number;
   holderCount?: number;
+  /** When set, "Get Certified" deep-links to this course instead of the
+   *  generic catalog. Used when a designation has a 1:1 backing course. */
+  primaryCourseSlug?: string | null;
 }
 
 interface TierMeta {
@@ -98,9 +101,14 @@ export function DesignationHero({
   cpeHours,
   cpeCycleYears,
   holderCount,
+  primaryCourseSlug,
 }: DesignationHeroProps) {
   const prefersReducedMotion = useReducedMotion();
   const isAr = locale === "ar";
+
+  const getCertifiedHref = primaryCourseSlug
+    ? `/${locale}/courses/${primaryCourseSlug}`
+    : `/${locale}/courses`;
 
   const tierLabels = isAr
     ? { gateway: "تأسيسي", professional: "مهني", executive: "تنفيذي" }
@@ -202,7 +210,7 @@ export function DesignationHero({
               {/* CTAs */}
               <div className="mt-10 flex flex-wrap gap-3">
                 <Link
-                  href={`/${locale}/courses`}
+                  href={getCertifiedHref}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-brand-900 shadow-xl shadow-black/20 transition-colors hover:bg-brand-50"
                 >
                   <GraduationCap className="h-4 w-4" />

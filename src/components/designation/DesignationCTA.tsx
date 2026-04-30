@@ -9,14 +9,21 @@ interface DesignationCTAProps {
   abbreviation: string;
   slug: string;
   locale: string;
+  /** Deep-link target for "Get Started" — same primary-course pattern as
+   *  the hero and steps CTAs. */
+  primaryCourseSlug?: string | null;
 }
 
 export function DesignationCTA({
   abbreviation,
   slug,
   locale,
+  primaryCourseSlug,
 }: DesignationCTAProps) {
   const prefersReducedMotion = useReducedMotion();
+  const startHref = primaryCourseSlug
+    ? `/${locale}/courses/${primaryCourseSlug}`
+    : `/${locale}/courses`;
 
   return (
     <section className="relative overflow-hidden rounded-2xl py-16 sm:py-20">
@@ -98,7 +105,7 @@ export function DesignationCTA({
               }
             >
               <Link
-                href={`/${locale}/courses`}
+                href={startHref}
                 className="group inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-brand-900 shadow-lg shadow-black/10 transition-colors hover:bg-brand-50"
               >
                 {locale === "ar" ? "ابدأ الآن" : "Get Started"}
