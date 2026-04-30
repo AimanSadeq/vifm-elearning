@@ -184,29 +184,6 @@ export default function AdminCertificateTemplatesPage() {
       render: (item) => getStyleBadge(item.template_key),
     },
     {
-      key: "colors",
-      header: "Colors",
-      render: (item) => (
-        <div className="flex items-center gap-1">
-          <div
-            className="h-5 w-5 rounded border"
-            style={{ backgroundColor: item.primary_color }}
-            title={`Primary: ${item.primary_color}`}
-          />
-          <div
-            className="h-5 w-5 rounded border"
-            style={{ backgroundColor: item.secondary_color }}
-            title={`Secondary: ${item.secondary_color}`}
-          />
-          <div
-            className="h-5 w-5 rounded border"
-            style={{ backgroundColor: item.accent_color }}
-            title={`Accent: ${item.accent_color}`}
-          />
-        </div>
-      ),
-    },
-    {
       key: "organization",
       header: "Organization",
       render: (item) => (

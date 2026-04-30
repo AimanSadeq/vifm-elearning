@@ -358,7 +358,9 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
         throw new Error(json?.error || 'Upload failed')
       }
 
-      setThumbnailUrl(`${json.thumbnail_url}?t=${Date.now()}`)
+      // Server already returns a cache-busted URL (?v=<timestamp>) — use it
+      // as-is. Appending another `?t=…` would produce a malformed URL.
+      setThumbnailUrl(json.thumbnail_url)
       toast.success('Thumbnail uploaded successfully')
       router.refresh()
     } catch (error) {

@@ -92,9 +92,13 @@ export async function POST(request: NextRequest) {
           .from("course-assets")
           .getPublicUrl(filePath);
 
+        // Cache-bust so a later edit that overwrites this same path
+        // forces fresh fetches across the catalog / detail pages.
+        const cacheBustedUrl = `${urlData.publicUrl}?v=${Date.now()}`;
+
         await supabaseAdmin
           .from("courses")
-          .update({ thumbnail_url: urlData.publicUrl })
+          .update({ thumbnail_url: cacheBustedUrl })
           .eq("id", courseId);
       }
     }

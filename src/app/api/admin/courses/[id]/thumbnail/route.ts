@@ -80,16 +80,22 @@ export async function POST(
 
     const { data: urlData } = supabaseAdmin.storage.from(BUCKET).getPublicUrl(filePath)
 
+    // Cache-bust on every replace. The Storage path stays stable (we
+    // overwrite the same `thumbnail.<ext>` to keep cleanup simple), so
+    // without a query param browsers + the Supabase CDN serve the old
+    // image after replace. Pin the bust value to upload time.
+    const cacheBustedUrl = `${urlData.publicUrl}?v=${Date.now()}`
+
     const { error: updateError } = await supabaseAdmin
       .from('courses')
-      .update({ thumbnail_url: urlData.publicUrl })
+      .update({ thumbnail_url: cacheBustedUrl })
       .eq('id', courseId)
 
     if (updateError) {
       return NextResponse.json({ error: updateError.message }, { status: 500 })
     }
 
-    return NextResponse.json({ thumbnail_url: urlData.publicUrl })
+    return NextResponse.json({ thumbnail_url: cacheBustedUrl })
   } catch (err) {
     console.error('Thumbnail upload error:', err)
     const message = err instanceof Error ? err.message : 'Internal server error'
