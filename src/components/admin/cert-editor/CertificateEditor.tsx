@@ -351,8 +351,8 @@ export function CertificateEditor({
       {pptxPath && (
         <div className="border-b border-emerald-200 bg-emerald-50 px-6 py-2 text-xs text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-200">
           <strong>Custom .pptx is active.</strong> The visual design comes from
-          your uploaded file — we can't pixel-render an arbitrary .pptx in the
-          browser, so there's no live canvas preview here. Click{" "}
+          your uploaded file — we can&apos;t pixel-render an arbitrary .pptx in the
+          browser, so there&apos;s no live canvas preview here. Click{" "}
           <strong>Sample (.pptx)</strong> to download a personalized copy and
           inspect the real layout in PowerPoint or Keynote. Set placeholder
           values on the right.
@@ -484,8 +484,8 @@ function UploadedPptxPanel({
       <p className="rounded-md border border-amber-200 bg-amber-50/60 px-3 py-2 text-xs text-amber-900 dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-200">
         <strong>Preview hosted by Microsoft.</strong> The viewer fetches your
         .pptx from its public storage URL, which means the file passes through
-        Microsoft's servers and may be cached on their CDN. Don't upload
-        templates that contain confidential information you wouldn't want
+        Microsoft&apos;s servers and may be cached on their CDN. Don&apos;t upload
+        templates that contain confidential information you wouldn&apos;t want
         third-party rendered.
       </p>
 
@@ -501,7 +501,7 @@ function UploadedPptxPanel({
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-white/95 p-6 text-center text-sm text-muted-foreground dark:bg-card/95">
               <FileText className="h-8 w-8 text-muted-foreground" />
               <p>
-                Preview didn't load — your network may block{" "}
+                Preview didn&apos;t load — your network may block{" "}
                 <code>view.officeapps.live.com</code>. Click{" "}
                 <strong>Sample (personalized)</strong> above to verify the
                 design instead.
@@ -526,7 +526,7 @@ function UploadedPptxPanel({
         <div className="rounded-2xl border border-dashed border-emerald-300 bg-white p-10 text-center shadow-sm dark:border-emerald-900/50 dark:bg-card">
           <FileText className="mx-auto h-10 w-10 text-emerald-600 dark:text-emerald-400" />
           <p className="mt-4 text-sm text-muted-foreground">
-            Custom .pptx active. The public preview URL isn't available — use
+            Custom .pptx active. The public preview URL isn&apos;t available — use
             the buttons above to download or replace the file.
           </p>
         </div>
