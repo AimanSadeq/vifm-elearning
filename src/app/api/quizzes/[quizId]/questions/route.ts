@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { quizQuestionSchema } from "@/lib/utils/validators";
+import { userHasCourseAccess } from "@/lib/services/access";
 
 interface RouteParams {
   params: Promise<{ quizId: string }>;
@@ -25,18 +26,68 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const isAdmin = profile?.role === "super_admin";
 
-    // Fetch questions with options
-    const { data: questions, error } = await supabase
+    // Resolve the owning course so we can authorize the caller. The
+    // user-scoped client is used (RLS-respecting); admin escalation only
+    // happens after we've confirmed access, never as the access check.
+    const { data: quiz } = await supabaseAdmin
+      .from("quizzes")
+      .select("id, course_id, is_published")
+      .eq("id", quizId)
+      .maybeSingle();
+
+    if (!quiz) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    // Pull instructor_id alongside the access check so we know whether to
+    // expose answer keys (super_admin + course's own instructor only).
+    const { data: course } = await supabaseAdmin
+      .from("courses")
+      .select("is_free, instructor_id, status")
+      .eq("id", quiz.course_id)
+      .maybeSingle();
+
+    const isInstructor =
+      !!course?.instructor_id && course.instructor_id === user.id;
+
+    // Non-admin/non-instructor callers cannot see draft quizzes. Even if
+    // the course were free, an unpublished quiz isn't part of the catalog.
+    if (!isAdmin && !isInstructor && !quiz.is_published) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Course-access gate (super_admin / free course / instructor /
+    // enrollment / subscription).
+    const allowed = await userHasCourseAccess(user.id, quiz.course_id, {
+      course,
+      authMetadata: { role: profile?.role ?? undefined },
+    });
+    if (!allowed) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Fetch questions with options. Use admin client because RLS for
+    // quiz_options/quiz_questions varies by role; we've already authorized
+    // and we strip the answer key below for non-authors.
+    const { data: questions, error } = await supabaseAdmin
       .from("quiz_questions")
       .select("*, options:quiz_options(*)")
       .eq("quiz_id", quizId)
       .order("sort_order");
 
-    if (error)
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      console.error("quiz questions fetch failed", error);
+      return NextResponse.json(
+        { error: "Internal server error" },
+        { status: 500 }
+      );
+    }
 
-    // Strip is_correct for learners
-    const result = isAdmin
+    // Only super_admins and the course's own instructor get the answer
+    // key. Every other authenticated viewer (including other instructors)
+    // sees options without `is_correct`.
+    const canSeeAnswers = isAdmin || isInstructor;
+    const result = canSeeAnswers
       ? questions
       : questions?.map((q) => ({
           ...q,
@@ -45,7 +96,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         }));
 
     return NextResponse.json({ data: result });
-  } catch {
+  } catch (err) {
+    console.error("GET /api/quizzes/[quizId]/questions failed", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

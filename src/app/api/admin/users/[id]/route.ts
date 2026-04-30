@@ -56,10 +56,12 @@ export async function PATCH(
         await supabaseAdmin.auth.admin.updateUserById(id, { password });
 
       if (pwError) {
-        return NextResponse.json(
-          { error: `Password update failed: ${pwError.message}` },
-          { status: 400 }
-        );
+        console.error("admin password update failed", pwError);
+        const msg = pwError.message?.toLowerCase() ?? "";
+        const friendly = msg.includes("password")
+          ? "Password did not meet the required strength"
+          : "Could not update password";
+        return NextResponse.json({ error: friendly }, { status: 400 });
       }
     }
 
@@ -78,8 +80,9 @@ export async function PATCH(
       .eq("id", id);
 
     if (updateError) {
+      console.error("admin profile update failed", updateError);
       return NextResponse.json(
-        { error: updateError.message },
+        { error: "Could not update profile" },
         { status: 500 }
       );
     }
@@ -94,9 +97,10 @@ export async function PATCH(
     return NextResponse.json({ data: updatedProfile });
   } catch (err) {
     console.error("Admin user update error:", err);
-    const message =
-      err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -125,8 +129,9 @@ export async function DELETE(
       await supabaseAdmin.auth.admin.deleteUser(id);
 
     if (deleteError) {
+      console.error("admin user delete failed", deleteError);
       return NextResponse.json(
-        { error: deleteError.message },
+        { error: "Could not delete user" },
         { status: 500 }
       );
     }
@@ -134,8 +139,9 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Admin user deletion error:", err);
-    const message =
-      err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

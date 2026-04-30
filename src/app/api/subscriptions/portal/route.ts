@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/services/stripe";
@@ -8,7 +8,7 @@ import { getStripe } from "@/lib/services/stripe";
  * have a Stripe customer attached (i.e. they completed at least one Stripe
  * subscription checkout in the past).
  */
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const supabase = await createServerSupabase();
     const {
@@ -43,8 +43,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL ?? request.headers.get("origin") ?? "";
+    // Origin header is attacker-controllable — falling back to it would
+    // let a phishing site embed a request that ends with a Stripe portal
+    // session whose `return_url` points at the attacker's domain. Fail
+    // closed when NEXT_PUBLIC_APP_URL isn't configured.
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+    if (!baseUrl) {
+      console.error("subscriptions/portal: NEXT_PUBLIC_APP_URL not set");
+      return NextResponse.json(
+        { error: "Billing portal is not configured." },
+        { status: 500 }
+      );
+    }
 
     const session = await getStripe().billingPortal.sessions.create({
       customer: sub.stripe_customer_id,

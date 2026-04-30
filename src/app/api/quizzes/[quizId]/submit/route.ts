@@ -44,6 +44,26 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (quizError || !quiz)
       return NextResponse.json({ error: "Quiz not found" }, { status: 404 });
 
+    // Look up the caller's role so super_admin can submit against drafts
+    // for testing without disabling the published-state guard for everyone.
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    const isAdmin = profile?.role === "super_admin";
+
+    // Block submissions to draft quizzes — they aren't part of the
+    // published catalog. Without this, a learner can pull `/api/quizzes/
+    // [quizId]/submit` directly with a draft id and burn `max_attempts`
+    // (or accidentally generate certificates from un-released content).
+    if (!quiz.is_published && !isAdmin) {
+      return NextResponse.json(
+        { error: "Quiz is not available" },
+        { status: 403 }
+      );
+    }
+
     // Verify enrollment
     const { data: enrollment } = await supabaseAdmin
       .from("enrollments")
@@ -53,7 +73,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .in("status", ["active", "completed"])
       .single();
 
-    if (!enrollment)
+    if (!enrollment && !isAdmin)
       return NextResponse.json(
         { error: "Not enrolled in this course" },
         { status: 403 }
@@ -194,9 +214,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
     }
 
-    // If final exam and passed, issue certificate
+    // If final exam and passed, issue certificate. Admin smoke-tests can
+    // submit without an enrollment row, so skip cert issuance in that
+    // case — there's nothing to attach the certificate to.
     let certificate = null;
-    if (quiz.is_final_exam && passed) {
+    if (quiz.is_final_exam && passed && enrollment) {
       try {
         certificate = await issueCertificate({
           userId: user.id,

@@ -14,32 +14,69 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const {
-      fullName,
-      memberNumber,
-      certifiedAt,
-      designationName,
-      abbreviation,
-      tierSlug,
-      verifyUrl,
-    } = body;
+    const body = await request.json().catch(() => ({}));
+    const memberNumber = typeof body?.memberNumber === "string" ? body.memberNumber : null;
 
-    if (!fullName || !memberNumber || !certifiedAt || !abbreviation) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (!memberNumber) {
+      return NextResponse.json(
+        { error: "memberNumber is required" },
+        { status: 400 }
+      );
     }
 
-    // Verify the user owns this holder record
+    // Pull the canonical record. We deliberately ignore client-supplied
+    // names, abbreviations, dates, and tier slugs — those are written into
+    // the certificate so trusting them lets a CDIP standard member request
+    // a "★ FOUNDING MEMBER" CFA cert. Everything goes through this lookup.
     const { data: holder } = await supabase
       .from("designation_holders")
-      .select("id, status")
+      .select(
+        `
+          id,
+          status,
+          member_number,
+          certified_at,
+          tier:designation_tiers!designation_holders_tier_id_fkey(slug),
+          designation:designations!designation_holders_designation_id_fkey(name, abbreviation, slug),
+          profile:profiles!designation_holders_user_id_fkey(full_name)
+        `
+      )
       .eq("user_id", user.id)
       .eq("member_number", memberNumber)
       .in("status", ["active", "grace_period"])
-      .single();
+      .maybeSingle();
 
-    if (!holder) {
-      return NextResponse.json({ error: "Active holder record not found" }, { status: 403 });
+    if (!holder || !holder.designation) {
+      return NextResponse.json(
+        { error: "Active holder record not found" },
+        { status: 403 }
+      );
+    }
+
+    const designationRow = Array.isArray(holder.designation)
+      ? holder.designation[0]
+      : holder.designation;
+    const tierRow = Array.isArray(holder.tier) ? holder.tier[0] : holder.tier;
+    const profileRow = Array.isArray(holder.profile)
+      ? holder.profile[0]
+      : holder.profile;
+
+    const fullName = profileRow?.full_name ?? "";
+    const certifiedAt = holder.certified_at;
+    const designationName = designationRow?.name ?? "";
+    const abbreviation = designationRow?.abbreviation ?? "";
+    const tierSlug = tierRow?.slug ?? null;
+
+    // Compose the verify URL on the server too — letting clients pass it
+    // means they could embed an attacker-controlled URL into the QR.
+    const origin = request.nextUrl.origin;
+    const verifyUrl = `${origin}/en/designations/${designationRow?.slug ?? ""}/verify/${encodeURIComponent(memberNumber)}`;
+
+    if (!fullName || !abbreviation || !certifiedAt) {
+      return NextResponse.json(
+        { error: "Holder record is incomplete" },
+        { status: 500 }
+      );
     }
 
     // Generate QR code as data URL
@@ -200,9 +237,8 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: unknown) {
     console.error("Certificate generation error:", error);
-    const message = error instanceof Error ? error.message : "Failed to generate certificate";
     return NextResponse.json(
-      { error: message },
+      { error: "Failed to generate certificate" },
       { status: 500 }
     );
   }

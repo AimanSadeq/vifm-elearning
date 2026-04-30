@@ -159,12 +159,7 @@ export async function POST(request: NextRequest) {
       );
     }
     return NextResponse.json(
-      {
-        error:
-          err instanceof Error
-            ? `Checkout failed: ${err.message}`
-            : "Internal server error",
-      },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

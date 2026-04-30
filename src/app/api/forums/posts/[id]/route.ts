@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 async function createSupabase() {
   const cookieStore = await cookies();
@@ -20,6 +21,13 @@ async function createSupabase() {
   );
 }
 
+const updatePostSchema = z.object({
+  title: z.string().min(1).max(300).optional(),
+  body: z.string().min(1).max(20_000).optional(),
+  is_pinned: z.boolean().optional(),
+  is_resolved: z.boolean().optional(),
+});
+
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -35,7 +43,19 @@ export async function PUT(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  const parsed = updatePostSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
+      { status: 400 }
+    );
+  }
 
   // Fetch existing post to verify ownership or instructor role
   const { data: post } = await supabase
@@ -73,14 +93,27 @@ export async function PUT(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  // Build update object — only include fields that were sent
+  // Build the update from a fixed allow-list. Each field is read explicitly
+  // from the validated payload — never spread the raw body — so there's no
+  // way a sender can sneak in an unintended column (author_id, course_id…)
+  // even if the client tries.
   const update: Record<string, unknown> = {};
-  if (body.title !== undefined) update.title = body.title;
-  if (body.body !== undefined) update.body = body.body;
-  if (body.is_pinned !== undefined && (isAdmin || isInstructor))
-    update.is_pinned = body.is_pinned;
-  if (body.is_resolved !== undefined && (isAdmin || isInstructor || isAuthor))
-    update.is_resolved = body.is_resolved;
+  if (parsed.data.title !== undefined) update.title = parsed.data.title;
+  if (parsed.data.body !== undefined) update.body = parsed.data.body;
+  if (parsed.data.is_pinned !== undefined && (isAdmin || isInstructor))
+    update.is_pinned = parsed.data.is_pinned;
+  if (
+    parsed.data.is_resolved !== undefined &&
+    (isAdmin || isInstructor || isAuthor)
+  )
+    update.is_resolved = parsed.data.is_resolved;
+
+  if (Object.keys(update).length === 0) {
+    return NextResponse.json(
+      { error: "No editable fields supplied" },
+      { status: 400 }
+    );
+  }
 
   const { data, error } = await supabase
     .from("forum_posts")
@@ -90,7 +123,11 @@ export async function PUT(
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("forum post update failed", error);
+    return NextResponse.json(
+      { error: "Could not update post" },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ data });

@@ -43,7 +43,10 @@ export async function GET(request: NextRequest) {
       query = query.eq("user_id", user.id);
     }
 
-    const search = params.get("search");
+    // Cap search input length before passing to PostgREST. Without a cap
+    // a 1MB `?search=` payload happily flows through, wasting the trip
+    // and shifting cost onto the DB.
+    const search = params.get("search")?.slice(0, 200);
     if (search) {
       const s = escapeIlike(search);
       query = query.or(
@@ -52,8 +55,13 @@ export async function GET(request: NextRequest) {
     }
 
     const { data, error, count } = await query;
-    if (error)
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      console.error("certificates list failed", error);
+      return NextResponse.json(
+        { error: "Could not load certificates" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ data, count: count ?? 0 });
   } catch {

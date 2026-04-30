@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { sanitizeFileName } from '@/lib/supabase/video-storage'
+import { isUuid } from '@/lib/utils/uuid'
 
 const VIDEO_BUCKET = 'course-videos'
 const DOCUMENT_BUCKET = 'course-assets'
@@ -41,6 +42,9 @@ export async function POST(
 ) {
   try {
     const { id: courseId } = await params
+    if (!isUuid(courseId)) {
+      return NextResponse.json({ error: 'Invalid course id' }, { status: 400 })
+    }
     const supabase = await createServerSupabase()
 
     const { data: { user } } = await supabase.auth.getUser()

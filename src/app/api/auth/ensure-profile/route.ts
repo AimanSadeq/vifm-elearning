@@ -1,9 +1,21 @@
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { applyRateLimit } from "@/lib/utils/rate-limit";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
+  // Throttle to stop a compromised/anon caller from looping forever; the
+  // route runs admin-client SQL so we never want it to be a free hot path.
+  const limited = applyRateLimit(request, {
+    scope: "auth:ensure-profile",
+    buckets: [
+      { limit: 10, windowMs: 60_000 },
+      { limit: 60, windowMs: 60 * 60_000 },
+    ],
+  });
+  if (limited) return limited;
+
   const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

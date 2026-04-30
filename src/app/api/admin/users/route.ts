@@ -57,10 +57,18 @@ export async function POST(request: NextRequest) {
       });
 
     if (createError) {
-      return NextResponse.json(
-        { error: createError.message },
-        { status: 400 }
-      );
+      // Translate the most common known cases to user-facing strings;
+      // anything else gets a generic message so we don't leak Supabase
+      // internals (auth provider config, raw DB errors).
+      console.error("admin createUser failed", createError);
+      const msg = createError.message?.toLowerCase() ?? "";
+      const friendly =
+        msg.includes("already") || msg.includes("registered")
+          ? "A user with this email already exists"
+          : msg.includes("password")
+            ? "Password did not meet the required strength"
+            : "Could not create user";
+      return NextResponse.json({ error: friendly }, { status: 400 });
     }
 
     // Update the auto-created profile row with additional fields
@@ -91,8 +99,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ data: createdProfile }, { status: 201 });
   } catch (err) {
     console.error("Admin user creation error:", err);
-    const message =
-      err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

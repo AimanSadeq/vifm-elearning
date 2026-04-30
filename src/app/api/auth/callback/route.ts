@@ -58,16 +58,41 @@ export async function GET(request: Request) {
           .single();
 
         if (!existingProfile) {
+          // user_metadata is user-writable (set during signup, OAuth, or
+          // any client-side updateUser call). Copying it raw would let
+          // anyone stuff XSS into full_name, bloat the row via phone, or
+          // try to set role. Apply the same safety net as ensure-profile.
           const metadata = user.user_metadata;
+          const appRole = user.app_metadata?.role as string | undefined;
+          const allowedRoles = [
+            "learner",
+            "instructor",
+            "admin",
+            "super_admin",
+            "corporate_admin",
+          ];
+          const role =
+            appRole && allowedRoles.includes(appRole) ? appRole : "learner";
+
+          const safeFullName =
+            typeof metadata?.full_name === "string" && metadata.full_name.trim()
+              ? metadata.full_name.trim().slice(0, 200)
+              : user.email!.split("@")[0];
+          const phoneRaw =
+            typeof metadata?.phone === "string" ? metadata.phone.trim() : "";
+          const phoneOk =
+            phoneRaw && /^[+\d\s().-]{4,32}$/.test(phoneRaw);
+          const language = metadata?.language === "ar" ? "ar" : "en";
+
           const { error: insertError } = await adminClient
             .from("profiles")
             .insert({
               id: user.id,
               email: user.email!,
-              full_name: metadata?.full_name || user.email!.split("@")[0],
-              phone: metadata?.phone || null,
-              language: metadata?.language || "en",
-              role: "learner",
+              full_name: safeFullName,
+              phone: phoneOk ? phoneRaw : null,
+              language,
+              role,
             });
 
           if (insertError) {

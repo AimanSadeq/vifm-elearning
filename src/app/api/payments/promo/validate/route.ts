@@ -1,9 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { applyRateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    // Brute-force guard: each guess returns a binary signal, so without a
+    // limit an attacker can enumerate every promo in seconds.
+    const limited = applyRateLimit(request, {
+      scope: "promo:validate",
+      buckets: [
+        { limit: 10, windowMs: 60_000 },
+        { limit: 60, windowMs: 60 * 60_000 },
+      ],
+    });
+    if (limited) return limited;
+
     const supabase = await createServerSupabase();
     const {
       data: { user },

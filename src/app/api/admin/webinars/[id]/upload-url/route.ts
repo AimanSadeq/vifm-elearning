@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { authorizeAdmin } from "@/lib/services/admin-auth";
 import { sanitizeFileName } from "@/lib/supabase/video-storage";
+import { isUuid } from "@/lib/utils/uuid";
 
 const VIDEO_BUCKET = "course-videos";
 const VIDEO_MIMES = ["video/mp4", "video/webm", "video/quicktime"];
@@ -30,6 +31,9 @@ interface UploadUrlRequest {
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const { id: webinarId } = await params;
+    if (!isUuid(webinarId)) {
+      return NextResponse.json({ error: "Invalid webinar id" }, { status: 400 });
+    }
 
     const auth = await authorizeAdmin(request);
     if (!auth.ok) {
@@ -79,8 +83,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .createSignedUploadUrl(path);
 
     if (error || !data) {
+      console.error("createSignedUploadUrl failed", error);
       return NextResponse.json(
-        { error: `Failed to create upload URL: ${error?.message || "unknown"}` },
+        { error: "Failed to create upload URL" },
         { status: 500 }
       );
     }

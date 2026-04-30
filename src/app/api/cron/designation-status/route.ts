@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { timingSafeEqual } from "crypto";
 
 /**
  * Nightly cron: Automated designation status transitions.
@@ -13,9 +14,19 @@ import { createClient } from "@supabase/supabase-js";
  * Secured by CRON_SECRET header.
  * Schedule: Daily at 1:00 AM UTC via external cron.
  */
+function verifyCronSecret(header: string | null): boolean {
+  const expected = process.env.CRON_SECRET;
+  if (!expected || !header) return false;
+  // Length-mismatched buffers throw inside timingSafeEqual, which itself
+  // would leak timing — so compare via fixed-size hashes (constant length).
+  const a = Buffer.from(header);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
+
 export async function POST(req: NextRequest) {
-  const cronSecret = req.headers.get("x-cron-secret");
-  if (cronSecret !== process.env.CRON_SECRET) {
+  if (!verifyCronSecret(req.headers.get("x-cron-secret"))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

@@ -1,6 +1,18 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+
+const createPostSchema = z.object({
+  courseId: z.string().uuid(),
+  lessonId: z.string().uuid().nullish(),
+  parentId: z.string().uuid().nullish(),
+  postType: z.enum(["discussion", "question", "announcement"]).optional(),
+  title: z.string().min(1).max(300).nullish(),
+  titleAr: z.string().min(1).max(300).nullish(),
+  content: z.string().min(1).max(20_000),
+  contentAr: z.string().max(20_000).nullish(),
+});
 
 async function createSupabase() {
   const cookieStore = await cookies();
@@ -68,7 +80,11 @@ export async function GET(request: Request) {
   const { data, error } = await query;
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("forum posts list failed", error);
+    return NextResponse.json(
+      { error: "Could not load posts" },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ data });
@@ -85,30 +101,43 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  let raw: unknown;
+  try {
+    raw = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
 
-  const { courseId, lessonId, parentId, postType, title, titleAr, content, contentAr } =
-    body;
-
-  if (!courseId || !content) {
+  const parsed = createPostSchema.safeParse(raw);
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: "courseId and content are required" },
+      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
       { status: 400 }
     );
   }
+  const {
+    courseId,
+    lessonId,
+    parentId,
+    postType,
+    title,
+    titleAr,
+    content,
+    contentAr,
+  } = parsed.data;
 
   const { data, error } = await supabase
     .from("forum_posts")
     .insert({
       course_id: courseId,
-      lesson_id: lessonId || null,
+      lesson_id: lessonId ?? null,
       author_id: user.id,
-      parent_id: parentId || null,
-      post_type: postType || "discussion",
-      title: title || null,
-      title_ar: titleAr || null,
+      parent_id: parentId ?? null,
+      post_type: postType ?? "discussion",
+      title: title ?? null,
+      title_ar: titleAr ?? null,
       body: content,
-      body_ar: contentAr || null,
+      body_ar: contentAr ?? null,
     })
     .select(
       "*, author:profiles!forum_posts_author_id_fkey(full_name, avatar_url)"
@@ -116,7 +145,11 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("forum post create failed", error);
+    return NextResponse.json(
+      { error: "Could not create post" },
+      { status: 500 }
+    );
   }
 
   // Increment reply count on parent if this is a reply

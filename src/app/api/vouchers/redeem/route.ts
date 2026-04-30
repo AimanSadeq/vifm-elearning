@@ -2,9 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { createEnrollmentFromPayment } from "@/lib/services/enrollment-service";
+import { applyRateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = applyRateLimit(request, {
+      scope: "voucher:redeem",
+      buckets: [
+        { limit: 5, windowMs: 60_000 },
+        { limit: 30, windowMs: 60 * 60_000 },
+      ],
+    });
+    if (limited) return limited;
+
     const supabase = await createServerSupabase();
     const {
       data: { user },

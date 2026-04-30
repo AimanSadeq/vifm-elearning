@@ -107,12 +107,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   } catch (err) {
     console.error("Confirm payment error:", err);
     return NextResponse.json(
-      {
-        error:
-          err instanceof Error
-            ? `Confirm failed: ${err.message}`
-            : "Internal server error",
-      },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

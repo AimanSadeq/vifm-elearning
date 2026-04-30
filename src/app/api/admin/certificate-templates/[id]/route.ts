@@ -75,7 +75,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     .update(update)
     .eq("id", id);
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("certificate template update failed", error);
+    return NextResponse.json(
+      { error: "Could not update template" },
+      { status: 500 }
+    );
   }
   return NextResponse.json({ ok: true });
 }

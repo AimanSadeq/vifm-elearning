@@ -1,5 +1,54 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+
+/** Strict allow-list of columns admins may set on `courses`. Anything not
+ *  here (id, slug, enrollment_count, average_rating, *_at, etc.) is
+ *  silently dropped — counters/timestamps are managed by the DB and slug
+ *  is generated server-side, so leaving them client-settable is how you
+ *  end up with admins overwriting another instructor's course. */
+const courseUpsertSchema = z.object({
+  title: z.string().max(300).nullable().optional(),
+  title_ar: z.string().max(300).nullable().optional(),
+  description: z.string().max(20_000).nullable().optional(),
+  description_ar: z.string().max(20_000).nullable().optional(),
+  short_description: z.string().max(500).nullable().optional(),
+  short_description_ar: z.string().max(500).nullable().optional(),
+  preview_video_url: z.string().url().max(2048).nullable().optional(),
+  category_id: z.string().uuid().nullable().optional(),
+  instructor_id: z.string().uuid().nullable().optional(),
+  status: z.enum(["draft", "published", "archived"]).optional(),
+  difficulty_level: z
+    .enum(["beginner", "intermediate", "advanced", "expert"])
+    .nullable()
+    .optional(),
+  tier_level: z
+    .enum(["gateway", "professional", "executive"])
+    .nullable()
+    .optional(),
+  duration_hours: z.number().int().min(0).max(10_000).nullable().optional(),
+  price: z.number().min(0).max(1_000_000).optional(),
+  currency: z.string().length(3).optional(),
+  is_featured: z.boolean().optional(),
+  is_free: z.boolean().optional(),
+  prerequisites: z.array(z.string().max(500)).max(50).nullable().optional(),
+  learning_outcomes: z.array(z.string().max(500)).max(50).nullable().optional(),
+  learning_outcomes_ar: z.array(z.string().max(500)).max(50).nullable().optional(),
+  tags: z.array(z.string().max(100)).max(50).nullable().optional(),
+  max_enrollment: z.number().int().min(0).max(1_000_000).nullable().optional(),
+  certificate_enabled: z.boolean().optional(),
+  certificate_template_id: z.string().uuid().nullable().optional(),
+  designation_id: z.string().uuid().nullable().optional(),
+  sequential_locking_enabled: z.boolean().optional(),
+  passing_score: z.number().int().min(0).max(100).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+  published_at: z.string().datetime().nullable().optional(),
+});
+
+const coursePayloadSchema = z.object({
+  mode: z.enum(["create", "edit"]).optional(),
+  courseId: z.string().uuid().optional(),
+}).and(courseUpsertSchema);
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,7 +57,7 @@ export async function POST(request: NextRequest) {
     const token = authHeader?.replace("Bearer ", "");
 
     if (!token) {
-      return NextResponse.json({ error: "Unauthorized - no token" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const {
@@ -17,7 +66,7 @@ export async function POST(request: NextRequest) {
     } = await supabaseAdmin.auth.getUser(token);
 
     if (authError || !user) {
-      return NextResponse.json({ error: `Unauthorized - ${authError?.message || "no user"}` }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Verify user has super_admin role
@@ -43,7 +92,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { mode, courseId: existingCourseId, ...coursePayload } = JSON.parse(courseDataJson);
+    let raw: unknown;
+    try {
+      raw = JSON.parse(courseDataJson);
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid courseData JSON" },
+        { status: 400 }
+      );
+    }
+    const parsed = coursePayloadSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid input" },
+        { status: 400 }
+      );
+    }
+
+    const { mode, courseId: existingCourseId, ...coursePayload } = parsed.data;
 
     let courseId: string;
 
@@ -55,7 +121,11 @@ export async function POST(request: NextRequest) {
         .eq("id", courseId);
 
       if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error("admin course update failed", error);
+        return NextResponse.json(
+          { error: "Could not update course" },
+          { status: 500 }
+        );
       }
     } else {
       const { data: created, error } = await supabaseAdmin
@@ -65,7 +135,11 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error("admin course insert failed", error);
+        return NextResponse.json(
+          { error: "Could not create course" },
+          { status: 500 }
+        );
       }
       courseId = created.id;
     }
@@ -106,8 +180,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ data: { id: courseId } }, { status: 201 });
   } catch (err) {
     console.error("Admin course creation error:", err);
-    const message =
-      err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
