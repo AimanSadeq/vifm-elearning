@@ -28,7 +28,11 @@ function normalize(s) {
   if (!s) return "";
   return String(s)
     .normalize("NFKD")
-    .replace(/[̀-ًͯ-ٟ]/g, "")
+    // Strip Unicode combining marks only — `\p{M}` catches Latin diacritics
+    // and Arabic harakat without eating base Arabic letters. The earlier
+    // hand-written range `[̀-ًͯ-ٟ]` mistakenly spanned U+0300–U+064B,
+    // which also matches every Arabic letter (U+0600–U+064A).
+    .replace(/\p{M}+/gu, "")
     .toLowerCase()
     .replace(/\s*\([^)]*\)\s*/g, " ")
     .replace(/[^a-z0-9؀-ۿ]+/g, " ")
@@ -36,15 +40,26 @@ function normalize(s) {
 }
 
 /**
- * Extract an acronym from a name. Prefers content inside the last
- * parentheses (e.g. "CERTIFIED AI-POWERED ACCOUNTANT (CAPA)" → "CAPA");
- * otherwise builds from the first letter of each significant word.
+ * Extract an acronym from a name. Prefers a short alphanumeric blob inside
+ * the last parens ("CERTIFIED AI-POWERED ACCOUNTANT (CAPA)" → "CAPA"). If
+ * that fails (e.g. Arabic-named rows whose parenthetical holds the full
+ * English title), build initials from the first letter of each significant
+ * word — first inside the parens (English content), then the rest of the
+ * name. Last resort returns "CERT" so we never hand back an empty string.
  */
 function deriveAbbreviation(name) {
   const m = name.match(/\(([^)]*)\)\s*$/);
   if (m) {
     const inside = m[1].replace(/[^A-Za-z0-9]/g, "");
     if (inside.length >= 2 && inside.length <= 12) return inside.toUpperCase();
+    const innerInitials = m[1]
+      .split(/\s+/)
+      .filter((w) => w.length >= 3 && /^[A-Za-z]/.test(w))
+      .map((w) => w[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 8);
+    if (innerInitials.length >= 2) return innerInitials;
   }
   const words = name
     .replace(/\([^)]*\)/g, "")
@@ -105,13 +120,43 @@ function uniqueSlug(s) {
   return candidate;
 }
 
+// `designations.abbreviation` is unique in the DB — track allocations across
+// existing rows + planned inserts so two new rows don't collide.
+const usedAbbr = new Set(
+  (existing ?? []).map((d) => d.abbreviation?.toUpperCase()).filter(Boolean)
+);
+function uniqueAbbr(base) {
+  const b = base.toUpperCase();
+  if (!usedAbbr.has(b)) {
+    usedAbbr.add(b);
+    return b;
+  }
+  for (let i = 2; i < 100; i++) {
+    const c = `${b}${i}`;
+    if (!usedAbbr.has(c)) {
+      usedAbbr.add(c);
+      return c;
+    }
+  }
+  return `${b}${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
+}
+
 // ---------- 3. Plan ----------
 const updates = [];
 const inserts = [];
 for (const e of fileEntries) {
   const abbr = deriveAbbreviation(e.name);
+  // Match by *normalized name* primarily — that's the most distinctive
+  // signal. Fall back to abbreviation only when the abbreviation was
+  // extracted directly from a parenthetical (the high-confidence form like
+  // "(CAPA)"). Initial-derived abbreviations can collide between unrelated
+  // rows (Level 1 / Level 2 of the same course series both derive
+  // "DARUELA"), so we don't trust them for matching.
+  const parenAbbrMatch = e.name.match(/\(([A-Z][A-Z0-9]{1,11})\)\s*$/);
+  const parensExtractedAbbr = parenAbbrMatch ? parenAbbrMatch[1] : null;
   const matched =
-    byAbbr.get(abbr.toUpperCase()) || byNameKey.get(normalize(e.name));
+    byNameKey.get(normalize(e.name)) ||
+    (parensExtractedAbbr ? byAbbr.get(parensExtractedAbbr) : null);
   if (matched) {
     const currentTier = matched.metadata?.tier_level ?? null;
     if (currentTier !== e.tier || !matched.is_active) {
@@ -125,8 +170,9 @@ for (const e of fileEntries) {
       });
     }
   } else {
-    const slug = uniqueSlug(deriveSlug(abbr, e.name));
-    inserts.push({ name: e.name, abbreviation: abbr, slug, tier: e.tier });
+    const finalAbbr = uniqueAbbr(abbr);
+    const slug = uniqueSlug(deriveSlug(finalAbbr, e.name));
+    inserts.push({ name: e.name, abbreviation: finalAbbr, slug, tier: e.tier });
   }
 }
 
