@@ -2,19 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  FileText,
-  Eye,
-} from "lucide-react";
+import { Download, FileText, Eye } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { escapeIlike } from "@/lib/utils/escape-search";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
+import { TablePagination } from "@/components/shared/TablePagination";
 import { SearchBar } from "@/components/shared/SearchBar";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import { formatCurrency, formatDate } from "@/lib/utils/formatters";
@@ -89,8 +84,6 @@ export default function AdminInvoicesPage() {
       cancelled = true;
     };
   }, [page, debouncedSearch, methodFilter, typeFilter]);
-
-  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   const columns: Column<InvoiceRow>[] = [
     {
@@ -276,33 +269,15 @@ export default function AdminInvoicesPage() {
             emptyMessage="No invoices match your filters."
           />
 
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between gap-2 border-t p-3">
-              <span className="text-xs text-muted-foreground">
-                Page {page + 1} of {totalPages}
-              </span>
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
-                  disabled={page === 0}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setPage((p) => Math.min(totalPages - 1, p + 1))
-                  }
-                  disabled={page >= totalPages - 1}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
+          <div className="border-t px-3 pb-3">
+            <TablePagination
+              page={page}
+              pageSize={PAGE_SIZE}
+              totalCount={totalCount}
+              isLoading={isLoading}
+              onPageChange={setPage}
+            />
+          </div>
         </CardContent>
       </Card>
     </div>

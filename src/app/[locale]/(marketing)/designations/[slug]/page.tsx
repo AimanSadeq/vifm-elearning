@@ -36,6 +36,7 @@ interface DesignationData {
   founding_fee: number;
   renewal_fee: number;
   late_fee: number;
+  currency?: string | null;
   annual_cpe_required: number;
   renewal_month: number;
   renewal_day: number;
@@ -143,6 +144,7 @@ export default function DesignationLandingPage() {
   const [documents, setDocuments] = useState<DesignationDocument[]>([]);
   const [cpeCategories, setCpeCategories] = useState<CPECategory[]>([]);
   const [resources, setResources] = useState<DesignationResource[]>([]);
+  const [holderCount, setHolderCount] = useState(0);
   const [hasAccess, setHasAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -170,7 +172,7 @@ export default function DesignationLandingPage() {
 
       setDesignation(desig as DesignationData);
 
-      // Fetch documents, CPE categories, and resources in parallel
+      // Fetch documents, CPE categories, resources, and holder count in parallel
       const promises: PromiseLike<unknown>[] = [
         supabase
           .from("designation_documents")
@@ -188,6 +190,12 @@ export default function DesignationLandingPage() {
           .eq("designation_id", desig.id)
           .eq("is_active", true)
           .order("sort_order"),
+        // Holder count drives the "At a glance" tile.
+        supabase
+          .from("designation_holders")
+          .select("id", { count: "exact", head: true })
+          .eq("designation_id", desig.id)
+          .in("status", ["active", "grace_period"]),
       ];
 
       // Check if logged-in user holds this designation
@@ -205,16 +213,16 @@ export default function DesignationLandingPage() {
       }
 
       const results = await Promise.all(promises);
-      const [docsRes, catsRes, resourcesRes, holderRes] = results as {
-        data: unknown[] | null;
-      }[];
+      const [docsRes, catsRes, resourcesRes, holderCountRes, userHolderRes] =
+        results as { data: unknown[] | null; count?: number | null }[];
 
       setDocuments((docsRes.data ?? []) as DesignationDocument[]);
       setCpeCategories((catsRes.data ?? []) as CPECategory[]);
       setResources((resourcesRes.data ?? []) as DesignationResource[]);
+      setHolderCount(holderCountRes?.count ?? 0);
       setHasAccess(
         authUser?.app_metadata?.role === "super_admin" ||
-        (holderRes?.data ?? []).length > 0
+          (userHolderRes?.data ?? []).length > 0
       );
       setIsLoading(false);
     }
@@ -255,6 +263,12 @@ export default function DesignationLandingPage() {
   const prerequisites: string[] = Array.isArray(meta.prerequisites) ? meta.prerequisites : [];
   const faqItems = buildFAQ(d, cpeCategories);
 
+  const tierRaw = meta.tier_level;
+  const tier =
+    tierRaw === "gateway" || tierRaw === "professional" || tierRaw === "executive"
+      ? tierRaw
+      : null;
+
   return (
     <div className="pb-0">
       {/* Hero */}
@@ -265,6 +279,12 @@ export default function DesignationLandingPage() {
         prerequisites={prerequisites}
         locale={locale}
         slug={slug}
+        tier={tier}
+        foundingFee={d.founding_fee}
+        currency={d.currency ?? "USD"}
+        cpeHours={cpeHours}
+        cpeCycleYears={renderCycleYears}
+        holderCount={holderCount}
       />
 
       {/* Tab Navigation */}

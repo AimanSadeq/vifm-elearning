@@ -9,35 +9,48 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
+import { TablePagination } from "@/components/shared/TablePagination";
 import { VoucherForm } from "@/components/admin/VoucherForm";
 import { formatDate } from "@/lib/utils/formatters";
 import type { VoucherInput } from "@/lib/utils/validators";
 import type { Voucher, VoucherType } from "@/types";
 
+const PAGE_SIZE = 25;
+
 export default function AdminVouchersPage() {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingVoucher, setEditingVoucher] = useState<Voucher | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     fetchVouchers();
-  }, []);
+    // fetchVouchers re-reads `page` via closure on each call — declaring it
+    // in deps would re-create the function and trigger an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
 
   async function fetchVouchers() {
     setIsLoading(true);
     const supabase = createClient();
-    const { data, error } = await supabase
+    const from = page * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    const { data, error, count } = await supabase
       .from("vouchers")
-      .select("*")
-      .order("created_at", { ascending: false });
+      .select("*", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .range(from, to);
 
     if (error) {
       reportSupabaseError(error, "Could not load vouchers");
       setVouchers([]);
+      setTotalCount(0);
     } else {
       setVouchers((data as Voucher[]) ?? []);
+      setTotalCount(count ?? 0);
     }
     setIsLoading(false);
   }
@@ -273,6 +286,13 @@ export default function AdminVouchersPage() {
             isLoading={isLoading}
             rowKey={(item) => item.id}
             emptyMessage="No vouchers yet. Create one to get started."
+          />
+          <TablePagination
+            page={page}
+            pageSize={PAGE_SIZE}
+            totalCount={totalCount}
+            isLoading={isLoading}
+            onPageChange={setPage}
           />
         </CardContent>
       </Card>

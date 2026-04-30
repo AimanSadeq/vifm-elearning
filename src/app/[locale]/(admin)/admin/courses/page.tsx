@@ -3,7 +3,15 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { Plus, Eye, Pencil, Trash2, ClipboardCheck, ToggleLeft, ToggleRight } from "lucide-react";
+import {
+  Plus,
+  Eye,
+  Pencil,
+  Trash2,
+  ClipboardCheck,
+  ToggleLeft,
+  ToggleRight,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { escapeIlike } from "@/lib/utils/escape-search";
@@ -12,24 +20,38 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { SearchBar } from "@/components/shared/SearchBar";
+import { TablePagination } from "@/components/shared/TablePagination";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import { formatCurrency } from "@/lib/utils/formatters";
 import type { Course } from "@/types";
+
+const PAGE_SIZE = 25;
 
 export default function AdminCoursesPage() {
   const t = useTranslations("admin");
   const locale = useLocale();
 
   const [courses, setCourses] = useState<Course[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [page, setPage] = useState(0);
   const debouncedSearch = useDebounce(search, 300);
+
+  // Reset to first page whenever filters/search change so we don't end up
+  // on an out-of-range page after the result set shrinks.
+  useEffect(() => {
+    setPage(0);
+  }, [debouncedSearch, statusFilter]);
 
   useEffect(() => {
     async function fetchCourses() {
       setIsLoading(true);
       const supabase = createClient();
+
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
 
       let query = supabase
         .from("courses")
@@ -38,9 +60,11 @@ export default function AdminCoursesPage() {
           *,
           category:categories(name, name_ar, slug),
           instructor:profiles!courses_instructor_id_fkey(full_name)
-        `
+        `,
+          { count: "exact" }
         )
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .range(from, to);
 
       if (statusFilter !== "all") {
         query = query.eq("status", statusFilter);
@@ -53,18 +77,20 @@ export default function AdminCoursesPage() {
         );
       }
 
-      const { data, error } = await query;
+      const { data, error, count } = await query;
       if (error) {
         reportSupabaseError(error, "Could not load courses");
         setCourses([]);
+        setTotalCount(0);
       } else {
         setCourses((data as Course[]) ?? []);
+        setTotalCount(count ?? 0);
       }
       setIsLoading(false);
     }
 
     fetchCourses();
-  }, [debouncedSearch, statusFilter]);
+  }, [debouncedSearch, statusFilter, page]);
 
   const handleDelete = async (courseId: string) => {
     if (!confirm("Are you sure you want to delete this course?")) return;
@@ -78,6 +104,7 @@ export default function AdminCoursesPage() {
     }
 
     setCourses((prev) => prev.filter((c) => c.id !== courseId));
+    setTotalCount((c) => Math.max(0, c - 1));
   };
 
   const handleToggleStatus = async (course: Course) => {
@@ -260,6 +287,13 @@ export default function AdminCoursesPage() {
             isLoading={isLoading}
             rowKey={(item) => item.id}
             emptyMessage="No courses found. Create your first course!"
+          />
+          <TablePagination
+            page={page}
+            pageSize={PAGE_SIZE}
+            totalCount={totalCount}
+            isLoading={isLoading}
+            onPageChange={setPage}
           />
         </CardContent>
       </Card>

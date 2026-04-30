@@ -11,27 +11,40 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { SearchBar } from "@/components/shared/SearchBar";
+import { TablePagination } from "@/components/shared/TablePagination";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import type { Organization } from "@/types";
+
+const PAGE_SIZE = 25;
 
 export default function AdminOrganizationsPage() {
   const t = useTranslations("admin");
   const locale = useLocale();
 
   const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
   const debouncedSearch = useDebounce(search, 300);
+
+  useEffect(() => {
+    setPage(0);
+  }, [debouncedSearch]);
 
   useEffect(() => {
     async function fetchOrgs() {
       setIsLoading(true);
       const supabase = createClient();
 
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
       let query = supabase
         .from("organizations")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("*", { count: "exact" })
+        .order("created_at", { ascending: false })
+        .range(from, to);
 
       if (debouncedSearch) {
         const s = escapeIlike(debouncedSearch);
@@ -40,13 +53,14 @@ export default function AdminOrganizationsPage() {
         );
       }
 
-      const { data } = await query;
+      const { data, count } = await query;
       setOrganizations((data as Organization[]) ?? []);
+      setTotalCount(count ?? 0);
       setIsLoading(false);
     }
 
     fetchOrgs();
-  }, [debouncedSearch]);
+  }, [debouncedSearch, page]);
 
   const handleDelete = async (orgId: string) => {
     if (!confirm("Are you sure you want to delete this organization?")) return;
@@ -56,6 +70,7 @@ export default function AdminOrganizationsPage() {
 
     if (!error) {
       setOrganizations((prev) => prev.filter((o) => o.id !== orgId));
+      setTotalCount((c) => Math.max(0, c - 1));
     }
   };
 
@@ -148,6 +163,13 @@ export default function AdminOrganizationsPage() {
             isLoading={isLoading}
             rowKey={(item) => item.id}
             emptyMessage="No organizations found."
+          />
+          <TablePagination
+            page={page}
+            pageSize={PAGE_SIZE}
+            totalCount={totalCount}
+            isLoading={isLoading}
+            onPageChange={setPage}
           />
         </CardContent>
       </Card>

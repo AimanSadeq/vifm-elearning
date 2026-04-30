@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { SearchBar } from "@/components/shared/SearchBar";
+import { TablePagination } from "@/components/shared/TablePagination";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import { formatDate } from "@/lib/utils/formatters";
 import type { Certificate } from "@/types";
@@ -17,28 +18,39 @@ type CertificateRow = Certificate & {
   user?: { full_name: string };
 };
 
+const PAGE_SIZE = 25;
+
 export default function AdminCertificatesPage() {
   const t = useTranslations("admin");
 
   const [certificates, setCertificates] = useState<CertificateRow[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
   const debouncedSearch = useDebounce(search, 300);
+
+  useEffect(() => {
+    setPage(0);
+  }, [debouncedSearch]);
 
   useEffect(() => {
     async function fetchCertificates() {
       setIsLoading(true);
       const params = new URLSearchParams();
       if (debouncedSearch) params.set("search", debouncedSearch);
+      params.set("page", String(page));
+      params.set("pageSize", String(PAGE_SIZE));
 
       const res = await fetch(`/api/certificates?${params.toString()}`);
-      const { data } = await res.json();
+      const { data, count } = await res.json();
       setCertificates(data ?? []);
+      setTotalCount(count ?? 0);
       setIsLoading(false);
     }
 
     fetchCertificates();
-  }, [debouncedSearch]);
+  }, [debouncedSearch, page]);
 
   const handleToggleStatus = async (cert: CertificateRow) => {
     const newStatus = cert.status === "issued" ? "revoked" : "issued";
@@ -151,6 +163,13 @@ export default function AdminCertificatesPage() {
             isLoading={isLoading}
             rowKey={(item) => item.id}
             emptyMessage="No certificates found."
+          />
+          <TablePagination
+            page={page}
+            pageSize={PAGE_SIZE}
+            totalCount={totalCount}
+            isLoading={isLoading}
+            onPageChange={setPage}
           />
         </CardContent>
       </Card>

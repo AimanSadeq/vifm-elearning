@@ -21,18 +21,29 @@ export async function GET(request: NextRequest) {
 
     const isAdmin = profile?.role === "super_admin";
 
+    const params = request.nextUrl.searchParams;
+    const page = Math.max(0, Number(params.get("page") ?? "0") || 0);
+    const pageSize = Math.min(
+      100,
+      Math.max(1, Number(params.get("pageSize") ?? "25") || 25)
+    );
+    const from = page * pageSize;
+    const to = from + pageSize - 1;
+
     let query = supabase
       .from("certificates")
       .select(
-        "*, course:courses(title, title_ar, slug), user:profiles!certificates_user_id_fkey(full_name)"
+        "*, course:courses(title, title_ar, slug), user:profiles!certificates_user_id_fkey(full_name)",
+        { count: "exact" }
       )
-      .order("issued_at", { ascending: false });
+      .order("issued_at", { ascending: false })
+      .range(from, to);
 
     if (!isAdmin) {
       query = query.eq("user_id", user.id);
     }
 
-    const search = request.nextUrl.searchParams.get("search");
+    const search = params.get("search");
     if (search) {
       const s = escapeIlike(search);
       query = query.or(
@@ -40,11 +51,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { data, error } = await query;
+    const { data, error, count } = await query;
     if (error)
       return NextResponse.json({ error: error.message }, { status: 500 });
 
-    return NextResponse.json({ data });
+    return NextResponse.json({ data, count: count ?? 0 });
   } catch {
     return NextResponse.json(
       { error: "Internal server error" },

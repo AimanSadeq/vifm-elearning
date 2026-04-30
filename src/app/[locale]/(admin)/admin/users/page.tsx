@@ -14,8 +14,6 @@ import {
   Trash2,
   ToggleLeft,
   ToggleRight,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -23,6 +21,7 @@ import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { escapeIlike } from "@/lib/utils/escape-search";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
+import { TablePagination } from "@/components/shared/TablePagination";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -382,49 +381,13 @@ export default function AdminUsersPage() {
             isLoading={isLoading}
             emptyMessage="No users found"
           />
-          {totalCount > 0 && (
-            <div className="mt-4 flex items-center justify-between gap-4 flex-wrap">
-              <p className="text-sm text-muted-foreground">
-                Showing{" "}
-                <span className="font-medium text-foreground">
-                  {(page * PAGE_SIZE + 1).toLocaleString()}
-                </span>
-                {"–"}
-                <span className="font-medium text-foreground">
-                  {Math.min((page + 1) * PAGE_SIZE, totalCount).toLocaleString()}
-                </span>{" "}
-                of{" "}
-                <span className="font-medium text-foreground">
-                  {totalCount.toLocaleString()}
-                </span>
-              </p>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={page === 0 || isLoading}
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
-                >
-                  <ChevronLeft className="h-4 w-4 me-1" />
-                  Prev
-                </Button>
-                <span className="text-sm text-muted-foreground">
-                  Page {page + 1} of {Math.max(1, Math.ceil(totalCount / PAGE_SIZE))}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={
-                    isLoading || (page + 1) * PAGE_SIZE >= totalCount
-                  }
-                  onClick={() => setPage((p) => p + 1)}
-                >
-                  Next
-                  <ChevronRight className="h-4 w-4 ms-1" />
-                </Button>
-              </div>
-            </div>
-          )}
+          <TablePagination
+            page={page}
+            pageSize={PAGE_SIZE}
+            totalCount={totalCount}
+            isLoading={isLoading}
+            onPageChange={setPage}
+          />
         </CardContent>
       </Card>
 
