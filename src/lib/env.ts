@@ -83,18 +83,24 @@ function loadEnv(): ServerEnv {
     .map(([key, msgs]) => `  ${key}: ${msgs?.join(", ") ?? "invalid"}`)
     .join("\n");
 
-  if (process.env.NODE_ENV === "production") {
-    // Fail-fast: better a non-starting service than one silently misconfigured.
+  // Next.js sets NEXT_PHASE=phase-production-build during `next build`. The
+  // build only needs to compile bundles — it never hits Supabase or any
+  // gateway — so we MUST NOT throw here, otherwise CI builds fail any time
+  // a real production secret isn't passed in (which it shouldn't be).
+  // Strict validation still runs at runtime startup (NEXT_PHASE is unset
+  // there), so misconfigured production servers still fail fast on boot.
+  const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
+
+  if (process.env.NODE_ENV === "production" && !isBuildPhase) {
     throw new Error(
       `Invalid environment configuration:\n${formatted}\n\n` +
         `Set the missing/invalid variables in Render → Environment, then redeploy.`
     );
   }
 
-  // Dev: warn but keep going so a half-set .env.local doesn't block work.
   console.warn(
-    `[env] Validation warnings (dev only):\n${formatted}\n` +
-      `Set them in .env.local to silence this warning.`
+    `[env] Validation warnings (build phase / dev):\n${formatted}\n` +
+      `These will fail-fast at runtime if not corrected before deploy.`
   );
   return process.env as unknown as ServerEnv;
 }
