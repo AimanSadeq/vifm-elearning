@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabase/admin";
+import { sendEmail } from "@/lib/services/email";
 import { z } from "zod";
 
 const bulkEmailSchema = z.object({
-  userIds: z.array(z.string().uuid()).min(1),
-  voucherCode: z.string(),
-  courseNames: z.array(z.string()),
+  userIds: z.array(z.string().uuid()).min(1).max(500),
+  voucherCode: z.string().max(200),
+  courseNames: z.array(z.string().max(300)).max(50),
 });
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createServerSupabase();
 
-    // Verify auth via cookies
     const {
       data: { user },
       error: authError,
@@ -22,7 +23,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Verify super_admin role
     const { data: profile } = await supabase
       .from("profiles")
       .select("role")
@@ -33,9 +33,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = await request.json();
-    const parsed = bulkEmailSchema.safeParse(body);
-
+    const parsed = bulkEmailSchema.safeParse(
+      await request.json().catch(() => ({}))
+    );
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Validation failed", details: parsed.error.flatten() },
@@ -43,19 +43,61 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Email delivery isn't wired up yet (Resend exists in deps but no
-    // server integration). Don't iterate per-user just to log PII into the
-    // platform log destination — refuse the request explicitly.
-    return NextResponse.json(
-      {
-        error:
-          "Email delivery is not configured. Wire up the email provider before using this endpoint.",
-      },
-      { status: 503 }
+    const { userIds, voucherCode, courseNames } = parsed.data;
+
+    // Resolve emails in one query — avoids the N+1 the old stub had.
+    const { data: recipients } = await supabaseAdmin
+      .from("profiles")
+      .select("id, email, full_name")
+      .in("id", userIds);
+
+    const lookup = new Map(
+      (recipients ?? [])
+        .filter((r): r is { id: string; email: string; full_name: string | null } =>
+          typeof r.email === "string" && r.email.length > 0
+        )
+        .map((r) => [r.id, r])
     );
+
+    const subject = `Your VIFM Academy access — voucher ${voucherCode}`;
+    const courseList = courseNames.length
+      ? courseNames.join(", ")
+      : "your courses";
+
+    const settled = await Promise.allSettled(
+      userIds.map(async (id) => {
+        const r = lookup.get(id);
+        if (!r) return { id, status: "missing" as const };
+        const body =
+          `Hi ${r.full_name ?? "there"},\n\n` +
+          `Your VIFM Academy account is ready. Use voucher code ${voucherCode} ` +
+          `to unlock ${courseList}.\n\n` +
+          `Sign in at the link in this email's footer to begin.\n\n— VIFM Academy`;
+        await sendEmail({ to: r.email, subject, body });
+        return { id, status: "sent" as const };
+      })
+    );
+
+    let sent = 0;
+    let failed = 0;
+    let missing = 0;
+    for (const r of settled) {
+      if (r.status === "fulfilled") {
+        if (r.value.status === "sent") sent++;
+        else missing++;
+      } else {
+        failed++;
+        // Provider error — log but don't echo back per-recipient details.
+        console.error("bulk send-email: provider error", r.reason);
+      }
+    }
+
+    return NextResponse.json({ sent, failed, missing });
   } catch (err) {
     console.error("Bulk send email error:", err);
-    const message = err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

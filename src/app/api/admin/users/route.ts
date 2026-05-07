@@ -89,6 +89,23 @@ export async function POST(request: NextRequest) {
       console.error("Profile update error after user creation:", updateError);
     }
 
+    // Audit-log the user creation. PATCH and DELETE write here too; without
+    // this, the trail of "who provisioned which admin" is incomplete.
+    // Best-effort: don't fail the response if the audit insert errors out.
+    const { error: auditError } = await supabaseAdmin.from("audit_log").insert({
+      user_id: user.id,
+      action: "user.created",
+      table_name: "profiles",
+      record_id: newAuthUser.user.id,
+      new_values: { email, role, organization_id: organization_id ?? null },
+      ip_address:
+        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+      user_agent: request.headers.get("user-agent") ?? null,
+    });
+    if (auditError) {
+      console.error("audit_log insert failed (user create)", auditError);
+    }
+
     // Fetch the complete profile to return
     const { data: createdProfile } = await supabaseAdmin
       .from("profiles")

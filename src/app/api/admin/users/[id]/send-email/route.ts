@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { sendEmail } from "@/lib/services/email";
 
 export async function POST(
   request: NextRequest,
@@ -9,7 +10,6 @@ export async function POST(
   try {
     const supabase = await createServerSupabase();
 
-    // Verify auth via cookies
     const {
       data: { user },
       error: authError,
@@ -19,7 +19,6 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Verify super_admin role
     const { data: profile } = await supabase
       .from("profiles")
       .select("role")
@@ -34,40 +33,56 @@ export async function POST(
     const body = await request.json();
     const { subject, body: emailBody } = body;
 
-    if (!subject || !emailBody) {
+    if (
+      typeof subject !== "string" ||
+      typeof emailBody !== "string" ||
+      !subject.trim() ||
+      !emailBody.trim() ||
+      subject.length > 200 ||
+      emailBody.length > 10_000
+    ) {
       return NextResponse.json(
-        { error: "Subject and body are required" },
+        { error: "Subject (≤200 chars) and body (≤10000 chars) are required" },
         { status: 400 }
       );
     }
 
-    // Confirm the target exists, but DON'T put their email/name into logs.
-    // The previous stub also leaked the admin-typed message body, which on
-    // any centralised log destination is a PII / data-protection issue.
+    // Fetch the recipient — we need the actual email address to deliver to.
+    // Use admin client because the caller's RLS view may not include it.
     const { data: targetUser } = await supabaseAdmin
       .from("profiles")
-      .select("id")
+      .select("email")
       .eq("id", id)
       .single();
 
-    if (!targetUser) {
+    if (!targetUser?.email) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Email delivery isn't wired up yet (Resend exists in deps but no
-    // server integration). Refuse the request with a clear status instead
-    // of pretending the email was sent.
-    return NextResponse.json(
-      {
-        error:
-          "Email delivery is not configured. Wire up the email provider before using this endpoint.",
-      },
-      { status: 503 }
-    );
+    // sendEmail throws in production if RESEND_API_KEY is missing — that's
+    // intentional. Catch here so we return a clean 503 instead of a 500.
+    try {
+      const result = await sendEmail({
+        to: targetUser.email,
+        subject,
+        body: emailBody,
+      });
+      return NextResponse.json({ success: result.success, id: result.id });
+    } catch (err) {
+      console.error("send-email: provider error", err);
+      return NextResponse.json(
+        {
+          error:
+            "Email provider not configured or rejected the request. Set RESEND_API_KEY and EMAIL_FROM on Render.",
+        },
+        { status: 503 }
+      );
+    }
   } catch (err) {
     console.error("Send email error:", err);
-    const message =
-      err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

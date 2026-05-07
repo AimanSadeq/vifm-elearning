@@ -8,7 +8,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { webinarSchema, type WebinarInput } from "@/lib/utils/validators";
-import { createZoomMeeting } from "@/lib/services/zoom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -121,13 +120,13 @@ export function WebinarForm({ initialData, mode }: WebinarFormProps) {
     try {
       const supabase = createClient();
 
-      // Create Zoom meeting (stub)
-      const zoomResult = await createZoomMeeting({
-        title: data.title,
-        scheduledAt: data.scheduledAt,
-        durationMinutes: data.durationMinutes,
-      });
-
+      // Zoom integration is server-only (calls Zoom API with secret creds).
+      // The previous version imported createZoomMeeting here directly, which
+      // bundled a server-only `refuse-in-production` guard into the client
+      // — admins literally couldn't create webinars in production. The
+      // webinar is created without meeting credentials; provision them via
+      // the admin Zoom panel or a future POST /api/admin/webinars/[id]/zoom
+      // server route once the Zoom SDK is wired up.
       const webinarPayload: Record<string, unknown> = {
         title: data.title,
         title_ar: data.titleAr || null,
@@ -142,8 +141,8 @@ export function WebinarForm({ initialData, mode }: WebinarFormProps) {
         price: data.isFree ? 0 : data.price,
         currency: data.currency,
         tags: data.tags ?? [],
-        meeting_id: zoomResult.meetingId,
-        meeting_url: zoomResult.joinUrl,
+        meeting_id: null,
+        meeting_url: null,
         status: "scheduled",
       };
 

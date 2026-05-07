@@ -111,6 +111,27 @@ export async function POST(request: NextRequest) {
 
     const { mode, courseId: existingCourseId, ...coursePayload } = parsed.data;
 
+    // Validate instructor_id refers to a real instructor profile. Without
+    // this, a super_admin can assign a course to any uuid (including a
+    // learner profile, which then grants that learner full course-access
+    // via userHasCourseAccess `course.instructor_id === userId` shortcut).
+    if (coursePayload.instructor_id) {
+      const { data: instructorProfile } = await supabaseAdmin
+        .from("profiles")
+        .select("role")
+        .eq("id", coursePayload.instructor_id)
+        .maybeSingle();
+      if (
+        !instructorProfile ||
+        !["instructor", "super_admin"].includes(instructorProfile.role)
+      ) {
+        return NextResponse.json(
+          { error: "instructor_id must reference an active instructor profile" },
+          { status: 400 }
+        );
+      }
+    }
+
     let courseId: string;
 
     if (mode === "edit" && existingCourseId) {
