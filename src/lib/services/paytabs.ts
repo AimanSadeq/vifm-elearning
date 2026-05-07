@@ -1,9 +1,22 @@
-import { createHmac, timingSafeEqual } from "crypto";
-
 const PAYTABS_SERVER_KEY = process.env.PAYTABS_SERVER_KEY ?? "";
 const PAYTABS_PROFILE_ID = process.env.PAYTABS_PROFILE_ID ?? "";
 const PAYTABS_BASE_URL =
   process.env.PAYTABS_BASE_URL ?? "https://secure.paytabs.sa";
+const FETCH_TIMEOUT_MS = 8_000;
+
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit & { timeoutMs?: number } = {}
+): Promise<Response> {
+  const { timeoutMs = FETCH_TIMEOUT_MS, ...rest } = init;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...rest, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 interface CreatePaymentPageParams {
   amount: number;
@@ -25,7 +38,7 @@ interface PayTabsResponse {
 export async function createPaymentPage(
   params: CreatePaymentPageParams
 ): Promise<PayTabsResponse> {
-  const response = await fetch(`${PAYTABS_BASE_URL}/payment/request`, {
+  const response = await fetchWithTimeout(`${PAYTABS_BASE_URL}/payment/request`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -56,40 +69,39 @@ export async function createPaymentPage(
 }
 
 /**
- * Verify PayTabs IPN callback signature.
- * PayTabs signs callbacks with HMAC-SHA256 using the server key.
+ * Server-to-server query of a transaction's authoritative state.
+ *
+ * The IPN body is attacker-controllable (anyone can POST to the public
+ * webhook URL). Rather than reimplementing PayTabs' canonical-string HMAC
+ * scheme — which is easy to get subtly wrong — we trust ONLY what PayTabs
+ * tells us when we ask them directly. Same trust model the MamoPay webhook
+ * uses when its HMAC secret is unset.
+ *
+ * Returns the parsed query response, or null on network error / 4xx.
  */
-export function verifyPayTabsCallback(
-  body: Record<string, unknown>
-): boolean {
-  if (!PAYTABS_SERVER_KEY) return false;
-
-  const signature = body.signature as string | undefined;
-  if (!signature) return false;
-
-  const tranRef = body.tran_ref as string;
-  const cartAmount = body.cart_amount as string;
-  const cartCurrency = body.cart_currency as string;
-  const responseCode =
-    (body.payment_result as Record<string, unknown>)?.response_code as string;
-
-  if (!tranRef || !cartAmount || !cartCurrency || !responseCode) return false;
-
-  // PayTabs HMAC: SHA256(server_key + tran_ref + cart_amount + cart_currency + response_code)
-  const data = `${PAYTABS_SERVER_KEY}${tranRef}${cartAmount}${cartCurrency}${responseCode}`;
-  const expectedSignature = createHmac("sha256", PAYTABS_SERVER_KEY)
-    .update(data)
-    .digest("hex");
-
-  // Timing-safe compare to defeat HMAC oracle attacks. Decode both sides
-  // first and compare their byte lengths — string-length is unreliable when
-  // either side contains non-hex characters.
+export async function queryPayTabsTransaction(
+  tranRef: string
+): Promise<Record<string, unknown> | null> {
+  if (!PAYTABS_SERVER_KEY || !PAYTABS_PROFILE_ID) return null;
+  if (!tranRef) return null;
   try {
-    const sigBuf = Buffer.from(signature, "hex");
-    const expBuf = Buffer.from(expectedSignature, "hex");
-    if (sigBuf.length !== expBuf.length) return false;
-    return timingSafeEqual(sigBuf, expBuf);
+    const response = await fetchWithTimeout(`${PAYTABS_BASE_URL}/payment/query`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: PAYTABS_SERVER_KEY,
+      },
+      body: JSON.stringify({
+        profile_id: PAYTABS_PROFILE_ID,
+        tran_ref: tranRef,
+      }),
+    });
+    if (!response.ok) return null;
+    return (await response.json().catch(() => null)) as Record<
+      string,
+      unknown
+    > | null;
   } catch {
-    return false;
+    return null;
   }
 }

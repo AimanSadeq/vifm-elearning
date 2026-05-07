@@ -41,10 +41,12 @@ export async function POST(
       );
     }
 
-    // Fetch user's email
+    // Confirm the target exists, but DON'T put their email/name into logs.
+    // The previous stub also leaked the admin-typed message body, which on
+    // any centralised log destination is a PII / data-protection issue.
     const { data: targetUser } = await supabaseAdmin
       .from("profiles")
-      .select("email, full_name")
+      .select("id")
       .eq("id", id)
       .single();
 
@@ -52,15 +54,16 @@ export async function POST(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Stub: log to console instead of sending
-    console.log(
-      `[EMAIL STUB] To: ${targetUser.email} (${targetUser.full_name}), Subject: ${subject}, Body: ${emailBody}`
+    // Email delivery isn't wired up yet (Resend exists in deps but no
+    // server integration). Refuse the request with a clear status instead
+    // of pretending the email was sent.
+    return NextResponse.json(
+      {
+        error:
+          "Email delivery is not configured. Wire up the email provider before using this endpoint.",
+      },
+      { status: 503 }
     );
-
-    return NextResponse.json({
-      success: true,
-      message: "Email logged to console (sending not configured)",
-    });
   } catch (err) {
     console.error("Send email error:", err);
     const message =

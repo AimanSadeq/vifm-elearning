@@ -117,8 +117,28 @@ export async function POST(request: NextRequest) {
 
           const userId = newAuthUser.user.id;
 
+          // Compensating action: if any follow-up write fails after the
+          // auth user exists, delete the auth user so we don't leave an
+          // orphan that the admin can't reset (no email delivery wired up
+          // yet — see /api/admin/users/[id]/send-email).
+          const rollback = async (reason: string) => {
+            try {
+              await supabaseAdmin.auth.admin.deleteUser(userId);
+            } catch (e) {
+              console.error(
+                "Bulk import rollback failed — orphan auth user remains",
+                { userId, email, reason, error: e }
+              );
+            }
+            return {
+              email,
+              status: "failed" as const,
+              reason,
+            };
+          };
+
           // Update profile
-          await supabaseAdmin
+          const { error: profileError } = await supabaseAdmin
             .from("profiles")
             .update({
               full_name: u.fullName,
@@ -128,20 +148,40 @@ export async function POST(request: NextRequest) {
             })
             .eq("id", userId);
 
-          // Insert voucher redemptions + enrollments for each course
-          for (const courseId of courseIds) {
-            await supabaseAdmin.from("voucher_redemptions").insert({
-              voucher_id: voucher.id,
-              user_id: userId,
-              course_id: courseId,
-            });
+          if (profileError) {
+            return rollback(`Profile update failed: ${profileError.message}`);
+          }
 
-            await supabaseAdmin.from("enrollments").insert({
-              user_id: userId,
-              course_id: courseId,
-              status: "active",
-              expires_at: accessExpiresAt,
-            });
+          // Insert voucher redemptions + enrollments for each course. If
+          // any single insert fails, roll back the whole user — partial
+          // enrolment is worse than none.
+          for (const courseId of courseIds) {
+            const { error: redemptionError } = await supabaseAdmin
+              .from("voucher_redemptions")
+              .insert({
+                voucher_id: voucher.id,
+                user_id: userId,
+                course_id: courseId,
+              });
+            if (redemptionError) {
+              return rollback(
+                `Voucher redemption failed: ${redemptionError.message}`
+              );
+            }
+
+            const { error: enrollmentError } = await supabaseAdmin
+              .from("enrollments")
+              .insert({
+                user_id: userId,
+                course_id: courseId,
+                status: "active",
+                expires_at: accessExpiresAt,
+              });
+            if (enrollmentError) {
+              return rollback(
+                `Enrollment insert failed: ${enrollmentError.message}`
+              );
+            }
           }
 
           return { email, status: "created" as const, userId };

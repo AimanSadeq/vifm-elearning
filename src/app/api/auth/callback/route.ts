@@ -1,9 +1,22 @@
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { applyRateLimit } from "@/lib/utils/rate-limit";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  // Anyone can hit this with arbitrary `?code=` values; on success we run
+  // admin-client SQL to provision a profile. Throttle by IP to stop a
+  // compromised/anon caller from looping it.
+  const limited = applyRateLimit(request, {
+    scope: "auth:callback",
+    buckets: [
+      { limit: 10, windowMs: 60_000 },
+      { limit: 60, windowMs: 60 * 60_000 },
+    ],
+  });
+  if (limited) return limited;
+
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   const rawNext = searchParams.get("next");

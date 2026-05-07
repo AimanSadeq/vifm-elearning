@@ -16,6 +16,21 @@ import crypto from "node:crypto";
 
 const SANDBOX_BASE = "https://sandbox.dev.business.mamopay.com/manage_api/v1";
 const PROD_BASE = "https://business.mamopay.com/manage_api/v1";
+const FETCH_TIMEOUT_MS = 8_000;
+
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit & { timeoutMs?: number } = {}
+): Promise<Response> {
+  const { timeoutMs = FETCH_TIMEOUT_MS, ...rest } = init;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...rest, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 function baseUrl() {
   return process.env.MAMOPAY_ENV === "production" ? PROD_BASE : SANDBOX_BASE;
@@ -91,7 +106,7 @@ export async function createPaymentLink(
     };
   }
 
-  const res = await fetch(`${baseUrl()}/links`, {
+  const res = await fetchWithTimeout(`${baseUrl()}/links`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey()}`,
@@ -169,14 +184,22 @@ export function verifyWebhookSignature(
 export async function fetchCharge(
   chargeId: string
 ): Promise<Record<string, unknown> | null> {
-  const res = await fetch(`${baseUrl()}/charges/${chargeId}`, {
-    headers: {
-      Authorization: `Bearer ${apiKey()}`,
-      Accept: "application/json",
-    },
-  });
-  if (!res.ok) return null;
-  return (await res.json().catch(() => null)) as Record<string, unknown> | null;
+  try {
+    const res = await fetchWithTimeout(`${baseUrl()}/charges/${chargeId}`, {
+      headers: {
+        Authorization: `Bearer ${apiKey()}`,
+        Accept: "application/json",
+      },
+    });
+    if (!res.ok) return null;
+    return (await res.json().catch(() => null)) as Record<
+      string,
+      unknown
+    > | null;
+  } catch {
+    // Timeout or network failure — caller treats as "can't verify".
+    return null;
+  }
 }
 
 export const MamoPay = {

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { z } from "zod";
 
 const bulkEmailSchema = z.object({
@@ -44,32 +43,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { userIds, voucherCode, courseNames } = parsed.data;
-
-    let sent = 0;
-    let failed = 0;
-
-    for (const userId of userIds) {
-      const { data: targetUser } = await supabaseAdmin
-        .from("profiles")
-        .select("email, full_name")
-        .eq("id", userId)
-        .single();
-
-      if (!targetUser) {
-        failed++;
-        continue;
-      }
-
-      // Stub: log to console instead of sending
-      console.log(
-        `[BULK EMAIL STUB] To: ${targetUser.email} (${targetUser.full_name}), ` +
-          `Voucher: ${voucherCode}, Courses: ${courseNames.join(", ")}`
-      );
-      sent++;
-    }
-
-    return NextResponse.json({ sent, failed });
+    // Email delivery isn't wired up yet (Resend exists in deps but no
+    // server integration). Don't iterate per-user just to log PII into the
+    // platform log destination — refuse the request explicitly.
+    return NextResponse.json(
+      {
+        error:
+          "Email delivery is not configured. Wire up the email provider before using this endpoint.",
+      },
+      { status: 503 }
+    );
   } catch (err) {
     console.error("Bulk send email error:", err);
     const message = err instanceof Error ? err.message : "Internal server error";

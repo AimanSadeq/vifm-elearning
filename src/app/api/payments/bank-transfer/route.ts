@@ -32,6 +32,47 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
 
+    // Already enrolled? Don't create a duplicate pending payment.
+    const { data: existingEnrollment } = await supabaseAdmin
+      .from("enrollments")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("course_id", courseId)
+      .maybeSingle();
+
+    if (existingEnrollment)
+      return NextResponse.json(
+        { error: "Already enrolled" },
+        { status: 400 }
+      );
+
+    // Already an open bank-transfer for this course? Reuse it instead of
+    // burning a new reference number — keeps admin reconciliation sane.
+    const { data: existingPending } = await supabaseAdmin
+      .from("payments")
+      .select("id, amount, currency, bank_reference, metadata")
+      .eq("user_id", user.id)
+      .eq("course_id", courseId)
+      .eq("payment_method", "bank_transfer")
+      .eq("status", "pending")
+      .maybeSingle();
+
+    if (existingPending) {
+      const meta = existingPending.metadata as
+        | { bankDetails?: Record<string, unknown> }
+        | null;
+      return NextResponse.json({
+        data: {
+          paymentId: existingPending.id,
+          amount: existingPending.amount,
+          currency: existingPending.currency,
+          bankDetails: meta?.bankDetails ?? null,
+          message:
+            "You already have a pending bank transfer for this course. Use the same reference and we'll activate access once we confirm the deposit.",
+        },
+      });
+    }
+
     // Calculate price with promo
     let finalPrice = Number(course.price);
     let discountAmount = 0;

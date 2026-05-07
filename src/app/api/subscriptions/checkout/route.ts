@@ -89,24 +89,27 @@ export async function POST(request: NextRequest) {
         finalPrice = validated.finalPrice;
 
         // Best-effort: create an ephemeral Stripe coupon so the discount shows
-        // on the checkout page itself.
+        // on the checkout page itself. We always normalise to percent_off so
+        // currency mismatch can't over- or under-discount — promo_codes does
+        // not track a currency column, and a fixed_amount in plan currency
+        // assumes parity with the plan, which we now enforce numerically.
         try {
           const stripe = getStripe();
-          const coupon = await stripe.coupons.create(
+          const planPrice = Number(plan.price);
+          const discountValue = Number(validated.promo.discount_value);
+          const percentOff =
             validated.promo.discount_type === "percentage"
-              ? {
-                  percent_off: Number(validated.promo.discount_value),
-                  duration: "once",
-                }
-              : {
-                  amount_off: Math.round(
-                    Number(validated.promo.discount_value) * 100
-                  ),
-                  currency: plan.currency.toLowerCase(),
-                  duration: "once",
-                }
-          );
-          stripeCouponId = coupon.id;
+              ? Math.min(100, Math.max(0, discountValue))
+              : planPrice > 0
+                ? Math.min(100, Math.max(0, (discountValue / planPrice) * 100))
+                : 0;
+          if (percentOff > 0) {
+            const coupon = await stripe.coupons.create({
+              percent_off: Math.round(percentOff * 100) / 100,
+              duration: "once",
+            });
+            stripeCouponId = coupon.id;
+          }
         } catch (err) {
           console.warn("Could not create Stripe coupon:", err);
         }

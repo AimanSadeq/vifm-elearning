@@ -53,10 +53,6 @@ export async function POST(request: NextRequest) {
       (payload.id as string) ??
       (data.charge_id as string) ??
       null;
-    const event =
-      ((payload.event as string) ?? (payload.type as string) ?? "")
-        .toString()
-        .toLowerCase();
 
     if (!externalId && !chargeId) {
       console.error("MamoPay webhook: no external_id / charge id in payload");
@@ -92,18 +88,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
-    // Locate the payment row. Prefer external_id (= our payments.id).
+    // Locate the payment row. Prefer external_id (= our payments.id). When
+    // it's missing we fall back to the link id stashed in metadata; a missing
+    // chargeId here is impossible because the early-return at the top of
+    // this handler exits when both ids are absent.
     const { data: payment } = externalId
       ? await supabaseAdmin
           .from("payments")
           .select("*")
           .eq("id", externalId)
           .maybeSingle()
-      : await supabaseAdmin
-          .from("payments")
-          .select("*")
-          .filter("metadata->>mamopay_link_id", "eq", chargeId ?? "")
-          .maybeSingle();
+      : chargeId
+        ? await supabaseAdmin
+            .from("payments")
+            .select("*")
+            .filter("metadata->>mamopay_link_id", "eq", chargeId)
+            .maybeSingle()
+        : { data: null };
 
     if (!payment) {
       console.error("MamoPay webhook: payment not found", {
@@ -113,19 +114,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
+    // Decide success/failure ONLY from trustedStatus. The body's `event`
+    // string is attacker-controlled until proven otherwise, and even an
+    // HMAC-verified body can carry an event name that disagrees with the
+    // status — we trust the status field exclusively.
     const isSuccess =
       trustedStatus === "success" ||
       trustedStatus === "succeeded" ||
       trustedStatus === "completed" ||
-      trustedStatus === "paid" ||
-      (verifiedBySignature && (event.includes("success") || event.includes("paid")));
+      trustedStatus === "paid";
 
     const isFailure =
       trustedStatus === "failed" ||
       trustedStatus === "cancelled" ||
-      trustedStatus === "canceled" ||
-      (verifiedBySignature &&
-        (event.includes("failed") || event.includes("cancel")));
+      trustedStatus === "canceled";
 
     if (isFailure) {
       await updatePaymentStatus({

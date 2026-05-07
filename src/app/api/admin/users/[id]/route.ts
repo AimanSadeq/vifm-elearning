@@ -50,6 +50,15 @@ export async function PATCH(
 
     const { password, full_name, full_name_ar, phone, role, organization_id, language, is_active } = parsed.data;
 
+    // Capture the pre-update role so we can write an audit row only when it
+    // actually changes — role changes are privileged actions and we want a
+    // trail of who escalated whom.
+    const { data: priorProfile } = await supabaseAdmin
+      .from("profiles")
+      .select("role")
+      .eq("id", id)
+      .maybeSingle();
+
     // Update auth password if provided
     if (password) {
       const { error: pwError } =
@@ -85,6 +94,24 @@ export async function PATCH(
         { error: "Could not update profile" },
         { status: 500 }
       );
+    }
+
+    // Audit any role change. Best-effort — don't fail the response if the
+    // audit insert errors out, but do log it so an alert can pick it up.
+    if (priorProfile && role && priorProfile.role !== role) {
+      const { error: auditError } = await supabaseAdmin.from("audit_log").insert({
+        user_id: admin.id,
+        action: "user.role_changed",
+        table_name: "profiles",
+        record_id: id,
+        old_values: { role: priorProfile.role },
+        new_values: { role },
+        ip_address: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+        user_agent: request.headers.get("user-agent") ?? null,
+      });
+      if (auditError) {
+        console.error("audit_log insert failed (role change)", auditError);
+      }
     }
 
     // Fetch updated profile
@@ -124,6 +151,13 @@ export async function DELETE(
       );
     }
 
+    // Capture identifying info before the cascade nukes the profile row.
+    const { data: priorProfile } = await supabaseAdmin
+      .from("profiles")
+      .select("email, role")
+      .eq("id", id)
+      .maybeSingle();
+
     // Delete auth user (cascades to profile via FK)
     const { error: deleteError } =
       await supabaseAdmin.auth.admin.deleteUser(id);
@@ -134,6 +168,19 @@ export async function DELETE(
         { error: "Could not delete user" },
         { status: 500 }
       );
+    }
+
+    const { error: auditError } = await supabaseAdmin.from("audit_log").insert({
+      user_id: admin.id,
+      action: "user.deleted",
+      table_name: "profiles",
+      record_id: id,
+      old_values: priorProfile ?? null,
+      ip_address: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+      user_agent: request.headers.get("user-agent") ?? null,
+    });
+    if (auditError) {
+      console.error("audit_log insert failed (user delete)", auditError);
     }
 
     return NextResponse.json({ success: true });
