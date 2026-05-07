@@ -45,7 +45,13 @@ export async function POST(
     );
   }
 
-  // Check for existing vote
+  // Check for existing vote — used only to decide the action label
+  // returned to the client. forum_posts.upvotes/downvotes are now
+  // maintained by a DB trigger (see migration
+  // 20260507_payment_idempotency_and_vote_counters.sql), so the route no
+  // longer increments counters by hand. Two concurrent votes from the
+  // same user used to lose-update the counters; the trigger derives them
+  // from a SELECT COUNT instead, eliminating the race.
   const { data: existingVote } = await supabase
     .from("forum_votes")
     .select("vote_type")
@@ -54,64 +60,20 @@ export async function POST(
     .maybeSingle();
 
   if (existingVote?.vote_type === voteType) {
-    // Remove vote (toggle off)
+    // Toggle off — delete; trigger recomputes counters
     await supabase
       .from("forum_votes")
       .delete()
       .eq("post_id", postId)
       .eq("user_id", user.id);
-
-    // Update post counts
-    const { data: post } = await supabase
-      .from("forum_posts")
-      .select("upvotes, downvotes")
-      .eq("id", postId)
-      .single();
-
-    if (post) {
-      const updates =
-        voteType === "up"
-          ? { upvotes: Math.max(0, (post.upvotes as number) - 1) }
-          : { downvotes: Math.max(0, (post.downvotes as number) - 1) };
-      await supabase
-        .from("forum_posts")
-        .update(updates)
-        .eq("id", postId);
-    }
-
     return NextResponse.json({ action: "removed" });
   }
 
-  // Upsert vote
+  // Insert or change vote — trigger recomputes counters
   await supabase.from("forum_votes").upsert(
     { post_id: postId, user_id: user.id, vote_type: voteType },
     { onConflict: "post_id,user_id" }
   );
-
-  // Update post counts
-  const { data: post } = await supabase
-    .from("forum_posts")
-    .select("upvotes, downvotes")
-    .eq("id", postId)
-    .single();
-
-  if (post) {
-    const updates: Record<string, number> = {};
-
-    if (voteType === "up") {
-      updates.upvotes = (post.upvotes || 0) + 1;
-      if (existingVote?.vote_type === "down") {
-        updates.downvotes = Math.max(0, (post.downvotes || 0) - 1);
-      }
-    } else {
-      updates.downvotes = (post.downvotes || 0) + 1;
-      if (existingVote?.vote_type === "up") {
-        updates.upvotes = Math.max(0, (post.upvotes || 0) - 1);
-      }
-    }
-
-    await supabase.from("forum_posts").update(updates).eq("id", postId);
-  }
 
   return NextResponse.json({
     action: existingVote ? "changed" : "voted",

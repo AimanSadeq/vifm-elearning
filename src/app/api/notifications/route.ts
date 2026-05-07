@@ -1,6 +1,52 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+
+// Notifications are written by an admin and rendered into another user's
+// feed (often as anchor href + body HTML). Without validation an admin
+// account compromise would let the attacker plant `<script>` payloads or
+// `javascript:` URLs into every user's feed. Validate strictly:
+//   - title/body are length-capped plain strings
+//   - action_url is either a relative path (must start with "/") or an
+//     https URL on the same app origin
+//   - channel is whitelisted
+const notificationSchema = z.object({
+  userId: z.string().uuid(),
+  title: z.string().trim().min(1).max(200),
+  titleAr: z.string().trim().max(200).optional().nullable(),
+  body: z.string().trim().min(1).max(2000),
+  bodyAr: z.string().trim().max(2000).optional().nullable(),
+  channel: z.enum(["in_app", "email", "whatsapp", "sms"]).optional(),
+  actionUrl: z
+    .string()
+    .max(2048)
+    .refine(
+      (val) => {
+        if (!val) return true;
+        // Reject any non-https scheme outright (defends against javascript:,
+        // data:, vbscript: etc.).
+        if (val.startsWith("/")) return !val.startsWith("//");
+        if (val.startsWith("https://")) {
+          try {
+            const u = new URL(val);
+            const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+            if (!appUrl) return false;
+            return u.origin === new URL(appUrl).origin;
+          } catch {
+            return false;
+          }
+        }
+        return false;
+      },
+      {
+        message:
+          "actionUrl must be a relative path or an https URL on this app's origin",
+      }
+    )
+    .optional()
+    .nullable(),
+});
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -82,17 +128,41 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const body = await request.json();
+  const parsed = notificationSchema.safeParse(
+    await request.json().catch(() => ({}))
+  );
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Validation failed", details: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+
+  // Confirm target user exists; without this we'd pollute the table with
+  // rows for non-existent UUIDs.
+  const { data: targetExists } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", parsed.data.userId)
+    .maybeSingle();
+
+  if (!targetExists) {
+    return NextResponse.json(
+      { error: "Target user not found" },
+      { status: 404 }
+    );
+  }
+
   const { data, error } = await supabase
     .from("notifications")
     .insert({
-      user_id: body.userId,
-      title: body.title,
-      title_ar: body.titleAr || null,
-      body: body.body,
-      body_ar: body.bodyAr || null,
-      channel: body.channel || "in_app",
-      action_url: body.actionUrl || null,
+      user_id: parsed.data.userId,
+      title: parsed.data.title,
+      title_ar: parsed.data.titleAr || null,
+      body: parsed.data.body,
+      body_ar: parsed.data.bodyAr || null,
+      channel: parsed.data.channel || "in_app",
+      action_url: parsed.data.actionUrl || null,
     })
     .select()
     .single();

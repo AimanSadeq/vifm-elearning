@@ -17,7 +17,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // --- 1. Force valid locale prefix on ALL requests ---
-  // This MUST happen first to prevent "admin" being treated as a locale
+  // This MUST happen first to prevent "admin" being treated as a locale.
   if (!hasValidLocale(pathname) && pathname !== "/") {
     const locale = routing.defaultLocale;
     const redirectUrl = new URL(`/${locale}${pathname}`, request.url);
@@ -25,7 +25,22 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // --- 2. Refresh Supabase auth session ---
+  // --- 2. Decide whether this route needs Supabase at all ---
+  // Cheap path-based check, no remote calls. Public pages (homepage,
+  // marketing, course catalog, etc.) skip the auth round-trip entirely —
+  // previously every navigation paid an ~80–200ms Supabase getUser() call.
+  const locale = getLocale(pathname);
+  const cleanPath = stripLocale(pathname);
+
+  const isProtected =
+    PROTECTED_PREFIXES.some((prefix) => cleanPath.startsWith(prefix)) ||
+    PROTECTED_PATTERNS.some((pattern) => pattern.test(cleanPath));
+
+  if (!isProtected) {
+    return intlMiddleware(request);
+  }
+
+  // --- 3. Protected route: refresh Supabase session and verify auth ---
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -57,17 +72,6 @@ export async function middleware(request: NextRequest) {
     });
     return response;
   };
-
-  // --- 3. Check if route is protected ---
-  const locale = getLocale(pathname);
-  const cleanPath = stripLocale(pathname);
-
-  const isProtected =
-    PROTECTED_PREFIXES.some((prefix) => cleanPath.startsWith(prefix)) ||
-    PROTECTED_PATTERNS.some((pattern) => pattern.test(cleanPath));
-
-  // Not protected → run intl middleware and return
-  if (!isProtected) return withAuthCookies(intlMiddleware(request));
 
   // --- 4. Authentication check ---
   if (!user) {

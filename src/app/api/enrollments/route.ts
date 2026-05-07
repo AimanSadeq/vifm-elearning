@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { userHasActiveSubscription } from "@/lib/services/access";
+import { applyRateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = await applyRateLimit(request, {
+      scope: "enrollments:create",
+      buckets: [
+        { limit: 10, windowMs: 60_000 },
+        { limit: 60, windowMs: 60 * 60_000 },
+      ],
+    });
+    if (limited) return limited;
+
     const supabase = await createServerSupabase();
     const {
       data: { user },

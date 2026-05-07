@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { applyRateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const limited = await applyRateLimit(request, {
+      scope: "learning-paths:enroll",
+      buckets: [
+        { limit: 10, windowMs: 60_000 },
+        { limit: 60, windowMs: 60 * 60_000 },
+      ],
+    });
+    if (limited) return limited;
+
     const { id: pathId } = await params;
 
     // Auth check

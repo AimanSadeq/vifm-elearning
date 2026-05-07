@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
+import { APP_URL } from "@/lib/env";
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://learn.viftraining.com";
+const SITE_URL = APP_URL;
 const LOCALES = ["en", "ar"] as const;
 
 const STATIC_PATHS = [

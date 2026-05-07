@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { getLocale } from "next-intl/server";
+import { APP_URL } from "@/lib/env";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://learn.viftraining.com"
-  ),
+  metadataBase: new URL(APP_URL),
   title: {
     default: "VIFM Academy — Professional Training & E-Learning",
     template: "%s | VIFM Academy",

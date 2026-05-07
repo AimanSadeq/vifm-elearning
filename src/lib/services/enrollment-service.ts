@@ -11,29 +11,37 @@ export async function createEnrollmentFromPayment({
   courseId,
   paymentId,
 }: CreateEnrollmentParams) {
-  // Idempotent: check if enrollment already exists
-  const { data: existing } = await supabaseAdmin
+  // The DB enforces UNIQUE(user_id, course_id) on enrollments. Use an
+  // upsert with ignoreDuplicates so two webhook deliveries arriving in the
+  // same millisecond (Stripe retries on 5xx, MamoPay on transient errors)
+  // don't both insert. The previous select-then-insert pattern had a
+  // narrow window where both could pass the existence check.
+  const { error: upsertError } = await supabaseAdmin
     .from("enrollments")
-    .select("id")
+    .upsert(
+      {
+        user_id: userId,
+        course_id: courseId,
+        payment_id: paymentId ?? null,
+        status: "active",
+        enrolled_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,course_id", ignoreDuplicates: true }
+    );
+
+  if (upsertError) {
+    throw new Error(`Failed to create enrollment: ${upsertError.message}`);
+  }
+
+  // Read back so callers get a consistent shape (also picks up a
+  // pre-existing row when the upsert was a no-op).
+  const { data } = await supabaseAdmin
+    .from("enrollments")
+    .select("*")
     .eq("user_id", userId)
     .eq("course_id", courseId)
-    .maybeSingle();
-
-  if (existing) return existing;
-
-  const { data, error } = await supabaseAdmin
-    .from("enrollments")
-    .insert({
-      user_id: userId,
-      course_id: courseId,
-      payment_id: paymentId ?? null,
-      status: "active",
-      enrolled_at: new Date().toISOString(),
-    })
-    .select()
     .single();
 
-  if (error) throw new Error(`Failed to create enrollment: ${error.message}`);
   return data;
 }
 
@@ -71,12 +79,22 @@ export async function createSubscriptionFromPayment({
   if (!planId)
     throw new Error(`Payment ${paymentId} has no plan_id in metadata`);
 
-  // Idempotent
+  // Idempotent: stripe_subscription_id has a partial unique index, and a
+  // partial unique on (user_id) WHERE status='active' stops concurrent
+  // Stripe webhook deliveries from creating two active rows for the same
+  // user. We still check explicitly so the success shape is consistent.
+  if (stripeSubscriptionId) {
+    const { data: existingByStripe } = await supabaseAdmin
+      .from("subscriptions")
+      .select("id")
+      .eq("stripe_subscription_id", stripeSubscriptionId)
+      .maybeSingle();
+    if (existingByStripe) return existingByStripe;
+  }
   const { data: existing } = await supabaseAdmin
     .from("subscriptions")
     .select("id")
     .eq("user_id", payment.user_id)
-    .eq("plan_id", planId)
     .eq("status", "active")
     .maybeSingle();
   if (existing) return existing;
@@ -116,8 +134,21 @@ export async function createSubscriptionFromPayment({
     .select()
     .single();
 
-  if (error)
+  if (error) {
+    // 23505 = unique_violation. With the new partial unique indexes,
+    // concurrent webhook deliveries can lose this race; treat the loser
+    // as success and read back the winner.
+    if ((error as { code?: string }).code === "23505") {
+      const { data: existingRow } = await supabaseAdmin
+        .from("subscriptions")
+        .select("*")
+        .eq("user_id", payment.user_id)
+        .eq("status", "active")
+        .single();
+      if (existingRow) return existingRow;
+    }
     throw new Error(`Failed to create subscription: ${error.message}`);
+  }
   return data;
 }
 

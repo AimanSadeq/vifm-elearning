@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { generateCertificateFile, type TemplateConfig } from "./certificate-generator";
+import { APP_URL } from "@/lib/env";
 import type { Certificate } from "@/types";
 
 interface IssueCertificateParams {
@@ -119,8 +120,7 @@ export async function issueCertificate({
     throw new Error(`Failed to insert certificate: ${insertError.message}`);
 
   const verificationCode = cert.verification_code;
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://academy.vifm.ae";
-  const verificationUrl = `${baseUrl}/verify/${verificationCode}`;
+  const verificationUrl = `${APP_URL}/verify/${verificationCode}`;
 
   // Generate certificate file from the VIFM .pptx template (mirrors OpsSys).
   const { buffer, mimeType, extension } = await generateCertificateFile(

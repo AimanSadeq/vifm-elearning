@@ -1,12 +1,22 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { registerZoomAttendee } from "@/lib/services/zoom";
+import { applyRateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(
-  _request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const limited = await applyRateLimit(request, {
+    scope: "webinars:register",
+    buckets: [
+      { limit: 5, windowMs: 60_000 },
+      { limit: 30, windowMs: 60 * 60_000 },
+    ],
+  });
+  if (limited) return limited;
+
   const { id } = await params;
   const cookieStore = await cookies();
   const supabase = createServerClient(

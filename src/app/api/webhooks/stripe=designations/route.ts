@@ -58,7 +58,9 @@ export async function POST(request: NextRequest) {
       const newEnd = new Date(newStart);
       newEnd.setFullYear(newEnd.getFullYear() + 1);
 
-      // 2. Insert payment record
+      // 2. Insert payment record. Use the canonical column names — the
+      // legacy `method` / `transaction_id` / `gateway_response` columns were
+      // never enforced, so writes here used to land partially NULL.
       const { data: payment } = await supabase
         .from("payments")
         .insert({
@@ -66,14 +68,15 @@ export async function POST(request: NextRequest) {
           amount: totalAmount,
           currency: "USD",
           status: "completed",
-          method: "stripe",
-          transaction_id: session.payment_intent as string,
-          gateway_response: {
-            session_id: session.id,
-            customer_id: session.customer,
-          },
+          payment_method: "stripe",
+          stripe_session_id: session.id,
+          stripe_payment_intent_id: session.payment_intent as string,
           payment_type: "designation_renewal",
           paid_at: new Date().toISOString(),
+          metadata: {
+            holder_id: holderId,
+            customer_id: session.customer,
+          },
         })
         .select("id")
         .single();
@@ -102,8 +105,6 @@ export async function POST(request: NextRequest) {
         .eq("id", holderId);
 
       // 5. Email notification handled by Operations outside the portal
-
-      console.log(`Renewal completed for holder ${holderId}`);
     } catch (dbError: unknown) {
       console.error("Database error processing renewal:", dbError);
       return NextResponse.json({ error: "Database error" }, { status: 500 });

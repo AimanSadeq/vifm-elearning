@@ -65,7 +65,23 @@ export async function createPaymentPage(
     throw new Error(`PayTabs API error: ${response.statusText}`);
   }
 
-  return response.json();
+  const json = (await response.json().catch(() => null)) as PayTabsResponse | null;
+  // PayTabs occasionally returns 200 with an error payload that lacks the
+  // hosted-page URL. If we don't validate here, the calling route will
+  // happily insert a `payments` row with `paytabs_transaction_ref = undefined`
+  // and redirect the customer to "undefined".
+  if (
+    !json ||
+    typeof json.redirect_url !== "string" ||
+    !json.redirect_url ||
+    typeof json.tran_ref !== "string" ||
+    !json.tran_ref
+  ) {
+    throw new Error(
+      "PayTabs returned no redirect_url / tran_ref — refusing to create payment row"
+    );
+  }
+  return json;
 }
 
 /**

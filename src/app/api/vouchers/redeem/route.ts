@@ -6,7 +6,7 @@ import { applyRateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
-    const limited = applyRateLimit(request, {
+    const limited = await applyRateLimit(request, {
       scope: "voucher:redeem",
       buckets: [
         { limit: 5, windowMs: 60_000 },
@@ -115,7 +115,12 @@ export async function POST(request: NextRequest) {
           amount: 0,
           currency: course.currency,
           status: "completed",
-          method: "voucher",
+          // Use the canonical column name. The legacy `method` column was
+          // kept around for backwards compat but every other route writes
+          // to `payment_method`; mixing the two means the row lands without
+          // a method and admin reconciliation reports mis-classify it.
+          payment_method: "voucher",
+          payment_type: "course_purchase",
           discount_amount: Number(course.price),
           paid_at: new Date().toISOString(),
           metadata: {

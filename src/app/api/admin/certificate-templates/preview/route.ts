@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { requireSuperAdmin } from "@/lib/services/require-super-admin";
 import { generateCertificateFile } from "@/lib/services/certificate-generator";
+import { APP_URL } from "@/lib/env";
 
 /**
  * POST /api/admin/certificate-templates/preview
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
       courseName: "Sample Course Title — Replace With Your Course",
       certificateNumber: "VIFM-PREVIEW-0001",
       issuedAt: new Date().toISOString(),
-      verificationUrl: "https://academy.vifm.ae/verify/PREVIEW",
+      verificationUrl: `${APP_URL}/verify/PREVIEW`,
     },
     {
       templateKey: "classic",

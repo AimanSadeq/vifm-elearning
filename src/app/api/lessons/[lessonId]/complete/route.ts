@@ -18,35 +18,38 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (!user)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    // Parse courseId from body
-    let body: Record<string, unknown>;
+    // Body is allowed but courseId is intentionally NOT trusted from it —
+    // a learner enrolled in a free course could otherwise mark lessons of
+    // any paid course as completed by sending the free course's id with
+    // any lesson id. We derive the canonical course id from the lesson row.
     try {
-      body = await request.json();
+      await request.json().catch(() => ({}));
     } catch {
-      return NextResponse.json(
-        { error: "Invalid request body" },
-        { status: 400 }
-      );
+      // empty body is fine
     }
 
-    const { courseId } = body;
-    if (!courseId || typeof courseId !== "string")
-      return NextResponse.json(
-        { error: "courseId is required" },
-        { status: 400 }
-      );
+    const { data: lesson } = await supabaseAdmin
+      .from("lessons")
+      .select("id, course_id")
+      .eq("id", lessonId)
+      .maybeSingle();
+
+    if (!lesson?.course_id) {
+      return NextResponse.json({ error: "Lesson not found" }, { status: 404 });
+    }
+    const courseId = lesson.course_id as string;
 
     // Admins can complete lessons without enrollment
     const isAdmin = user.app_metadata?.role === "super_admin";
 
-    // Verify enrollment
+    // Verify enrollment against the lesson's actual course
     const { data: enrollment } = await supabaseAdmin
       .from("enrollments")
       .select("id, completed_lesson_ids, total_lesson_items")
       .eq("user_id", user.id)
       .eq("course_id", courseId)
       .in("status", ["active", "completed"])
-      .single();
+      .maybeSingle();
 
     if (!enrollment && !isAdmin)
       return NextResponse.json(

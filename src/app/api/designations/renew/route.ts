@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/services/stripe";
+import { APP_URL } from "@/lib/env";
 import type Stripe from "stripe";
 
 export async function POST(request: NextRequest) {
@@ -144,15 +145,16 @@ export async function POST(request: NextRequest) {
       customerId = customer.id;
     }
 
-    // Create Stripe Checkout Session
-    const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL;
-
+    // Create Stripe Checkout Session. NEVER use the request Origin header
+    // here — it's attacker-controlled in cross-site fetches and can be
+    // pointed at a phishing domain that mirrors our checkout flow. APP_URL
+    // is the only trustworthy origin.
     const session = await getStripe().checkout.sessions.create({
       customer: customerId,
       mode: "payment",
       line_items: lineItems,
-      success_url: `${origin}/en/dashboard/designations?renewed=true`,
-      cancel_url: `${origin}/en/dashboard/designations/renew?cancelled=true`,
+      success_url: `${APP_URL}/en/dashboard/designations?renewed=true`,
+      cancel_url: `${APP_URL}/en/dashboard/designations/renew?cancelled=true`,
       metadata: {
         type: "designation_renewal",
         holder_id: holder.id,

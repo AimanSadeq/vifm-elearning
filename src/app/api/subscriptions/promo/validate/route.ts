@@ -5,7 +5,7 @@ import { applyRateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
-    const limited = applyRateLimit(request, {
+    const limited = await applyRateLimit(request, {
       scope: "subscription-promo:validate",
       buckets: [
         { limit: 10, windowMs: 60_000 },

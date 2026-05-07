@@ -3,6 +3,8 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/services/stripe";
 import { validatePromoForCheckout } from "@/lib/services/promo";
+import { applyRateLimit } from "@/lib/utils/rate-limit";
+import { APP_URL } from "@/lib/env";
 
 const INTERVAL_MAP: Record<string, "month" | "year"> = {
   monthly: "month",
@@ -17,6 +19,15 @@ const INTERVAL_MAP: Record<string, "month" | "year"> = {
  */
 export async function POST(request: NextRequest) {
   try {
+    const limited = await applyRateLimit(request, {
+      scope: "subscriptions:checkout",
+      buckets: [
+        { limit: 5, windowMs: 60_000 },
+        { limit: 30, windowMs: 60 * 60_000 },
+      ],
+    });
+    if (limited) return limited;
+
     const supabase = await createServerSupabase();
     const {
       data: { user },
@@ -70,6 +81,34 @@ export async function POST(request: NextRequest) {
         },
         { status: 400 }
       );
+
+    // Block double-checkout: if the user has a pending subscription payment
+    // started in the last 5 minutes, refuse a second Stripe session. Without
+    // this, two rapid clicks both pass the active-sub check and create two
+    // Stripe sessions; the user can pay both, get charged twice, and end up
+    // with only one subscription (the second insert hits the
+    // active-per-user partial unique index added in
+    // 20260507_payment_idempotency_and_vote_counters.sql).
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60_000).toISOString();
+    const { data: inFlight } = await supabaseAdmin
+      .from("payments")
+      .select("id, created_at")
+      .eq("user_id", user.id)
+      .eq("payment_type", "subscription")
+      .eq("status", "pending")
+      .gt("created_at", fiveMinutesAgo)
+      .limit(1)
+      .maybeSingle();
+
+    if (inFlight) {
+      return NextResponse.json(
+        {
+          error:
+            "A subscription checkout is already in progress. Finish it on Stripe or wait a few minutes before starting another.",
+        },
+        { status: 409 }
+      );
+    }
 
     // Resolve promo code
     let promoCodeId: string | null = null;
@@ -158,8 +197,7 @@ export async function POST(request: NextRequest) {
         .eq("id", plan.id);
     }
 
-    const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL ?? "https://learn.viftraining.com";
+    const baseUrl = APP_URL;
     const isLifetime = plan.plan_type === "lifetime";
 
     const session = await stripe.checkout.sessions.create({

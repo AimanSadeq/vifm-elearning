@@ -2,9 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/services/stripe";
+import { applyRateLimit } from "@/lib/utils/rate-limit";
+import { APP_URL } from "@/lib/env";
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = await applyRateLimit(request, {
+      scope: "subscriptions:create",
+      buckets: [
+        { limit: 5, windowMs: 60_000 },
+        { limit: 30, windowMs: 60 * 60_000 },
+      ],
+    });
+    if (limited) return limited;
+
     // Auth check
     const supabase = await createServerSupabase();
     const {
@@ -112,7 +123,7 @@ export async function POST(request: NextRequest) {
     }
 
     const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL ?? "https://academy.vifm.ae";
+      APP_URL;
 
     // Create Stripe Checkout Session
     const isLifetime = plan.plan_type === "lifetime";

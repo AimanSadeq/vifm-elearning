@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   // Anyone can hit this with arbitrary `?code=` values; on success we run
   // admin-client SQL to provision a profile. Throttle by IP to stop a
   // compromised/anon caller from looping it.
-  const limited = applyRateLimit(request, {
+  const limited = await applyRateLimit(request, {
     scope: "auth:callback",
     buckets: [
       { limit: 10, windowMs: 60_000 },

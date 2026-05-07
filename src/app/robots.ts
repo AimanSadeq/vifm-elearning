@@ -1,7 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://learn.viftraining.com";
+import { APP_URL } from "@/lib/env";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -25,7 +23,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: `${SITE_URL}/sitemap.xml`,
-    host: SITE_URL,
+    sitemap: `${APP_URL}/sitemap.xml`,
+    host: APP_URL,
   };
 }

@@ -7,7 +7,7 @@ import { applyRateLimit } from "@/lib/utils/rate-limit";
 export async function POST(request: NextRequest) {
   // Throttle to stop a compromised/anon caller from looping forever; the
   // route runs admin-client SQL so we never want it to be a free hot path.
-  const limited = applyRateLimit(request, {
+  const limited = await applyRateLimit(request, {
     scope: "auth:ensure-profile",
     buckets: [
       { limit: 10, windowMs: 60_000 },

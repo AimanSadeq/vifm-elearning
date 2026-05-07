@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     // Brute-force guard: each guess returns a binary signal, so without a
     // limit an attacker can enumerate every promo in seconds.
-    const limited = applyRateLimit(request, {
+    const limited = await applyRateLimit(request, {
       scope: "promo:validate",
       buckets: [
         { limit: 10, windowMs: 60_000 },

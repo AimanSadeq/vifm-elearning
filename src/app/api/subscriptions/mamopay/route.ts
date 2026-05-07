@@ -3,9 +3,20 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { createPaymentLink } from "@/lib/services/mamopay";
 import { validatePromoForCheckout } from "@/lib/services/promo";
+import { applyRateLimit } from "@/lib/utils/rate-limit";
+import { APP_URL } from "@/lib/env";
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = await applyRateLimit(request, {
+      scope: "subscriptions:mamopay",
+      buckets: [
+        { limit: 5, windowMs: 60_000 },
+        { limit: 30, windowMs: 60 * 60_000 },
+      ],
+    });
+    if (limited) return limited;
+
     const supabase = await createServerSupabase();
     const {
       data: { user },
@@ -91,7 +102,7 @@ export async function POST(request: NextRequest) {
       );
 
     const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL ?? "https://learn.viftraining.com";
+      APP_URL;
 
     const link = await createPaymentLink({
       title: `Subscription: ${plan.name}`.slice(0, 50),
