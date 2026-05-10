@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
@@ -197,6 +198,13 @@ export async function POST(request: NextRequest) {
           .eq("id", courseId);
       }
     }
+
+    // Bust the SSR catalog cache so the new/updated course appears on
+    // /courses and /categories/[slug] within seconds rather than waiting
+    // for the 60s revalidate window. The "courses" tag is shared by the
+    // course-grid cache + the category-page caches (which mark themselves
+    // with both "categories" and "courses" tags).
+    revalidateTag("courses");
 
     return NextResponse.json({ data: { id: courseId } }, { status: 201 });
   } catch (err) {

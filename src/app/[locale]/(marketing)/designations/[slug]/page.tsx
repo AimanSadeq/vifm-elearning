@@ -1,66 +1,14 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useLocale } from "next-intl";
-import { useParams, useSearchParams } from "next/navigation";
+import { getLocale } from "next-intl/server";
 import { AlertTriangle } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { useAuth } from "@/lib/hooks/useAuth";
-import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import {
+  getCachedDesignationBySlug,
+  getCachedDesignationBundle,
+  type DesignationDetail,
+  type CPECategoryRow,
+} from "@/lib/server/catalog-data";
+import { createServerSupabase } from "@/lib/supabase/server";
 import type { DesignationResource } from "@/types";
-
-import { DesignationHero } from "@/components/designation/DesignationHero";
-import { DesignationTabs } from "@/components/designation/DesignationTabs";
-import { DesignationOverview } from "@/components/designation/DesignationOverview";
-import { DesignationModules } from "@/components/designation/DesignationModules";
-import { DesignationFoundingMember } from "@/components/designation/DesignationFoundingMember";
-import { DesignationSteps } from "@/components/designation/DesignationSteps";
-import { DesignationCPE } from "@/components/designation/DesignationCPE";
-import { DesignationResources } from "@/components/designation/DesignationResources";
-import { DesignationCourseContent } from "@/components/designation/DesignationCourseContent";
-import { DesignationFAQ } from "@/components/designation/DesignationFAQ";
-import { DesignationCTA } from "@/components/designation/DesignationCTA";
-
-/* ------------------------------------------------------------------ */
-/*  Types                                                              */
-/* ------------------------------------------------------------------ */
-
-interface DesignationData {
-  id: string;
-  name: string;
-  name_ar: string | null;
-  slug: string;
-  abbreviation: string;
-  description: string | null;
-  description_ar: string | null;
-  founding_fee: number;
-  renewal_fee: number;
-  late_fee: number;
-  currency?: string | null;
-  annual_cpe_required: number;
-  renewal_month: number;
-  renewal_day: number;
-  grace_period_months: number;
-  metadata: Record<string, unknown> | null;
-}
-
-interface DesignationDocument {
-  id: string;
-  title: string;
-  title_ar: string | null;
-  description: string | null;
-  sort_order: number;
-}
-
-interface CPECategory {
-  id: string;
-  name: string;
-  name_ar: string | null;
-  description: string | null;
-  annual_max_hours: number | null;
-  requires_approval: boolean;
-  sort_order: number;
-}
+import DesignationLandingClient from "./DesignationLandingClient";
 
 interface FAQItem {
   question: string;
@@ -70,18 +18,24 @@ interface FAQItem {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Helper: build FAQ from designation data                            */
+/*  Helper: build FAQ from designation data — unchanged from previous */
+/*  client implementation, just lifted to the server.                  */
 /* ------------------------------------------------------------------ */
 
-function buildFAQ(d: DesignationData, cpeCategories: CPECategory[]): FAQItem[] {
+function buildFAQ(d: DesignationDetail, cpeCategories: CPECategoryRow[]): FAQItem[] {
   const meta = d.metadata ?? {};
-  const examType = meta.exam_type === "simulation" ? "simulation-based" : "multiple-choice";
-  const examTypeAr = meta.exam_type === "simulation" ? "قائم على المحاكاة" : "اختيار من متعدد";
+  const examType =
+    meta.exam_type === "simulation" ? "simulation-based" : "multiple-choice";
+  const examTypeAr =
+    meta.exam_type === "simulation" ? "قائم على المحاكاة" : "اختيار من متعدد";
   const passRate = Number(meta.pass_rate) || 65;
   const freeAttempts = Number(meta.free_attempts) || 2;
-  const prerequisites: string[] = Array.isArray(meta.prerequisites) ? meta.prerequisites : [];
+  const prerequisites: string[] = Array.isArray(meta.prerequisites)
+    ? (meta.prerequisites as string[])
+    : [];
   const cycleYears = Number(meta.cpe_cycle_years) || 1;
-  const cpeHours = Number(meta.cpe_cycle_hours) || d.annual_cpe_required * cycleYears;
+  const cpeHours =
+    Number(meta.cpe_cycle_hours) || d.annual_cpe_required * cycleYears;
 
   const faqs: FAQItem[] = [
     {
@@ -128,138 +82,30 @@ function buildFAQ(d: DesignationData, cpeCategories: CPECategory[]): FAQItem[] {
   return faqs;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Page Component                                                     */
-/* ------------------------------------------------------------------ */
+interface PageProps {
+  params: Promise<{ locale: string; slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
 
-export default function DesignationLandingPage() {
-  const locale = useLocale();
-  const params = useParams();
-  const searchParams = useSearchParams();
-  const { user, isLoading: authLoading } = useAuth();
-  const slug = params.slug as string;
-  const tabParam = searchParams.get("tab");
+/**
+ * Designation detail page. Pre-fetches the designation row + its bundle of
+ * documents/CPE/resources/holder-count/primary-course server-side via
+ * `unstable_cache` (60s revalidate), then computes the user-specific
+ * `hasAccess` flag using the cookie-bound Supabase server client.
+ *
+ * The user-access query is intentionally NOT in the cache — it depends on
+ * the authenticated user, which would otherwise be cached across visitors.
+ */
+export default async function DesignationLandingPage({
+  params,
+  searchParams,
+}: PageProps) {
+  const [{ slug }, sp] = await Promise.all([params, searchParams]);
+  const locale = await getLocale();
 
-  const [designation, setDesignation] = useState<DesignationData | null>(null);
-  const [documents, setDocuments] = useState<DesignationDocument[]>([]);
-  const [cpeCategories, setCpeCategories] = useState<CPECategory[]>([]);
-  const [resources, setResources] = useState<DesignationResource[]>([]);
-  const [holderCount, setHolderCount] = useState(0);
-  const [primaryCourseSlug, setPrimaryCourseSlug] = useState<string | null>(null);
-  const [hasAccess, setHasAccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
-  const [activeTab, setActiveTab] = useState<"overview" | "courseWebsite">(
-    tabParam === "courseWebsite" ? "courseWebsite" : "overview"
-  );
+  const designation = await getCachedDesignationBySlug(slug);
 
-  useEffect(() => {
-    async function fetchData() {
-      const supabase = createClient();
-
-      // Fetch designation
-      const { data: desig } = await supabase
-        .from("designations")
-        .select("*")
-        .eq("slug", slug)
-        .eq("is_active", true)
-        .single();
-
-      if (!desig) {
-        setNotFound(true);
-        setIsLoading(false);
-        return;
-      }
-
-      setDesignation(desig as DesignationData);
-
-      // Fetch documents, CPE categories, resources, and holder count in parallel
-      const promises: PromiseLike<unknown>[] = [
-        supabase
-          .from("designation_documents")
-          .select("id, title, title_ar, description, sort_order")
-          .eq("designation_id", desig.id)
-          .order("sort_order"),
-        supabase
-          .from("cpe_categories")
-          .select("id, name, name_ar, description, annual_max_hours, requires_approval, sort_order")
-          .eq("designation_id", desig.id)
-          .order("sort_order"),
-        supabase
-          .from("designation_resources")
-          .select("*")
-          .eq("designation_id", desig.id)
-          .eq("is_active", true)
-          .order("sort_order"),
-        // Holder count drives the "At a glance" tile.
-        supabase
-          .from("designation_holders")
-          .select("id", { count: "exact", head: true })
-          .eq("designation_id", desig.id)
-          .in("status", ["active", "grace_period"]),
-        // Primary course for this designation, if linked. Drives the
-        // "Get Certified" CTA — when present, the button deep-links to the
-        // course detail page instead of dumping the visitor in the catalog.
-        supabase
-          .from("courses")
-          .select("slug")
-          .eq("designation_id", desig.id)
-          .eq("status", "published")
-          .order("created_at", { ascending: true })
-          .limit(1)
-          .maybeSingle(),
-      ];
-
-      // Check if logged-in user holds this designation
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser) {
-        promises.push(
-          supabase
-            .from("designation_holders")
-            .select("id")
-            .eq("designation_id", desig.id)
-            .eq("user_id", authUser.id)
-            .in("status", ["active", "grace_period"])
-            .limit(1)
-        );
-      }
-
-      const results = await Promise.all(promises);
-      const [
-        docsRes,
-        catsRes,
-        resourcesRes,
-        holderCountRes,
-        primaryCourseRes,
-        userHolderRes,
-      ] = results as { data: unknown; count?: number | null }[];
-
-      setDocuments((docsRes.data ?? []) as DesignationDocument[]);
-      setCpeCategories((catsRes.data ?? []) as CPECategory[]);
-      setResources((resourcesRes.data ?? []) as DesignationResource[]);
-      setHolderCount(holderCountRes?.count ?? 0);
-      setPrimaryCourseSlug(
-        (primaryCourseRes?.data as { slug: string } | null)?.slug ?? null
-      );
-      setHasAccess(
-        authUser?.app_metadata?.role === "super_admin" ||
-          ((userHolderRes?.data ?? []) as unknown[]).length > 0
-      );
-      setIsLoading(false);
-    }
-
-    fetchData();
-  }, [slug]);
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
-  if (notFound || !designation) {
+  if (!designation) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <AlertTriangle className="h-16 w-16 text-muted-foreground/50" />
@@ -275,132 +121,52 @@ export default function DesignationLandingPage() {
     );
   }
 
-  const d = designation;
-  const meta = d.metadata ?? {};
-  const name = locale === "ar" && d.name_ar ? d.name_ar : d.name;
-  const desc = (locale === "ar" && d.description_ar ? d.description_ar : d.description) ?? "";
-  const renderCycleYears = Number(meta.cpe_cycle_years) || 1;
-  const cpeHours = Number(meta.cpe_cycle_hours) || d.annual_cpe_required * renderCycleYears;
-  const prerequisites: string[] = Array.isArray(meta.prerequisites) ? meta.prerequisites : [];
-  const faqItems = buildFAQ(d, cpeCategories);
+  const bundle = await getCachedDesignationBundle(designation.id);
 
-  const tierRaw = meta.tier_level;
-  const tier =
-    tierRaw === "gateway" || tierRaw === "professional" || tierRaw === "executive"
-      ? tierRaw
-      : null;
+  // User-specific access check (NOT cached — depends on logged-in user).
+  // Super admins always see the gated content; otherwise a row in
+  // designation_holders with active/grace_period status grants access.
+  const supabase = await createServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // Designations can opt out of the Overview / Course Website tab strip via
-  // metadata. When hidden, the page renders the Overview body inline with no
-  // tab nav and the gated Course Website panel is suppressed.
-  const hideTabs = meta.hide_tabs === true;
-  const effectiveTab = hideTabs ? "overview" : activeTab;
+  let hasAccess = false;
+  if (user) {
+    if ((user.app_metadata?.role as string) === "super_admin") {
+      hasAccess = true;
+    } else {
+      const { data: holderRow } = await supabase
+        .from("designation_holders")
+        .select("id")
+        .eq("designation_id", designation.id)
+        .eq("user_id", user.id)
+        .in("status", ["active", "grace_period"])
+        .limit(1)
+        .maybeSingle();
+      hasAccess = Boolean(holderRow);
+    }
+  }
+
+  const tabParam = typeof sp.tab === "string" ? sp.tab : "";
+  const initialTab: "overview" | "courseWebsite" =
+    tabParam === "courseWebsite" ? "courseWebsite" : "overview";
+
+  const faqItems = buildFAQ(designation, bundle.cpeCategories);
 
   return (
-    <div className="pb-0">
-      {/* Hero */}
-      <DesignationHero
-        name={name}
-        abbreviation={d.abbreviation}
-        description={desc}
-        prerequisites={prerequisites}
-        locale={locale}
-        slug={slug}
-        tier={tier}
-        foundingFee={d.founding_fee}
-        currency={d.currency ?? "USD"}
-        cpeHours={cpeHours}
-        cpeCycleYears={renderCycleYears}
-        holderCount={holderCount}
-        primaryCourseSlug={primaryCourseSlug}
-      />
-
-      {/* Tab Navigation */}
-      {!hideTabs && (
-        <DesignationTabs
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          locale={locale}
-        />
-      )}
-
-      {/* Tab Content */}
-      {effectiveTab === "overview" ? (
-        <div className="space-y-16 py-16">
-          <div className="container mx-auto px-4">
-            <DesignationOverview
-              abbreviation={d.abbreviation}
-              description={desc}
-              documentsCount={documents.length}
-              cpeHours={cpeHours}
-              cpeCycleYears={renderCycleYears}
-              locale={locale}
-            />
-          </div>
-
-          {documents.length > 0 && (
-            <div className="container mx-auto px-4">
-              <DesignationModules documents={documents} locale={locale} />
-            </div>
-          )}
-
-          <div className="container mx-auto px-4">
-            <DesignationFoundingMember
-              abbreviation={d.abbreviation}
-              foundingFee={d.founding_fee}
-              locale={locale}
-            />
-          </div>
-
-          <div className="container mx-auto px-4">
-            <DesignationSteps
-              abbreviation={d.abbreviation}
-              locale={locale}
-              primaryCourseSlug={primaryCourseSlug}
-            />
-          </div>
-
-          {cpeCategories.length > 0 && (
-            <div className="container mx-auto px-4">
-              <DesignationCPE
-                cpeCategories={cpeCategories}
-                abbreviation={d.abbreviation}
-                cpeHours={cpeHours}
-                cpeCycleYears={renderCycleYears}
-                slug={slug}
-                locale={locale}
-              />
-            </div>
-          )}
-
-          <div className="container mx-auto px-4">
-            <DesignationFAQ items={faqItems} locale={locale} />
-          </div>
-
-          <DesignationCTA
-            abbreviation={d.abbreviation}
-            slug={slug}
-            locale={locale}
-            primaryCourseSlug={primaryCourseSlug}
-          />
-        </div>
-      ) : (
-        <div className="space-y-16 py-16">
-          <div className="container mx-auto px-4">
-            <DesignationCourseContent slug={slug} locale={locale} designationId={d.id} />
-          </div>
-          <div className="container mx-auto px-4">
-            <DesignationResources
-              resources={resources}
-              locale={locale}
-              abbreviation={d.abbreviation}
-              hasAccess={hasAccess}
-              isLoggedIn={!!user && !authLoading}
-              slug={slug}
-            />
-          </div>
-        </div>
-      )}
-    </div>
+    <DesignationLandingClient
+      designation={designation}
+      documents={bundle.documents}
+      cpeCategories={bundle.cpeCategories}
+      resources={bundle.resources as DesignationResource[]}
+      holderCount={bundle.holderCount}
+      primaryCourseSlug={bundle.primaryCourseSlug}
+      hasAccess={hasAccess}
+      isLoggedIn={Boolean(user)}
+      initialTab={initialTab}
+      faqItems={faqItems}
+      slug={slug}
+    />
   );
 }

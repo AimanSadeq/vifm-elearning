@@ -11,6 +11,14 @@ interface UseCoursesCatalogOptions {
   filters: CourseFilterValues;
   page?: number;
   pageSize?: number;
+  /**
+   * Initial catalog state pre-fetched on the server. When provided and the
+   * filterKey hasn't changed yet, the hook skips its first client-side
+   * fetch — the user gets the SSR-baked data immediately and we save a
+   * Supabase round-trip on first paint. Subsequent filter changes still
+   * hit the network normally.
+   */
+  initialData?: { courses: Course[]; totalCount: number };
 }
 
 interface UseCoursesCatalogResult {
@@ -24,20 +32,31 @@ export function useCoursesCatalog({
   filters,
   page = 1,
   pageSize = 12,
+  initialData,
 }: UseCoursesCatalogOptions): UseCoursesCatalogResult {
   const locale = useLocale();
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [totalCount, setTotalCount] = useState(0);
+  const [courses, setCourses] = useState<Course[]>(initialData?.courses ?? []);
+  const [isLoading, setIsLoading] = useState(initialData ? false : true);
+  const [totalCount, setTotalCount] = useState(initialData?.totalCount ?? 0);
 
   // Serialize filters to a stable string to avoid re-fetching on every render.
   // Include locale so switching language refetches.
   const filterKey = JSON.stringify({ ...filters, locale });
   const prevFilterKey = useRef(filterKey);
   const isFirstRender = useRef(true);
+  // Track whether we've consumed the SSR-supplied initial data. Only the
+  // FIRST render with the FIRST filterKey benefits from initialData; if the
+  // user immediately changes a filter we still need to fetch.
+  const hasUsedInitialData = useRef(Boolean(initialData));
 
   useEffect(() => {
     let cancelled = false;
+
+    // First render with SSR-baked initial data → skip the network fetch.
+    if (isFirstRender.current && hasUsedInitialData.current) {
+      isFirstRender.current = false;
+      return;
+    }
 
     // Only show loading skeleton on first render or when filters actually changed
     if (isFirstRender.current || prevFilterKey.current !== filterKey) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 
@@ -22,12 +22,29 @@ const EMPTY: CourseFacets = {
   isLoading: true,
 };
 
-export function useCourseFacets(): CourseFacets {
+interface UseCourseFacetsOptions {
+  /** Pre-fetched facets from the server — avoids the round-trip on first paint. */
+  initialFacets?: Omit<CourseFacets, "isLoading">;
+}
+
+export function useCourseFacets(
+  options: UseCourseFacetsOptions = {}
+): CourseFacets {
+  const { initialFacets } = options;
   const locale = useLocale();
-  const [state, setState] = useState<CourseFacets>(EMPTY);
+  const [state, setState] = useState<CourseFacets>(
+    initialFacets ? { ...initialFacets, isLoading: false } : EMPTY
+  );
+  const hasUsedInitial = useRef(Boolean(initialFacets));
 
   useEffect(() => {
     let cancelled = false;
+    if (hasUsedInitial.current) {
+      // SSR data is good for the first paint; don't re-fetch immediately.
+      // Locale changes after mount still trigger a fresh fetch.
+      hasUsedInitial.current = false;
+      return;
+    }
 
     async function run() {
       const supabase = createClient();

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
@@ -95,6 +96,9 @@ export async function POST(
       return NextResponse.json({ error: updateError.message }, { status: 500 })
     }
 
+    // Catalog cards show this thumbnail; bust the SSR cache.
+    revalidateTag('courses')
+
     return NextResponse.json({ thumbnail_url: cacheBustedUrl })
   } catch (err) {
     console.error('Thumbnail upload error:', err)
@@ -134,6 +138,8 @@ export async function DELETE(
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
+
+    revalidateTag('courses')
 
     return NextResponse.json({ success: true })
   } catch (err) {

@@ -1,6 +1,14 @@
 import createNextIntlPlugin from "next-intl/plugin";
+import bundleAnalyzer from "@next/bundle-analyzer";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+
+// Wrap the build with the analyzer when ANALYZE=true. Run as:
+//   ANALYZE=true npm run build
+// → outputs HTML reports under .next/analyze/ for client + server bundles.
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 // Defence-in-depth headers applied to every response. CSP is intentionally
 // omitted here — it requires per-deploy tuning (Stripe/Supabase/MamoPay/
@@ -66,4 +74,4 @@ const nextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withBundleAnalyzer(withNextIntl(nextConfig));

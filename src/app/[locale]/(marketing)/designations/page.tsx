@@ -1,71 +1,37 @@
-"use client";
-
-import { Fragment, useEffect, useState } from "react";
-import { useLocale } from "next-intl";
+import { Fragment } from "react";
+import { getLocale } from "next-intl/server";
 import Link from "next/link";
 import { Award, ArrowRight } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import {
   DESIGNATION_TIERS,
   DESIGNATION_TIER_IDS,
   getDesignationTier,
 } from "@/lib/site-content";
-
-interface Designation {
-  id: string;
-  name: string;
-  name_ar: string | null;
-  slug: string;
-  abbreviation: string;
-  description: string | null;
-  description_ar: string | null;
-  founding_fee: number;
-  currency: string;
-  metadata: { tier_level?: string } | null;
-}
+import { getCachedDesignations } from "@/lib/server/catalog-data";
 
 const TIER_ORDER = DESIGNATION_TIER_IDS;
 
-export default function DesignationsPage() {
-  const locale = useLocale();
-  const [designations, setDesignations] = useState<Designation[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchDesignations() {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("designations")
-        .select(
-          "id, name, name_ar, slug, abbreviation, description, description_ar, founding_fee, currency, metadata"
-        )
-        .eq("is_active", true)
-        .order("name");
-
-      setDesignations((data as Designation[]) ?? []);
-      setIsLoading(false);
-    }
-
-    fetchDesignations();
-  }, []);
+/**
+ * Public designations listing. Pure Server Component — no interactivity on
+ * this page (just links into /designations/[slug]), so we don't need a
+ * client wrapper at all.
+ *
+ * Data: Supabase `designations` table where `is_active = true`. Wrapped in
+ * `unstable_cache({ revalidate: 60, tags: ["designations"] })` so repeating
+ * visitors share one fetch per minute. Admins editing the table see their
+ * change within ≤60s; for instant invalidation, call `revalidateTag(
+ * "designations")` from any admin mutation route once one exists.
+ */
+export default async function DesignationsPage() {
+  const locale = await getLocale();
+  const designations = await getCachedDesignations();
 
   const grouped = TIER_ORDER.map((tier) => ({
     tier,
-    items: designations.filter(
-      (d) => d.metadata?.tier_level === tier
-    ),
+    items: designations.filter((d) => d.metadata?.tier_level === tier),
   })).filter((g) => g.items.length > 0);
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen">
@@ -118,7 +84,9 @@ export default function DesignationsPage() {
           return (
             <section key={tier}>
               {/* Tier Header */}
-              <div className={`rounded-2xl bg-gradient-to-r ${config.gradient} p-6 sm:p-8 mb-6`}>
+              <div
+                className={`rounded-2xl bg-gradient-to-r ${config.gradient} p-6 sm:p-8 mb-6`}
+              >
                 <div className="flex items-center gap-3 mb-2">
                   <Icon className="h-6 w-6 text-foreground" />
                   <h2 className="text-2xl font-bold text-foreground">
@@ -126,7 +94,11 @@ export default function DesignationsPage() {
                   </h2>
                   <Badge className={config.badgeColor}>
                     {items.length}{" "}
-                    {locale === "ar" ? "شهادات" : items.length === 1 ? "certification" : "certifications"}
+                    {locale === "ar"
+                      ? "شهادات"
+                      : items.length === 1
+                        ? "certification"
+                        : "certifications"}
                   </Badge>
                 </div>
                 <p className="text-muted-foreground">
