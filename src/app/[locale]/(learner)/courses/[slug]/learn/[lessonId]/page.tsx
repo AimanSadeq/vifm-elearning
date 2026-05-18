@@ -4,7 +4,8 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { ChevronLeft, ChevronRight, Globe, ExternalLink, MessageSquare, Bookmark, Lock, Play, CheckCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Globe, ExternalLink, MessageSquare, Bookmark, Lock, Play, CheckCircle, FileSpreadsheet, FileText, Presentation, FileArchive, FileImage, File as FileIcon, Download } from "lucide-react";
+import { getDocumentMeta, isOfficeKind, type DocumentKind } from "@/lib/utils/document-meta";
 import DOMPurify from "dompurify";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
@@ -592,14 +593,7 @@ export default function LessonPage() {
                     ? raw
                     : `${base}/storage/v1/object/public/course-assets/${raw}`;
 
-                  const docType = (currentLesson.document_type ?? "").toLowerCase();
-                  const ext = raw.split("?")[0].split(".").pop()?.toLowerCase() ?? "";
-                  const isZip = docType === "zip" || ext === "zip";
-                  const isOffice =
-                    docType === "word" ||
-                    docType === "excel" ||
-                    ["doc", "docx", "xls", "xlsx", "ppt", "pptx"].includes(ext);
-                  const isPdf = docType === "pdf" || ext === "pdf";
+                  const meta = getDocumentMeta(raw, currentLesson.document_type);
 
                   const fileName =
                     (currentLesson.metadata as { file_name?: string } | null)
@@ -616,56 +610,28 @@ export default function LessonPage() {
                         : `${Math.round(fileSize / 1024)} KB`
                       : null;
 
-                  // ZIPs can't be previewed inline — show a download card instead.
-                  if (isZip) {
+                  // Office files (xlsx/docx/pptx) cannot be reliably embedded
+                  // — Google Docs Viewer silently fails for many xlsx files
+                  // and leaves an empty iframe. ZIPs obviously can't preview.
+                  // Show a clean download card for all of these. PDFs and
+                  // images render natively in an iframe.
+                  if (isOfficeKind(meta.kind) || meta.kind === "zip" || meta.kind === "other") {
                     return (
-                      <div className="rounded-xl border bg-card p-8 flex flex-col items-center text-center gap-4">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
-                          <svg
-                            className="h-7 w-7"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            aria-hidden
-                          >
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="7 10 12 15 17 10" />
-                            <line x1="12" y1="15" x2="12" y2="3" />
-                          </svg>
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-lg">{fileName}</h3>
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            {locale === "ar"
-                              ? "ملف مضغوط — قم بالتنزيل لاستخدام المحتوى"
-                              : "ZIP archive — download to access the contents"}
-                            {prettySize ? ` · ${prettySize}` : ""}
-                          </p>
-                        </div>
-                        <a
-                          href={resolved}
-                          download={fileName}
-                          className="inline-flex items-center gap-2 rounded-lg bg-brand-600 text-white px-5 py-2.5 text-sm font-medium hover:bg-brand-700 transition-colors"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                          {locale === "ar" ? "تنزيل" : "Download"}
-                        </a>
-                      </div>
+                      <DocumentDownloadCard
+                        kind={meta.kind}
+                        label={meta.label}
+                        fileName={fileName}
+                        prettySize={prettySize}
+                        href={resolved}
+                        locale={locale}
+                      />
                     );
                   }
-
-                  // PDFs render natively in an iframe; Office docs use Google Docs Viewer.
-                  const iframeSrc = isOffice
-                    ? `https://docs.google.com/gview?url=${encodeURIComponent(resolved)}&embedded=true`
-                    : resolved;
 
                   return (
                     <div className="space-y-2">
                       <iframe
-                        src={iframeSrc}
+                        src={resolved}
                         className="w-full rounded-lg border"
                         style={{ minHeight: "70vh" }}
                         title={tp("documentViewer")}
@@ -684,15 +650,13 @@ export default function LessonPage() {
                           >
                             {tp("openInNewTab")} ↗
                           </a>
-                          {(isPdf || isOffice) && (
-                            <a
-                              href={resolved}
-                              download={fileName}
-                              className="text-sm text-primary hover:underline"
-                            >
-                              {locale === "ar" ? "تنزيل" : "Download"} ↓
-                            </a>
-                          )}
+                          <a
+                            href={resolved}
+                            download={fileName}
+                            className="text-sm text-primary hover:underline"
+                          >
+                            {locale === "ar" ? "تنزيل" : "Download"} ↓
+                          </a>
                         </div>
                       </div>
                     </div>
@@ -946,5 +910,96 @@ export default function LessonPage() {
         />
       )}
     </CoursePlayer>
+  );
+}
+
+function DocumentDownloadCard({
+  kind,
+  label,
+  fileName,
+  prettySize,
+  href,
+  locale,
+}: {
+  kind: DocumentKind;
+  label: string;
+  fileName: string;
+  prettySize: string | null;
+  href: string;
+  locale: string;
+}) {
+  // Per-kind styling so an XLSX visibly differs from a DOCX / ZIP.
+  const ICONS: Record<DocumentKind, React.ComponentType<{ className?: string }>> = {
+    excel: FileSpreadsheet,
+    word: FileText,
+    powerpoint: Presentation,
+    zip: FileArchive,
+    image: FileImage,
+    pdf: FileText,
+    other: FileIcon,
+  };
+  const TONE: Record<DocumentKind, { bg: string; fg: string }> = {
+    excel: { bg: "bg-green-50 dark:bg-green-950/30", fg: "text-green-700 dark:text-green-300" },
+    word: { bg: "bg-blue-50 dark:bg-blue-950/30", fg: "text-blue-700 dark:text-blue-300" },
+    powerpoint: { bg: "bg-orange-50 dark:bg-orange-950/30", fg: "text-orange-700 dark:text-orange-300" },
+    zip: { bg: "bg-amber-50 dark:bg-amber-950/30", fg: "text-amber-700 dark:text-amber-300" },
+    image: { bg: "bg-purple-50 dark:bg-purple-950/30", fg: "text-purple-700 dark:text-purple-300" },
+    pdf: { bg: "bg-red-50 dark:bg-red-950/30", fg: "text-red-700 dark:text-red-300" },
+    other: { bg: "bg-muted", fg: "text-muted-foreground" },
+  };
+  const Icon = ICONS[kind];
+  const tone = TONE[kind];
+
+  const helper =
+    kind === "zip"
+      ? locale === "ar"
+        ? "ملف مضغوط — قم بالتنزيل لاستخدام المحتوى"
+        : "Archive — download to access the contents"
+      : kind === "excel" || kind === "word" || kind === "powerpoint"
+        ? locale === "ar"
+          ? "لا يمكن عرض ملفات أوفيس داخل المتصفح — افتحها أو نزّلها"
+          : "Office files can’t be previewed in-browser — open or download"
+        : locale === "ar"
+          ? "هذا الملف لا يدعم المعاينة المباشرة"
+          : "Preview not supported for this file type";
+
+  return (
+    <div
+      className="rounded-xl border border-border bg-card p-8 flex flex-col items-center text-center gap-4"
+      style={{ minHeight: "40vh", justifyContent: "center" }}
+    >
+      <div className={`flex h-16 w-16 items-center justify-center rounded-2xl ${tone.bg}`}>
+        <Icon className={`h-8 w-8 ${tone.fg}`} />
+      </div>
+      <div>
+        <p className={`text-[10px] font-bold uppercase tracking-wider ${tone.fg}`}>
+          {label}
+        </p>
+        <h3 className="mt-1 font-semibold text-lg break-all px-4">{fileName}</h3>
+        {prettySize && (
+          <p className="mt-0.5 text-xs text-muted-foreground">{prettySize}</p>
+        )}
+        <p className="mt-3 max-w-md text-sm text-muted-foreground">{helper}</p>
+      </div>
+      <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
+        >
+          <ExternalLink className="h-4 w-4" />
+          {locale === "ar" ? "فتح في علامة تبويب جديدة" : "Open in new tab"}
+        </a>
+        <a
+          href={href}
+          download={fileName}
+          className="inline-flex items-center gap-2 rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-medium hover:bg-brand-700 transition-colors"
+        >
+          <Download className="h-4 w-4" />
+          {locale === "ar" ? "تنزيل" : "Download"}
+        </a>
+      </div>
+    </div>
   );
 }

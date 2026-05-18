@@ -21,6 +21,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 import { formatDuration } from "@/lib/utils/formatters";
+import { getDocumentMeta } from "@/lib/utils/document-meta";
 import type { Course, Module, LessonProgress } from "@/types";
 
 interface ContentSidebarProps {
@@ -326,6 +327,12 @@ export function ContentSidebar({
                         : lesson.title || lesson.title_ar || "";
                     const badgeClass = contentTypeBadgeClass[lesson.content_type];
                     const badgeLabelKey = contentTypeLabelKey[lesson.content_type];
+                    // For documents, prefer the actual file extension
+                    // (XLSX/PDF/DOCX/...) over the generic "DOC" label.
+                    const documentBadge =
+                      lesson.content_type === "document"
+                        ? getDocumentMeta(lesson.document_url, lesson.document_type).label
+                        : null;
 
                     return (
                       <Link
@@ -384,7 +391,7 @@ export function ContentSidebar({
                                 {lesson.content_type === "video" && (
                                   <Play className="h-2.5 w-2.5" />
                                 )}
-                                {t(badgeLabelKey)}
+                                {documentBadge ?? t(badgeLabelKey)}
                               </span>
                             )}
                             {lesson.duration_minutes > 0 && (
