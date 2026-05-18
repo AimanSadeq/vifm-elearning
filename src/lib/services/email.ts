@@ -10,10 +10,16 @@
 
 import { Resend } from "resend";
 import { env } from "@/lib/env";
+import {
+  canSendChannel,
+  type NotificationChannel,
+} from "./notification-preferences";
 
 interface EmailResult {
   id: string;
   success: boolean;
+  /** Set to true when the send was skipped because the user opted out. */
+  skipped?: boolean;
 }
 
 let cachedClient: Resend | null = null;
@@ -105,7 +111,13 @@ export async function sendWebinarReminder(params: {
   webinarTitle: string;
   scheduledAt: string;
   joinUrl: string;
+  /** When set, respects the user's webinar_reminders preference. */
+  userId?: string;
 }): Promise<EmailResult> {
+  if (params.userId) {
+    const allowed = await canSendChannel(params.userId, "webinar_reminders");
+    if (!allowed) return { id: "opt-out", success: false, skipped: true };
+  }
   const html = `
     <div style="font-family: system-ui, sans-serif; line-height: 1.5; max-width: 560px;">
       <h2>${escapeHtml(params.webinarTitle)}</h2>
@@ -115,4 +127,40 @@ export async function sendWebinarReminder(params: {
     </div>
   `;
   return send(params.to, `Reminder: ${params.webinarTitle}`, html);
+}
+
+/**
+ * Send a marketing/announcement email, gated on the user's marketing_emails
+ * preference. Returns { skipped: true } if the user has opted out — callers
+ * should treat this as success (not an error).
+ *
+ * For transactional sends (enrollment confirmation, password reset, voucher
+ * delivery) use sendEmail / sendEnrollmentConfirmation directly — those
+ * bypass preferences by design.
+ */
+export async function sendMarketingEmail(params: {
+  to: string;
+  userId: string;
+  subject: string;
+  html: string;
+}): Promise<EmailResult> {
+  const allowed = await canSendChannel(params.userId, "marketing_emails");
+  if (!allowed) return { id: "opt-out", success: false, skipped: true };
+  return send(params.to, params.subject, params.html);
+}
+
+/**
+ * Generic gated sender. Use when you have the userId and want to respect a
+ * specific channel preference (course_updates, etc.).
+ */
+export async function sendEmailIfAllowed(params: {
+  to: string;
+  userId: string;
+  channel: NotificationChannel;
+  subject: string;
+  body: string;
+}): Promise<EmailResult> {
+  const allowed = await canSendChannel(params.userId, params.channel);
+  if (!allowed) return { id: "opt-out", success: false, skipped: true };
+  return sendEmail({ to: params.to, subject: params.subject, body: params.body });
 }

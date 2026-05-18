@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -334,49 +334,144 @@ export default function ProfilePage() {
 
       <Separator />
 
-      {/* Notification Preferences — backend not wired yet */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between gap-2 text-lg">
-            <span className="flex items-center gap-2">
-              <BellRing className="h-5 w-5" />
-              Notification Preferences
-            </span>
-            <span className="rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 px-2 py-0.5 text-[10px] font-semibold">
-              Coming soon
-            </span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="mb-4 text-sm text-muted-foreground">
-            By default you receive transactional notifications (course
-            enrollment, certificates, password reset). Per-channel preferences
-            are coming soon — for now, contact support to opt out of any
-            specific notifications.
-          </p>
-          <div className="space-y-4 opacity-60">
-            {[
-              { id: "emailNotifications", label: "Email Notifications", desc: "Receive important updates via email" },
-              { id: "webinarReminders", label: "Webinar Reminders", desc: "Get reminded before webinars start" },
-              { id: "courseUpdates", label: "Course Updates", desc: "Notifications about course progress and new content" },
-              { id: "marketingEmails", label: "Marketing Emails", desc: "Promotions and new course announcements" },
-            ].map((pref) => (
-              <div key={pref.id} className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">{pref.label}</p>
-                  <p className="text-xs text-muted-foreground">{pref.desc}</p>
-                </div>
-                <input
-                  type="checkbox"
-                  defaultChecked={true}
-                  disabled
-                  className="h-4 w-4 rounded border-input cursor-not-allowed"
-                />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Notification Preferences */}
+      <NotificationPreferencesSection />
     </div>
+  );
+}
+
+interface PrefsState {
+  email_notifications: boolean;
+  webinar_reminders: boolean;
+  course_updates: boolean;
+  marketing_emails: boolean;
+}
+
+const PREF_FIELDS: { id: keyof PrefsState; label: string; desc: string }[] = [
+  { id: "email_notifications", label: "Email Notifications", desc: "Receive important updates via email" },
+  { id: "webinar_reminders", label: "Webinar Reminders", desc: "Get reminded before webinars start" },
+  { id: "course_updates", label: "Course Updates", desc: "Notifications about course progress and new content" },
+  { id: "marketing_emails", label: "Marketing Emails", desc: "Promotions and new course announcements" },
+];
+
+function NotificationPreferencesSection() {
+  const [prefs, setPrefs] = useState<PrefsState | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/learner/notification-preferences")
+      .then((r) => r.json())
+      .then((j) => {
+        if (!cancelled && j.data) setPrefs(j.data);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const toggle = (key: keyof PrefsState) => {
+    setPrefs((prev) => (prev ? { ...prev, [key]: !prev[key] } : prev));
+    setSuccess(false);
+    setError(null);
+  };
+
+  const save = async () => {
+    if (!prefs) return;
+    setIsSaving(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/learner/notification-preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(prefs),
+      });
+      const j = await res.json();
+      if (!res.ok) {
+        setError(j.error ?? "Could not save");
+        return;
+      }
+      setPrefs(j.data);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <BellRing className="h-5 w-5" />
+          Notification Preferences
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="mb-4 text-sm text-muted-foreground">
+          Transactional notifications (course enrollment, certificates,
+          password reset) are always sent. The toggles below control everything
+          else.
+        </p>
+
+        {error && (
+          <div className="mb-4 rounded-md bg-error/10 px-4 py-3 text-sm text-error">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="mb-4 rounded-md bg-success/10 px-4 py-3 text-sm text-success">
+            Preferences saved.
+          </div>
+        )}
+
+        {isLoading || !prefs ? (
+          <div className="flex items-center justify-center py-6">
+            <LoadingSpinner size="sm" />
+          </div>
+        ) : (
+          <>
+            <div className="space-y-4">
+              {PREF_FIELDS.map((field) => (
+                <label
+                  key={field.id}
+                  className="flex cursor-pointer items-center justify-between"
+                >
+                  <div>
+                    <p className="text-sm font-medium">{field.label}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {field.desc}
+                    </p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={prefs[field.id]}
+                    onChange={() => toggle(field.id)}
+                    className="h-4 w-4 rounded border-input"
+                  />
+                </label>
+              ))}
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <Button onClick={save} disabled={isSaving}>
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Save Preferences"
+                )}
+              </Button>
+            </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }
