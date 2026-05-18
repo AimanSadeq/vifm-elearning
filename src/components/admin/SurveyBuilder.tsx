@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Pencil, X, Star, ListChecks, AlignLeft, Smile } from "lucide-react";
+import { Plus, Trash2, Pencil, X, Star, ListChecks, AlignLeft, Smile, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Badge as UiBadge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { CourseSurveyModal } from "@/components/learner/CourseSurveyModal";
 import type {
   CourseSurvey,
   SurveyOptions,
@@ -45,6 +46,7 @@ export function SurveyBuilder({ courseId }: Props) {
   const [editingQuestion, setEditingQuestion] = useState<SurveyQuestion | null>(
     null
   );
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const load = async () => {
     setIsLoading(true);
@@ -159,16 +161,32 @@ export function SurveyBuilder({ courseId }: Props) {
           <h3 className="text-lg font-semibold">
             Questions ({questions.length})
           </h3>
-          <Button
-            size="sm"
-            onClick={() => {
-              setEditingQuestion(null);
-              setShowQuestionForm(true);
-            }}
-          >
-            <Plus className="h-4 w-4 me-1" />
-            Add Question
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={questions.length === 0}
+              onClick={() => setPreviewOpen(true)}
+              title={
+                questions.length === 0
+                  ? "Add at least one question to preview"
+                  : "Preview survey as a learner sees it"
+              }
+            >
+              <Eye className="h-4 w-4 me-1" />
+              Preview
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                setEditingQuestion(null);
+                setShowQuestionForm(true);
+              }}
+            >
+              <Plus className="h-4 w-4 me-1" />
+              Add Question
+            </Button>
+          </div>
         </div>
 
         {showQuestionForm && (
@@ -271,6 +289,15 @@ export function SurveyBuilder({ courseId }: Props) {
           </div>
         )}
       </div>
+
+      {previewOpen && (
+        <CourseSurveyModal
+          courseId={courseId}
+          required={false}
+          onSubmitted={() => setPreviewOpen(false)}
+          onClose={() => setPreviewOpen(false)}
+        />
+      )}
     </div>
   );
 }
