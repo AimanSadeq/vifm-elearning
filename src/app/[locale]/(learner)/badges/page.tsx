@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trophy, ExternalLink, Wallet } from "lucide-react";
+import { Trophy, ExternalLink } from "lucide-react";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -63,8 +63,8 @@ export default function MyBadgesPage() {
       <div>
         <h1 className="font-heading text-2xl font-bold">My Badges</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Verifiable digital credentials you&apos;ve earned. Share them on
-          LinkedIn, add to your Wallet, or link from your CV.
+          Verifiable digital credentials you&apos;ve earned. Share the
+          verification link on LinkedIn or from your CV.
         </p>
       </div>
 
@@ -106,9 +106,6 @@ export default function MyBadgesPage() {
             const verifyUrl =
               verifyBase &&
               `${verifyBase.replace(/\/+$/, "")}/verify/${encodeURIComponent(b.verification_id)}`;
-            const walletUrl =
-              verifyBase &&
-              `${verifyBase.replace(/\/+$/, "")}/api/verify/${encodeURIComponent(b.verification_id)}/wallet`;
             return (
               <Card key={b.verification_id}>
                 <CardContent className="space-y-4 p-5">
@@ -142,30 +139,17 @@ export default function MyBadgesPage() {
                     </div>
                   </div>
 
-                  {(verifyUrl || walletUrl) && (
+                  {verifyUrl && (
                     <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3">
-                      {verifyUrl && (
-                        <a
-                          href={verifyUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-                        >
-                          <ExternalLink className="h-3.5 w-3.5" />
-                          Verify
-                        </a>
-                      )}
-                      {walletUrl && (
-                        <a
-                          href={walletUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-                        >
-                          <Wallet className="h-3.5 w-3.5" />
-                          Add to Wallet
-                        </a>
-                      )}
+                      <a
+                        href={verifyUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        Verify
+                      </a>
                     </div>
                   )}
                 </CardContent>
