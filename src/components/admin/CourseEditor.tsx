@@ -130,7 +130,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
   })
 
   const [badgeTemplates, setBadgeTemplates] = useState<
-    { id: string; title: string; tier?: string }[]
+    { id: string; name?: string; title?: string; tier?: string }[]
   >([])
 
   useEffect(() => {
@@ -1018,8 +1018,8 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                     <option value="">— No badge —</option>
                     {badgeTemplates.map((tpl) => (
                       <option key={tpl.id} value={tpl.id}>
-                        {tpl.title}
-                        {tpl.tier ? ` (${tpl.tier})` : ''}
+                        {tpl.name || tpl.title || `(${tpl.tier ?? 'untitled'})`}
+                        {tpl.tier ? ` — ${tpl.tier}` : ''}
                       </option>
                     ))}
                   </select>

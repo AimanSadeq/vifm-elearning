@@ -14,7 +14,10 @@ import { env } from "@/lib/env";
 export interface BadgeTemplate {
   id: string;
   external_id?: string;
-  title: string;
+  // External API column name is `name`. Older drafts of this code used
+  // `title`; aliased so any pre-existing consumers keep working.
+  name: string;
+  title?: string;
   tier?: string;
   category?: string;
   image_url?: string;
@@ -25,6 +28,11 @@ export interface IssuedBadge {
   id: string;
   verification_id: string;
   template_id: string;
+  // External API returns the template's display name as `template_name`,
+  // with `badge_name` set to the per-issuance override if any.
+  template_name?: string;
+  badge_name?: string;
+  /** @deprecated kept for back-compat — use template_name / badge_name. */
   template_title?: string;
   delegate_external_id?: string;
   delegate_name?: string;

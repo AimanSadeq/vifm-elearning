@@ -21,7 +21,8 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 interface BadgeTemplate {
   id: string;
   external_id?: string;
-  title: string;
+  name: string;
+  title?: string; // legacy alias
   tier?: string;
   category?: string;
   image_url?: string;
@@ -32,12 +33,23 @@ interface IssuedBadge {
   id: string;
   verification_id: string;
   template_id: string;
-  template_title?: string;
+  template_name?: string;
+  badge_name?: string;
+  template_title?: string; // legacy
   delegate_external_id?: string;
   delegate_name?: string;
   status: "pending" | "active" | "revoked" | "expired";
   issued_at?: string;
   image_url?: string;
+}
+
+// Display helpers — fall through legacy → primary so a template missing one
+// field still renders something sensible.
+function tplLabel(t: BadgeTemplate): string {
+  return t.name || t.title || `(${t.tier ?? "untitled"})`;
+}
+function badgeLabel(b: IssuedBadge): string {
+  return b.badge_name || b.template_name || b.template_title || b.template_id;
 }
 
 interface CourseAssignment {
@@ -183,7 +195,7 @@ function TemplatesTab({
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={tpl.image_url ?? tpl.preview_url}
-                      alt={tpl.title}
+                      alt={tplLabel(tpl)}
                       className="h-16 w-16 rounded object-contain"
                     />
                   ) : (
@@ -192,7 +204,7 @@ function TemplatesTab({
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">{tpl.title}</p>
+                    <p className="font-medium text-sm truncate">{tplLabel(tpl)}</p>
                     <p className="text-xs text-muted-foreground mt-0.5 font-mono truncate">
                       {tpl.id}
                     </p>
@@ -302,8 +314,8 @@ function AssignmentsTab() {
           <option value="">— None —</option>
           {templates.map((tpl) => (
             <option key={tpl.id} value={tpl.id}>
-              {tpl.title}
-              {tpl.tier ? ` (${tpl.tier})` : ""}
+              {tplLabel(tpl)}
+              {tpl.tier ? ` — ${tpl.tier}` : ""}
             </option>
           ))}
         </select>
@@ -401,7 +413,7 @@ function IssuedTab() {
       key: "template",
       header: "Template",
       render: (b) => (
-        <span className="text-sm">{b.template_title ?? b.template_id}</span>
+        <span className="text-sm">{badgeLabel(b)}</span>
       ),
     },
     {
@@ -600,7 +612,7 @@ function ManualIssueTab() {
               <option value="">— Use template assigned to the course —</option>
               {templates.map((tpl) => (
                 <option key={tpl.id} value={tpl.id}>
-                  {tpl.title}
+                  {tplLabel(tpl)}
                 </option>
               ))}
             </select>
