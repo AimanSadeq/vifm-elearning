@@ -44,6 +44,7 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
         { icon: BookOpen, label: "My Courses", href: "/my-courses" },
         { icon: Route, label: "Learning Paths", href: "/my-learning-paths" },
         { icon: Award, label: t("dashboard.certificates"), href: "/certificates" },
+        { icon: Trophy, label: "My Badges", href: "/badges" },
         { icon: CreditCard, label: "Subscription", href: "/subscription" },
         { icon: Bell, label: t("notifications.title"), href: "/notifications" },
         { icon: User, label: "Profile", href: "/profile" },
