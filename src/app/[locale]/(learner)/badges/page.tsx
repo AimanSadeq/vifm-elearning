@@ -8,10 +8,16 @@ import { Card, CardContent } from "@/components/ui/card";
 interface EarnedBadge {
   verification_id: string;
   template_id: string;
-  template_title?: string;
+  template_name?: string;
+  badge_name?: string;
+  template_title?: string; // legacy
   status: "pending" | "active" | "revoked" | "expired";
   issued_at?: string;
   image_url?: string;
+}
+
+function badgeLabel(b: EarnedBadge): string {
+  return b.badge_name || b.template_name || b.template_title || "Badge";
 }
 
 export default function MyBadgesPage() {
@@ -111,7 +117,7 @@ export default function MyBadgesPage() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={b.image_url}
-                        alt={b.template_title ?? "Badge"}
+                        alt={badgeLabel(b)}
                         className="h-20 w-20 rounded-xl object-contain"
                       />
                     ) : (
@@ -121,7 +127,7 @@ export default function MyBadgesPage() {
                     )}
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold leading-snug">
-                        {b.template_title ?? "Badge"}
+                        {badgeLabel(b)}
                       </p>
                       {b.issued_at && (
                         <p className="mt-1 text-xs text-muted-foreground">
