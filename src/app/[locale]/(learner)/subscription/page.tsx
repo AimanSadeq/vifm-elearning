@@ -58,7 +58,9 @@ export default function UserSubscriptionPage() {
 
       const supabase = createClient();
 
-      // Fetch user's active subscription
+      // Fetch user's active subscription. maybeSingle() — without it
+      // Supabase 406s when the learner has no active sub (the common
+      // case), spamming the browser console with red errors.
       const { data: subData } = await supabase
         .from("subscriptions")
         .select(
@@ -73,7 +75,7 @@ export default function UserSubscriptionPage() {
         .in("status", ["active", "past_due"])
         .order("created_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (subData) {
         const planInfo = subData.subscription_plans as unknown as {

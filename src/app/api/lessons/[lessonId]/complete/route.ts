@@ -90,7 +90,20 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         completedIds.push(lessonId);
       }
 
-      const totalItems = enrollment.total_lesson_items ?? 0;
+      // enrollment.total_lesson_items is a denormalised counter that's
+      // supposed to be kept in sync when modules/lessons change, but
+      // there's no trigger maintaining it — older enrollments end up
+      // with 0/NULL and the courseCompleted gate never flips. When we
+      // detect a missing value, count actual lessons live. Slightly
+      // more expensive but only on the unhealthy path.
+      let totalItems = enrollment.total_lesson_items ?? 0;
+      if (totalItems <= 0) {
+        const { count } = await supabaseAdmin
+          .from("lessons")
+          .select("id", { count: "exact", head: true })
+          .eq("course_id", courseId);
+        totalItems = count ?? 0;
+      }
       const completedItems = completedIds.length;
       const progressPct =
         totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
@@ -104,6 +117,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           completed_lesson_ids: completedIds,
           completed_lesson_items: completedItems,
           progress_percentage: progressPct,
+          // Backfill total_lesson_items when we had to compute it
+          // ourselves, so the cheap path works for the next call.
+          ...(enrollment.total_lesson_items !== totalItems
+            ? { total_lesson_items: totalItems }
+            : {}),
           ...(courseCompleted
             ? { status: "completed", completed_at: new Date().toISOString() }
             : {}),

@@ -14,6 +14,13 @@
 /e2e/
 playwright.config.ts
 
+# playwright MCP — browser-tool artifacts (snapshots, console logs, screenshots)
+.playwright-mcp/
+# loose screenshots written to repo root by the playwright MCP tool
+/*.png
+/*.jpeg
+/*.jpg
+
 # next.js
 /.next/
 /out/
