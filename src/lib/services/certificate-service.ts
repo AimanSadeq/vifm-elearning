@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { generateCertificateFile, type TemplateConfig } from "./certificate-generator";
 import { APP_URL } from "@/lib/env";
+import { issueCourseBadge, isBadgesEnabled } from "./badges-client";
 import type { Certificate } from "@/types";
 
 interface IssueCertificateParams {
@@ -36,12 +37,12 @@ export async function issueCertificate({
   const [{ data: profile }, { data: course }] = await Promise.all([
     supabaseAdmin
       .from("profiles")
-      .select("full_name")
+      .select("full_name, email")
       .eq("id", userId)
       .single(),
     supabaseAdmin
       .from("courses")
-      .select("title, certificate_template_id")
+      .select("title, certificate_template_id, badge_template_external_id")
       .eq("id", courseId)
       .single(),
   ]);
@@ -163,6 +164,33 @@ export async function issueCertificate({
     .eq("id", cert.id)
     .select("*")
     .single();
+
+  // Safety-net badge issuance — idempotent on (courseId, userId), so if the
+  // course-completion trigger already fired, this is a no-op at the badges
+  // service. Catches cases where a certificate is issued without going
+  // through the lesson-completion path (e.g. admin manual issue).
+  const badgeTemplateId = (
+    course as { badge_template_external_id?: string | null } | null
+  )?.badge_template_external_id;
+  if (isBadgesEnabled() && badgeTemplateId) {
+    issueCourseBadge({
+      userId,
+      userName,
+      userEmail:
+        (profile as { email?: string | null } | null)?.email ?? undefined,
+      courseId,
+      courseTitle: courseName,
+      templateExternalId: badgeTemplateId,
+    })
+      .then((r) => {
+        if (!r.ok) {
+          console.warn(
+            `[badges] issue from certificate failed for user=${userId} course=${courseId}: ${r.error}`
+          );
+        }
+      })
+      .catch((err) => console.warn("[badges] issue from certificate threw", err));
+  }
 
   return (updated ?? cert) as Certificate;
 }

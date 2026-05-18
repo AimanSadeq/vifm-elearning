@@ -123,8 +123,29 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     certificate_enabled: course.certificate_enabled,
     passing_score: course.passing_score?.toString() || '70',
     sequential_locking_enabled: course.sequential_locking_enabled ?? false,
+    badge_template_external_id:
+      (course as { badge_template_external_id?: string | null })
+        .badge_template_external_id ?? '',
     status: course.status,
   })
+
+  const [badgeTemplates, setBadgeTemplates] = useState<
+    { id: string; title: string; tier?: string }[]
+  >([])
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/admin/badges/templates')
+      .then((r) => r.json())
+      .then((j) => {
+        if (cancelled) return
+        if (j.enabled !== false) setBadgeTemplates(j.data ?? [])
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // Local mirror of the persisted status — kept in sync after every save so
   // the publish-guard doesn't read stale `course.status` from props.
@@ -310,6 +331,8 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
           certificate_enabled: courseForm.certificate_enabled,
           passing_score: parseInt(courseForm.passing_score) || 70,
           sequential_locking_enabled: courseForm.sequential_locking_enabled,
+          badge_template_external_id:
+            courseForm.badge_template_external_id || null,
           status: courseForm.status,
           ...(courseForm.status === 'published' && !course.published_at
             ? { published_at: new Date().toISOString() }
@@ -983,6 +1006,25 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                 <div>
                   <label className="block text-sm font-medium text-foreground">Passing Score (%)</label>
                   <input type="number" min="0" max="100" value={courseForm.passing_score} onChange={(e) => setCourseForm({ ...courseForm, passing_score: e.target.value })} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-foreground">Badge Template (issued on course completion)</label>
+                  <select
+                    value={courseForm.badge_template_external_id}
+                    onChange={(e) => setCourseForm({ ...courseForm, badge_template_external_id: e.target.value })}
+                    className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="">— No badge —</option>
+                    {badgeTemplates.map((tpl) => (
+                      <option key={tpl.id} value={tpl.id}>
+                        {tpl.title}
+                        {tpl.tier ? ` (${tpl.tier})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                  {badgeTemplates.length === 0 && (
+                    <p className="mt-1 text-xs text-muted-foreground">No templates loaded. Configure the badges service or check the admin Badges tab.</p>
+                  )}
                 </div>
                 <div className="sm:col-span-2 flex flex-wrap gap-6">
                   <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={courseForm.is_free} onChange={(e) => setCourseForm({ ...courseForm, is_free: e.target.checked })} className="h-4 w-4 rounded border-border text-primary" /> Free Course</label>

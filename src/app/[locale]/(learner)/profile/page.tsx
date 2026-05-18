@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, User, Lock, Eye, EyeOff, BellRing } from "lucide-react";
+import { Loader2, User, Lock, Eye, EyeOff, BellRing, Trophy, ExternalLink } from "lucide-react";
 import { z } from "zod";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { createClient } from "@/lib/supabase/client";
@@ -334,6 +334,11 @@ export default function ProfilePage() {
 
       <Separator />
 
+      {/* Earned Badges */}
+      <MyBadgesSection />
+
+      <Separator />
+
       {/* Notification Preferences — backend not wired yet */}
       <Card>
         <CardHeader>
@@ -378,5 +383,116 @@ export default function ProfilePage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+interface EarnedBadge {
+  verification_id: string;
+  template_id: string;
+  template_title?: string;
+  status: "pending" | "active" | "revoked" | "expired";
+  issued_at?: string;
+  image_url?: string;
+}
+
+function MyBadgesSection() {
+  const [badges, setBadges] = useState<EarnedBadge[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [enabled, setEnabled] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/learner/badges")
+      .then((r) => r.json())
+      .then((j) => {
+        if (cancelled) return;
+        setEnabled(j.enabled !== false);
+        setBadges(j.data ?? []);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Don't show the section at all if badges aren't configured in this env.
+  if (!enabled) return null;
+
+  const verifyBase = process.env.NEXT_PUBLIC_BADGES_PUBLIC_URL;
+  const visible = badges.filter((b) => b.status === "active");
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Trophy className="h-5 w-5" />
+          My Badges
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-6">
+            <LoadingSpinner size="sm" />
+          </div>
+        ) : visible.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            You haven&apos;t earned any badges yet. Complete a course to start
+            collecting them.
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {visible.map((b) => {
+              const verifyUrl =
+                verifyBase &&
+                `${verifyBase.replace(/\/+$/, "")}/verify/${encodeURIComponent(b.verification_id)}`;
+              return (
+                <div
+                  key={b.verification_id}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
+                  <div className="flex items-start gap-3">
+                    {b.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={b.image_url}
+                        alt={b.template_title ?? "Badge"}
+                        className="h-16 w-16 rounded object-contain"
+                      />
+                    ) : (
+                      <div className="flex h-16 w-16 items-center justify-center rounded bg-warning/10">
+                        <Trophy className="h-8 w-8 text-warning" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">
+                        {b.template_title ?? "Badge"}
+                      </p>
+                      {b.issued_at && (
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          {new Date(b.issued_at).toLocaleDateString()}
+                        </p>
+                      )}
+                      {verifyUrl && (
+                        <a
+                          href={verifyUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-2 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                        >
+                          Verify <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

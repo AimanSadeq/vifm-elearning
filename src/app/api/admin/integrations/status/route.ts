@@ -33,6 +33,9 @@ export async function GET() {
       mamopay_env: process.env.MAMOPAY_ENV ?? "sandbox",
       zoom: Boolean(process.env.ZOOM_API_KEY || process.env.ZOOM_CLIENT_ID),
       email: Boolean(process.env.RESEND_API_KEY || process.env.SENDGRID_API_KEY),
+      badges: Boolean(
+        process.env.BADGES_API_BASE_URL && process.env.BADGES_API_KEY
+      ),
     },
   });
 }

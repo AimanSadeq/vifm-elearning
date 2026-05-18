@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { recalculateAllPathsForUser } from "@/lib/services/learning-path-service";
+import { issueCourseBadge, isBadgesEnabled } from "@/lib/services/badges-client";
 
 interface RouteParams {
   params: Promise<{ lessonId: string }>;
@@ -109,6 +110,47 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
       if (courseCompleted) {
         recalculateAllPathsForUser(supabase, user.id).catch(() => {});
+
+        // Fire-and-forget badge issuance. Idempotent at the badges service
+        // on (courseId, userId), so the safety-net call inside
+        // issueCertificate is harmless if both fire. Never block the
+        // completion response on a slow/down badges service.
+        if (isBadgesEnabled()) {
+          (async () => {
+            try {
+              const [{ data: profile }, { data: courseRow }] = await Promise.all(
+                [
+                  supabaseAdmin
+                    .from("profiles")
+                    .select("full_name, email")
+                    .eq("id", user.id)
+                    .single(),
+                  supabaseAdmin
+                    .from("courses")
+                    .select("title, badge_template_external_id")
+                    .eq("id", courseId)
+                    .single(),
+                ]
+              );
+              if (!courseRow?.badge_template_external_id) return;
+              const r = await issueCourseBadge({
+                userId: user.id,
+                userName: profile?.full_name ?? "Learner",
+                userEmail: profile?.email ?? undefined,
+                courseId,
+                courseTitle: courseRow.title ?? undefined,
+                templateExternalId: courseRow.badge_template_external_id,
+              });
+              if (!r.ok) {
+                console.warn(
+                  `[badges] issue failed for user=${user.id} course=${courseId}: ${r.error}`
+                );
+              }
+            } catch (err) {
+              console.warn("[badges] issue threw", err);
+            }
+          })();
+        }
       }
     }
 

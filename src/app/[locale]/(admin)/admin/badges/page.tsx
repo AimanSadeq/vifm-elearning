@@ -1,358 +1,631 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Trophy, Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import {
+  Trophy,
+  ExternalLink,
+  Loader2,
+  ShieldOff,
+  Send,
+  AlertTriangle,
+} from "lucide-react";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
-import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 
-interface BadgeRow {
+interface BadgeTemplate {
   id: string;
-  name: string;
-  name_ar: string | null;
-  description: string | null;
-  description_ar: string | null;
-  icon_url: string | null;
-  criteria: string | null;
-  is_active: boolean;
-  created_at: string;
+  external_id?: string;
+  title: string;
+  tier?: string;
+  category?: string;
+  image_url?: string;
+  preview_url?: string;
 }
+
+interface IssuedBadge {
+  id: string;
+  verification_id: string;
+  template_id: string;
+  template_title?: string;
+  delegate_external_id?: string;
+  delegate_name?: string;
+  status: "pending" | "active" | "revoked" | "expired";
+  issued_at?: string;
+  image_url?: string;
+}
+
+interface CourseAssignment {
+  id: string;
+  title: string;
+  title_ar: string | null;
+  slug: string | null;
+  badge_template_external_id: string | null;
+}
+
+interface ProfileOption {
+  id: string;
+  full_name: string;
+  email: string;
+}
+
+interface CourseOption {
+  id: string;
+  title: string;
+}
+
+type Tab = "templates" | "assignments" | "issued" | "manual";
+
+const TABS: { key: Tab; label: string }[] = [
+  { key: "templates", label: "Templates" },
+  { key: "assignments", label: "Course Assignments" },
+  { key: "issued", label: "Issued Badges" },
+  { key: "manual", label: "Manual Issue" },
+];
 
 export default function AdminBadgesPage() {
   const t = useTranslations("admin");
+  const [tab, setTab] = useState<Tab>("templates");
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [configError, setConfigError] = useState<string | null>(null);
 
-  const [badges, setBadges] = useState<BadgeRow[]>([]);
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="font-heading text-2xl font-bold">{t("badges")}</h1>
+      </div>
+
+      {enabled === false && (
+        <Card className="border-amber-500/40 bg-amber-500/5">
+          <CardContent className="flex items-start gap-3 py-4">
+            <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-amber-900 dark:text-amber-200">
+                Badges integration is not configured.
+              </p>
+              <p className="text-amber-800/80 dark:text-amber-200/70 mt-1">
+                Set <code className="rounded bg-amber-500/20 px-1">BADGES_API_BASE_URL</code>,{" "}
+                <code className="rounded bg-amber-500/20 px-1">BADGES_API_KEY</code>, and{" "}
+                <code className="rounded bg-amber-500/20 px-1">NEXT_PUBLIC_BADGES_PUBLIC_URL</code> in
+                your environment. Then issue an API key from the VIFM Digital Badges admin UI.
+              </p>
+              {configError && (
+                <p className="mt-1 text-xs text-amber-700/80">{configError}</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <nav className="-mb-px flex space-x-4 sm:space-x-6 overflow-x-auto border-b border-border">
+        {TABS.map((tabDef) => (
+          <button
+            key={tabDef.key}
+            onClick={() => setTab(tabDef.key)}
+            className={`whitespace-nowrap border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${
+              tab === tabDef.key
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {tabDef.label}
+          </button>
+        ))}
+      </nav>
+
+      {tab === "templates" && (
+        <TemplatesTab
+          onEnabledChange={setEnabled}
+          onConfigErrorChange={setConfigError}
+        />
+      )}
+      {tab === "assignments" && <AssignmentsTab />}
+      {tab === "issued" && <IssuedTab />}
+      {tab === "manual" && <ManualIssueTab />}
+    </div>
+  );
+}
+
+function TemplatesTab({
+  onEnabledChange,
+  onConfigErrorChange,
+}: {
+  onEnabledChange: (v: boolean) => void;
+  onConfigErrorChange: (v: string | null) => void;
+}) {
+  const [templates, setTemplates] = useState<BadgeTemplate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    name_ar: "",
-    description: "",
-    description_ar: "",
-    icon_url: "",
-    criteria: "",
-  });
-
-  const fetchBadges = async () => {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from("badges")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      reportSupabaseError(error, "Could not load badges");
-      setBadges([]);
-    } else {
-      setBadges((data as BadgeRow[]) ?? []);
-    }
-    setIsLoading(false);
-  };
 
   useEffect(() => {
-    fetchBadges();
+    fetch("/api/admin/badges/templates")
+      .then(async (r) => {
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.error ?? "Failed to load templates");
+        onEnabledChange(Boolean(j.enabled));
+        onConfigErrorChange(j.error ?? null);
+        setTemplates(j.data ?? []);
+      })
+      .catch((err) => {
+        toast.error(err instanceof Error ? err.message : "Failed to load");
+      })
+      .finally(() => setIsLoading(false));
+  }, [onEnabledChange, onConfigErrorChange]);
+
+  if (isLoading) return <CenterSpinner />;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Trophy className="h-5 w-5" />
+          Badge Templates ({templates.length})
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {templates.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No templates available. Create them in the VIFM Digital Badges admin UI, then refresh.
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {templates.map((tpl) => (
+              <div
+                key={tpl.id}
+                className="rounded-lg border border-border bg-card p-4"
+              >
+                <div className="flex items-start gap-3">
+                  {tpl.image_url || tpl.preview_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={tpl.image_url ?? tpl.preview_url}
+                      alt={tpl.title}
+                      className="h-16 w-16 rounded object-contain"
+                    />
+                  ) : (
+                    <div className="flex h-16 w-16 items-center justify-center rounded bg-warning/10">
+                      <Trophy className="h-8 w-8 text-warning" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm truncate">{tpl.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 font-mono truncate">
+                      {tpl.id}
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {tpl.tier && (
+                        <Badge variant="secondary" className="text-[10px]">
+                          {tpl.tier}
+                        </Badge>
+                      )}
+                      {tpl.category && (
+                        <Badge variant="outline" className="text-[10px]">
+                          {tpl.category}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function AssignmentsTab() {
+  const [courses, setCourses] = useState<CourseAssignment[]>([]);
+  const [templates, setTemplates] = useState<BadgeTemplate[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [savingId, setSavingId] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    try {
+      const [coursesRes, templatesRes] = await Promise.all([
+        fetch("/api/admin/badges/assignments").then((r) => r.json()),
+        fetch("/api/admin/badges/templates").then((r) => r.json()),
+      ]);
+      setCourses(coursesRes.data ?? []);
+      setTemplates(templatesRes.data ?? []);
+    } catch {
+      toast.error("Failed to load");
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const handleSave = async () => {
-    setIsSaving(true);
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const updateAssignment = async (
+    courseId: string,
+    templateExternalId: string | null
+  ) => {
+    setSavingId(courseId);
+    const { createClient } = await import("@/lib/supabase/client");
     const supabase = createClient();
-
-    const payload = {
-      name: formData.name,
-      name_ar: formData.name_ar || null,
-      description: formData.description || null,
-      description_ar: formData.description_ar || null,
-      icon_url: formData.icon_url || null,
-      criteria: formData.criteria || null,
-    };
-
-    const { error } = editingId
-      ? await supabase.from("badges").update(payload).eq("id", editingId)
-      : await supabase.from("badges").insert(payload);
-
-    setIsSaving(false);
-
+    const { error } = await supabase
+      .from("courses")
+      .update({ badge_template_external_id: templateExternalId })
+      .eq("id", courseId);
+    setSavingId(null);
     if (error) {
-      toast.error(`Could not save badge: ${error.message}`);
+      toast.error(`Could not save: ${error.message}`);
       return;
     }
-
-    toast.success(editingId ? "Badge updated" : "Badge created");
-    setShowForm(false);
-    setEditingId(null);
-    setFormData({
-      name: "",
-      name_ar: "",
-      description: "",
-      description_ar: "",
-      icon_url: "",
-      criteria: "",
-    });
-    fetchBadges();
+    toast.success("Assignment updated");
+    setCourses((prev) =>
+      prev.map((c) =>
+        c.id === courseId
+          ? { ...c, badge_template_external_id: templateExternalId }
+          : c
+      )
+    );
   };
 
-  const handleEdit = (badge: BadgeRow) => {
-    setEditingId(badge.id);
-    setFormData({
-      name: badge.name,
-      name_ar: badge.name_ar ?? "",
-      description: badge.description ?? "",
-      description_ar: badge.description_ar ?? "",
-      icon_url: badge.icon_url ?? "",
-      criteria: badge.criteria ?? "",
-    });
-    setShowForm(true);
-  };
+  if (isLoading) return <CenterSpinner />;
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this badge?")) return;
-    const supabase = createClient();
-    const { error } = await supabase.from("badges").delete().eq("id", id);
-    if (error) {
-      toast.error(`Could not delete: ${error.message}`);
-      return;
-    }
-    toast.success("Badge deleted");
-    fetchBadges();
-  };
-
-  const columns: Column<BadgeRow>[] = [
+  const columns: Column<CourseAssignment>[] = [
     {
-      key: "icon",
-      header: "",
-      render: (item) =>
-        item.icon_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={item.icon_url}
-            alt={item.name}
-            className="h-8 w-8 rounded"
-          />
-        ) : (
-          <div className="flex h-8 w-8 items-center justify-center rounded bg-warning/10">
-            <Trophy className="h-4 w-4 text-warning" />
-          </div>
-        ),
-      className: "w-12",
-    },
-    {
-      key: "name",
-      header: "Badge",
-      render: (item) => (
+      key: "title",
+      header: "Course",
+      render: (c) => (
         <div>
-          <span className="font-medium">{item.name}</span>
-          {item.name_ar && (
+          <p className="font-medium text-sm">{c.title}</p>
+          {c.title_ar && (
             <p className="text-xs text-muted-foreground" dir="rtl">
-              {item.name_ar}
+              {c.title_ar}
             </p>
           )}
         </div>
       ),
     },
     {
-      key: "description",
-      header: "Description",
-      render: (item) => (
-        <span className="text-xs text-muted-foreground line-clamp-2">
-          {item.description || "—"}
-        </span>
+      key: "template",
+      header: "Badge Template",
+      render: (c) => (
+        <select
+          value={c.badge_template_external_id ?? ""}
+          onChange={(e) =>
+            updateAssignment(c.id, e.target.value === "" ? null : e.target.value)
+          }
+          disabled={savingId === c.id}
+          className="block w-full rounded-md border border-border bg-card px-3 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+        >
+          <option value="">— None —</option>
+          {templates.map((tpl) => (
+            <option key={tpl.id} value={tpl.id}>
+              {tpl.title}
+              {tpl.tier ? ` (${tpl.tier})` : ""}
+            </option>
+          ))}
+        </select>
+      ),
+    },
+  ];
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">
+          Course → Badge Template Assignments
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {templates.length === 0 && (
+          <p className="mb-3 text-xs text-amber-600">
+            No templates loaded — assignments will be empty until templates are
+            configured in the badges service.
+          </p>
+        )}
+        <DataTable
+          columns={columns}
+          data={courses}
+          rowKey={(c) => c.id}
+          emptyMessage="No courses yet"
+        />
+      </CardContent>
+    </Card>
+  );
+}
+
+function IssuedTab() {
+  const [badges, setBadges] = useState<IssuedBadge[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [revokingId, setRevokingId] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/badges/issued?pageSize=100");
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error ?? "Failed");
+      setBadges(j.data ?? []);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const handleRevoke = async (b: IssuedBadge) => {
+    if (!confirm(`Revoke badge for ${b.delegate_name ?? b.delegate_external_id ?? "this user"}?`)) {
+      return;
+    }
+    setRevokingId(b.verification_id);
+    const res = await fetch("/api/admin/badges/revoke", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ verificationId: b.verification_id }),
+    });
+    const j = await res.json();
+    setRevokingId(null);
+    if (!res.ok) {
+      toast.error(j.error ?? "Failed to revoke");
+      return;
+    }
+    toast.success("Badge revoked");
+    load();
+  };
+
+  if (isLoading) return <CenterSpinner />;
+
+  const verifyBase = process.env.NEXT_PUBLIC_BADGES_PUBLIC_URL;
+
+  const columns: Column<IssuedBadge>[] = [
+    {
+      key: "delegate",
+      header: "Recipient",
+      render: (b) => (
+        <div>
+          <p className="text-sm font-medium">
+            {b.delegate_name ?? "—"}
+          </p>
+          <p className="text-xs text-muted-foreground font-mono truncate">
+            {b.delegate_external_id ?? ""}
+          </p>
+        </div>
       ),
     },
     {
-      key: "criteria",
-      header: "Criteria",
-      render: (item) => (
+      key: "template",
+      header: "Template",
+      render: (b) => (
+        <span className="text-sm">{b.template_title ?? b.template_id}</span>
+      ),
+    },
+    {
+      key: "issued",
+      header: "Issued",
+      render: (b) => (
         <span className="text-xs text-muted-foreground">
-          {item.criteria || "—"}
+          {b.issued_at ? new Date(b.issued_at).toLocaleDateString() : "—"}
         </span>
       ),
     },
     {
       key: "status",
       header: "Status",
-      render: (item) => (
-        <Badge variant={item.is_active ? "success" : "secondary"}>
-          {item.is_active ? "Active" : "Inactive"}
+      render: (b) => (
+        <Badge
+          variant={
+            b.status === "active"
+              ? "success"
+              : b.status === "revoked"
+                ? "destructive"
+                : "secondary"
+          }
+        >
+          {b.status}
         </Badge>
       ),
     },
     {
       key: "actions",
       header: "",
-      render: (item) => (
+      render: (b) => (
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={() => handleEdit(item)}>
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleDelete(item.id)}
-          >
-            <Trash2 className="h-4 w-4 text-error" />
-          </Button>
+          {verifyBase && (
+            <a
+              href={`${verifyBase.replace(/\/+$/, "")}/verify/${encodeURIComponent(b.verification_id)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-muted"
+              title="Verify"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          )}
+          {b.status === "active" && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleRevoke(b)}
+              disabled={revokingId === b.verification_id}
+            >
+              {revokingId === b.verification_id ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ShieldOff className="h-4 w-4 text-error" />
+              )}
+            </Button>
+          )}
         </div>
       ),
     },
   ];
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">
+          Issued Badges ({badges.length})
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <DataTable
+          columns={columns}
+          data={badges}
+          rowKey={(b) => b.verification_id}
+          emptyMessage="No badges issued yet"
+        />
+      </CardContent>
+    </Card>
+  );
+}
+
+function ManualIssueTab() {
+  const [users, setUsers] = useState<ProfileOption[]>([]);
+  const [courses, setCourses] = useState<CourseOption[]>([]);
+  const [templates, setTemplates] = useState<BadgeTemplate[]>([]);
+  const [userId, setUserId] = useState("");
+  const [courseId, setCourseId] = useState("");
+  const [templateId, setTemplateId] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const [usersRes, coursesRes, templatesRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, full_name, email")
+          .order("full_name", { ascending: true })
+          .limit(500),
+        supabase
+          .from("courses")
+          .select("id, title")
+          .order("title", { ascending: true }),
+        fetch("/api/admin/badges/templates").then((r) => r.json()),
+      ]);
+      setUsers((usersRes.data as ProfileOption[]) ?? []);
+      setCourses((coursesRes.data as CourseOption[]) ?? []);
+      setTemplates(templatesRes.data ?? []);
+      setIsLoading(false);
+    })();
+  }, []);
+
+  const handleIssue = async () => {
+    if (!userId || !courseId) {
+      toast.error("Pick a user and a course");
+      return;
+    }
+    setIsSubmitting(true);
+    const res = await fetch("/api/admin/badges/issue", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId,
+        courseId,
+        templateExternalId: templateId || undefined,
+      }),
+    });
+    const j = await res.json();
+    setIsSubmitting(false);
+    if (!res.ok) {
+      toast.error(j.error ?? "Failed to issue");
+      return;
+    }
+    toast.success("Badge issued");
+    setUserId("");
+    setCourseId("");
+    setTemplateId("");
+  };
+
+  if (isLoading) return <CenterSpinner />;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="font-heading text-2xl font-bold">{t("badges")}</h1>
-        <Button
-          size="sm"
-          onClick={() => {
-            setEditingId(null);
-            setFormData({
-              name: "",
-              name_ar: "",
-              description: "",
-              description_ar: "",
-              icon_url: "",
-              criteria: "",
-            });
-            setShowForm(true);
-          }}
-        >
-          <Plus className="h-4 w-4 me-1" />
-          Add Badge
-        </Button>
-      </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">Issue a Badge Manually</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-xs text-muted-foreground">
+          Idempotent — re-submitting the same user+course returns the existing
+          badge rather than issuing a duplicate.
+        </p>
 
-      {/* Create/Edit Form */}
-      {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">
-              {editingId ? "Edit Badge" : "New Badge"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Name (EN) *</Label>
-                <Input
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Name (AR)</Label>
-                <Input
-                  value={formData.name_ar}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name_ar: e.target.value })
-                  }
-                  dir="rtl"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Description (EN)</Label>
-                <Textarea
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  rows={2}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Description (AR)</Label>
-                <Textarea
-                  value={formData.description_ar}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      description_ar: e.target.value,
-                    })
-                  }
-                  rows={2}
-                  dir="rtl"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Icon URL</Label>
-                <Input
-                  value={formData.icon_url}
-                  onChange={(e) =>
-                    setFormData({ ...formData, icon_url: e.target.value })
-                  }
-                  placeholder="https://..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Criteria</Label>
-                <Input
-                  value={formData.criteria}
-                  onChange={(e) =>
-                    setFormData({ ...formData, criteria: e.target.value })
-                  }
-                  placeholder="e.g. Complete 5 courses"
-                />
-              </div>
-            </div>
-            <div className="mt-4 flex gap-2 justify-end">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowForm(false);
-                  setEditingId(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSave}
-                disabled={isSaving || !formData.name}
-              >
-                {isSaving && (
-                  <Loader2 className="h-4 w-4 animate-spin me-2" />
-                )}
-                {editingId ? "Update" : "Create"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label>User</Label>
+            <select
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+              className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
+            >
+              <option value="">— Select user —</option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.full_name} ({u.email})
+                </option>
+              ))}
+            </select>
+          </div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Trophy className="h-5 w-5" />
-            Badges ({badges.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <DataTable
-            columns={columns}
-            data={badges}
-            rowKey={(item) => item.id}
-            emptyMessage="No badges yet"
-          />
-        </CardContent>
-      </Card>
+          <div className="space-y-2">
+            <Label>Course</Label>
+            <select
+              value={courseId}
+              onChange={(e) => setCourseId(e.target.value)}
+              className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
+            >
+              <option value="">— Select course —</option>
+              {courses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-2 sm:col-span-2">
+            <Label>Template override (optional)</Label>
+            <select
+              value={templateId}
+              onChange={(e) => setTemplateId(e.target.value)}
+              className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
+            >
+              <option value="">— Use template assigned to the course —</option>
+              {templates.map((tpl) => (
+                <option key={tpl.id} value={tpl.id}>
+                  {tpl.title}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="flex justify-end">
+          <Button onClick={handleIssue} disabled={isSubmitting}>
+            {isSubmitting ? (
+              <Loader2 className="h-4 w-4 animate-spin me-2" />
+            ) : (
+              <Send className="h-4 w-4 me-2" />
+            )}
+            Issue Badge
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CenterSpinner() {
+  return (
+    <div className="flex min-h-[30vh] items-center justify-center">
+      <LoadingSpinner size="lg" />
     </div>
   );
 }

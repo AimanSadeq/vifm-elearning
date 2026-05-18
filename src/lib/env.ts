@@ -63,6 +63,11 @@ const serverEnvSchema = z.object({
   // --- Rate-limit Redis (optional — falls back to in-memory) ---
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+
+  // --- VIFM Digital Badges (optional — feature-gated at call sites) ---
+  BADGES_API_BASE_URL: z.string().url().optional(),
+  BADGES_API_KEY: z.string().optional(),
+  NEXT_PUBLIC_BADGES_PUBLIC_URL: z.string().url().optional(),
 });
 
 type ServerEnv = z.infer<typeof serverEnvSchema>;
