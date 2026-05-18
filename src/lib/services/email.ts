@@ -14,12 +14,33 @@ import {
   canSendChannel,
   type NotificationChannel,
 } from "./notification-preferences";
+import { getSetting } from "./site-settings";
 
 interface EmailResult {
   id: string;
   success: boolean;
   /** Set to true when the send was skipped because the user opted out. */
   skipped?: boolean;
+}
+
+interface EmailTemplateRow {
+  key: string;
+  name?: string;
+  subject: string;
+  html: string;
+}
+
+async function getEmailTemplate(key: string): Promise<EmailTemplateRow | null> {
+  const templates = await getSetting<EmailTemplateRow[]>("email_templates", []);
+  return templates.find((t) => t.key === key) ?? null;
+}
+
+/** Replaces `{{name}}` placeholders with values from `vars`. */
+function applyTemplate(
+  template: string,
+  vars: Record<string, string | undefined>,
+): string {
+  return template.replace(/\{\{(\w+)\}\}/g, (_m, k) => vars[k] ?? "");
 }
 
 let cachedClient: Resend | null = null;
@@ -47,15 +68,24 @@ function getClient(): Resend | null {
   return cachedClient;
 }
 
-function fromAddress(): string {
+/**
+ * Sender address resolution, in priority order:
+ *   1. site_settings.email_from (admin-editable)
+ *   2. EMAIL_FROM env var
+ *   3. compiled default
+ */
+async function fromAddress(): Promise<string> {
+  const fromSetting = await getSetting<string>("email_from", "");
+  if (fromSetting) return fromSetting;
   return env.EMAIL_FROM || "VIFM Academy <noreply@learn.viftraining.com>";
 }
 
 async function send(to: string, subject: string, html: string): Promise<EmailResult> {
   const client = getClient();
   if (!client) return { id: "dev-skip", success: false };
+  const from = await fromAddress();
   const { data, error } = await client.emails.send({
-    from: fromAddress(),
+    from,
     to,
     subject,
     html,
@@ -94,15 +124,25 @@ export async function sendEnrollmentConfirmation(params: {
   userName: string;
   courseName: string;
 }): Promise<EmailResult> {
-  const html = `
-    <div style="font-family: system-ui, sans-serif; line-height: 1.5; max-width: 560px;">
-      <h2>Welcome to ${escapeHtml(params.courseName)}</h2>
-      <p>Hi ${escapeHtml(params.userName)},</p>
-      <p>You're enrolled. Sign in any time at <a href="${env.NEXT_PUBLIC_APP_URL ?? ""}">VIFM Academy</a> to start learning.</p>
-      <p>— VIFM Academy</p>
-    </div>
-  `;
-  return send(params.to, `Enrollment confirmed — ${params.courseName}`, html);
+  const vars = {
+    userName: escapeHtml(params.userName),
+    courseName: escapeHtml(params.courseName),
+    appUrl: env.NEXT_PUBLIC_APP_URL ?? "",
+  };
+
+  const tpl = await getEmailTemplate("enrollment_confirmation");
+  const subject = tpl?.subject
+    ? applyTemplate(tpl.subject, vars)
+    : `Enrollment confirmed — ${params.courseName}`;
+  const body = tpl?.html
+    ? applyTemplate(tpl.html, vars)
+    : `<h2>Welcome to ${vars.courseName}</h2>
+       <p>Hi ${vars.userName},</p>
+       <p>You're enrolled. Sign in any time at <a href="${vars.appUrl}">VIFM Academy</a> to start learning.</p>
+       <p>— VIFM Academy</p>`;
+
+  const html = `<div style="font-family: system-ui, sans-serif; line-height: 1.5; max-width: 560px;">${body}</div>`;
+  return send(params.to, subject, html);
 }
 
 export async function sendWebinarReminder(params: {
@@ -118,15 +158,24 @@ export async function sendWebinarReminder(params: {
     const allowed = await canSendChannel(params.userId, "webinar_reminders");
     if (!allowed) return { id: "opt-out", success: false, skipped: true };
   }
-  const html = `
-    <div style="font-family: system-ui, sans-serif; line-height: 1.5; max-width: 560px;">
-      <h2>${escapeHtml(params.webinarTitle)}</h2>
-      <p>Hi ${escapeHtml(params.userName)},</p>
-      <p>Reminder: your webinar starts at ${escapeHtml(params.scheduledAt)}.</p>
-      <p><a href="${encodeURI(params.joinUrl)}" style="display:inline-block;padding:10px 18px;background:#134BA1;color:#fff;text-decoration:none;border-radius:6px;">Join the webinar</a></p>
-    </div>
-  `;
-  return send(params.to, `Reminder: ${params.webinarTitle}`, html);
+  const vars = {
+    userName: escapeHtml(params.userName),
+    webinarTitle: escapeHtml(params.webinarTitle),
+    scheduledAt: escapeHtml(params.scheduledAt),
+    joinUrl: encodeURI(params.joinUrl),
+  };
+  const tpl = await getEmailTemplate("webinar_reminder");
+  const subject = tpl?.subject
+    ? applyTemplate(tpl.subject, vars)
+    : `Reminder: ${params.webinarTitle}`;
+  const body = tpl?.html
+    ? applyTemplate(tpl.html, vars)
+    : `<h2>${vars.webinarTitle}</h2>
+       <p>Hi ${vars.userName},</p>
+       <p>Reminder: your webinar starts at ${vars.scheduledAt}.</p>
+       <p><a href="${vars.joinUrl}" style="display:inline-block;padding:10px 18px;background:#134BA1;color:#fff;text-decoration:none;border-radius:6px;">Join the webinar</a></p>`;
+  const html = `<div style="font-family: system-ui, sans-serif; line-height: 1.5; max-width: 560px;">${body}</div>`;
+  return send(params.to, subject, html);
 }
 
 /**

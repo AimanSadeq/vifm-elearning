@@ -237,6 +237,23 @@ export function AddContentDialog({
       if (contentType === 'quiz' && insertedLesson?.id) {
         const quizTitle =
           formData.title.trim() || formData.title_ar.trim() || 'New Quiz'
+
+        // Pull admin-editable defaults so the auto-created quiz inherits
+        // the platform's configured passing score / max attempts. Falls
+        // back to 70/3 if the settings endpoint is unreachable.
+        let passingScore = 70
+        let maxAttempts = 3
+        try {
+          const dRes = await fetch('/api/site-settings/public')
+          if (dRes.ok) {
+            const j = await dRes.json()
+            passingScore = Number(j.data?.default_quiz_passing_score) || 70
+            maxAttempts = Number(j.data?.default_quiz_max_attempts) || 3
+          }
+        } catch {
+          /* keep defaults */
+        }
+
         const quizRes = await fetch('/api/quizzes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -246,8 +263,8 @@ export function AddContentDialog({
             title: quizTitle,
             titleAr: formData.title_ar.trim() || undefined,
             description: formData.description.trim() || undefined,
-            passingScore: 70,
-            maxAttempts: 3,
+            passingScore,
+            maxAttempts,
             shuffleQuestions: false,
             showCorrectAnswers: true,
             isFinalExam: false,

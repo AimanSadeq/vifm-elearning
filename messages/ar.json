@@ -579,7 +579,9 @@
     "followUs": "تابعنا",
     "copyright": "© {year} VIFM. جميع الحقوق محفوظة.",
     "getTheApp": "حمّل التطبيق",
-    "comingSoon": "قريباً"
+    "comingSoon": "قريباً",
+    "downloadOn": "حمّل من",
+    "getItOn": "احصل عليه من"
   },
   "player": {
     "bookmarks": "العلامات المرجعية",

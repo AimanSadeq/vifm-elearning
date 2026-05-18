@@ -127,28 +127,51 @@ export default function AdminSettingsPage() {
       <h1 className="font-heading text-2xl font-bold">{t("settings")}</h1>
 
       {/* Site Content — editable by admins */}
-      <Link
-        href={`/${locale}/admin/settings/site-content`}
-        className="group block rounded-xl border bg-card p-5 hover:border-brand-300 hover:shadow-card transition-all"
-      >
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-start gap-4 min-w-0">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
-              <Pencil className="h-5 w-5" />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Link
+          href={`/${locale}/admin/settings/site-content`}
+          className="group block rounded-xl border bg-card p-5 hover:border-brand-300 hover:shadow-card transition-all"
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-start gap-4 min-w-0">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                <Pencil className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="font-semibold group-hover:text-brand-700 transition-colors">
+                  Site content
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Office locations + support email.
+                </p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <h2 className="font-semibold group-hover:text-brand-700 transition-colors">
-                Site content
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Edit offices and the support email shown on /about, /contact,
-                and designation FAQ pages. Changes go live immediately.
-              </p>
-            </div>
+            <ArrowRight className="h-5 w-5 text-muted-foreground shrink-0 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1 transition-transform" />
           </div>
-          <ArrowRight className="h-5 w-5 text-muted-foreground shrink-0 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1 transition-transform" />
-        </div>
-      </Link>
+        </Link>
+
+        <Link
+          href={`/${locale}/admin/settings/platform`}
+          className="group block rounded-xl border bg-card p-5 hover:border-brand-300 hover:shadow-card transition-all"
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-start gap-4 min-w-0">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                <Settings className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="font-semibold group-hover:text-brand-700 transition-colors">
+                  Platform settings
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Email sender + templates, quiz defaults, homepage stats, app badges, tiers.
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="h-5 w-5 text-muted-foreground shrink-0 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1 transition-transform" />
+          </div>
+        </Link>
+      </div>
 
       {/* Platform Info */}
       <Card>

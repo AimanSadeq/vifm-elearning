@@ -1,8 +1,16 @@
 /**
  * Shared, semi-static site content that's referenced in multiple places
- * (header nav, marketing pages, footer, etc.). Kept here to avoid
- * duplication and drift. When any of this eventually moves to a
- * `site_settings` DB table, swap the import targets only.
+ * (header nav, marketing pages, footer, etc.).
+ *
+ * IMPORTANT: this file must remain client-safe — it's imported by
+ * "use client" components like Header. Server-only helpers that need
+ * supabaseAdmin live in `./site-content.server.ts`. Don't import
+ * server-only deps here.
+ *
+ * Tiers and offices are admin-editable via site_settings — see
+ * loadDesignationTiers() for server components, and useSiteSettings()
+ * for client. The hardcoded values below are the seed defaults and the
+ * fallback when the DB is unreachable.
  */
 
 import {
@@ -12,6 +20,18 @@ import {
   GraduationCap,
   type LucideIcon,
 } from "lucide-react";
+
+/** Map persisted icon NAME → Lucide component. Add to this when adding new tier icons. */
+export const TIER_ICON_MAP: Record<string, LucideIcon> = {
+  GraduationCap,
+  Briefcase,
+  Crown,
+  Award,
+};
+
+export function resolveTierIcon(name: string | undefined): LucideIcon {
+  return (name && TIER_ICON_MAP[name]) || GraduationCap;
+}
 
 export interface Office {
   key: string;
@@ -123,6 +143,18 @@ export const DESIGNATION_TIER_IDS = DESIGNATION_TIERS.map((t) => t.id);
 export function getDesignationTier(id: string | null | undefined) {
   if (!id) return null;
   return DESIGNATION_TIERS.find((t) => t.id === id) ?? null;
+}
+
+export interface PersistedTier {
+  id: string;
+  label: string;
+  labelAr: string;
+  description: string;
+  descriptionAr: string;
+  icon?: string;
+  accentColor: string;
+  gradient: string;
+  badgeColor: string;
 }
 
 /** Intentionally re-exported so consumers need only one import. */

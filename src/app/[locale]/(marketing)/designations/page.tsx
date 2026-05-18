@@ -4,14 +4,8 @@ import Link from "next/link";
 import { Award, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  DESIGNATION_TIERS,
-  DESIGNATION_TIER_IDS,
-  getDesignationTier,
-} from "@/lib/site-content";
+import { loadDesignationTiers } from "@/lib/site-content.server";
 import { getCachedDesignations } from "@/lib/server/catalog-data";
-
-const TIER_ORDER = DESIGNATION_TIER_IDS;
 
 /**
  * Public designations listing. Pure Server Component — no interactivity on
@@ -26,12 +20,19 @@ const TIER_ORDER = DESIGNATION_TIER_IDS;
  */
 export default async function DesignationsPage() {
   const locale = await getLocale();
-  const designations = await getCachedDesignations();
+  const [designations, tiers] = await Promise.all([
+    getCachedDesignations(),
+    loadDesignationTiers(),
+  ]);
+  const tierOrder = tiers.map((t) => t.id);
+  const tierById = new Map(tiers.map((t) => [t.id, t]));
 
-  const grouped = TIER_ORDER.map((tier) => ({
-    tier,
-    items: designations.filter((d) => d.metadata?.tier_level === tier),
-  })).filter((g) => g.items.length > 0);
+  const grouped = tierOrder
+    .map((tier) => ({
+      tier,
+      items: designations.filter((d) => d.metadata?.tier_level === tier),
+    }))
+    .filter((g) => g.items.length > 0);
 
   return (
     <div className="min-h-screen">
@@ -52,7 +53,7 @@ export default async function DesignationsPage() {
               : `Discover ${designations.length} accredited professional designations across three tiers — from Gateway to Executive — designed to advance your career in finance, AI, and business.`}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-white/70">
-            {DESIGNATION_TIERS.map((tier, i) => {
+            {tiers.map((tier, i) => {
               const Icon = tier.icon;
               const count =
                 grouped.find((g) => g.tier === tier.id)?.items.length ?? 0;
@@ -77,7 +78,7 @@ export default async function DesignationsPage() {
       {/* Tier Sections */}
       <div className="container mx-auto px-4 py-12 space-y-16">
         {grouped.map(({ tier, items }) => {
-          const config = getDesignationTier(tier);
+          const config = tierById.get(tier);
           if (!config) return null;
           const Icon = config.icon;
 

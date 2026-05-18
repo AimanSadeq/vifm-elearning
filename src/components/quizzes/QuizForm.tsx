@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -20,6 +20,23 @@ interface QuizFormProps {
 export function QuizForm({ initialData, onSubmit, isLoading }: QuizFormProps) {
   const t = useTranslations("common");
 
+  // Site-wide defaults from admin settings — used only when creating a
+  // brand new quiz (no initialData). Existing quizzes keep their own
+  // values. Falls back to 70/3 if the settings endpoint fails.
+  const [defaults, setDefaults] = useState({ passingScore: 70, maxAttempts: 3 });
+  useEffect(() => {
+    fetch("/api/site-settings/public")
+      .then((r) => r.json())
+      .then((j) => {
+        const d = j.data ?? {};
+        setDefaults({
+          passingScore: Number(d.default_quiz_passing_score) || 70,
+          maxAttempts: Number(d.default_quiz_max_attempts) || 3,
+        });
+      })
+      .catch(() => {});
+  }, []);
+
   const {
     register,
     handleSubmit,
@@ -32,13 +49,31 @@ export function QuizForm({ initialData, onSubmit, isLoading }: QuizFormProps) {
       titleAr: initialData?.titleAr ?? "",
       description: initialData?.description ?? "",
       isFinalExam: initialData?.isFinalExam ?? false,
-      passingScore: initialData?.passingScore ?? 70,
+      passingScore: initialData?.passingScore ?? defaults.passingScore,
       timeLimitMinutes: initialData?.timeLimitMinutes ?? null,
-      maxAttempts: initialData?.maxAttempts ?? 3,
+      maxAttempts: initialData?.maxAttempts ?? defaults.maxAttempts,
       shuffleQuestions: initialData?.shuffleQuestions ?? false,
       showCorrectAnswers: initialData?.showCorrectAnswers ?? true,
     },
   });
+
+  // When defaults arrive after mount and we don't have initialData, push
+  // them into the form so the inputs reflect the configured defaults.
+  useEffect(() => {
+    if (initialData) return;
+    reset({
+      title: "",
+      titleAr: "",
+      description: "",
+      isFinalExam: false,
+      passingScore: defaults.passingScore,
+      timeLimitMinutes: null,
+      maxAttempts: defaults.maxAttempts,
+      shuffleQuestions: false,
+      showCorrectAnswers: true,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaults.passingScore, defaults.maxAttempts]);
 
   // The parent fetches the quiz async, so `initialData` is undefined on
   // first mount and arrives a tick later. `defaultValues` only run once on

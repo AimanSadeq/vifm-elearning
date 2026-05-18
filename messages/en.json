@@ -579,7 +579,9 @@
     "followUs": "Follow Us",
     "copyright": "© {year} VIFM. All rights reserved.",
     "getTheApp": "Get the App",
-    "comingSoon": "Coming Soon"
+    "comingSoon": "Coming Soon",
+    "downloadOn": "Download on the",
+    "getItOn": "Get it on"
   },
   "player": {
     "bookmarks": "Bookmarks",

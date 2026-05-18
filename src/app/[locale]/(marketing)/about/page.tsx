@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   Building2,
@@ -10,20 +11,57 @@ import {
   Target,
   MapPin,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSiteSettings } from "@/lib/hooks/useSiteSettings";
+
+interface RawStat {
+  key: string;
+  value: string;
+  label: string;
+  labelAr?: string;
+}
+
+// Icon mapping keyed by the stat's `key` field, so admins can swap copy
+// freely but icons stay sensible. Unknown keys get a generic Award icon.
+const STAT_ICONS: Record<string, LucideIcon> = {
+  learners: Users,
+  courses: BookOpen,
+  certificates: Award,
+  instructors: Users,
+  organizations: Building2,
+  countries: Globe,
+};
 
 export default function AboutPage() {
   const t = useTranslations("about");
   const locale = useLocale();
   const { offices: rawOffices } = useSiteSettings();
+  const [rawStats, setRawStats] = useState<RawStat[] | null>(null);
 
-  const stats = [
-    { icon: Users, label: t("statLearners"), value: "10,000+" },
-    { icon: BookOpen, label: t("statCourses"), value: "200+" },
-    { icon: Award, label: t("statCertificates"), value: "5,000+" },
-    { icon: Building2, label: t("statOrganizations"), value: "50+" },
-  ];
+  useEffect(() => {
+    fetch("/api/site-settings/public")
+      .then((r) => r.json())
+      .then((j) => {
+        const arr = j.data?.homepage_stats;
+        if (Array.isArray(arr)) setRawStats(arr as RawStat[]);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Defaults map to the original hardcoded values so the page never
+  // renders empty before the fetch resolves.
+  const stats = (rawStats ?? [
+    { key: "learners", value: "10,000+", label: t("statLearners") },
+    { key: "courses", value: "200+", label: t("statCourses") },
+    { key: "certificates", value: "5,000+", label: t("statCertificates") },
+    { key: "organizations", value: "50+", label: t("statOrganizations") },
+  ]).map((s) => ({
+    key: s.key,
+    icon: STAT_ICONS[s.key] ?? Award,
+    label: locale === "ar" && "labelAr" in s && s.labelAr ? s.labelAr : s.label,
+    value: s.value,
+  }));
 
   const offices = rawOffices.map((o) => ({
     key: o.key,
@@ -65,7 +103,7 @@ export default function AboutPage() {
         <section className="mb-16">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat) => (
-              <Card key={stat.label}>
+              <Card key={stat.key}>
                 <CardContent className="flex flex-col items-center p-6 text-center">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50">
                     <stat.icon className="h-6 w-6 text-brand-600" />
