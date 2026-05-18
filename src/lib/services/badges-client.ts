@@ -134,6 +134,31 @@ export const badgesClient = {
     return call("GET", "/templates");
   },
 
+  /**
+   * Create a new badge template in the external service. `tier` must be one
+   * of the values the badges service accepts:
+   *   course | specialization | certification | distinction
+   */
+  createTemplate(input: {
+    name: string;
+    tier: "course" | "specialization" | "certification" | "distinction";
+    category: string;
+    criteria: string;
+    description?: string;
+    skills?: string[];
+    externalId?: string;
+  }): Promise<BadgesResult<{ id: string; external_id?: string; created?: boolean }>> {
+    return call("POST", "/templates", {
+      name: input.name,
+      tier: input.tier,
+      category: input.category,
+      criteria: input.criteria,
+      description: input.description ?? "",
+      skills: input.skills ?? [],
+      external_id: input.externalId,
+    });
+  },
+
   upsertDelegate(input: UpsertDelegateInput): Promise<BadgesResult<unknown>> {
     return call("PUT", `/delegates/${encodeURIComponent(input.externalId)}`, {
       name: input.name,
