@@ -43,13 +43,37 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   if (validationError)
     return NextResponse.json({ error: validationError }, { status: 400 });
 
-  // Look up enrollment for traceability (optional FK).
+  // Enrollment gate — only learners who have actually completed the
+  // course can submit. Mirrors the modal's behaviour on the lesson
+  // player (which only auto-opens at 100% completion) and prevents
+  // anyone from POSTing early to unlock the cert/badge gate before
+  // they've finished the work. Super admins bypass so they can use
+  // the admin Preview button to test end-to-end.
+  const isAdmin = user.app_metadata?.role === "super_admin";
   const { data: enrollment } = await supabaseAdmin
     .from("enrollments")
-    .select("id")
+    .select("id, status")
     .eq("user_id", user.id)
     .eq("course_id", courseId)
     .maybeSingle();
+
+  if (!isAdmin) {
+    if (!enrollment) {
+      return NextResponse.json(
+        { error: "Not enrolled in this course" },
+        { status: 403 }
+      );
+    }
+    if (enrollment.status !== "completed") {
+      return NextResponse.json(
+        {
+          error: "Complete the course before submitting the survey",
+          code: "COURSE_NOT_COMPLETED",
+        },
+        { status: 403 }
+      );
+    }
+  }
 
   const upsert = await upsertResponse({
     surveyId: result.survey.id,
