@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { generateCertificateFile, type TemplateConfig } from "./certificate-generator";
 import { APP_URL } from "@/lib/env";
@@ -121,7 +122,16 @@ export async function issueCertificate({
     }
   }
 
-  // Insert certificate record first to get the verification_code
+  // Insert certificate row. Two prod-schema quirks handled here:
+  //   - `verification_code` is NOT NULL with no DB default → generate one
+  //     here so the insert always succeeds. UUID stripped of hyphens
+  //     reads cleanly in URLs.
+  //   - `template_id` is NOT a column on the certificates table in prod
+  //     (despite the type def implying so) — passing it caused every
+  //     auto-issue to silently fail with a "column not found" error.
+  //     The template choice is still applied via templateConfig above
+  //     for the PDF render; we just don't persist the FK.
+  const verificationCodeForInsert = randomUUID().replace(/-/g, "").slice(0, 24);
   const { data: cert, error: insertError } = await supabaseAdmin
     .from("certificates")
     .insert({
@@ -131,7 +141,7 @@ export async function issueCertificate({
       certificate_number: certificateNumber,
       status: "issued",
       issued_at: new Date().toISOString(),
-      template_id: course?.certificate_template_id ?? null,
+      verification_code: verificationCodeForInsert,
     })
     .select("*")
     .single();
