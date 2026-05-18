@@ -127,6 +127,22 @@ function safeJson(s: string): unknown {
   }
 }
 
+/**
+ * Badges service requires first_name + last_name. Most VIFM profiles have
+ * a single `full_name` field — split on the first space, fall back to
+ * "Learner" / "User" so the upsert never 400s on a name-only learner.
+ */
+function splitName(full: string): { first_name: string; last_name: string } {
+  const trimmed = (full ?? "").trim();
+  if (!trimmed) return { first_name: "Learner", last_name: "User" };
+  const idx = trimmed.indexOf(" ");
+  if (idx === -1) return { first_name: trimmed, last_name: "—" };
+  return {
+    first_name: trimmed.slice(0, idx),
+    last_name: trimmed.slice(idx + 1).trim() || "—",
+  };
+}
+
 export const badgesClient = {
   isEnabled: isBadgesEnabled,
 
@@ -160,28 +176,35 @@ export const badgesClient = {
   },
 
   upsertDelegate(input: UpsertDelegateInput): Promise<BadgesResult<unknown>> {
+    const { first_name, last_name } = splitName(input.name);
     return call("PUT", `/delegates/${encodeURIComponent(input.externalId)}`, {
-      name: input.name,
+      first_name,
+      last_name,
       email: input.email,
     });
   },
 
   issueBadge(input: IssueBadgeInput): Promise<BadgesResult<IssuedBadge>> {
+    const { first_name, last_name } = splitName(input.delegateName);
     return call(
       "POST",
       "/badges/issue",
       {
         external_id: input.externalId,
         template_id: input.templateId,
-        delegate: {
-          external_id: input.delegateExternalId,
-          name: input.delegateName,
-          email: input.delegateEmail,
-        },
+        // The badges service reads delegate identity from top-level
+        // fields (not a nested object). It also requires first_name +
+        // last_name + email — single `name` is rejected with 400.
+        delegate_external_id: input.delegateExternalId,
+        email: input.delegateEmail,
+        first_name,
+        last_name,
         issued_at: input.issuedAt ?? new Date().toISOString(),
         metadata: input.metadata,
       },
-      input.externalId,
+      // Idempotency key prefix bumped to invalidate any pre-fix 409s
+      // stuck from older payload-shape attempts.
+      `v2:${input.externalId}`,
     );
   },
 
