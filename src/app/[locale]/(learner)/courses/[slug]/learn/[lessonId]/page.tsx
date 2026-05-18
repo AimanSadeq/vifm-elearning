@@ -20,6 +20,7 @@ import { BookmarksPanel } from "@/components/video/BookmarksPanel";
 import { WatchStatsBadge } from "@/components/video/WatchStatsBadge";
 import { QuizGate } from "@/components/quizzes/QuizGate";
 import { CourseSurveyModal } from "@/components/learner/CourseSurveyModal";
+import { AssignmentSubmission } from "@/components/learner/AssignmentSubmission";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -795,6 +796,24 @@ export default function LessonPage() {
 
             {currentLesson.content_type === "quiz" && course && (
               <QuizGate lessonId={lessonId} courseId={course.id} />
+            )}
+
+            {currentLesson.content_type === "assignment" && course && (
+              <AssignmentSubmission
+                lessonId={lessonId}
+                onSubmitted={() => {
+                  // Reflect the local progress map immediately so the
+                  // sidebar / progress bar update without a refetch.
+                  setProgressMap((prev) => ({
+                    ...prev,
+                    [lessonId]: {
+                      ...prev[lessonId],
+                      is_completed: true,
+                      completed_at: new Date().toISOString(),
+                    } as LessonProgress,
+                  }));
+                }}
+              />
             )}
           </>
         )}

@@ -52,12 +52,19 @@ export function AddContentDialog({
     allow_speed_control: true,
     allow_download: false,
     minimum_watch_percentage: '90',
+    // Assignment-only
+    assignment_instructions: '',
+    assignment_max_points: '100',
+    assignment_allow_file: true,
+    assignment_allow_text: true,
   })
 
   const handleTypeSelect = (type: ContentType) => {
     setContentType(type)
-    if (type === 'quiz') {
-      // Go directly to details — quizzes are managed via the quizzes page
+    if (type === 'quiz' || type === 'assignment') {
+      // Quizzes and assignments skip the upload step — the assignment
+      // file (if any) is uploaded by the LEARNER, not the admin. Admin
+      // only configures instructions + grading settings.
       setStep('details')
     } else {
       setStep('upload')
@@ -194,6 +201,16 @@ export function AddContentDialog({
           file_name: uploadedFile?.fileName,
           file_size: uploadedFile?.fileSize,
         }
+      } else if (contentType === 'assignment') {
+        lessonData.content_html = formData.assignment_instructions || null
+        lessonData.assignment_max_points = formData.assignment_max_points
+          ? parseInt(formData.assignment_max_points, 10) || null
+          : null
+        lessonData.assignment_allow_file = formData.assignment_allow_file
+        lessonData.assignment_allow_text = formData.assignment_allow_text
+        if (!formData.assignment_allow_file && !formData.assignment_allow_text) {
+          throw new Error('Enable at least one of "Allow file" or "Allow text" for the assignment.')
+        }
       }
 
       // Store video settings in metadata
@@ -262,7 +279,7 @@ export function AddContentDialog({
     }
   }
 
-  const steps = contentType === 'quiz'
+  const steps = contentType === 'quiz' || contentType === 'assignment'
     ? [
         { key: 'type', label: 'Type', number: 1 },
         { key: 'details', label: 'Details', number: 2 },
@@ -366,8 +383,8 @@ export function AddContentDialog({
               </button>
 
               <button
-                disabled
-                className="flex flex-col items-center gap-3 rounded-lg border-2 border-border p-6 text-center opacity-50"
+                onClick={() => handleTypeSelect('assignment')}
+                className="flex flex-col items-center gap-3 rounded-lg border-2 border-border p-6 text-center transition-colors hover:border-green-500 hover:bg-green-50 dark:hover:border-green-600 dark:hover:bg-green-950/50"
               >
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
                   <svg className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -376,7 +393,7 @@ export function AddContentDialog({
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">Assignment</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Coming soon</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Learner submits work — manually graded</p>
                 </div>
               </button>
             </div>
@@ -531,6 +548,57 @@ export function AddContentDialog({
                   />
                 </div>
               </div>
+
+              {/* Assignment-specific fields */}
+              {contentType === 'assignment' && (
+                <div className="space-y-4 rounded-lg border border-green-200 bg-green-50/50 p-4 dark:border-green-900 dark:bg-green-950/30">
+                  <h3 className="text-sm font-semibold text-foreground">Assignment Configuration</h3>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground">Instructions for the learner</label>
+                    <textarea
+                      rows={5}
+                      value={formData.assignment_instructions}
+                      onChange={(e) => setFormData({ ...formData, assignment_instructions: e.target.value })}
+                      className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                      placeholder="e.g., Build a sales dashboard in Excel using the dataset attached in lesson 8. Upload the .xlsx file when done."
+                    />
+                    <p className="mt-1 text-xs text-muted-foreground">Plain text. Shown to the learner above the submission form.</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground">Maximum points</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.assignment_max_points}
+                      onChange={(e) => setFormData({ ...formData, assignment_max_points: e.target.value })}
+                      className="mt-1 block w-32 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground"
+                      placeholder="100"
+                    />
+                    <p className="mt-1 text-xs text-muted-foreground">Leave blank for an ungraded assignment (feedback only).</p>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={formData.assignment_allow_file}
+                        onChange={(e) => setFormData({ ...formData, assignment_allow_file: e.target.checked })}
+                        className="h-4 w-4 rounded border-border text-primary"
+                      />
+                      Allow file upload
+                    </label>
+                    <label className="flex items-center gap-3 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={formData.assignment_allow_text}
+                        onChange={(e) => setFormData({ ...formData, assignment_allow_text: e.target.checked })}
+                        className="h-4 w-4 rounded border-border text-primary"
+                      />
+                      Allow written response
+                    </label>
+                    <p className="text-xs text-muted-foreground">At least one must be enabled.</p>
+                  </div>
+                </div>
+              )}
 
               {/* Settings */}
               <div className="space-y-3 rounded-lg border border-border bg-muted/50 p-4">
