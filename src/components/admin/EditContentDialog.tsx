@@ -21,6 +21,15 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
 
+  // Assignment fields live as top-level columns; cast through unknown
+  // since the Lesson type is broad. content_html is the instructions.
+  const lessonRow = lesson as unknown as {
+    content_html?: string | null
+    assignment_max_points?: number | null
+    assignment_allow_file?: boolean | null
+    assignment_allow_text?: boolean | null
+  }
+
   const [formData, setFormData] = useState({
     title: lesson.title || '',
     title_ar: lesson.title_ar || '',
@@ -32,6 +41,13 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
     allow_speed_control: (lesson.metadata as Record<string, unknown>)?.allow_speed_control as boolean ?? true,
     allow_download: (lesson.metadata as Record<string, unknown>)?.allow_download as boolean ?? false,
     minimum_watch_percentage: ((lesson.metadata as Record<string, unknown>)?.minimum_watch_percentage as number ?? 90).toString(),
+    assignment_instructions: lessonRow.content_html ?? '',
+    assignment_max_points:
+      lessonRow.assignment_max_points != null
+        ? lessonRow.assignment_max_points.toString()
+        : '',
+    assignment_allow_file: lessonRow.assignment_allow_file ?? true,
+    assignment_allow_text: lessonRow.assignment_allow_text ?? true,
   })
 
   const handleFileUpload = async (file: File) => {
@@ -102,6 +118,19 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
           allow_download: formData.allow_download,
           minimum_watch_percentage: parseInt(formData.minimum_watch_percentage) || 90,
         }
+      }
+
+      // Update assignment-specific fields
+      if (lesson.content_type === 'assignment') {
+        if (!formData.assignment_allow_file && !formData.assignment_allow_text) {
+          throw new Error('Enable at least one of "Allow file" or "Allow text".')
+        }
+        updateData.content_html = formData.assignment_instructions || null
+        updateData.assignment_max_points = formData.assignment_max_points
+          ? parseInt(formData.assignment_max_points, 10) || null
+          : null
+        updateData.assignment_allow_file = formData.assignment_allow_file
+        updateData.assignment_allow_text = formData.assignment_allow_text
       }
 
       // Update file if replaced
@@ -240,6 +269,56 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
                   <div className="h-2 w-full rounded-full bg-muted"><div className="h-2 rounded-full bg-primary transition-all" style={{ width: `${uploadProgress}%` }} /></div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Assignment-specific fields */}
+          {lesson.content_type === 'assignment' && (
+            <div className="space-y-4 rounded-lg border border-green-200 bg-green-50/50 p-4 dark:border-green-900 dark:bg-green-950/30">
+              <h3 className="text-sm font-semibold text-foreground">Assignment Configuration</h3>
+              <div>
+                <label className="block text-sm font-medium text-foreground">Instructions for the learner</label>
+                <textarea
+                  rows={5}
+                  value={formData.assignment_instructions}
+                  onChange={(e) => setFormData({ ...formData, assignment_instructions: e.target.value })}
+                  className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">Plain text. Shown to the learner above the submission form.</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground">Maximum points</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={formData.assignment_max_points}
+                  onChange={(e) => setFormData({ ...formData, assignment_max_points: e.target.value })}
+                  className="mt-1 block w-32 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground"
+                  placeholder="100"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">Leave blank for an ungraded assignment (feedback only).</p>
+              </div>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={formData.assignment_allow_file}
+                    onChange={(e) => setFormData({ ...formData, assignment_allow_file: e.target.checked })}
+                    className="h-4 w-4 rounded border-border text-primary"
+                  />
+                  Allow file upload
+                </label>
+                <label className="flex items-center gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={formData.assignment_allow_text}
+                    onChange={(e) => setFormData({ ...formData, assignment_allow_text: e.target.checked })}
+                    className="h-4 w-4 rounded border-border text-primary"
+                  />
+                  Allow written response
+                </label>
+                <p className="text-xs text-muted-foreground">At least one must be enabled.</p>
+              </div>
             </div>
           )}
 

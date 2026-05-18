@@ -49,7 +49,14 @@ export async function getUserSubmission(
 /**
  * Insert or update the learner's submission. Mirrors the survey
  * upsert pattern: first submission stamps submitted_at (immutable),
- * subsequent edits bump updated_at. Cannot edit after grading.
+ * subsequent edits bump updated_at.
+ *
+ * Editable while status is 'submitted' (pre-grading) or 'needs_revision'
+ * (admin asked for changes). When updating a needs_revision row, status
+ * flips back to 'submitted' so it re-enters the review queue and the
+ * previous grade is cleared (a fresh review).
+ *
+ * Locked once status === 'graded'.
  */
 export async function upsertSubmission(opts: {
   userId: string;
@@ -66,7 +73,7 @@ export async function upsertSubmission(opts: {
 > {
   const existing = await getUserSubmission(opts.userId, opts.lessonId);
 
-  if (existing && existing.status !== "submitted") {
+  if (existing && existing.status === "graded") {
     return {
       ok: false,
       error: "Submission is already graded — cannot edit.",
@@ -75,6 +82,7 @@ export async function upsertSubmission(opts: {
   }
 
   if (existing) {
+    const wasRevision = existing.status === "needs_revision";
     const { data, error } = await supabaseAdmin
       .from("assignment_submissions")
       .update({
@@ -83,6 +91,18 @@ export async function upsertSubmission(opts: {
         file_name: opts.fileName ?? null,
         file_size: opts.fileSize ?? null,
         updated_at: new Date().toISOString(),
+        // If the learner is resubmitting after "needs revision", flip
+        // back to 'submitted' and clear the prior grade/feedback so the
+        // reviewer sees a fresh entry in the queue.
+        ...(wasRevision
+          ? {
+              status: "submitted",
+              grade: null,
+              feedback: null,
+              graded_by: null,
+              graded_at: null,
+            }
+          : {}),
       })
       .eq("id", existing.id)
       .select("*")
