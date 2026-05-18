@@ -4,6 +4,10 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { recalculateAllPathsForUser } from "@/lib/services/learning-path-service";
 import { issueCourseBadge, isBadgesEnabled } from "@/lib/services/badges-client";
 import { getCourseSurveyStatus } from "@/lib/services/survey-service";
+import {
+  issueCertificate,
+  SurveyRequiredError,
+} from "@/lib/services/certificate-service";
 
 interface RouteParams {
   params: Promise<{ lessonId: string }>;
@@ -130,6 +134,39 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
       if (courseCompleted) {
         recalculateAllPathsForUser(supabase, user.id).catch(() => {});
+
+        // Fire-and-forget certificate generation when the course opts
+        // in (course.certificate_enabled). issueCertificate is idempotent
+        // on (userId, courseId) and respects the survey gate — if a
+        // required survey isn't submitted yet, it throws SurveyRequiredError
+        // which we swallow here (the cert will be issued automatically
+        // later when the learner submits the survey via the certificate
+        // service's safety-net check on next call).
+        const enrollmentIdForCert = enrollment.id;
+        (async () => {
+          try {
+            const { data: courseRow } = await supabaseAdmin
+              .from("courses")
+              .select("certificate_enabled")
+              .eq("id", courseId)
+              .single();
+            if (!courseRow?.certificate_enabled) return;
+            await issueCertificate({
+              userId: user.id,
+              courseId,
+              enrollmentId: enrollmentIdForCert,
+            });
+          } catch (err) {
+            if (err instanceof SurveyRequiredError) {
+              // Expected — cert will issue after survey submission.
+              return;
+            }
+            console.warn(
+              `[cert] auto-issue failed for user=${user.id} course=${courseId}:`,
+              err instanceof Error ? err.message : err,
+            );
+          }
+        })();
 
         // Fire-and-forget badge issuance. Idempotent at the badges service
         // on (courseId, userId), so the safety-net call inside
