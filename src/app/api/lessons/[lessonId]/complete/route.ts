@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { recalculateAllPathsForUser } from "@/lib/services/learning-path-service";
-import { issueCourseBadge, isBadgesEnabled } from "@/lib/services/badges-client";
+import {
+  ensureCourseBadgeTemplate,
+  issueCourseBadge,
+  isBadgesEnabled,
+} from "@/lib/services/badges-client";
 import { getCourseSurveyStatus } from "@/lib/services/survey-service";
 import {
   issueCertificate,
@@ -184,19 +188,54 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                     .single(),
                   supabaseAdmin
                     .from("courses")
-                    .select("title, badge_template_external_id")
+                    .select(
+                      "title, badge_template_external_id, category:categories(name)"
+                    )
                     .eq("id", courseId)
                     .single(),
                 ]
               );
-              if (!courseRow?.badge_template_external_id) return;
+
+              // Three possible states for badge_template_external_id:
+              //   - null/empty       → admin opted out; skip silently
+              //   - "AUTO" sentinel  → auto-resolve (look up by course id,
+              //                        create if missing)
+              //   - any other value  → explicit template id; use as-is
+              const stored = courseRow?.badge_template_external_id ?? null;
+              if (!stored) return;
+
+              let templateId: string;
+              if (stored === "AUTO") {
+                const cat = (courseRow?.category as
+                  | { name?: string }
+                  | { name?: string }[]
+                  | null);
+                const categoryName = Array.isArray(cat)
+                  ? cat[0]?.name
+                  : cat?.name;
+                const ensured = await ensureCourseBadgeTemplate({
+                  courseId,
+                  courseTitle: courseRow?.title ?? undefined,
+                  courseCategory: categoryName ?? undefined,
+                });
+                if (!ensured.ok || !ensured.data?.id) {
+                  console.warn(
+                    `[badges] auto-resolve failed for course=${courseId}: ${ensured.error}`
+                  );
+                  return;
+                }
+                templateId = ensured.data.id;
+              } else {
+                templateId = stored;
+              }
+
               const r = await issueCourseBadge({
                 userId: user.id,
                 userName: profile?.full_name ?? "Learner",
                 userEmail: profile?.email ?? undefined,
                 courseId,
-                courseTitle: courseRow.title ?? undefined,
-                templateExternalId: courseRow.badge_template_external_id,
+                courseTitle: courseRow?.title ?? undefined,
+                templateExternalId: templateId,
               });
               if (!r.ok) {
                 console.warn(

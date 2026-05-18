@@ -129,32 +129,9 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     status: course.status,
   })
 
-  const [badgeTemplates, setBadgeTemplates] = useState<
-    { id: string; name?: string; title?: string; tier?: string }[]
-  >([])
-  const [showCreateBadgeTemplate, setShowCreateBadgeTemplate] = useState(false)
-  const [isCreatingBadgeTemplate, setIsCreatingBadgeTemplate] = useState(false)
-  const [newBadgeTemplate, setNewBadgeTemplate] = useState<{
-    name: string
-    tier: 'course' | 'specialization' | 'certification' | 'distinction'
-    category: string
-    criteria: string
-    description: string
-  }>({ name: '', tier: 'course', category: '', criteria: '', description: '' })
-
-  useEffect(() => {
-    let cancelled = false
-    fetch('/api/admin/badges/templates')
-      .then((r) => r.json())
-      .then((j) => {
-        if (cancelled) return
-        if (j.enabled !== false) setBadgeTemplates(j.data ?? [])
-      })
-      .catch(() => {})
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  // (Badge template picker removed — templates are now auto-resolved by
+  // the backend per course via the 'AUTO' sentinel in
+  // courses.badge_template_external_id. See lessons/[lessonId]/complete.)
 
   // Local mirror of the persisted status — kept in sync after every save so
   // the publish-guard doesn't read stale `course.status` from props.
@@ -1018,150 +995,27 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                   <input type="number" min="0" max="100" value={courseForm.passing_score} onChange={(e) => setCourseForm({ ...courseForm, passing_score: e.target.value })} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-foreground">Badge Template (issued on course completion)</label>
-                  <div className="mt-1 flex gap-2">
-                    <select
-                      value={courseForm.badge_template_external_id}
-                      onChange={(e) => setCourseForm({ ...courseForm, badge_template_external_id: e.target.value })}
-                      className="block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                    >
-                      <option value="">— No badge —</option>
-                      {badgeTemplates.map((tpl) => (
-                        <option key={tpl.id} value={tpl.id}>
-                          {tpl.name || tpl.title || `(${tpl.tier ?? 'untitled'})`}
-                          {tpl.tier ? ` — ${tpl.tier}` : ''}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      type="button"
-                      onClick={() => setShowCreateBadgeTemplate(true)}
-                      className="whitespace-nowrap rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
-                      title="Create a new badge template in the badges service"
-                    >
-                      + New
-                    </button>
-                  </div>
-                  {badgeTemplates.length === 0 && (
-                    <p className="mt-1 text-xs text-muted-foreground">No templates yet — click <strong>+ New</strong> to create one for this course.</p>
-                  )}
+                  <label className="flex items-start gap-3 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={courseForm.badge_template_external_id !== ''}
+                      onChange={(e) => setCourseForm({
+                        ...courseForm,
+                        // 'AUTO' sentinel — backend resolves to an existing
+                        // template by external_id 'course:{id}', or creates
+                        // one with sensible defaults on first completion.
+                        badge_template_external_id: e.target.checked ? 'AUTO' : '',
+                      })}
+                      className="mt-0.5 h-4 w-4 rounded border-border text-primary"
+                    />
+                    <span>
+                      <span className="block font-medium text-foreground">Issue badge on completion</span>
+                      <span className="block text-xs text-muted-foreground">
+                        Auto-creates a badge template named after this course on the badges service the first time a learner completes it, and reuses it for everyone after. Uncheck to disable badges for this course.
+                      </span>
+                    </span>
+                  </label>
 
-                  {showCreateBadgeTemplate && (
-                    <div className="mt-3 rounded-lg border border-border bg-muted/30 p-4 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-semibold">Create badge template</p>
-                        <button
-                          type="button"
-                          onClick={() => setShowCreateBadgeTemplate(false)}
-                          className="text-xs text-muted-foreground hover:text-foreground"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        <div>
-                          <label className="block text-xs font-medium text-foreground">Name *</label>
-                          <input
-                            type="text"
-                            value={newBadgeTemplate.name}
-                            onChange={(e) => setNewBadgeTemplate({ ...newBadgeTemplate, name: e.target.value })}
-                            className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-1.5 text-sm"
-                            placeholder={courseForm.title || 'e.g., Excel Foundations'}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-medium text-foreground">Tier *</label>
-                          <select
-                            value={newBadgeTemplate.tier}
-                            onChange={(e) => setNewBadgeTemplate({ ...newBadgeTemplate, tier: e.target.value as 'course' | 'specialization' | 'certification' | 'distinction' })}
-                            className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-1.5 text-sm"
-                          >
-                            <option value="course">Course</option>
-                            <option value="specialization">Specialization</option>
-                            <option value="certification">Certification</option>
-                            <option value="distinction">Distinction</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-xs font-medium text-foreground">Category *</label>
-                          <input
-                            type="text"
-                            value={newBadgeTemplate.category}
-                            onChange={(e) => setNewBadgeTemplate({ ...newBadgeTemplate, category: e.target.value })}
-                            className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-1.5 text-sm"
-                            placeholder={course.category?.name ?? 'e.g., Data Analytics'}
-                          />
-                          <p className="mt-1 text-[10px] text-muted-foreground">Drives the badge background colour (finance/data/project/leadership/real estate).</p>
-                        </div>
-                        <div>
-                          <label className="block text-xs font-medium text-foreground">Criteria *</label>
-                          <input
-                            type="text"
-                            value={newBadgeTemplate.criteria}
-                            onChange={(e) => setNewBadgeTemplate({ ...newBadgeTemplate, criteria: e.target.value })}
-                            className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-1.5 text-sm"
-                            placeholder="e.g., Completed all lessons in the course"
-                          />
-                        </div>
-                        <div className="sm:col-span-2">
-                          <label className="block text-xs font-medium text-foreground">Description</label>
-                          <textarea
-                            rows={2}
-                            value={newBadgeTemplate.description}
-                            onChange={(e) => setNewBadgeTemplate({ ...newBadgeTemplate, description: e.target.value })}
-                            className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-1.5 text-sm"
-                            placeholder="Optional short description shown on the badge verify page."
-                          />
-                        </div>
-                      </div>
-                      <div className="flex justify-end">
-                        <button
-                          type="button"
-                          disabled={isCreatingBadgeTemplate}
-                          onClick={async () => {
-                            const payload = {
-                              name: newBadgeTemplate.name.trim() || courseForm.title?.trim() || '',
-                              tier: newBadgeTemplate.tier,
-                              category: newBadgeTemplate.category.trim() || course.category?.name?.trim() || 'general',
-                              criteria: newBadgeTemplate.criteria.trim() || `Completed ${courseForm.title || 'this course'}`,
-                              description: newBadgeTemplate.description.trim() || undefined,
-                            }
-                            if (!payload.name) {
-                              toast.error('Name is required')
-                              return
-                            }
-                            setIsCreatingBadgeTemplate(true)
-                            try {
-                              const res = await fetch('/api/admin/badges/templates', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(payload),
-                              })
-                              const j = await res.json()
-                              if (!res.ok) {
-                                toast.error(j.error ?? 'Failed to create template')
-                                return
-                              }
-                              const newId = j.data?.id
-                              // Refresh templates list + auto-select the new one
-                              const refresh = await fetch('/api/admin/badges/templates')
-                              const rj = await refresh.json()
-                              if (rj.enabled !== false) setBadgeTemplates(rj.data ?? [])
-                              if (newId) setCourseForm((p) => ({ ...p, badge_template_external_id: newId }))
-                              setShowCreateBadgeTemplate(false)
-                              setNewBadgeTemplate({ name: '', tier: 'course', category: '', criteria: '', description: '' })
-                              toast.success('Badge template created — selected for this course. Save the course to persist.')
-                            } finally {
-                              setIsCreatingBadgeTemplate(false)
-                            }
-                          }}
-                          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50"
-                        >
-                          {isCreatingBadgeTemplate ? 'Creating…' : 'Create template'}
-                        </button>
-                      </div>
-                    </div>
-                  )}
                 </div>
                 <div className="sm:col-span-2 flex flex-wrap gap-6">
                   <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={courseForm.is_free} onChange={(e) => setCourseForm({ ...courseForm, is_free: e.target.checked })} className="h-4 w-4 rounded border-border text-primary" /> Free Course</label>

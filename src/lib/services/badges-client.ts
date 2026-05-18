@@ -218,6 +218,54 @@ export const badgesClient = {
 };
 
 /**
+ * Resolve (or auto-create) the badge template for a course. The badges
+ * service is the source of truth; we deterministically tag templates we
+ * create from this side with `external_id = course:{courseId}` so the
+ * lookup is O(1)-by-filter even though the list endpoint isn't filtered
+ * server-side (yet).
+ *
+ * If a template already exists with that external_id (e.g. the admin
+ * created one earlier OR a previous course completion created it), we
+ * reuse its id — we do NOT overwrite admin edits.
+ *
+ * Returns the template id on success, or { ok: false } if the badges
+ * service is unreachable or rejects the create.
+ */
+export async function ensureCourseBadgeTemplate(opts: {
+  courseId: string;
+  courseTitle?: string;
+  courseCategory?: string;
+}): Promise<BadgesResult<{ id: string; reused: boolean }>> {
+  if (!isBadgesEnabled()) {
+    return { ok: false, error: "Badges integration is not configured" };
+  }
+
+  const externalId = `course:${opts.courseId}`;
+
+  // 1. Look for an existing template tagged with this course.
+  const list = await badgesClient.listTemplates();
+  if (list.ok) {
+    const found = (list.data?.data ?? []).find(
+      (t) => t.external_id === externalId,
+    );
+    if (found) return { ok: true, data: { id: found.id, reused: true } };
+  }
+
+  // 2. None — create one with sensible defaults derived from the course.
+  const created = await badgesClient.createTemplate({
+    name: opts.courseTitle?.trim() || "Course Badge",
+    tier: "course",
+    category: opts.courseCategory?.trim() || "general",
+    criteria: `Completed ${opts.courseTitle?.trim() || "the course"}`,
+    externalId,
+  });
+  if (!created.ok || !created.data?.id) {
+    return { ok: false, error: created.error ?? "Failed to create template" };
+  }
+  return { ok: true, data: { id: created.data.id, reused: false } };
+}
+
+/**
  * Issue a badge to a learner for completing a course. Idempotent on
  * `${courseId}:${userId}`. Safe to call from multiple triggers (course
  * completion AND certificate issuance) — the second call returns the

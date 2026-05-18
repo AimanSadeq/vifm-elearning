@@ -1,7 +1,11 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { generateCertificateFile, type TemplateConfig } from "./certificate-generator";
 import { APP_URL } from "@/lib/env";
-import { issueCourseBadge, isBadgesEnabled } from "./badges-client";
+import {
+  ensureCourseBadgeTemplate,
+  issueCourseBadge,
+  isBadgesEnabled,
+} from "./badges-client";
 import { hasCompletedRequiredSurvey } from "./survey-service";
 import type { Certificate } from "@/types";
 
@@ -184,21 +188,37 @@ export async function issueCertificate({
   // course-completion trigger already fired, this is a no-op at the badges
   // service. Catches cases where a certificate is issued without going
   // through the lesson-completion path (e.g. admin manual issue).
-  const badgeTemplateId = (
+  const stored = (
     course as { badge_template_external_id?: string | null } | null
-  )?.badge_template_external_id;
-  if (isBadgesEnabled() && badgeTemplateId) {
-    issueCourseBadge({
-      userId,
-      userName,
-      userEmail:
-        (profile as { email?: string | null } | null)?.email ?? undefined,
-      courseId,
-      courseTitle: courseName,
-      templateExternalId: badgeTemplateId,
-    })
+  )?.badge_template_external_id ?? null;
+  if (isBadgesEnabled() && stored) {
+    (async () => {
+      let templateId = stored;
+      if (stored === "AUTO") {
+        const ensured = await ensureCourseBadgeTemplate({
+          courseId,
+          courseTitle: courseName,
+        });
+        if (!ensured.ok || !ensured.data?.id) {
+          console.warn(
+            `[badges] auto-resolve failed (cert path) for course=${courseId}: ${ensured.error}`
+          );
+          return;
+        }
+        templateId = ensured.data.id;
+      }
+      return issueCourseBadge({
+        userId,
+        userName,
+        userEmail:
+          (profile as { email?: string | null } | null)?.email ?? undefined,
+        courseId,
+        courseTitle: courseName,
+        templateExternalId: templateId,
+      });
+    })()
       .then((r) => {
-        if (!r.ok) {
+        if (r && !r.ok) {
           console.warn(
             `[badges] issue from certificate failed for user=${userId} course=${courseId}: ${r.error}`
           );
