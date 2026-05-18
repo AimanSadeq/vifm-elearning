@@ -185,10 +185,16 @@ export default function LessonPage() {
     fetchConfig();
   }, [lessonId]);
 
-  // Fetch signed video URL when lesson changes
+  // Fetch signed video URL only for video lessons that actually have a
+  // video file. Without this gate the call also fires for documents/
+  // quizzes/etc and returns a noisy 404 in the console.
   useEffect(() => {
     if (!lessonId) return;
     setSignedVideoUrl(null);
+    if (!currentLesson) return;
+    if (currentLesson.content_type !== "video") return;
+    if (!currentLesson.video_url && !currentLesson.video_hls_url) return;
+
     async function fetchSignedUrl() {
       try {
         const res = await fetch("/api/video/signed-url", {
@@ -205,7 +211,7 @@ export default function LessonPage() {
       }
     }
     fetchSignedUrl();
-  }, [lessonId]);
+  }, [lessonId, currentLesson]);
 
   // Load existing progress including watched segments
   const userId = user?.id;
