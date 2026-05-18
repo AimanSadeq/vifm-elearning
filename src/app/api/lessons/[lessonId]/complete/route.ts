@@ -3,6 +3,7 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { recalculateAllPathsForUser } from "@/lib/services/learning-path-service";
 import { issueCourseBadge, isBadgesEnabled } from "@/lib/services/badges-client";
+import { getCourseSurveyStatus } from "@/lib/services/survey-service";
 
 interface RouteParams {
   params: Promise<{ lessonId: string }>;
@@ -80,6 +81,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
 
     // Update enrollment completed_lesson_ids and progress (skip if admin without enrollment)
+    let courseCompleted = false;
     if (enrollment) {
       const completedIds: string[] =
         (enrollment.completed_lesson_ids as string[]) ?? [];
@@ -92,7 +94,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       const completedItems = completedIds.length;
       const progressPct =
         totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
-      const courseCompleted = totalItems > 0 && completedItems >= totalItems;
+      courseCompleted = totalItems > 0 && completedItems >= totalItems;
 
       await supabaseAdmin
         .from("enrollments")
@@ -154,7 +156,30 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
     }
 
-    return NextResponse.json({ success: true });
+    // Tell the client whether the course just completed AND whether a
+    // post-course survey is blocking the cert/badge. Lets the player
+    // open the survey modal at the right moment without a second
+    // round-trip.
+    let surveyStatus = {
+      hasSurvey: false,
+      isRequired: false,
+      hasResponded: false,
+      blocking: false,
+    };
+    if (courseCompleted) {
+      const s = await getCourseSurveyStatus(user.id, courseId);
+      surveyStatus = {
+        hasSurvey: s.hasSurvey,
+        isRequired: s.isRequired,
+        hasResponded: s.hasResponded,
+        blocking: s.blocking,
+      };
+    }
+    return NextResponse.json({
+      success: true,
+      courseCompleted,
+      survey: surveyStatus,
+    });
   } catch {
     return NextResponse.json(
       { error: "Internal server error" },

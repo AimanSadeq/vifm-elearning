@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { issueCertificate } from "@/lib/services/certificate-service";
+import { issueCertificate, SurveyRequiredError } from "@/lib/services/certificate-service";
 import { escapeIlike } from "@/lib/utils/escape-search";
 
 export async function GET(request: NextRequest) {
@@ -119,6 +119,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data: certificate }, { status: 201 });
   } catch (err) {
+    if (err instanceof SurveyRequiredError) {
+      return NextResponse.json(
+        { error: err.message, code: "SURVEY_REQUIRED" },
+        { status: 409 }
+      );
+    }
     const message =
       err instanceof Error ? err.message : "Internal server error";
     return NextResponse.json({ error: message }, { status: 500 });

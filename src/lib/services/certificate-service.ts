@@ -2,7 +2,16 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { generateCertificateFile, type TemplateConfig } from "./certificate-generator";
 import { APP_URL } from "@/lib/env";
 import { issueCourseBadge, isBadgesEnabled } from "./badges-client";
+import { hasCompletedRequiredSurvey } from "./survey-service";
 import type { Certificate } from "@/types";
+
+/** Thrown when the learner hasn't completed a required survey yet. */
+export class SurveyRequiredError extends Error {
+  constructor() {
+    super("Course survey must be completed before the certificate is issued.");
+    this.name = "SurveyRequiredError";
+  }
+}
 
 interface IssueCertificateParams {
   userId: string;
@@ -24,6 +33,12 @@ export async function issueCertificate({
     .single();
 
   if (existing) return existing as Certificate;
+
+  // Survey gate — if the course has an active required survey and the
+  // learner hasn't submitted, refuse to issue. Both the API route and
+  // the admin manual-issue surface need to handle this rejection.
+  const surveyOk = await hasCompletedRequiredSurvey(userId, courseId);
+  if (!surveyOk) throw new SurveyRequiredError();
 
   // Generate certificate number via DB function
   const { data: certNumResult } = await supabaseAdmin.rpc(

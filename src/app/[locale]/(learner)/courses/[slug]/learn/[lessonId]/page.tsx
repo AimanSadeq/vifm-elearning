@@ -18,6 +18,7 @@ import { useVideoProgress } from "@/components/video/VideoProgress";
 import { BookmarksPanel } from "@/components/video/BookmarksPanel";
 import { WatchStatsBadge } from "@/components/video/WatchStatsBadge";
 import { QuizGate } from "@/components/quizzes/QuizGate";
+import { CourseSurveyModal } from "@/components/learner/CourseSurveyModal";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,37 @@ export default function LessonPage() {
   const [showDiscussion, setShowDiscussion] = useState(false);
   const [showLockAlert, setShowLockAlert] = useState(false);
   const [videoCurrentTime, setVideoCurrentTime] = useState(0);
+  const [surveyModal, setSurveyModal] = useState<
+    { courseId: string; required: boolean } | null
+  >(null);
+  // Tracks per-course whether we've already checked survey status, so we
+  // don't fire the GET on every progress tick. Reset to null when course
+  // changes.
+  const surveyCheckedRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!course) return;
+    if (overallProgress < 100) return;
+    if (surveyCheckedRef.current === course.id) return;
+    if (surveyModal) return;
+    surveyCheckedRef.current = course.id;
+
+    (async () => {
+      const res = await fetch(`/api/courses/${course.id}/survey`);
+      if (!res.ok) return;
+      const j = await res.json();
+      const payload = j.data as {
+        survey: { is_required: boolean };
+        existingResponse: unknown | null;
+      } | null;
+      if (!payload) return;
+      if (payload.existingResponse) return;
+      setSurveyModal({
+        courseId: course.id,
+        required: payload.survey.is_required,
+      });
+    })();
+  }, [course, overallProgress, surveyModal]);
   const [videoConfig, setVideoConfig] = useState<VideoConfig | null>(null);
   const [markingComplete, setMarkingComplete] = useState(false);
   const [designationSlug, setDesignationSlug] = useState<string | null>(null);
@@ -749,6 +781,7 @@ export default function LessonPage() {
                             }
                           );
                           if (res.ok) {
+                            const payload = await res.json().catch(() => ({}));
                             setProgressMap((prev) => ({
                               ...prev,
                               [lessonId]: {
@@ -757,6 +790,16 @@ export default function LessonPage() {
                                 completed_at: new Date().toISOString(),
                               } as LessonProgress,
                             }));
+                            if (
+                              payload.courseCompleted &&
+                              payload.survey?.hasSurvey &&
+                              !payload.survey.hasResponded
+                            ) {
+                              setSurveyModal({
+                                courseId: course.id,
+                                required: Boolean(payload.survey.isRequired),
+                              });
+                            }
                           }
                         } finally {
                           setMarkingComplete(false);
@@ -893,6 +936,15 @@ export default function LessonPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {surveyModal && (
+        <CourseSurveyModal
+          courseId={surveyModal.courseId}
+          required={surveyModal.required}
+          onSubmitted={() => setSurveyModal(null)}
+          onClose={() => setSurveyModal(null)}
+        />
+      )}
     </CoursePlayer>
   );
 }

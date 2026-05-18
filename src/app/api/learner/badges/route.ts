@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { badgesClient, isBadgesEnabled } from "@/lib/services/badges-client";
+import { hasCompletedRequiredSurvey } from "@/lib/services/survey-service";
+
+interface IssuedBadgeWithExternal {
+  external_id?: string;
+}
 
 export async function GET() {
   try {
@@ -23,7 +28,24 @@ export async function GET() {
     }
 
     const badges = result.data?.data ?? [];
-    return NextResponse.json({ data: badges, enabled: true });
+
+    // Survey gate — filter out badges for courses with an unsubmitted
+    // required survey. We encode the source course in external_id as
+    // `${courseId}:${userId}` (see issueCourseBadge), so we can recover
+    // the courseId from the badge without an extra round-trip.
+    const filtered: typeof badges = [];
+    for (const b of badges) {
+      const ext = (b as IssuedBadgeWithExternal).external_id;
+      const courseId = ext?.split(":")[0];
+      if (!courseId) {
+        filtered.push(b);
+        continue;
+      }
+      const ok = await hasCompletedRequiredSurvey(user.id, courseId);
+      if (ok) filtered.push(b);
+    }
+
+    return NextResponse.json({ data: filtered, enabled: true });
   } catch {
     return NextResponse.json(
       { error: "Internal server error" },

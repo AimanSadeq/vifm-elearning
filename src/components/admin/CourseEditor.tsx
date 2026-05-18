@@ -64,7 +64,7 @@ interface CourseEditorProps {
   instructors: { id: string; full_name: string }[]
 }
 
-type TabType = 'details' | 'content' | 'quizzes'
+type TabType = 'details' | 'content' | 'quizzes' | 'survey'
 
 export function CourseEditor({ course, modules: initialModules, categories, instructors }: CourseEditorProps) {
   const router = useRouter()
@@ -801,6 +801,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
             { key: 'details' as TabType, label: 'Course Details' },
             { key: 'content' as TabType, label: `Content (${totalLessons})` },
             { key: 'quizzes' as TabType, label: 'Quizzes' },
+            { key: 'survey' as TabType, label: 'Survey' },
           ]).map((tab) => (
             <button
               key={tab.key}
@@ -1150,6 +1151,26 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
             </div>
             <p className="text-sm text-muted-foreground">
               Create and manage quizzes for this course from the dedicated quizzes page.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {activeTab === 'survey' && (
+        <section className="space-y-6">
+          <div className="rounded-lg border border-border bg-card p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground">Course Survey</h2>
+              <Link
+                href={`/${locale}/admin/courses/${course.id}/surveys`}
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90"
+              >
+                <ClipboardList className="h-4 w-4" />
+                Manage Survey
+              </Link>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Shown to learners after course completion. When marked required, blocks the certificate and badge until submitted.
             </p>
           </div>
         </section>
