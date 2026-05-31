@@ -214,7 +214,14 @@ export function QuestionForm({
 
         {/* Question Image (shown below the question to the learner) */}
         <div className="space-y-2">
-          <Label>Question Image (optional)</Label>
+          {/* Label + helper text grouped at the top so the preview always
+              renders beneath them. */}
+          <div className="space-y-1">
+            <Label>Question Image (optional)</Label>
+            <p className="text-xs text-muted-foreground">
+              JPEG, PNG, WebP, or GIF. Max 5 MB.
+            </p>
+          </div>
           <input
             ref={fileInputRef}
             type="file"
@@ -223,7 +230,7 @@ export function QuestionForm({
             onChange={handleImageSelect}
           />
           {imageUrl ? (
-            <div className="relative inline-block">
+            <div className="relative w-fit">
               {/* External Supabase Storage URL — plain img avoids next/image
                   remote-host config and is fine for an admin preview. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -257,9 +264,6 @@ export function QuestionForm({
           {imageError && (
             <p className="text-sm text-destructive">{imageError}</p>
           )}
-          <p className="text-xs text-muted-foreground">
-            JPEG, PNG, WebP, or GIF. Max 5 MB.
-          </p>
         </div>
 
         {/* Points */}
