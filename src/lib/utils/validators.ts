@@ -227,6 +227,7 @@ export { datetimeLocalOptional, optionalPositiveNumber };
 export const quizQuestionSchema = z.object({
   questionText: z.string().min(1, "Question text is required"),
   questionTextAr: z.string().optional(),
+  imageUrl: z.string().url().optional().or(z.literal("")),
   questionType: z.enum([
     "multiple_choice",
     "true_false",

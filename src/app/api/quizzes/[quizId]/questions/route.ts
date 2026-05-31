@@ -150,6 +150,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         quiz_id: quizId,
         question_text: parsed.data.questionText,
         question_text_ar: parsed.data.questionTextAr ?? null,
+        image_url: parsed.data.imageUrl || null,
         question_type: parsed.data.questionType,
         points: parsed.data.points,
         explanation: parsed.data.explanation ?? null,

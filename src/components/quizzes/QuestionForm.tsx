@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { ImagePlus, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +18,7 @@ interface OptionInput {
 interface QuestionFormData {
   questionText: string;
   questionTextAr: string;
+  imageUrl: string;
   questionType: QuestionType;
   points: number;
   explanation: string;
@@ -26,6 +27,8 @@ interface QuestionFormData {
 }
 
 interface QuestionFormProps {
+  /** Owning course id — used to upload the question image. */
+  courseId: string;
   initialData?: Partial<QuestionFormData>;
   onSubmit: (data: QuestionFormData) => Promise<void>;
   onCancel: () => void;
@@ -45,6 +48,7 @@ const DEFAULT_TRUE_FALSE_OPTIONS: OptionInput[] = [
 ];
 
 export function QuestionForm({
+  courseId,
   initialData,
   onSubmit,
   onCancel,
@@ -56,6 +60,10 @@ export function QuestionForm({
   const [questionTextAr, setQuestionTextAr] = useState(
     initialData?.questionTextAr ?? ""
   );
+  const [imageUrl, setImageUrl] = useState(initialData?.imageUrl ?? "");
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [questionType, setQuestionType] = useState<QuestionType>(
     initialData?.questionType ?? "multiple_choice"
   );
@@ -117,10 +125,38 @@ export function QuestionForm({
     setOptions(updated);
   };
 
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    // Reset the input so selecting the same file again still fires onChange.
+    e.target.value = "";
+    if (!file) return;
+
+    setImageError(null);
+    setIsUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`/api/admin/courses/${courseId}/quiz-image`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Upload failed");
+      }
+      setImageUrl(data.url);
+    } catch (err) {
+      setImageError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
   const handleFormSubmit = () => {
     onSubmit({
       questionText,
       questionTextAr,
+      imageUrl,
       questionType,
       points,
       explanation,
@@ -174,6 +210,56 @@ export function QuestionForm({
               rows={2}
             />
           </div>
+        </div>
+
+        {/* Question Image (shown below the question to the learner) */}
+        <div className="space-y-2">
+          <Label>Question Image (optional)</Label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            className="hidden"
+            onChange={handleImageSelect}
+          />
+          {imageUrl ? (
+            <div className="relative inline-block">
+              {/* External Supabase Storage URL — plain img avoids next/image
+                  remote-host config and is fine for an admin preview. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imageUrl}
+                alt="Question"
+                className="max-h-48 rounded-md border object-contain"
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                className="absolute end-2 top-2 h-7 w-7 p-0"
+                onClick={() => setImageUrl("")}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isUploadingImage}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <ImagePlus className="h-4 w-4 me-1" />
+              {isUploadingImage ? "Uploading..." : "Upload Image"}
+            </Button>
+          )}
+          {imageError && (
+            <p className="text-sm text-destructive">{imageError}</p>
+          )}
+          <p className="text-xs text-muted-foreground">
+            JPEG, PNG, WebP, or GIF. Max 5 MB.
+          </p>
         </div>
 
         {/* Points */}

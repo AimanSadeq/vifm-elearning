@@ -85,6 +85,7 @@ export function QuizBuilder({ courseId, quizId }: QuizBuilderProps) {
   async function handleSaveQuestion(data: {
     questionText: string;
     questionTextAr: string;
+    imageUrl: string;
     questionType: string;
     points: number;
     explanation: string;
@@ -221,11 +222,13 @@ export function QuizBuilder({ courseId, quizId }: QuizBuilderProps) {
           {/* Question form */}
           {showQuestionForm && (
             <QuestionForm
+              courseId={courseId}
               initialData={
                 editingQuestion
                   ? {
                       questionText: editingQuestion.question_text,
                       questionTextAr: editingQuestion.question_text_ar ?? "",
+                      imageUrl: editingQuestion.image_url ?? "",
                       questionType: editingQuestion.question_type,
                       points: editingQuestion.points,
                       explanation: editingQuestion.explanation ?? "",
@@ -289,6 +292,16 @@ export function QuizBuilder({ courseId, quizId }: QuizBuilderProps) {
                       </Button>
                     </div>
                   </div>
+
+                  {/* Attached image preview */}
+                  {q.image_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={q.image_url}
+                      alt="Question"
+                      className="mt-2 max-h-32 rounded-md border object-contain"
+                    />
+                  )}
 
                   {/* Show options preview */}
                   {q.options && q.options.length > 0 && (

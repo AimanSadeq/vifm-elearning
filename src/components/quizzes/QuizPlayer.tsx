@@ -139,8 +139,16 @@ export function QuizPlayer({ quiz, questions, onComplete }: QuizPlayerProps) {
       {/* Question card */}
       <Card>
         <CardContent className="p-6 space-y-6">
-          <div>
+          <div className="space-y-3">
             <p className="text-lg font-medium">{qText}</p>
+            {currentQuestion.image_url && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={currentQuestion.image_url}
+                alt=""
+                className="max-h-80 w-full rounded-md border object-contain"
+              />
+            )}
             <span className="text-xs text-muted-foreground">
               {currentQuestion.points} point
               {currentQuestion.points !== 1 ? "s" : ""}

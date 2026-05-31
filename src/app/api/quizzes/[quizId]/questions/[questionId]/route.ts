@@ -40,6 +40,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       .update({
         question_text: parsed.data.questionText,
         question_text_ar: parsed.data.questionTextAr ?? null,
+        image_url: parsed.data.imageUrl || null,
         question_type: parsed.data.questionType,
         points: parsed.data.points,
         explanation: parsed.data.explanation ?? null,

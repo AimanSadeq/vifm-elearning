@@ -300,6 +300,7 @@ export interface QuizQuestion {
   question_type: QuestionType;
   question_text: string;
   question_text_ar?: string | null;
+  image_url?: string | null;
   explanation?: string | null;
   explanation_ar?: string | null;
   points: number;
