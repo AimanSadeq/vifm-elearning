@@ -16,6 +16,7 @@ import {
   Pencil,
   ArrowRight,
   Wallet,
+  LayoutTemplate,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -143,6 +144,28 @@ export default function AdminSettingsPage() {
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Office locations + support email.
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="h-5 w-5 text-muted-foreground shrink-0 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1 transition-transform" />
+          </div>
+        </Link>
+
+        <Link
+          href={`/${locale}/admin/settings/home-content`}
+          className="group block rounded-xl border bg-card p-5 hover:border-brand-300 hover:shadow-card transition-all"
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-start gap-4 min-w-0">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                <LayoutTemplate className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="font-semibold group-hover:text-brand-700 transition-colors">
+                  Home content
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Marketing hero, platform feature cards + closing CTA (app & web).
                 </p>
               </div>
             </div>
