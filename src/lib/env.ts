@@ -57,6 +57,16 @@ const serverEnvSchema = z.object({
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().email().optional(),
 
+  // --- Email via Microsoft Graph / Outlook ---
+  // App-registration (client-credentials) creds. Used to send every email the
+  // system produces: auth (signup confirmation, password reset) and
+  // transactional (enrollment, webinar reminders, admin sends). Optional —
+  // feature-gated at the call sites.
+  OUTLOOK_TENANT_ID: z.string().optional(),
+  OUTLOOK_CLIENT_ID: z.string().optional(),
+  OUTLOOK_CLIENT_SECRET: z.string().optional(),
+  OUTLOOK_SENDER_EMAIL: z.string().email().optional(),
+
   // --- Cron auth ---
   CRON_SECRET: z.string().optional(),
 

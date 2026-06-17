@@ -1,5 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type EmailOtpType } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { applyRateLimit } from "@/lib/utils/rate-limit";
@@ -18,7 +18,11 @@ export async function GET(request: NextRequest) {
   if (limited) return limited;
 
   const { searchParams, origin } = new URL(request.url);
+  // PKCE (?code=) is used by OAuth and the legacy email links; the Send Email
+  // Hook (Outlook) instead delivers a one-time token (?token_hash=&type=).
   const code = searchParams.get("code");
+  const tokenHash = searchParams.get("token_hash");
+  const otpType = searchParams.get("type") as EmailOtpType | null;
   const rawNext = searchParams.get("next");
   const next = (() => {
     if (!rawNext) return "/en/dashboard";
@@ -32,7 +36,7 @@ export async function GET(request: NextRequest) {
     }
   })();
 
-  if (code) {
+  if (code || (tokenHash && otpType)) {
     const cookieStore = await cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -49,7 +53,12 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { error } = code
+      ? await supabase.auth.exchangeCodeForSession(code)
+      : await supabase.auth.verifyOtp({
+          type: otpType!,
+          token_hash: tokenHash!,
+        });
 
     if (!error) {
       // Check if profile already exists, if not create one

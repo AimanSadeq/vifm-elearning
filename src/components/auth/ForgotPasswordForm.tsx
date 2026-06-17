@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,21 +33,26 @@ export function ForgotPasswordForm() {
 
   const onSubmit = async (data: ForgotPasswordInput) => {
     setError(null);
-    const supabase = createClient();
 
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-      data.email,
-      {
-        redirectTo: `${window.location.origin}/api/auth/callback?next=/${locale}/reset-password`,
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email, locale }),
+      });
+
+      if (!res.ok) {
+        const json = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        setError(json?.error ?? "Something went wrong. Please try again.");
+        return;
       }
-    );
 
-    if (resetError) {
-      setError(resetError.message);
-      return;
+      setSuccess(true);
+    } catch {
+      setError("Something went wrong. Please try again.");
     }
-
-    setSuccess(true);
   };
 
   return (

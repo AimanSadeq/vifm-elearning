@@ -1,19 +1,19 @@
 /**
  * Email service.
  *
- * Real Resend integration when `RESEND_API_KEY` is set. In production with
- * the key missing we throw — silently returning success masked the fact that
- * no enrollment confirmations or webinar reminders ever reached learners.
- * In development we log a one-time warning and short-circuit so a half-set
- * `.env.local` doesn't break the dev loop.
+ * Sends through Microsoft Graph (Outlook) when the OUTLOOK_* vars are set. In
+ * production with them missing we throw — silently returning success masked
+ * the fact that no enrollment confirmations or webinar reminders ever reached
+ * learners. In development we log a one-time warning and short-circuit so a
+ * half-set `.env.local` doesn't break the dev loop.
  */
 
-import { Resend } from "resend";
 import { env } from "@/lib/env";
 import {
   canSendChannel,
   type NotificationChannel,
 } from "./notification-preferences";
+import { isOutlookConfigured, sendOutlookEmail } from "./outlook";
 import { getSetting } from "./site-settings";
 
 interface EmailResult {
@@ -43,57 +43,39 @@ function applyTemplate(
   return template.replace(/\{\{(\w+)\}\}/g, (_m, k) => vars[k] ?? "");
 }
 
-let cachedClient: Resend | null = null;
-let warnedAboutMissingKey = false;
-
-function getClient(): Resend | null {
-  if (cachedClient) return cachedClient;
-  const apiKey = env.RESEND_API_KEY;
-  if (!apiKey) {
-    if (env.NODE_ENV === "production") {
-      throw new Error(
-        "RESEND_API_KEY is not configured. Set it in Render env vars or stop calling email service from this flow."
-      );
-    }
-    if (!warnedAboutMissingKey) {
-      warnedAboutMissingKey = true;
-      console.warn(
-        "[email] RESEND_API_KEY not set — emails will be skipped in dev. " +
-          "Set RESEND_API_KEY in .env.local to test real sending."
-      );
-    }
-    return null;
-  }
-  cachedClient = new Resend(apiKey);
-  return cachedClient;
-}
+let warnedAboutMissingConfig = false;
 
 /**
- * Sender address resolution, in priority order:
- *   1. site_settings.email_from (admin-editable)
- *   2. EMAIL_FROM env var
- *   3. compiled default
+ * Returns true when Outlook is configured and we should actually send. In
+ * production a missing config throws (callers must not silently no-op); in dev
+ * it warns once and short-circuits. Mail is sent from OUTLOOK_SENDER_EMAIL —
+ * Graph sends as the configured mailbox, so there's no per-message "from".
  */
-async function fromAddress(): Promise<string> {
-  const fromSetting = await getSetting<string>("email_from", "");
-  if (fromSetting) return fromSetting;
-  return env.EMAIL_FROM || "VIFM Academy <noreply@learn.viftraining.com>";
+function ensureConfigured(): boolean {
+  if (isOutlookConfigured()) return true;
+  if (env.NODE_ENV === "production") {
+    throw new Error(
+      "Outlook email is not configured. Set OUTLOOK_TENANT_ID, " +
+        "OUTLOOK_CLIENT_ID, OUTLOOK_CLIENT_SECRET, and OUTLOOK_SENDER_EMAIL " +
+        "in Render env vars, or stop calling the email service from this flow."
+    );
+  }
+  if (!warnedAboutMissingConfig) {
+    warnedAboutMissingConfig = true;
+    console.warn(
+      "[email] Outlook not configured — emails will be skipped in dev. " +
+        "Set OUTLOOK_* in .env.local to test real sending."
+    );
+  }
+  return false;
 }
 
 async function send(to: string, subject: string, html: string): Promise<EmailResult> {
-  const client = getClient();
-  if (!client) return { id: "dev-skip", success: false };
-  const from = await fromAddress();
-  const { data, error } = await client.emails.send({
-    from,
-    to,
-    subject,
-    html,
-  });
-  if (error || !data?.id) {
-    throw new Error(`Resend error: ${error?.message ?? "unknown"}`);
-  }
-  return { id: data.id, success: true };
+  if (!ensureConfigured()) return { id: "dev-skip", success: false };
+  // Graph sendMail returns 202 with no body / message id; synthesize one so
+  // callers that log or store the result still get a stable value.
+  await sendOutlookEmail({ to, subject, html });
+  return { id: `outlook:${to}`, success: true };
 }
 
 function escapeHtml(s: string): string {

@@ -59,7 +59,7 @@ export async function POST(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // sendEmail throws in production if RESEND_API_KEY is missing — that's
+    // sendEmail throws in production if Outlook isn't configured — that's
     // intentional. Catch here so we return a clean 503 instead of a 500.
     try {
       const result = await sendEmail({
@@ -73,7 +73,7 @@ export async function POST(
       return NextResponse.json(
         {
           error:
-            "Email provider not configured or rejected the request. Set RESEND_API_KEY and EMAIL_FROM on Render.",
+            "Email provider not configured or rejected the request. Set the OUTLOOK_* vars on Render.",
         },
         { status: 503 }
       );

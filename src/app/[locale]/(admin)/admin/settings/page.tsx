@@ -95,7 +95,7 @@ export default function AdminSettingsPage() {
       details: "Live webinars & recordings",
     },
     {
-      name: "SendGrid / Resend",
+      name: "Microsoft Outlook",
       description: "Email delivery",
       icon: <Mail className="h-5 w-5" />,
       connected: status?.email ?? false,

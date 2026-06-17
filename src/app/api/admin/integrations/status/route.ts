@@ -32,7 +32,12 @@ export async function GET() {
       mamopay_webhook: Boolean(process.env.MAMOPAY_WEBHOOK_SECRET),
       mamopay_env: process.env.MAMOPAY_ENV ?? "sandbox",
       zoom: Boolean(process.env.ZOOM_API_KEY || process.env.ZOOM_CLIENT_ID),
-      email: Boolean(process.env.RESEND_API_KEY || process.env.SENDGRID_API_KEY),
+      email: Boolean(
+        process.env.OUTLOOK_TENANT_ID &&
+          process.env.OUTLOOK_CLIENT_ID &&
+          process.env.OUTLOOK_CLIENT_SECRET &&
+          process.env.OUTLOOK_SENDER_EMAIL
+      ),
       badges: Boolean(
         process.env.BADGES_API_BASE_URL && process.env.BADGES_API_KEY
       ),

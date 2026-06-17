@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import { registerSchema, type RegisterInput } from "@/lib/utils/validators";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,27 +32,26 @@ export function RegisterForm() {
 
   const onSubmit = async (data: RegisterInput) => {
     setError(null);
-    const supabase = createClient();
 
-    const { error: authError } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: {
-        data: {
-          full_name: data.fullName,
-          phone: data.phone || null,
-          language: data.preferredLanguage,
-        },
-        emailRedirectTo: `${window.location.origin}/api/auth/callback`,
-      },
-    });
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    if (authError) {
-      setError(authError.message);
-      return;
+      if (!res.ok) {
+        const json = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        setError(json?.error ?? "Something went wrong. Please try again.");
+        return;
+      }
+
+      setSuccess(true);
+    } catch {
+      setError("Something went wrong. Please try again.");
     }
-
-    setSuccess(true);
   };
 
   if (success) {
