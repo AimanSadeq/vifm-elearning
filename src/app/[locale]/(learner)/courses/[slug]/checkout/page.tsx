@@ -176,6 +176,7 @@ export default function CheckoutPage() {
             courseId: course.id,
             promoCode: promoApplied ? promoCode : undefined,
             voucherId: voucherApplied && voucherType !== "full_access" ? voucherId : undefined,
+            locale,
           }),
         });
         const { data, error } = await res.json();

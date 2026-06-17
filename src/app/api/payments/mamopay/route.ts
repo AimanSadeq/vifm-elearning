@@ -145,12 +145,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { courseId, promoCode, voucherId } = await request.json();
+    const { courseId, promoCode, voucherId, locale } = await request.json();
     if (!courseId)
       return NextResponse.json(
         { error: "courseId is required" },
         { status: 400 }
       );
+
+    // Redirect targets must carry the locale prefix — the app routes live under
+    // /[locale]/..., and the middleware's auto-prefix is unreliable behind the
+    // proxy, so an unprefixed /payment/success 404s.
+    const safeLocale = locale === "ar" ? "ar" : "en";
 
     const { data: course } = await supabaseAdmin
       .from("courses")
@@ -200,7 +205,7 @@ export async function POST(request: NextRequest) {
         if (free) {
           return NextResponse.json({
             data: {
-              url: `${APP_URL}/payment/success?payment_id=${free.paymentId}`,
+              url: `${APP_URL}/${safeLocale}/payment/success?payment_id=${free.paymentId}`,
               paymentId: free.paymentId,
             },
           });
@@ -250,7 +255,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         data: {
-          url: `${APP_URL}/payment/success?payment_id=${freePayment.id}`,
+          url: `${APP_URL}/${safeLocale}/payment/success?payment_id=${freePayment.id}`,
           paymentId: freePayment.id,
         },
       });
@@ -284,8 +289,8 @@ export async function POST(request: NextRequest) {
       description: course.short_description ?? undefined,
       amount: finalPrice,
       currency: course.currency,
-      returnUrl: `${baseUrl}/payment/success?payment_id=${payment.id}`,
-      failureReturnUrl: `${baseUrl}/courses/${course.slug}/checkout`,
+      returnUrl: `${baseUrl}/${safeLocale}/payment/success?payment_id=${payment.id}`,
+      failureReturnUrl: `${baseUrl}/${safeLocale}/courses/${course.slug}/checkout`,
       externalId: payment.id,
       customer: {
         email: profile?.email ?? user.email ?? undefined,
