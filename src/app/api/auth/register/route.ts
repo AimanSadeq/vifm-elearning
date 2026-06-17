@@ -45,12 +45,17 @@ async function generateSignupLink(
   return res.data?.properties?.hashed_token ?? null;
 }
 
+type RecycleResult =
+  | { kind: "token"; token: string }
+  | { kind: "confirmed" }
+  | { kind: "none" };
+
 /**
  * generateLink({type:'signup'}) fails once an account with that email exists.
  * If that account never confirmed its email (a re-signup, or a first attempt
  * whose email never arrived), recycle it so the learner can get a fresh link.
- * A *confirmed* account is a genuine duplicate — return null and stay silent so
- * we don't leak which emails are registered.
+ * A *confirmed* account is a genuine duplicate — the caller tells the learner
+ * to sign in instead.
  */
 async function recycleUnconfirmed(
   admin: SupabaseClient,
@@ -58,7 +63,7 @@ async function recycleUnconfirmed(
   password: string,
   data: LinkMeta,
   redirectTo: string,
-): Promise<string | null> {
+): Promise<RecycleResult> {
   // The handle_new_user trigger mirrors every auth user into profiles, so we
   // can resolve the id without paging the whole admin user list.
   const { data: profile } = await admin
@@ -66,18 +71,19 @@ async function recycleUnconfirmed(
     .select("id")
     .ilike("email", email)
     .maybeSingle();
-  if (!profile?.id) return null;
+  if (!profile?.id) return { kind: "none" };
 
   const { data: existing } = await admin.auth.admin.getUserById(profile.id);
-  if (!existing?.user) return null;
+  if (!existing?.user) return { kind: "none" };
   if (existing.user.email_confirmed_at) {
-    console.log("[auth/register] email already confirmed — not resending");
-    return null;
+    console.log("[auth/register] email already confirmed — telling user to sign in");
+    return { kind: "confirmed" };
   }
 
   console.log("[auth/register] recycling unconfirmed account for resend");
   await admin.auth.admin.deleteUser(profile.id);
-  return generateSignupLink(admin, email, password, data, redirectTo);
+  const token = await generateSignupLink(admin, email, password, data, redirectTo);
+  return token ? { kind: "token", token } : { kind: "none" };
 }
 
 export async function POST(request: NextRequest) {
@@ -118,18 +124,24 @@ export async function POST(request: NextRequest) {
     redirectTo,
   );
   if (!hashedToken) {
-    hashedToken = await recycleUnconfirmed(
+    const recycled = await recycleUnconfirmed(
       admin,
       email,
       password,
       metadata,
       redirectTo,
     );
+    if (recycled.kind === "confirmed") {
+      return NextResponse.json(
+        { error: "already_registered" },
+        { status: 409 },
+      );
+    }
+    if (recycled.kind === "token") hashedToken = recycled.token;
   }
 
   if (!hashedToken) {
-    // Genuine duplicate (already confirmed) or lookup miss. Return success so
-    // we don't reveal which addresses have accounts. Nothing is sent.
+    // Lookup miss / unexpected. Return success rather than reveal anything.
     return NextResponse.json({ ok: true });
   }
 

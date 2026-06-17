@@ -41,6 +41,12 @@ export function RegisterForm() {
       });
 
       if (!res.ok) {
+        if (res.status === 409) {
+          setError(
+            "This email is already registered. Please sign in instead.",
+          );
+          return;
+        }
         const json = (await res.json().catch(() => null)) as {
           error?: string;
         } | null;
