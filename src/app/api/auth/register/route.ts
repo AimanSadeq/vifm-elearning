@@ -8,7 +8,7 @@
  * /api/auth/callback, which verifies the token and provisions the profile.
  */
 
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 import { APP_URL } from "@/lib/env";
 import { applyRateLimit } from "@/lib/utils/rate-limit";
@@ -18,6 +18,67 @@ import { sendOutlookEmail } from "@/lib/services/outlook";
 
 // Service-role client + Graph fetch — must run on the Node runtime.
 export const runtime = "nodejs";
+
+interface LinkMeta {
+  full_name: string;
+  phone: string | null;
+  language: "en" | "ar";
+}
+
+async function generateSignupLink(
+  admin: SupabaseClient,
+  email: string,
+  password: string,
+  data: LinkMeta,
+  redirectTo: string,
+): Promise<string | null> {
+  const res = await admin.auth.admin.generateLink({
+    type: "signup",
+    email,
+    password,
+    options: { data, redirectTo },
+  });
+  if (res.error) {
+    console.warn("[auth/register] generateLink:", res.error.message);
+    return null;
+  }
+  return res.data?.properties?.hashed_token ?? null;
+}
+
+/**
+ * generateLink({type:'signup'}) fails once an account with that email exists.
+ * If that account never confirmed its email (a re-signup, or a first attempt
+ * whose email never arrived), recycle it so the learner can get a fresh link.
+ * A *confirmed* account is a genuine duplicate — return null and stay silent so
+ * we don't leak which emails are registered.
+ */
+async function recycleUnconfirmed(
+  admin: SupabaseClient,
+  email: string,
+  password: string,
+  data: LinkMeta,
+  redirectTo: string,
+): Promise<string | null> {
+  // The handle_new_user trigger mirrors every auth user into profiles, so we
+  // can resolve the id without paging the whole admin user list.
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("id")
+    .ilike("email", email)
+    .maybeSingle();
+  if (!profile?.id) return null;
+
+  const { data: existing } = await admin.auth.admin.getUserById(profile.id);
+  if (!existing?.user) return null;
+  if (existing.user.email_confirmed_at) {
+    console.log("[auth/register] email already confirmed — not resending");
+    return null;
+  }
+
+  console.log("[auth/register] recycling unconfirmed account for resend");
+  await admin.auth.admin.deleteUser(profile.id);
+  return generateSignupLink(admin, email, password, data, redirectTo);
+}
 
 export async function POST(request: NextRequest) {
   // Creating users + sending mail with the service-role key — throttle by IP.
@@ -42,43 +103,52 @@ export async function POST(request: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
 
-  const metadata = {
+  const metadata: LinkMeta = {
     full_name: fullName,
     phone: phone || null,
     language: preferredLanguage,
   };
+  const redirectTo = `${APP_URL}/api/auth/callback`;
 
-  const { data, error } = await admin.auth.admin.generateLink({
-    type: "signup",
+  let hashedToken = await generateSignupLink(
+    admin,
     email,
     password,
-    options: {
-      data: metadata,
-      redirectTo: `${APP_URL}/api/auth/callback`,
-    },
-  });
+    metadata,
+    redirectTo,
+  );
+  if (!hashedToken) {
+    hashedToken = await recycleUnconfirmed(
+      admin,
+      email,
+      password,
+      metadata,
+      redirectTo,
+    );
+  }
 
-  const hashedToken = data?.properties?.hashed_token;
-  if (error || !hashedToken) {
-    // Most common cause is "email already registered". Don't reveal which —
-    // return success so we don't leak which addresses have accounts. Nothing
-    // is sent in that case.
-    console.error("[auth/register] generateLink failed:", error?.message);
+  if (!hashedToken) {
+    // Genuine duplicate (already confirmed) or lookup miss. Return success so
+    // we don't reveal which addresses have accounts. Nothing is sent.
     return NextResponse.json({ ok: true });
   }
 
   try {
     const { subject, html } = buildAuthEmail({
-      user: { email, user_metadata: metadata },
+      user: {
+        email,
+        user_metadata: metadata as unknown as Record<string, unknown>,
+      },
       email_data: {
         token_hash: hashedToken,
-        redirect_to: `${APP_URL}/api/auth/callback`,
+        redirect_to: redirectTo,
         email_action_type: "signup",
       },
     });
     await sendOutlookEmail({ to: email, subject, html });
+    console.log("[auth/register] confirmation email sent via Outlook");
   } catch (err) {
-    console.error("[auth/register] send failed:", err);
+    console.error("[auth/register] Outlook send failed:", err);
     return NextResponse.json(
       { error: "Could not send the confirmation email. Please try again." },
       { status: 502 },
