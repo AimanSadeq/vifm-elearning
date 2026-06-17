@@ -218,6 +218,44 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // A $0 total with no voucher (e.g. a price-0 course that was left as paid
+    // / not flagged "Free Course", or a promo that zeroes it) must not reach
+    // MamoPay either — it would floor the charge to a 2-unit minimum. Enroll
+    // for free directly instead.
+    if (finalPrice <= 0) {
+      const { data: freePayment, error: freeErr } = await supabaseAdmin
+        .from("payments")
+        .insert({
+          user_id: user.id,
+          course_id: courseId,
+          amount: 0,
+          currency: course.currency,
+          status: "completed",
+          payment_method: "free",
+          payment_type: "course_purchase",
+          promo_code_id: promoCodeId,
+          discount_amount: discountAmount,
+          paid_at: new Date().toISOString(),
+        })
+        .select("id")
+        .single();
+      if (freeErr)
+        return NextResponse.json({ error: freeErr.message }, { status: 500 });
+
+      await createEnrollmentFromPayment({
+        userId: user.id,
+        courseId,
+        paymentId: freePayment.id,
+      });
+
+      return NextResponse.json({
+        data: {
+          url: `${APP_URL}/payment/success?payment_id=${freePayment.id}`,
+          paymentId: freePayment.id,
+        },
+      });
+    }
+
     const { data: payment, error: paymentError } = await supabaseAdmin
       .from("payments")
       .insert({
