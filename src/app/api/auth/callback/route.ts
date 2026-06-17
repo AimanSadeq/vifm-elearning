@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { createClient, type EmailOtpType } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { APP_URL } from "@/lib/env";
 import { applyRateLimit } from "@/lib/utils/rate-limit";
 
 export async function GET(request: NextRequest) {
@@ -17,9 +18,15 @@ export async function GET(request: NextRequest) {
   });
   if (limited) return limited;
 
-  const { searchParams, origin } = new URL(request.url);
-  // PKCE (?code=) is used by OAuth and the legacy email links; the Send Email
-  // Hook (Outlook) instead delivers a one-time token (?token_hash=&type=).
+  const { searchParams } = new URL(request.url);
+  // Redirect against the canonical app origin, NOT the request origin: behind
+  // Render's proxy request.url resolves to the internal localhost:5000, which
+  // would send confirmed users to a dead localhost URL. APP_URL is the public
+  // domain in prod and localhost only in local dev.
+  const appOrigin = new URL(APP_URL).origin;
+
+  // PKCE (?code=) is used by OAuth and the legacy email links; the email
+  // confirmation links instead deliver a one-time token (?token_hash=&type=).
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const otpType = searchParams.get("type") as EmailOtpType | null;
@@ -27,8 +34,8 @@ export async function GET(request: NextRequest) {
   const next = (() => {
     if (!rawNext) return "/en/dashboard";
     try {
-      const resolved = new URL(rawNext, origin);
-      return resolved.origin === origin
+      const resolved = new URL(rawNext, appOrigin);
+      return resolved.origin === appOrigin
         ? resolved.pathname + resolved.search
         : "/en/dashboard";
     } catch {
@@ -123,10 +130,12 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      return NextResponse.redirect(`${origin}${next}`);
+      return NextResponse.redirect(`${appOrigin}${next}`);
     }
   }
 
   // Return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/en/login?error=auth_callback_failed`);
+  return NextResponse.redirect(
+    `${appOrigin}/en/login?error=auth_callback_failed`,
+  );
 }
