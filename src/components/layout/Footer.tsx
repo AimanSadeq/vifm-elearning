@@ -4,11 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 
 export function Footer() {
   const t = useTranslations("footer");
   const tc = useTranslations("common");
   const locale = useLocale();
+  const featureFlags = useFeatureFlags();
   const year = new Date().getFullYear();
 
   const [appUrls, setAppUrls] = useState<{
@@ -112,14 +114,16 @@ export function Footer() {
                   {tc("webinars")}
                 </Link>
               </li>
-              <li>
-                <Link
-                  href={`/${locale}/pricing`}
-                  className="text-sm text-brand-300 hover:text-white transition-colors"
-                >
-                  {tc("pricing")}
-                </Link>
-              </li>
+              {featureFlags.subscriptions && (
+                <li>
+                  <Link
+                    href={`/${locale}/pricing`}
+                    className="text-sm text-brand-300 hover:text-white transition-colors"
+                  >
+                    {tc("pricing")}
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link
                   href={`/${locale}/about`}

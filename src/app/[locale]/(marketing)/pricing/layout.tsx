@@ -1,19 +1,9 @@
-import type { Metadata } from "next";
-import { pageMetadata } from "@/lib/seo/page-metadata";
+import { FeatureGate } from "@/components/shared/FeatureGate";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
-  const { locale } = await params;
-  return pageMetadata({ locale, key: "pricing", pathname: "/pricing" });
-}
-
-export default function PricingLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return children;
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <FeatureGate flag="subscriptions" redirectTo="/">
+      {children}
+    </FeatureGate>
+  );
 }

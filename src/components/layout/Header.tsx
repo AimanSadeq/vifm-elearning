@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useState, useRef, useCallback, useEffect, Fragment } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 import { createClient } from "@/lib/supabase/client";
 import { DESIGNATION_TIERS } from "@/lib/site-content";
 import { cn } from "@/lib/utils/cn";
@@ -41,6 +42,7 @@ interface HeaderCategory {
 export function Header() {
   const t = useTranslations("common");
   const locale = useLocale();
+  const featureFlags = useFeatureFlags();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -95,7 +97,10 @@ export function Header() {
     { href: `/${locale}/courses`, label: t("courses") },
     { href: `/${locale}/designations`, label: t("certifications") },
     { href: `/${locale}/webinars`, label: t("webinars") },
-    { href: `/${locale}/pricing`, label: t("pricing") },
+    // Pricing sells subscription plans — hide it when subscriptions are off.
+    ...(featureFlags.subscriptions
+      ? [{ href: `/${locale}/pricing`, label: t("pricing") }]
+      : []),
     { href: `/${locale}/about`, label: t("about") },
     { href: `/${locale}/contact`, label: t("contact") },
   ];

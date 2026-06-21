@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 import type { Lesson } from "@/types";
 
 interface LessonPreviewDialogProps {
@@ -39,6 +40,7 @@ export function LessonPreviewDialog({
   onOpenChange,
 }: LessonPreviewDialogProps) {
   const locale = useLocale();
+  const flags = useFeatureFlags();
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isResolving, setIsResolving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -150,12 +152,14 @@ export function LessonPreviewDialog({
                 : "Subscribe or enroll to access every lesson, certificates, and more."}
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              <Link href={`/${locale}/pricing`}>
-                <Button size="sm">
-                  <Sparkles className="h-3.5 w-3.5 me-1.5" />
-                  {locale === "ar" ? "عرض الأسعار" : "View plans"}
-                </Button>
-              </Link>
+              {flags.subscriptions && (
+                <Link href={`/${locale}/pricing`}>
+                  <Button size="sm">
+                    <Sparkles className="h-3.5 w-3.5 me-1.5" />
+                    {locale === "ar" ? "عرض الأسعار" : "View plans"}
+                  </Button>
+                </Link>
+              )}
               <Link href={`/${locale}/courses/${courseSlug}/checkout`}>
                 <Button size="sm" variant="outline">
                   {locale === "ar"

@@ -250,12 +250,22 @@ export function Sidebar({ role, collapsed, onToggle }: SidebarProps) {
   const locale = useLocale();
   const t = useTranslations();
   const flags = useFeatureFlags();
-  // Subscription + Learning Paths tabs are admin-gated (hidden by default).
-  const navItems = getNavItems(role, t).filter((item) => {
-    if (item.href === "/subscription") return flags.subscriptions;
-    if (item.href === "/my-learning-paths") return flags.learningPaths;
+  // Subscription + Learning Paths are admin-gated (hidden by default) — drop
+  // them from both the top-level learner tabs and the nested admin menus.
+  const isGatedHref = (href: string) => {
+    if (href === "/subscription" || href === "/admin/subscriptions")
+      return flags.subscriptions;
+    if (href === "/my-learning-paths" || href === "/admin/learning-paths")
+      return flags.learningPaths;
     return true;
-  });
+  };
+  const navItems = getNavItems(role, t)
+    .filter((item) => isGatedHref(item.href))
+    .map((item) =>
+      item.children
+        ? { ...item, children: item.children.filter((c) => isGatedHref(c.href)) }
+        : item
+    );
 
   return (
     <aside

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { useDebounce } from "@/lib/hooks/useDebounce";
+import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 
 interface SearchResult {
@@ -27,6 +28,7 @@ export function GlobalSearchOverlay({
 }: GlobalSearchOverlayProps) {
   const tc = useTranslations("common");
   const locale = useLocale();
+  const featureFlags = useFeatureFlags();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -161,7 +163,9 @@ export function GlobalSearchOverlay({
   const popularLinks = [
     { label: tc("courses"), href: `/${locale}/courses`, icon: BookOpen },
     { label: tc("certifications"), href: `/${locale}/designations`, icon: Award },
-    { label: tc("pricing"), href: `/${locale}/pricing`, icon: ArrowRight },
+    ...(featureFlags.subscriptions
+      ? [{ label: tc("pricing"), href: `/${locale}/pricing`, icon: ArrowRight }]
+      : []),
   ];
 
   return (
