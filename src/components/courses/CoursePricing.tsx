@@ -14,22 +14,30 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LessonPreviewDialog } from "./LessonPreviewDialog";
 import { formatCurrency } from "@/lib/utils/formatters";
 import { useAuth } from "@/lib/hooks/useAuth";
-import type { Course, Enrollment } from "@/types";
+import type { Course, Enrollment, Lesson } from "@/types";
 
 interface CoursePricingProps {
   course: Course;
   enrollment?: Enrollment | null;
+  /** First free-preview video lesson; when set, a "Watch Demo" button shows. */
+  previewLesson?: Lesson | null;
 }
 
-export function CoursePricing({ course, enrollment }: CoursePricingProps) {
+export function CoursePricing({
+  course,
+  enrollment,
+  previewLesson,
+}: CoursePricingProps) {
   const t = useTranslations("courses");
   const tc = useTranslations("common");
   const locale = useLocale();
   const router = useRouter();
   const { user } = useAuth();
   const [isEnrolling, setIsEnrolling] = useState(false);
+  const [demoOpen, setDemoOpen] = useState(false);
 
   const handleEnroll = async () => {
     if (!user) {
@@ -125,6 +133,21 @@ export function CoursePricing({ course, enrollment }: CoursePricingProps) {
             </Button>
           </div>
 
+          {/* Secondary CTA — watch the first lesson free */}
+          {previewLesson && (
+            <div className="mt-3">
+              <Button
+                variant="outline"
+                className="w-full"
+                size="lg"
+                onClick={() => setDemoOpen(true)}
+              >
+                <PlayCircle className="h-4 w-4 me-2" />
+                {locale === "ar" ? "شاهد العرض التوضيحي" : "Watch Demo"}
+              </Button>
+            </div>
+          )}
+
           {/* Includes — refined list with icon plates */}
           <div className="mt-6 space-y-2">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -146,6 +169,15 @@ export function CoursePricing({ course, enrollment }: CoursePricingProps) {
           </div>
         </div>
       </div>
+
+      {previewLesson && (
+        <LessonPreviewDialog
+          lesson={previewLesson}
+          courseSlug={course.slug}
+          open={demoOpen}
+          onOpenChange={setDemoOpen}
+        />
+      )}
     </div>
   );
 }

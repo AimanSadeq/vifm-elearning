@@ -4,9 +4,21 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { SIGNED_URL_EXPIRY } from "@/lib/utils/constants";
 import { createCourseVideoSignedUrl } from "@/lib/supabase/video-storage";
 import { userHasCourseAccess } from "@/lib/services/access";
+import { applyRateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    // Preview lessons are reachable without auth (the "Watch Demo" funnel), so
+    // throttle by IP to stop anyone from looping signed-URL generation.
+    const limited = await applyRateLimit(request, {
+      scope: "video:signed-url",
+      buckets: [
+        { limit: 30, windowMs: 60_000 },
+        { limit: 200, windowMs: 60 * 60_000 },
+      ],
+    });
+    if (limited) return limited;
+
     const { lessonId } = await request.json();
 
     if (!lessonId) {
@@ -16,19 +28,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify user is authenticated
-    const supabase = await createServerSupabase();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    // Read the lesson with the service-role client so preview status can be
+    // evaluated even for logged-out visitors (preview lessons are public).
+    const adminClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Get lesson details
-    const { data: lesson, error: lessonError } = await supabase
+    const { data: lesson, error: lessonError } = await adminClient
       .from("lessons")
       .select("video_url, video_hls_url, course_id, is_preview")
       .eq("id", lessonId)
@@ -41,9 +48,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Preview lessons are always accessible. Otherwise check access:
+    // Preview lessons are always accessible — anyone can watch the demo.
+    // Everything else requires auth + course access:
     // admin → free course → instructor → enrolled → active subscription.
     if (!lesson.is_preview) {
+      const supabase = await createServerSupabase();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+
       const allowed = await userHasCourseAccess(user.id, lesson.course_id, {
         authMetadata: user.app_metadata as { role?: string } | null,
       });
@@ -79,11 +97,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Fallback: legacy "videos" bucket
-    const adminClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-
     const { data: signedUrl, error: signError } = await adminClient.storage
       .from("videos")
       .createSignedUrl(videoPath, SIGNED_URL_EXPIRY);
