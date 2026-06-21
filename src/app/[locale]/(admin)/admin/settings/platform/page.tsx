@@ -15,8 +15,10 @@ import {
   BarChart3,
   CheckCircle2,
   Loader2,
+  Eye,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { invalidateFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,6 +63,8 @@ const SETTING_KEYS = [
   "footer_google_play_url",
   "designation_tiers",
   "email_templates",
+  "feature_subscriptions",
+  "feature_learning_paths",
 ] as const;
 
 export default function AdminPlatformSettingsPage() {
@@ -78,6 +82,8 @@ export default function AdminPlatformSettingsPage() {
   const [stats, setStats] = useState<HomeStat[]>([]);
   const [tiers, setTiers] = useState<DesignationTierRow[]>([]);
   const [templates, setTemplates] = useState<EmailTemplateRow[]>([]);
+  const [showSubscription, setShowSubscription] = useState(false);
+  const [showLearningPaths, setShowLearningPaths] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -97,6 +103,8 @@ export default function AdminPlatformSettingsPage() {
       setStats(Array.isArray(map.get("homepage_stats")) ? (map.get("homepage_stats") as HomeStat[]) : []);
       setTiers(Array.isArray(map.get("designation_tiers")) ? (map.get("designation_tiers") as DesignationTierRow[]) : []);
       setTemplates(Array.isArray(map.get("email_templates")) ? (map.get("email_templates") as EmailTemplateRow[]) : []);
+      setShowSubscription(map.get("feature_subscriptions") === true);
+      setShowLearningPaths(map.get("feature_learning_paths") === true);
       setLoading(false);
     })();
   }, []);
@@ -115,11 +123,15 @@ export default function AdminPlatformSettingsPage() {
         { key: "homepage_stats", value: stats },
         { key: "designation_tiers", value: tiers },
         { key: "email_templates", value: templates },
+        { key: "feature_subscriptions", value: showSubscription },
+        { key: "feature_learning_paths", value: showLearningPaths },
       ];
       const { error: err } = await supabase
         .from("site_settings")
         .upsert(rows, { onConflict: "key" });
       if (err) throw err;
+      // Drop the cached flags so the learner sidebar reflects the change.
+      invalidateFeatureFlags();
       setSavedAt(new Date());
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -193,6 +205,44 @@ export default function AdminPlatformSettingsPage() {
           <p className="mt-2 text-xs text-muted-foreground">
             Used as the &quot;From&quot; on all transactional emails. Format:{" "}
             <code className="rounded bg-muted px-1">Name &lt;email@domain&gt;</code>.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Learner navigation tabs */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Eye className="h-4 w-4 text-brand-600" />
+            Learner navigation tabs
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showSubscription}
+              onChange={(e) => setShowSubscription(e.target.checked)}
+              className="h-4 w-4 rounded border-border accent-brand-600"
+            />
+            <span className="text-sm">
+              Show <strong>Subscription</strong> tab
+            </span>
+          </label>
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showLearningPaths}
+              onChange={(e) => setShowLearningPaths(e.target.checked)}
+              className="h-4 w-4 rounded border-border accent-brand-600"
+            />
+            <span className="text-sm">
+              Show <strong>Learning Paths</strong> tab
+            </span>
+          </label>
+          <p className="text-xs text-muted-foreground">
+            Controls whether these tabs appear in the learner sidebar. Both are
+            hidden by default. Save to apply.
           </p>
         </CardContent>
       </Card>

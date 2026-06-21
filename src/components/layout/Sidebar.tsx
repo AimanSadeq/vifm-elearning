@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils/cn";
+import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 import type { UserRole } from "@/types";
 
 interface NavItem {
@@ -248,7 +249,13 @@ interface SidebarProps {
 export function Sidebar({ role, collapsed, onToggle }: SidebarProps) {
   const locale = useLocale();
   const t = useTranslations();
-  const navItems = getNavItems(role, t);
+  const flags = useFeatureFlags();
+  // Subscription + Learning Paths tabs are admin-gated (hidden by default).
+  const navItems = getNavItems(role, t).filter((item) => {
+    if (item.href === "/subscription") return flags.subscriptions;
+    if (item.href === "/my-learning-paths") return flags.learningPaths;
+    return true;
+  });
 
   return (
     <aside
