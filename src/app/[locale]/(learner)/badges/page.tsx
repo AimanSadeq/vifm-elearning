@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trophy, ExternalLink } from "lucide-react";
+import { Trophy, Eye, Share2, Download } from "lucide-react";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface EarnedBadge {
   verification_id: string;
@@ -25,6 +26,57 @@ export default function MyBadgesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [enabled, setEnabled] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Native share sheet when available; otherwise copy the link (or open it).
+  async function shareBadge(b: EarnedBadge, url: string) {
+    const data = {
+      title: badgeLabel(b),
+      text: `I earned the ${badgeLabel(b)} badge on VIFM Academy.`,
+      url,
+    };
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share(data);
+      } catch {
+        /* user dismissed the share sheet */
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedId(b.verification_id);
+      setTimeout(
+        () => setCopiedId((id) => (id === b.verification_id ? null : id)),
+        2000,
+      );
+    } catch {
+      window.open(url, "_blank", "noopener");
+    }
+  }
+
+  // Force a download; falls back to opening the image when the badge host
+  // doesn't allow cross-origin fetch (so the user can still save it manually).
+  async function downloadBadge(b: EarnedBadge) {
+    if (!b.image_url) return;
+    const ext = (b.image_url.split("?")[0].split(".").pop() || "png").slice(0, 4);
+    const filename = `${badgeLabel(b).replace(/\s+/g, "-").toLowerCase()}.${ext}`;
+    try {
+      const res = await fetch(b.image_url);
+      if (!res.ok) throw new Error("fetch failed");
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(objectUrl);
+    } catch {
+      window.open(b.image_url, "_blank", "noopener");
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -106,52 +158,70 @@ export default function MyBadgesPage() {
             const verifyUrl =
               verifyBase &&
               `${verifyBase.replace(/\/+$/, "")}/verify/${encodeURIComponent(b.verification_id)}`;
+            const viewUrl = verifyUrl || b.image_url;
             return (
               <Card key={b.verification_id}>
-                <CardContent className="space-y-4 p-5">
-                  <div className="flex items-start gap-4">
-                    {b.image_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={b.image_url}
-                        alt={badgeLabel(b)}
-                        className="h-20 w-20 rounded-xl object-contain"
-                      />
-                    ) : (
-                      <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-warning/10">
-                        <Trophy className="h-10 w-10 text-warning" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold leading-snug">
-                        {badgeLabel(b)}
-                      </p>
-                      {b.issued_at && (
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          Issued{" "}
-                          {new Date(b.issued_at).toLocaleDateString(undefined, {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {verifyUrl && (
-                    <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3">
-                      <a
-                        href={verifyUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                        Verify
-                      </a>
+                <CardContent className="flex flex-col items-center gap-3 p-5 text-center">
+                  {b.image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={b.image_url}
+                      alt={badgeLabel(b)}
+                      className="h-28 w-28 rounded-xl object-contain"
+                    />
+                  ) : (
+                    <div className="flex h-28 w-28 items-center justify-center rounded-xl bg-warning/10">
+                      <Trophy className="h-12 w-12 text-warning" />
                     </div>
                   )}
+                  <div>
+                    <p className="font-semibold leading-snug">{badgeLabel(b)}</p>
+                    {b.issued_at && (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Issued{" "}
+                        {new Date(b.issued_at).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="mt-1 flex w-full flex-wrap gap-2 border-t border-border pt-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      disabled={!viewUrl}
+                      onClick={() =>
+                        viewUrl && window.open(viewUrl, "_blank", "noopener")
+                      }
+                    >
+                      <Eye className="h-3.5 w-3.5 me-1.5" />
+                      View
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      disabled={!viewUrl}
+                      onClick={() => viewUrl && shareBadge(b, viewUrl)}
+                    >
+                      <Share2 className="h-3.5 w-3.5 me-1.5" />
+                      {copiedId === b.verification_id ? "Copied!" : "Share"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      disabled={!b.image_url}
+                      onClick={() => downloadBadge(b)}
+                    >
+                      <Download className="h-3.5 w-3.5 me-1.5" />
+                      Download
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             );
