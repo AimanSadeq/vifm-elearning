@@ -3,10 +3,10 @@ import { DemoShell } from "@/components/demo/DemoShell";
 import { PlayCircle } from "lucide-react";
 
 const courses = [
-  { title: "Financial Analysis Masterclass", instructor: "Dr. Sarah Ahmed", progress: 78, lessonsDone: 12, totalLessons: 16, image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&q=80", nextLesson: "Module 4 — DCF Valuation Practice" },
-  { title: "Risk Management & Basel III", instructor: "Prof. Omar Hassan", progress: 45, lessonsDone: 9, totalLessons: 20, image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&q=80", nextLesson: "Chapter 5 — Market Risk Framework" },
+  { title: "Financial Analysis Masterclass", instructor: "Dr. Sarah Ahmed", progress: 78, lessonsDone: 12, totalLessons: 16, image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&q=80", nextLesson: "Module 4 DCF Valuation Practice" },
+  { title: "Risk Management & Basel III", instructor: "Prof. Omar Hassan", progress: 45, lessonsDone: 9, totalLessons: 20, image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&q=80", nextLesson: "Chapter 5 Market Risk Framework" },
   { title: "Excel for Finance Professionals", instructor: "Maria Fernandez", progress: 100, lessonsDone: 12, totalLessons: 12, image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80", nextLesson: "Completed" },
-  { title: "Anti-Money Laundering (AML)", instructor: "Dr. Sarah Ahmed", progress: 23, lessonsDone: 4, totalLessons: 15, image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80", nextLesson: "Module 2 — Transaction Monitoring" },
+  { title: "Anti-Money Laundering (AML)", instructor: "Dr. Sarah Ahmed", progress: 23, lessonsDone: 4, totalLessons: 15, image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80", nextLesson: "Module 2 Transaction Monitoring" },
 ];
 
 export default async function LearnerCoursesPage({ params }: { params: Promise<{ locale: string }> }) {

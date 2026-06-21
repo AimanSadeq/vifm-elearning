@@ -41,7 +41,7 @@ export function AdminHeader({
           <Link href={dashHref} className="flex items-center">
             <Image
               src="/images/vifm-logo.png"
-              alt="VIFM — Admin"
+              alt="VIFM Admin"
               width={240}
               height={80}
               className="h-16 w-auto"

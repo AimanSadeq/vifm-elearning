@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
   const { buffer, mimeType } = await generateCertificateFile(
     {
       userName: "Sample Learner Name",
-      courseName: "Sample Course Title — Replace With Your Course",
+      courseName: "Sample Course Title Replace With Your Course",
       certificateNumber: "VIFM-PREVIEW-0001",
       issuedAt: new Date().toISOString(),
       verificationUrl: `${APP_URL}/verify/PREVIEW`,

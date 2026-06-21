@@ -49,8 +49,8 @@ export default async function DesignationsPage() {
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-white/80">
             {locale === "ar"
-              ? `اكتشف ${designations.length} شهادة مهنية معتمدة عبر ثلاثة مستويات — من التأسيسي إلى التنفيذي — مصممة لتطوير مهاراتك المهنية.`
-              : `Discover ${designations.length} accredited professional designations across three tiers — from Gateway to Executive — designed to advance your career in finance, AI, and business.`}
+              ? `اكتشف ${designations.length} شهادة مهنية معتمدة عبر ثلاثة مستويات من التأسيسي إلى التنفيذي مصممة لتطوير مهاراتك المهنية.`
+              : `Discover ${designations.length} accredited professional designations across three tiers from Gateway to Executive designed to advance your career in finance, AI, and business.`}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-white/70">
             {tiers.map((tier, i) => {

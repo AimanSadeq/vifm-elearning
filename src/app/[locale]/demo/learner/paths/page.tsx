@@ -3,7 +3,7 @@ import { DemoShell } from "@/components/demo/DemoShell";
 const paths = [
   { title: "Certified Financial Analyst (CFA-like)", description: "6-course sequence covering valuation, risk, portfolio theory, and financial reporting", courses: 6, completed: 2, hours: 72, badge: "🎓", color: "from-blue-500 to-indigo-600" },
   { title: "Banking Compliance Professional", description: "Complete compliance training: AML, KYC, Basel III, sanctions screening, regulatory reporting", courses: 5, completed: 3, hours: 58, badge: "🏛️", color: "from-emerald-500 to-teal-600" },
-  { title: "Finance Data Analytics Track", description: "Excel, Power BI, Python for Finance, and financial modeling — for the data-driven finance professional", courses: 4, completed: 1, hours: 40, badge: "📊", color: "from-violet-500 to-purple-600" },
+  { title: "Finance Data Analytics Track", description: "Excel, Power BI, Python for Finance, and financial modeling for the data-driven finance professional", courses: 4, completed: 1, hours: 40, badge: "📊", color: "from-violet-500 to-purple-600" },
 ];
 
 export default async function LearnerPathsPage({ params }: { params: Promise<{ locale: string }> }) {

@@ -243,7 +243,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
       issues.push({ level: 'error', message: 'Add at least one module to organize lessons.' })
     }
     if (totalLessons === 0) {
-      issues.push({ level: 'error', message: 'Add at least one lesson — the course is currently empty.' })
+      issues.push({ level: 'error', message: 'Add at least one lesson the course is currently empty.' })
     }
 
     // Modules with zero lessons
@@ -286,12 +286,12 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     const hasEn = (courseForm.title ?? '').trim().length > 0
     const hasAr = (courseForm.title_ar ?? '').trim().length > 0
     if (!hasEn && !hasAr) {
-      toast.error('Provide a course title in English or Arabic — at least one is required')
+      toast.error('Provide a course title in English or Arabic at least one is required')
       return
     }
     // Block publishing an incomplete course
     if (courseForm.status === 'published' && persistedStatus !== 'published' && !canPublish) {
-      toast.error('Cannot publish — fix the blocking issues listed at the top of the page first.')
+      toast.error('Cannot publish fix the blocking issues listed at the top of the page first.')
       return
     }
     setIsSaving(true)
@@ -705,8 +705,8 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                 }`}
               >
                 {blockingIssues.length > 0
-                  ? `Course is incomplete — fix ${blockingIssues.length} issue${blockingIssues.length === 1 ? '' : 's'} before publishing`
-                  : 'Course has missing content — review before publishing'}
+                  ? `Course is incomplete fix ${blockingIssues.length} issue${blockingIssues.length === 1 ? '' : 's'} before publishing`
+                  : 'Course has missing content review before publishing'}
               </p>
               <ul className="mt-2 space-y-1 text-sm">
                 {validationIssues.map((issue, i) => (
@@ -906,7 +906,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
               <form className="grid gap-6 sm:grid-cols-2" onSubmit={(e) => { e.preventDefault(); handleSaveCourse() }}>
                 <div className="sm:col-span-2 -mb-3">
                   <p className="text-xs text-muted-foreground">
-                    Fill in at least one title — EN-only courses appear on the
+                    Fill in at least one title EN-only courses appear on the
                     English catalog, AR-only on the Arabic one, both = both.
                   </p>
                 </div>
@@ -959,7 +959,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                 <div>
                   <label className="block text-sm font-medium text-foreground">Tier</label>
                   <select value={courseForm.tier_level} onChange={(e) => setCourseForm({ ...courseForm, tier_level: e.target.value })} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
-                    <option value="">— Untiered —</option>
+                    <option value=""> Untiered </option>
                     <option value="gateway">Gateway</option>
                     <option value="professional">Professional</option>
                     <option value="executive">Executive</option>

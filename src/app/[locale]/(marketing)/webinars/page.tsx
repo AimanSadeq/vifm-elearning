@@ -180,7 +180,7 @@ export default function WebinarsPage() {
           </span>
           <h1 className="mt-5 font-heading text-3xl md:text-5xl font-bold leading-tight">
             {locale === "ar"
-              ? "ندواتنا — حضور مباشر أو إعادة مشاهدة"
+              ? "ندواتنا حضور مباشر أو إعادة مشاهدة"
               : "Expert-led webinars, anywhere"}
           </h1>
           <p className="mt-3 max-w-2xl mx-auto text-white/75 text-base md:text-lg">
@@ -198,7 +198,7 @@ export default function WebinarsPage() {
               </span>
               {locale === "ar"
                 ? `${liveNow.length} ندوة مباشرة الآن`
-                : `${liveNow.length} live now — join`}
+                : `${liveNow.length} live now join`}
             </div>
           )}
 
@@ -519,7 +519,7 @@ function EmptyState({
             : "Try adjusting your search or clearing filters."
           : tab === "upcoming"
           ? locale === "ar"
-            ? "سيتم نشر الندوات القادمة هنا — يمكنك تصفّح الإعادات في الأثناء."
+            ? "سيتم نشر الندوات القادمة هنا يمكنك تصفّح الإعادات في الأثناء."
             : "New webinars will appear here. In the meantime, browse the past replays."
           : ""}
       </p>

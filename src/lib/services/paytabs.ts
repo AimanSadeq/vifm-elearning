@@ -78,7 +78,7 @@ export async function createPaymentPage(
     !json.tran_ref
   ) {
     throw new Error(
-      "PayTabs returned no redirect_url / tran_ref — refusing to create payment row"
+      "PayTabs returned no redirect_url / tran_ref refusing to create payment row"
     );
   }
   return json;

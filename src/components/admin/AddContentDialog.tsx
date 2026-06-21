@@ -163,7 +163,7 @@ export function AddContentDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.title.trim() && !formData.title_ar.trim()) {
-      setError('Provide a lesson title in English or Arabic — at least one is required')
+      setError('Provide a lesson title in English or Arabic at least one is required')
       return
     }
 
@@ -276,10 +276,10 @@ export function AddContentDialog({
           // row pointing at nothing.
           await supabase.from('lessons').delete().eq('id', insertedLesson.id)
           throw new Error(
-            `Could not auto-create the quiz (${quizJson?.error ?? quizRes.status}). Lesson rolled back — try again.`
+            `Could not auto-create the quiz (${quizJson?.error ?? quizRes.status}). Lesson rolled back try again.`
           )
         }
-        toast.success('Quiz lesson created — add questions next')
+        toast.success('Quiz lesson created add questions next')
         onSuccess()
         router.push(
           `/${locale}/admin/courses/${courseId}/quizzes/${quizJson.data.id}`
@@ -410,7 +410,7 @@ export function AddContentDialog({
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">Assignment</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Learner submits work — manually graded</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Learner submits work manually graded</p>
                 </div>
               </button>
             </div>
@@ -522,7 +522,7 @@ export function AddContentDialog({
 
               <div className="space-y-4">
                 <p className="text-xs text-muted-foreground">
-                  Fill in at least one language — Arabic-only lessons appear in the Arabic version of the course only, and vice versa.
+                  Fill in at least one language Arabic-only lessons appear in the Arabic version of the course only, and vice versa.
                 </p>
                 <div>
                   <label className="block text-sm font-medium text-foreground">Title (English)</label>

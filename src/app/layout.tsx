@@ -6,11 +6,11 @@ import { APP_URL } from "@/lib/env";
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "VIFM Academy — Professional Training & E-Learning",
+    default: "VIFM Academy Professional Training & E-Learning",
     template: "%s | VIFM Academy",
   },
   description:
-    "Virginia Institute of Finance and Management — Professional training and e-learning courses in Finance, Data Analytics, Strategy, and Compliance across the GCC region.",
+    "Virginia Institute of Finance and Management Professional training and e-learning courses in Finance, Data Analytics, Strategy, and Compliance across the GCC region.",
   applicationName: "VIFM Academy",
   authors: [{ name: "VIFM Academy" }],
   keywords: [
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "VIFM Academy",
-    title: "VIFM Academy — Professional Training & E-Learning",
+    title: "VIFM Academy Professional Training & E-Learning",
     description:
       "Professional training in Finance, Data Analytics, Strategy and Compliance across the GCC region.",
   },

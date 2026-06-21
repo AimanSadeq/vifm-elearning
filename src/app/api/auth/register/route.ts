@@ -76,7 +76,7 @@ async function recycleUnconfirmed(
   const { data: existing } = await admin.auth.admin.getUserById(profile.id);
   if (!existing?.user) return { kind: "none" };
   if (existing.user.email_confirmed_at) {
-    console.log("[auth/register] email already confirmed — telling user to sign in");
+    console.log("[auth/register] email already confirmed telling user to sign in");
     return { kind: "confirmed" };
   }
 

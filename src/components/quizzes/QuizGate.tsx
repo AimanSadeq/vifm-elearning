@@ -186,7 +186,7 @@ export function QuizGate({ lessonId, courseId }: QuizGateProps) {
                           : "text-red-600 dark:text-red-400"
                       }
                     >
-                      {a.percentage?.toFixed(0)}% —{" "}
+                      {a.percentage?.toFixed(0)}% {" "}
                       {a.passed ? tq("passed") : tq("failed")}
                     </span>
                   </div>

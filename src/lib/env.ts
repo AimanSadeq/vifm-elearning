@@ -134,7 +134,7 @@ function resolveAppUrl(): string {
   if (raw) return raw.replace(/\/+$/, "");
   if (process.env.NODE_ENV === "production") {
     throw new Error(
-      "NEXT_PUBLIC_APP_URL is required in production — configure it in Render."
+      "NEXT_PUBLIC_APP_URL is required in production configure it in Render."
     );
   }
   return "http://localhost:5000";

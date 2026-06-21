@@ -138,7 +138,7 @@ export default function AdminHomeContentPage() {
           key: "homepage_hero",
           value: hero,
           description:
-            "Marketing hero on the app/web home — badge, title and subtitle (EN + AR).",
+            "Marketing hero on the app/web home badge, title and subtitle (EN + AR).",
         },
         {
           key: "platform_features",
@@ -150,7 +150,7 @@ export default function AdminHomeContentPage() {
           key: "homepage_cta",
           value: cta,
           description:
-            "Closing call-to-action copy on the home — title + subtitle (EN + AR).",
+            "Closing call-to-action copy on the home title + subtitle (EN + AR).",
         },
       ];
       const { error: err } = await supabase

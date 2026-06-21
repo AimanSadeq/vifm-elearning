@@ -118,7 +118,7 @@ export const DEFAULT_LAYOUT: CertLayout = {
     {
       id: "caption-1",
       type: "text",
-      label: "Caption — acknowledges",
+      label: "Caption acknowledges",
       x: 50,
       y: 42,
       text: "THIS ACKNOWLEDGES THAT",
@@ -159,7 +159,7 @@ export const DEFAULT_LAYOUT: CertLayout = {
     {
       id: "caption-2",
       type: "text",
-      label: "Caption — completed",
+      label: "Caption completed",
       x: 50,
       y: 62,
       text: "HAS SUCCESSFULLY COMPLETED",
@@ -270,7 +270,7 @@ export const DEFAULT_LAYOUT: CertLayout = {
     {
       id: "seal-line-1",
       type: "text",
-      label: "Seal — line 1",
+      label: "Seal line 1",
       x: 50,
       y: 88.5,
       text: "VIRGINIA INSTITUTE",
@@ -284,7 +284,7 @@ export const DEFAULT_LAYOUT: CertLayout = {
     {
       id: "seal-line-2",
       type: "text",
-      label: "Seal — line 2",
+      label: "Seal line 2",
       x: 50,
       y: 90.5,
       text: "OF FINANCE",
@@ -298,7 +298,7 @@ export const DEFAULT_LAYOUT: CertLayout = {
     {
       id: "seal-year",
       type: "text",
-      label: "Seal — year",
+      label: "Seal year",
       x: 50,
       y: 92.5,
       text: "2010",
@@ -312,7 +312,7 @@ export const DEFAULT_LAYOUT: CertLayout = {
     {
       id: "seal-line-3",
       type: "text",
-      label: "Seal — line 3",
+      label: "Seal line 3",
       x: 50,
       y: 94.5,
       text: "VIRGINIA · USA",

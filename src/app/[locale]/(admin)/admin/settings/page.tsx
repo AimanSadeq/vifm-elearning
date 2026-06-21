@@ -85,7 +85,7 @@ export default function AdminSettingsPage() {
         ? `Cards · Apple Pay · ${status.mamopay_env === "production" ? "Live" : "Sandbox"}${
             status.mamopay_webhook ? " · Webhook signed" : " · Webhook unsigned (fallback active)"
           }`
-        : "Cards · Apple Pay · Tabby — for UAE businesses",
+        : "Cards · Apple Pay · Tabby for UAE businesses",
     },
     {
       name: "Zoom",

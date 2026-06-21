@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     } else {
       // Neither HMAC nor a chargeId we can re-fetch → can't trust anything.
       console.error(
-        "MamoPay webhook: unsigned payload with no chargeId — refusing to provision"
+        "MamoPay webhook: unsigned payload with no chargeId refusing to provision"
       );
       return NextResponse.json({ received: true });
     }

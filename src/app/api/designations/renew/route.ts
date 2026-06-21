@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
           currency,
           product_data: {
             name: `${designation?.abbreviation ?? "CDIP"} Annual Renewal`,
-            description: `${designation?.name ?? "Designation"} — ${isFounding ? "Founding Member" : "Standard"} tier`,
+            description: `${designation?.name ?? "Designation"} ${isFounding ? "Founding Member" : "Standard"} tier`,
           },
           unit_amount: Math.round(baseFee * 100),
         },

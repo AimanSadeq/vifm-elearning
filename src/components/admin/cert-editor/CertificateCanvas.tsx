@@ -12,7 +12,7 @@ import type {
 
 const SAMPLE: Record<string, string> = {
   "{{ATTENDEE_NAME}}": "Sample Learner Name",
-  "{{COURSE_TITLE}}": "Sample Course Title — Replace With Your Course",
+  "{{COURSE_TITLE}}": "Sample Course Title Replace With Your Course",
   "{{DATE_RANGE}}": new Date().toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",

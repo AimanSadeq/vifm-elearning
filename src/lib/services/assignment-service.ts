@@ -76,7 +76,7 @@ export async function upsertSubmission(opts: {
   if (existing && existing.status === "graded") {
     return {
       ok: false,
-      error: "Submission is already graded — cannot edit.",
+      error: "Submission is already graded cannot edit.",
       status: 409,
     };
   }

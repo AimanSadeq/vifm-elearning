@@ -150,7 +150,7 @@ export default function AdminPlatformSettingsPage() {
           <div>
             <h1 className="font-heading text-2xl font-bold">Platform settings</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Edit values that used to require a code deploy — sender,
+              Edit values that used to require a code deploy sender,
               quiz defaults, marketing copy, tiers, email templates.
             </p>
           </div>
@@ -389,7 +389,7 @@ export default function AdminPlatformSettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-xs text-muted-foreground">
-            The tier <code>id</code> must match the values stored on courses (<em>gateway, professional, executive</em>) — changing it disconnects the tier from existing course rows.
+            The tier <code>id</code> must match the values stored on courses (<em>gateway, professional, executive</em>) changing it disconnects the tier from existing course rows.
           </p>
           {tiers.map((tier, i) => (
             <div key={tier.id + i} className="rounded-lg border p-4">

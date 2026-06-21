@@ -178,7 +178,7 @@ function AggregatePanel({
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg">Results — {surveyTitle}</CardTitle>
+        <CardTitle className="text-lg">Results {surveyTitle}</CardTitle>
         <Button variant="ghost" size="sm" onClick={onClose}>
           Close
         </Button>

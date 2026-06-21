@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
         .map((r) => [r.id, r])
     );
 
-    const subject = `Your VIFM Academy access — voucher ${voucherCode}`;
+    const subject = `Your VIFM Academy access voucher ${voucherCode}`;
     const courseList = courseNames.length
       ? courseNames.join(", ")
       : "your courses";
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
           `Hi ${r.full_name ?? "there"},\n\n` +
           `Your VIFM Academy account is ready. Use voucher code ${voucherCode} ` +
           `to unlock ${courseList}.\n\n` +
-          `Sign in at the link in this email's footer to begin.\n\n— VIFM Academy`;
+          `Sign in at the link in this email's footer to begin.\n\n VIFM Academy`;
         await sendEmail({ to: r.email, subject, body });
         return { id, status: "sent" as const };
       })

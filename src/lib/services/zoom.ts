@@ -30,7 +30,7 @@ function devWarn(): void {
   if (!warnedDev) {
     warnedDev = true;
     console.warn(
-      "[zoom] Zoom integration is not wired up — returning placeholder data in dev."
+      "[zoom] Zoom integration is not wired up returning placeholder data in dev."
     );
   }
 }

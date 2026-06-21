@@ -71,7 +71,7 @@ export default function MyBadgesPage() {
       {!enabled && (
         <Card className="border-amber-500/40 bg-amber-500/5">
           <CardContent className="py-4 text-sm text-amber-900 dark:text-amber-200">
-            Badges aren&apos;t configured on this site yet — your future
+            Badges aren&apos;t configured on this site yet your future
             completed courses will appear here once they are.
           </CardContent>
         </Card>

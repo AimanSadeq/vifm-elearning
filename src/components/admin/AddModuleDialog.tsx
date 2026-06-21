@@ -30,7 +30,7 @@ export function AddModuleDialog({
     e.preventDefault()
 
     if (!formData.title.trim() && !formData.title_ar.trim()) {
-      toast.error('Provide a module title in English or Arabic — at least one is required')
+      toast.error('Provide a module title in English or Arabic at least one is required')
       return
     }
 
@@ -95,7 +95,7 @@ export function AddModuleDialog({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <p className="text-xs text-muted-foreground">
-            Fill in at least one language — modules with only an Arabic title appear in the Arabic catalog only, and vice versa.
+            Fill in at least one language modules with only an Arabic title appear in the Arabic catalog only, and vice versa.
           </p>
           <div>
             <label className="block text-sm font-medium text-foreground">Module Title (English)</label>

@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
               await supabaseAdmin.auth.admin.deleteUser(userId);
             } catch (e) {
               console.error(
-                "Bulk import rollback failed — orphan auth user remains",
+                "Bulk import rollback failed orphan auth user remains",
                 { userId, email, reason, error: e }
               );
             }

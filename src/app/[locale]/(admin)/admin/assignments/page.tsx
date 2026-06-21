@@ -320,7 +320,7 @@ function GradingPanel({
               )}
             </div>
             {max == null && (
-              <p className="mt-1 text-xs text-muted-foreground">Ungraded — feedback only</p>
+              <p className="mt-1 text-xs text-muted-foreground">Ungraded feedback only</p>
             )}
           </div>
           <div>

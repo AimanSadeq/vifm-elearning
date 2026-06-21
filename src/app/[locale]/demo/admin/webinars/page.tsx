@@ -4,7 +4,7 @@ const webinars = [
   { title: "IFRS 17 Implementation Deep Dive", date: "Apr 22, 2026 · 2:00 PM GST", host: "Dr. Sarah Ahmed", registered: 147, capacity: 200, status: "upcoming" },
   { title: "Basel IV: What Banks Need to Know", date: "Apr 29, 2026 · 4:00 PM GST", host: "Prof. Omar Hassan", registered: 89, capacity: 150, status: "upcoming" },
   { title: "AI in Compliance Monitoring", date: "May 5, 2026 · 3:00 PM GST", host: "Dr. Khaled Al-Mutairi", registered: 34, capacity: 100, status: "upcoming" },
-  { title: "Q1 Regulatory Updates — GCC", date: "Apr 1, 2026 · 2:00 PM GST", host: "Dr. Sarah Ahmed", registered: 198, capacity: 200, status: "past" },
+  { title: "Q1 Regulatory Updates GCC", date: "Apr 1, 2026 · 2:00 PM GST", host: "Dr. Sarah Ahmed", registered: 198, capacity: 200, status: "past" },
   { title: "ESG Reporting for Banks", date: "Mar 18, 2026 · 3:00 PM GST", host: "Maria Fernandez", registered: 156, capacity: 200, status: "past" },
 ];
 

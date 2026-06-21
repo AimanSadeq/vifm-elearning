@@ -60,7 +60,7 @@ export async function POST(
 
     if (existingModules && existingModules.length > 0) {
       return NextResponse.json({
-        message: "Course already has modules — scaffold skipped",
+        message: "Course already has modules scaffold skipped",
         skipped: true,
       });
     }

@@ -90,7 +90,7 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
     e.preventDefault()
 
     if (!formData.title.trim() && !formData.title_ar.trim()) {
-      setError('Provide a lesson title in English or Arabic — at least one is required')
+      setError('Provide a lesson title in English or Arabic at least one is required')
       return
     }
 
@@ -182,7 +182,7 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
           {/* Titles */}
           <div className="space-y-2">
             <p className="text-xs text-muted-foreground">
-              Fill in at least one language — Arabic-only lessons appear in the Arabic version of the course only, and vice versa.
+              Fill in at least one language Arabic-only lessons appear in the Arabic version of the course only, and vice versa.
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -219,7 +219,7 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
                 {uploadedFile ? (
                   <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
                     <CheckCircle2 className="h-4 w-4" />
-                    New file uploaded — will be saved on update
+                    New file uploaded will be saved on update
                   </span>
                 ) : (lesson.video_url || lesson.document_url) ? (
                   <span className="text-muted-foreground">File uploaded</span>

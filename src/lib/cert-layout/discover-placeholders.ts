@@ -51,7 +51,7 @@ export function discoverPlaceholders(pptxBuffer: Buffer): string[] {
     totalDecompressed += xml.length;
     if (totalDecompressed > MAX_DECOMPRESSED_BYTES) {
       throw new Error(
-        `[discover-placeholders] .pptx slides decompressed past ${MAX_DECOMPRESSED_BYTES} bytes — refusing to scan further`
+        `[discover-placeholders] .pptx slides decompressed past ${MAX_DECOMPRESSED_BYTES} bytes refusing to scan further`
       );
     }
     let m: RegExpExecArray | null;

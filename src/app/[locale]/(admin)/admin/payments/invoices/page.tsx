@@ -210,7 +210,7 @@ export default function AdminInvoicesPage() {
             Invoices
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Completed payments — receipts, refunds, and invoice exports.
+            Completed payments receipts, refunds, and invoice exports.
           </p>
         </div>
         <span className="text-sm text-muted-foreground">

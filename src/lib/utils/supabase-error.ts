@@ -31,7 +31,7 @@ export function reportSupabaseError(
     msg.includes("invalid jwt") ||
     (msg.includes("session") && msg.includes("expired"));
   if (isJwtExpired) {
-    toast.error("Your session expired — please sign in again.");
+    toast.error("Your session expired please sign in again.");
     return;
   }
   if (code === "42501") {

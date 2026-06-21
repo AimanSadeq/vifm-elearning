@@ -64,7 +64,7 @@ export default function AdminCertificateTemplatesPage() {
       if ((count ?? 0) <= 1) {
         setIsSaving(false);
         toast.error(
-          "Cannot remove default — set another template as default first."
+          "Cannot remove default set another template as default first."
         );
         return;
       }

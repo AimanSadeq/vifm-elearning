@@ -137,7 +137,7 @@ export async function incrementPromoUsage(
   // the migration `20260424_increment_promo_usage.sql` hasn't been applied
   // — log loudly so it doesn't quietly under-count promo redemptions.
   console.warn(
-    "[promo] increment_promo_usage RPC missing — falling back to non-atomic update.",
+    "[promo] increment_promo_usage RPC missing falling back to non-atomic update.",
     "Apply supabase/migrations/20260424_increment_promo_usage.sql.",
     rpcError
   );

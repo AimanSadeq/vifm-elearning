@@ -63,7 +63,7 @@ function ensureConfigured(): boolean {
   if (!warnedAboutMissingConfig) {
     warnedAboutMissingConfig = true;
     console.warn(
-      "[email] Outlook not configured — emails will be skipped in dev. " +
+      "[email] Outlook not configured emails will be skipped in dev. " +
         "Set OUTLOOK_* in .env.local to test real sending."
     );
   }
@@ -115,13 +115,13 @@ export async function sendEnrollmentConfirmation(params: {
   const tpl = await getEmailTemplate("enrollment_confirmation");
   const subject = tpl?.subject
     ? applyTemplate(tpl.subject, vars)
-    : `Enrollment confirmed — ${params.courseName}`;
+    : `Enrollment confirmed ${params.courseName}`;
   const body = tpl?.html
     ? applyTemplate(tpl.html, vars)
     : `<h2>Welcome to ${vars.courseName}</h2>
        <p>Hi ${vars.userName},</p>
        <p>You're enrolled. Sign in any time at <a href="${vars.appUrl}">VIFM Academy</a> to start learning.</p>
-       <p>— VIFM Academy</p>`;
+       <p> VIFM Academy</p>`;
 
   const html = `<div style="font-family: system-ui, sans-serif; line-height: 1.5; max-width: 560px;">${body}</div>`;
   return send(params.to, subject, html);

@@ -129,7 +129,7 @@ export async function generateCertificateFile(
   if (blockingMissing.length > 0) {
     throw new Error(
       `[certificate-generator] required placeholders unresolved: ${blockingMissing.join(", ")}. ` +
-        `PowerPoint may have split the token across runs — open the .pptx, delete and retype the affected text, and re-upload.`
+        `PowerPoint may have split the token across runs open the .pptx, delete and retype the affected text, and re-upload.`
     );
   }
 

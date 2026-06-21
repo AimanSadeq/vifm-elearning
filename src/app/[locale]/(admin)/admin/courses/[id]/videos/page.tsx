@@ -428,7 +428,7 @@ export default function BulkVideosPage() {
       }
 
       if (result.skipped) {
-        toast.info("Modules already exist — nothing to scaffold");
+        toast.info("Modules already exist nothing to scaffold");
       } else {
         toast.success(
           `Created ${result.modulesCreated} modules and ${result.lessonsCreated} lessons`

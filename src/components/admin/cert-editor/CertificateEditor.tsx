@@ -207,7 +207,7 @@ export function CertificateEditor({
         // this the local `placeholderValues` map could disagree with what the
         // PATCH endpoint will accept on Save.
         await fetchPlaceholders();
-        toast.success("Template uploaded — new certificates will use this file");
+        toast.success("Template uploaded new certificates will use this file");
       } catch (error) {
         const message = error instanceof Error ? error.message : "Upload failed";
         toast.error(message);
@@ -231,7 +231,7 @@ export function CertificateEditor({
       setPptxPath(null);
       setPptxPublicUrl(null);
       fetchPlaceholders();
-      toast.success("Custom template removed — using bundled default");
+      toast.success("Custom template removed using bundled default");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Remove failed";
       toast.error(message);
@@ -351,7 +351,7 @@ export function CertificateEditor({
       {pptxPath && (
         <div className="border-b border-emerald-200 bg-emerald-50 px-6 py-2 text-xs text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-200">
           <strong>Custom .pptx is active.</strong> The visual design comes from
-          your uploaded file — we can&apos;t pixel-render an arbitrary .pptx in the
+          your uploaded file we can&apos;t pixel-render an arbitrary .pptx in the
           browser, so there&apos;s no live canvas preview here. Click{" "}
           <strong>Sample (.pptx)</strong> to download a personalized copy and
           inspect the real layout in PowerPoint or Keynote. Set placeholder
@@ -501,7 +501,7 @@ function UploadedPptxPanel({
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-white/95 p-6 text-center text-sm text-muted-foreground dark:bg-card/95">
               <FileText className="h-8 w-8 text-muted-foreground" />
               <p>
-                Preview didn&apos;t load — your network may block{" "}
+                Preview didn&apos;t load your network may block{" "}
                 <code>view.officeapps.live.com</code>. Click{" "}
                 <strong>Sample (personalized)</strong> above to verify the
                 design instead.
@@ -526,7 +526,7 @@ function UploadedPptxPanel({
         <div className="rounded-2xl border border-dashed border-emerald-300 bg-white p-10 text-center shadow-sm dark:border-emerald-900/50 dark:bg-card">
           <FileText className="mx-auto h-10 w-10 text-emerald-600 dark:text-emerald-400" />
           <p className="mt-4 text-sm text-muted-foreground">
-            Custom .pptx active. The public preview URL isn&apos;t available — use
+            Custom .pptx active. The public preview URL isn&apos;t available use
             the buttons above to download or replace the file.
           </p>
         </div>

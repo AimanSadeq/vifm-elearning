@@ -82,11 +82,11 @@ export function BulkUploadVideosDialog({
 
     Array.from(files).forEach((file) => {
       if (!ALLOWED_TYPES.includes(file.type)) {
-        rejected.push(`${file.name} — unsupported type`)
+        rejected.push(`${file.name} unsupported type`)
         return
       }
       if (file.size > MAX_FILE_SIZE) {
-        rejected.push(`${file.name} — over 2GB`)
+        rejected.push(`${file.name} over 2GB`)
         return
       }
       incoming.push({
@@ -127,7 +127,7 @@ export function BulkUploadVideosDialog({
     const titleAr = row.title_ar.trim()
 
     if (!titleEn && !titleAr) {
-      const message = 'Provide a title in English or Arabic — at least one is required'
+      const message = 'Provide a title in English or Arabic at least one is required'
       updateRow(row.id, { status: 'error', progress: 0, error: message })
       return { ok: false, error: message }
     }
@@ -249,7 +249,7 @@ export function BulkUploadVideosDialog({
           <div>
             <h2 className="text-xl font-semibold text-foreground">Bulk Upload Videos</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Pick multiple video files. English titles are generated from filenames — edit before uploading. Add Arabic if needed (at least one language is required per row).
+              Pick multiple video files. English titles are generated from filenames edit before uploading. Add Arabic if needed (at least one language is required per row).
             </p>
           </div>
           <button

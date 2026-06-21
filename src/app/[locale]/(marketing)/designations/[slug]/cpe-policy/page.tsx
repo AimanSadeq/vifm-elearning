@@ -137,8 +137,8 @@ export default function DesignationCPEPolicyPage() {
         </h1>
         <p className="mt-3 text-muted-foreground">
           {locale === "ar"
-            ? `شهادة ${d.abbreviation} — معهد فيرجينيا للتمويل والإدارة`
-            : `${d.abbreviation} Designation — Virginia Institute of Finance and Management`}
+            ? `شهادة ${d.abbreviation} معهد فيرجينيا للتمويل والإدارة`
+            : `${d.abbreviation} Designation Virginia Institute of Finance and Management`}
         </p>
       </div>
 

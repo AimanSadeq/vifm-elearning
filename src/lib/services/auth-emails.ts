@@ -79,7 +79,7 @@ function copyFor(action: string, lang: Lang): Copy {
       intro: "We received a request to reset your password. Click below to choose a new one.",
       cta: "Reset password",
       fallback: "If the button doesn't work, copy and paste this link into your browser:",
-      ignore: "If you didn't request this, you can safely ignore this email — your password won't change.",
+      ignore: "If you didn't request this, you can safely ignore this email your password won't change.",
     },
     magiclink: {
       subject: "Your VIFM Academy sign-in link",

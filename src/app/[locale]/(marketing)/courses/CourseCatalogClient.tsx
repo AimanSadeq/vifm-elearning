@@ -95,7 +95,7 @@ export default function CourseCatalogClient({
           <p className="mt-3 max-w-xl mx-auto text-white/75 text-base md:text-lg">
             {locale === "ar"
               ? "دورات عالمية في التمويل، المصرفية، البيانات، والقيادة"
-              : "Professional courses in Finance, Banking, Data, and Leadership — taught by industry leaders."}
+              : "Professional courses in Finance, Banking, Data, and Leadership taught by industry leaders."}
           </p>
 
           {/* Search */}

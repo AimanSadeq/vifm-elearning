@@ -86,7 +86,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json(
         {
           error:
-            "Payment has no course_id and is not a subscription — nothing to provision.",
+            "Payment has no course_id and is not a subscription nothing to provision.",
         },
         { status: 400 }
       );

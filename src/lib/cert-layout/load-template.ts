@@ -43,7 +43,7 @@ export async function loadActiveTemplate(
 
   if (!isValidTemplatePath(pptxPath)) {
     throw new Error(
-      `[cert-layout] refusing to load pptx_path "${pptxPath}" — must match templates/<id>.pptx`
+      `[cert-layout] refusing to load pptx_path "${pptxPath}" must match templates/<id>.pptx`
     );
   }
 

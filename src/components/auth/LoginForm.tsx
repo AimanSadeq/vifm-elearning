@@ -175,7 +175,7 @@ export function LoginForm() {
           👁 Try Demo
         </p>
         <p className="mb-3 text-center text-[12px] text-muted-foreground">
-          Explore the system with sample data — no login required
+          Explore the system with sample data no login required
         </p>
         <div className="flex flex-col gap-2">
           {[
@@ -250,7 +250,7 @@ export function LoginForm() {
                   <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-center">
                     <div className="text-3xl mb-1">✅</div>
                     <div className="font-bold text-emerald-800 mb-1">Request Sent</div>
-                    <div className="text-sm text-emerald-700">Thanks — our team will reach out shortly.</div>
+                    <div className="text-sm text-emerald-700">Thanks our team will reach out shortly.</div>
                   </div>
                 ) : (
                   <form
@@ -268,7 +268,7 @@ export function LoginForm() {
                             company: reqCompany.trim(),
                             phone: reqPhone.trim(),
                             message: reqMessage.trim(),
-                            sourceSystem: "VIFM Academy — E-Learning Platform",
+                            sourceSystem: "VIFM Academy E-Learning Platform",
                           }),
                         });
                         const data = await resp.json().catch(() => ({}));

@@ -70,7 +70,7 @@ export function SurveyBuilder({ courseId }: Props) {
         title: "Course Feedback",
         title_ar: "تقييم الدورة",
         description:
-          "Help us improve — share your experience with this course.",
+          "Help us improve share your experience with this course.",
         is_required: true,
         is_active: true,
       }),
@@ -512,7 +512,7 @@ function QuestionEditor({
           </select>
           {initial && (
             <p className="text-xs text-muted-foreground">
-              Type cannot be changed after creation — delete and recreate if
+              Type cannot be changed after creation delete and recreate if
               needed.
             </p>
           )}

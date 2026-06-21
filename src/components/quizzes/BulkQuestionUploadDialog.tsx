@@ -165,7 +165,7 @@ function parseRow(row: Record<string, unknown>, rowNumber: number): ParsedQuesti
       rowNumber,
       ok: false,
       error:
-        "short_answer is not supported in bulk upload yet — add it manually via Add Question",
+        "short_answer is not supported in bulk upload yet add it manually via Add Question",
       questionText,
       questionType,
       points: 1,
@@ -298,7 +298,7 @@ export function BulkQuestionUploadDialog({
       if (rows.length === 0) throw new Error("No rows found");
       if (rows.length > MAX_IMPORT_QUESTIONS) {
         toast.error(
-          `Too many rows (${rows.length}). Max ${MAX_IMPORT_QUESTIONS} per import — split the file and upload again.`
+          `Too many rows (${rows.length}). Max ${MAX_IMPORT_QUESTIONS} per import split the file and upload again.`
         );
         setParsed([]);
         return;
@@ -399,7 +399,7 @@ export function BulkQuestionUploadDialog({
                   <div>
                     <p className="font-medium">Drop or pick a file</p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      .xlsx or .csv — first row should be column headers.
+                      .xlsx or .csv first row should be column headers.
                     </p>
                   </div>
                   <input

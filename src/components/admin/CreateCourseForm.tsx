@@ -96,7 +96,7 @@ export function CreateCourseForm() {
 
     if (!hasEn && !hasAr) {
       toast.error(
-        'Provide a course title in English or Arabic — at least one is required'
+        'Provide a course title in English or Arabic at least one is required'
       )
       return
     }
@@ -160,7 +160,7 @@ export function CreateCourseForm() {
           {/* Title — at least one of EN/AR required */}
           <div className="space-y-2">
             <p className="text-xs text-muted-foreground">
-              <span className="font-semibold text-foreground">Course title</span> — fill in the language(s) you want this course to appear in. At least one is required. Arabic-only courses will only appear on the Arabic catalog; English-only on the English catalog.
+              <span className="font-semibold text-foreground">Course title</span>  fill in the language(s) you want this course to appear in. At least one is required. Arabic-only courses will only appear on the Arabic catalog; English-only on the English catalog.
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>

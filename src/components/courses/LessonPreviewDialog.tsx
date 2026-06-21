@@ -203,8 +203,8 @@ function DocumentPreview({ lesson }: { lesson: Lesson }) {
           <p className="font-medium truncate">{fileName}</p>
           <p className="text-xs text-muted-foreground">
             {locale === "ar"
-              ? "ملف مضغوط — قم بالتنزيل"
-              : "ZIP archive — download to view"}
+              ? "ملف مضغوط قم بالتنزيل"
+              : "ZIP archive download to view"}
           </p>
         </div>
         <a

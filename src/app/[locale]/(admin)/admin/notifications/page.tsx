@@ -131,7 +131,7 @@ export default function AdminNotificationsPage() {
 
     if (userIds.length === 0) {
       setIsSending(false);
-      toast.error("No matching recipients found — nothing was sent.");
+      toast.error("No matching recipients found nothing was sent.");
       return;
     }
 

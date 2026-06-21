@@ -978,12 +978,12 @@ function DocumentDownloadCard({
   const helper =
     kind === "zip"
       ? locale === "ar"
-        ? "ملف مضغوط — قم بالتنزيل لاستخدام المحتوى"
-        : "Archive — download to access the contents"
+        ? "ملف مضغوط قم بالتنزيل لاستخدام المحتوى"
+        : "Archive download to access the contents"
       : kind === "excel" || kind === "word" || kind === "powerpoint"
         ? locale === "ar"
-          ? "لا يمكن عرض ملفات أوفيس داخل المتصفح — افتحها أو نزّلها"
-          : "Office files can’t be previewed in-browser — open or download"
+          ? "لا يمكن عرض ملفات أوفيس داخل المتصفح افتحها أو نزّلها"
+          : "Office files can’t be previewed in-browser open or download"
         : locale === "ar"
           ? "هذا الملف لا يدعم المعاينة المباشرة"
           : "Preview not supported for this file type";

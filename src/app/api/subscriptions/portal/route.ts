@@ -19,7 +19,7 @@ export async function POST() {
 
     if (!process.env.STRIPE_SECRET_KEY) {
       return NextResponse.json(
-        { error: "Billing portal is not available — Stripe is not configured." },
+        { error: "Billing portal is not available Stripe is not configured." },
         { status: 503 }
       );
     }

@@ -149,7 +149,7 @@ export default function CertificatePage() {
 
     const linkedInUrl = new URL("https://www.linkedin.com/profile/add");
     linkedInUrl.searchParams.set("startTask", "CERTIFICATION_NAME");
-    linkedInUrl.searchParams.set("name", `${certData.abbreviation} — ${certData.designationName}`);
+    linkedInUrl.searchParams.set("name", `${certData.abbreviation} ${certData.designationName}`);
     linkedInUrl.searchParams.set("organizationName", "Virginia Institute of Finance and Management (VIFM)");
     linkedInUrl.searchParams.set("certUrl", certData.verifyUrl);
     linkedInUrl.searchParams.set("certId", certData.memberNumber);

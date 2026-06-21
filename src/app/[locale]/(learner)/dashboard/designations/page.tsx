@@ -256,8 +256,8 @@ export default function DesignationDashboardPage() {
               <p className={`font-semibold ${isGracePeriod ? "text-amber-900" : "text-brand-900"}`}>
                 {isGracePeriod
                   ? locale === "ar"
-                    ? "أنت في فترة السماح — تطبق رسوم تأخير"
-                    : "You are in the grace period — late fee applies"
+                    ? "أنت في فترة السماح تطبق رسوم تأخير"
+                    : "You are in the grace period late fee applies"
                   : locale === "ar"
                     ? `${daysUntilRenewal} يوم حتى موعد التجديد`
                     : `${daysUntilRenewal} days until renewal deadline`}

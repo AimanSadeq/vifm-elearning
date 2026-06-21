@@ -568,7 +568,7 @@
     "successMessage": "Thank you for reaching out. We'll get back to you within 24 hours."
   },
   "footer": {
-    "description": "Virginia Institute of Finance and Management — Professional training and consulting across the GCC region.",
+    "description": "Virginia Institute of Finance and Management Professional training and consulting across the GCC region.",
     "quickLinks": "Quick Links",
     "support": "Support",
     "legal": "Legal",
@@ -654,7 +654,7 @@
   },
   "landing": {
     "heroTitle": "Advance Your Career with World-Class Professional E-Learning",
-    "heroSubtitle": "Expert-led courses in Finance, Data Analytics, Strategy, and Compliance — designed for professionals across the GCC region.",
+    "heroSubtitle": "Expert-led courses in Finance, Data Analytics, Strategy, and Compliance designed for professionals across the GCC region.",
     "exploreCourses": "Explore Courses",
     "getStarted": "Get Started Free",
     "heroFeatured": "Featured course",
@@ -726,13 +726,13 @@
     "pfAssessmentsTitle": "Proctored Examinations",
     "pfAssessmentsDesc": "Secure, proctored final examinations for professional designations. Our assessment platform ensures credential integrity with fair, transparent testing.",
     "pfAssessmentsH1": "Timed exams with secure proctoring",
-    "pfAssessmentsH2": "Multiple question formats — MCQ, case studies, essays",
+    "pfAssessmentsH2": "Multiple question formats MCQ, case studies, essays",
     "pfAssessmentsH3": "Detailed score breakdowns by topic area",
     "careerPathwaysTitle": "Your Career Progression",
     "careerPathwaysSubtitle": "Career Pathways",
     "careerGatewayTitle": "Gateway Tier",
     "careerGatewayDesc": "Begin your professional journey with foundational certifications that build core competencies in finance, data analytics, and AI.",
-    "careerGatewayH1": "No prerequisites — open to all professionals",
+    "careerGatewayH1": "No prerequisites open to all professionals",
     "careerGatewayH2": "Build a strong foundation in your chosen field",
     "careerGatewayH3": "Earn your first professional credential",
     "careerProfessionalTitle": "Professional Tier",
@@ -892,7 +892,7 @@
   },
   "metadata": {
     "home": {
-      "title": "VIFM Academy — Professional Training & E-Learning",
+      "title": "VIFM Academy Professional Training & E-Learning",
       "description": "Professional training in Finance, Data Analytics, Strategy and Compliance across the GCC region."
     },
     "courses": {
@@ -913,7 +913,7 @@
     },
     "about": {
       "title": "About VIFM Academy",
-      "description": "Learn about the Virginia Institute of Finance and Management — our mission, faculty, and offices across the GCC."
+      "description": "Learn about the Virginia Institute of Finance and Management our mission, faculty, and offices across the GCC."
     },
     "contact": {
       "title": "Contact Us",

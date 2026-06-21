@@ -155,7 +155,7 @@ export default function PaymentSuccessPage() {
               <h1 className="text-2xl font-bold">Payment received</h1>
               <p className="text-muted-foreground">
                 Your payment is still being confirmed by the bank. We&apos;ll
-                send you an email as soon as it&apos;s settled — you can also
+                send you an email as soon as it&apos;s settled you can also
                 check your account in a few minutes.
               </p>
               <div className="flex flex-col gap-3 pt-4">

@@ -311,11 +311,11 @@ function AssignmentsTab() {
           disabled={savingId === c.id}
           className="block w-full rounded-md border border-border bg-card px-3 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         >
-          <option value="">— None —</option>
+          <option value=""> None </option>
           {templates.map((tpl) => (
             <option key={tpl.id} value={tpl.id}>
               {tplLabel(tpl)}
-              {tpl.tier ? ` — ${tpl.tier}` : ""}
+              {tpl.tier ? ` ${tpl.tier}` : ""}
             </option>
           ))}
         </select>
@@ -333,7 +333,7 @@ function AssignmentsTab() {
       <CardContent>
         {templates.length === 0 && (
           <p className="mb-3 text-xs text-amber-600">
-            No templates loaded — assignments will be empty until templates are
+            No templates loaded assignments will be empty until templates are
             configured in the badges service.
           </p>
         )}
@@ -565,7 +565,7 @@ function ManualIssueTab() {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-xs text-muted-foreground">
-          Idempotent — re-submitting the same user+course returns the existing
+          Idempotent re-submitting the same user+course returns the existing
           badge rather than issuing a duplicate.
         </p>
 
@@ -577,7 +577,7 @@ function ManualIssueTab() {
               onChange={(e) => setUserId(e.target.value)}
               className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
             >
-              <option value="">— Select user —</option>
+              <option value=""> Select user </option>
               {users.map((u) => (
                 <option key={u.id} value={u.id}>
                   {u.full_name} ({u.email})
@@ -593,7 +593,7 @@ function ManualIssueTab() {
               onChange={(e) => setCourseId(e.target.value)}
               className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
             >
-              <option value="">— Select course —</option>
+              <option value=""> Select course </option>
               {courses.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.title}
@@ -609,7 +609,7 @@ function ManualIssueTab() {
               onChange={(e) => setTemplateId(e.target.value)}
               className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
             >
-              <option value="">— Use template assigned to the course —</option>
+              <option value=""> Use template assigned to the course </option>
               {templates.map((tpl) => (
                 <option key={tpl.id} value={tpl.id}>
                   {tplLabel(tpl)}

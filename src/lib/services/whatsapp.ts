@@ -31,7 +31,7 @@ export async function sendWhatsAppMessage(_params: {
   if (!warnedDev) {
     warnedDev = true;
     console.warn(
-      "[whatsapp] WhatsApp delivery is not wired up — message skipped in dev."
+      "[whatsapp] WhatsApp delivery is not wired up message skipped in dev."
     );
   }
   return { messageId: `wa_dev_${Date.now()}`, success: false };

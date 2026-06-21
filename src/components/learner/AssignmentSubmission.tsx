@@ -121,7 +121,7 @@ export function AssignmentSubmission({ lessonId, onSubmitted }: Props) {
         return;
       }
       setPendingFile({ path, name: file.name, size: file.size });
-      toast.success("File ready — click Submit to send.");
+      toast.success("File ready click Submit to send.");
     } finally {
       setIsUploading(false);
     }
@@ -150,7 +150,7 @@ export function AssignmentSubmission({ lessonId, onSubmitted }: Props) {
       return;
     }
     toast.success(
-      submission ? "Updated — your instructor will review again." : "Submitted!"
+      submission ? "Updated your instructor will review again." : "Submitted!"
     );
     setSubmission(j.data);
     onSubmitted?.();
@@ -217,7 +217,7 @@ export function AssignmentSubmission({ lessonId, onSubmitted }: Props) {
                   Needs revision
                 </Badge>
               ) : (
-                <Badge variant="secondary">Submitted — awaiting review</Badge>
+                <Badge variant="secondary">Submitted awaiting review</Badge>
               )}
               {isGraded && meta.assignment_max_points && (
                 <span className="inline-flex items-center gap-1 text-sm font-semibold">
@@ -379,8 +379,8 @@ export function AssignmentSubmission({ lessonId, onSubmitted }: Props) {
           {!canEdit && (
             <p className="text-xs text-muted-foreground border-t border-border pt-3">
               {isAr
-                ? "تم تقدير هذه الإجابة — لا يمكن تعديلها."
-                : "This submission has been graded — it can no longer be edited."}
+                ? "تم تقدير هذه الإجابة لا يمكن تعديلها."
+                : "This submission has been graded it can no longer be edited."}
             </p>
           )}
         </CardContent>
