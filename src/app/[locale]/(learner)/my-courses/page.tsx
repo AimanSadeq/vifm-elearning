@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import { BookOpen, PlayCircle, Award } from "lucide-react";
+import { BookOpen, PlayCircle, Award, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
@@ -177,20 +177,29 @@ export default function MyCoursesPage() {
                     </h3>
 
                     <div className="mt-3">
-                      <div className="flex items-center justify-between text-xs mb-1">
-                        <span className="text-muted-foreground">
-                          {tc("overview") === "Overview"
-                            ? "Progress"
-                            : "التقدم"}
-                        </span>
-                        <span className="font-medium">
-                          {Math.round(enrollment.progress_percentage)}%
-                        </span>
-                      </div>
-                      <Progress
-                        value={enrollment.progress_percentage}
-                        className="h-2"
-                      />
+                      {isCompleted ? (
+                        <div className="flex items-center gap-1.5 text-sm font-medium text-success">
+                          <CheckCircle2 className="h-4 w-4" />
+                          {tc("completed")}
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-muted-foreground">
+                              {tc("overview") === "Overview"
+                                ? "Progress"
+                                : "التقدم"}
+                            </span>
+                            <span className="font-medium">
+                              {Math.round(enrollment.progress_percentage)}%
+                            </span>
+                          </div>
+                          <Progress
+                            value={enrollment.progress_percentage}
+                            className="h-2"
+                          />
+                        </>
+                      )}
                     </div>
 
                     <Button
