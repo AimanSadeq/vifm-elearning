@@ -93,8 +93,15 @@ export default function CoursesAnalyticsPage() {
       render: (item) => (
         <div>
           <p className="font-medium">{item.title}</p>
-          <p className="text-xs capitalize text-muted-foreground">
-            {item.level}
+          <p className="text-xs text-muted-foreground">
+            {(
+              {
+                beginner: "Gateway",
+                intermediate: "Professional",
+                advanced: "Executive",
+                expert: "Expert",
+              } as Record<string, string>
+            )[item.level] ?? item.level}
           </p>
         </div>
       ),

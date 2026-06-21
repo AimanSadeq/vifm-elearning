@@ -262,10 +262,9 @@ export function CreateCourseForm() {
                 onChange={(e) => setForm({ ...form, difficulty_level: e.target.value })}
                 className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               >
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-                <option value="expert">Expert</option>
+                <option value="beginner">Gateway</option>
+                <option value="intermediate">Professional</option>
+                <option value="advanced">Executive</option>
               </select>
             </div>
             <div>

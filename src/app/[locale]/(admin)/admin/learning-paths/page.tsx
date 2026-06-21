@@ -230,11 +230,11 @@ export default function AdminLearningPathsPage() {
   function getDifficultyBadge(level?: DifficultyLevel | null) {
     switch (level) {
       case "beginner":
-        return <Badge variant="success">Beginner</Badge>;
+        return <Badge variant="success">Gateway</Badge>;
       case "intermediate":
-        return <Badge variant="info">Intermediate</Badge>;
+        return <Badge variant="info">Professional</Badge>;
       case "advanced":
-        return <Badge variant="warning">Advanced</Badge>;
+        return <Badge variant="warning">Executive</Badge>;
       case "expert":
         return <Badge variant="destructive">Expert</Badge>;
       default:

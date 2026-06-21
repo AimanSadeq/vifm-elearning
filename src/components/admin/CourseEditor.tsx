@@ -950,10 +950,9 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                 <div>
                   <label className="block text-sm font-medium text-foreground">Difficulty Level</label>
                   <select value={courseForm.difficulty_level} onChange={(e) => setCourseForm({ ...courseForm, difficulty_level: e.target.value as DifficultyLevel })} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                    <option value="expert">Expert</option>
+                    <option value="beginner">Gateway</option>
+                    <option value="intermediate">Professional</option>
+                    <option value="advanced">Executive</option>
                   </select>
                 </div>
                 <div>
@@ -1030,7 +1029,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                 <div><p className="text-xs text-muted-foreground">Title (AR)</p><p className="mt-0.5 text-sm text-foreground" dir="rtl">{course.title_ar || '—'}</p></div>
                 <div><p className="text-xs text-muted-foreground">Category</p><p className="mt-0.5 text-sm text-foreground">{course.category?.name || '—'}</p></div>
                 <div><p className="text-xs text-muted-foreground">Instructor</p><p className="mt-0.5 text-sm text-foreground">{course.instructor?.full_name || '—'}</p></div>
-                <div><p className="text-xs text-muted-foreground">Difficulty</p><p className="mt-0.5 text-sm text-foreground capitalize">{course.difficulty_level || '—'}</p></div>
+                <div><p className="text-xs text-muted-foreground">Difficulty</p><p className="mt-0.5 text-sm text-foreground">{course.difficulty_level ? ({ beginner: 'Gateway', intermediate: 'Professional', advanced: 'Executive', expert: 'Expert' }[course.difficulty_level] ?? course.difficulty_level) : '—'}</p></div>
                 <div><p className="text-xs text-muted-foreground">Price</p><p className="mt-0.5 text-sm text-foreground">{course.is_free ? 'Free' : `${course.price} ${course.currency}`}</p></div>
                 <div><p className="text-xs text-muted-foreground">Passing Score</p><p className="mt-0.5 text-sm text-foreground">{course.passing_score}%</p></div>
                 <div><p className="text-xs text-muted-foreground">Certificate</p><p className="mt-0.5 text-sm text-foreground">{course.certificate_enabled ? 'Enabled' : 'Disabled'}</p></div>

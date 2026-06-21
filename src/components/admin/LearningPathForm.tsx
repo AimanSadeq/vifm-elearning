@@ -154,10 +154,9 @@ export function LearningPathForm({
                 {...register("difficultyLevel")}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               >
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-                <option value="expert">Expert</option>
+                <option value="beginner">Gateway</option>
+                <option value="intermediate">Professional</option>
+                <option value="advanced">Executive</option>
               </select>
             </div>
 

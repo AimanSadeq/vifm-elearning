@@ -44,21 +44,21 @@ function getDifficultyMeta(
   switch (level) {
     case "beginner":
       return {
-        label: labelMap.beginner ?? "Beginner",
+        label: labelMap.beginner ?? "Gateway",
         ribbonClasses: "from-brand-300/30 via-transparent",
         stripeClasses: "from-brand-300 to-brand-500",
         pillClasses: "border-brand-200/60 bg-brand-300/15 text-brand-50",
       };
     case "intermediate":
       return {
-        label: labelMap.intermediate ?? "Intermediate",
+        label: labelMap.intermediate ?? "Professional",
         ribbonClasses: "from-brand-400/30 via-transparent",
         stripeClasses: "from-brand-400 to-brand-600",
         pillClasses: "border-brand-300/60 bg-brand-400/15 text-brand-100",
       };
     case "advanced":
       return {
-        label: labelMap.advanced ?? "Advanced",
+        label: labelMap.advanced ?? "Executive",
         ribbonClasses: "from-brand-600/40 via-transparent",
         stripeClasses: "from-brand-600 to-brand-800",
         pillClasses: "border-brand-400/60 bg-brand-500/20 text-brand-100",
