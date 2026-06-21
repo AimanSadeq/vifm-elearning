@@ -229,11 +229,11 @@ export default function AdminLearningPathsPage() {
 
   function getDifficultyBadge(level?: DifficultyLevel | null) {
     switch (level) {
-      case "beginner":
+      case "gateway":
         return <Badge variant="success">Gateway</Badge>;
-      case "intermediate":
+      case "professional":
         return <Badge variant="info">Professional</Badge>;
-      case "advanced":
+      case "executive":
         return <Badge variant="warning">Executive</Badge>;
       case "expert":
         return <Badge variant="destructive">Expert</Badge>;
@@ -361,7 +361,7 @@ export default function AdminLearningPathsPage() {
                   description: editingPath.description ?? undefined,
                   descriptionAr: editingPath.description_ar ?? undefined,
                   difficultyLevel:
-                    editingPath.difficulty_level ?? "beginner",
+                    editingPath.difficulty_level ?? "gateway",
                   categoryId: editingPath.category_id ?? undefined,
                   estimatedHours: editingPath.estimated_hours,
                   isPublished: editingPath.is_published,

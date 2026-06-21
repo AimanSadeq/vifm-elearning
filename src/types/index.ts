@@ -33,9 +33,9 @@ export type CertificateTemplateKey = "classic" | "modern" | "corporate" | "elega
 export type SubscriptionStatus = "active" | "cancelled" | "expired" | "past_due";
 export type LearningPathStatus = "active" | "completed" | "dropped";
 export type DifficultyLevel =
-  | "beginner"
-  | "intermediate"
-  | "advanced"
+  | "gateway"
+  | "professional"
+  | "executive"
   | "expert";
 
 export interface Profile {

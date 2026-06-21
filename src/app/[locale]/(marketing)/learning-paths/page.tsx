@@ -84,12 +84,12 @@ export default function LearningPathsPage() {
 
   function getDifficultyBadge(level?: DifficultyLevel | null) {
     switch (level) {
-      case "beginner":
-        return <Badge variant="success">{t("beginner")}</Badge>;
-      case "intermediate":
-        return <Badge variant="info">{t("intermediate")}</Badge>;
-      case "advanced":
-        return <Badge variant="warning">{t("advanced")}</Badge>;
+      case "gateway":
+        return <Badge variant="success">{t("gateway")}</Badge>;
+      case "professional":
+        return <Badge variant="info">{t("professional")}</Badge>;
+      case "executive":
+        return <Badge variant="warning">{t("executive")}</Badge>;
       case "expert":
         return <Badge variant="destructive">{t("expert")}</Badge>;
       default:

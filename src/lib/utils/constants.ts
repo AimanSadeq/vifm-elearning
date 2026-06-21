@@ -16,9 +16,9 @@ export const COURSE_STATUSES = ["draft", "published", "archived"] as const;
 export type CourseStatus = (typeof COURSE_STATUSES)[number];
 
 export const DIFFICULTY_LEVELS = [
-  "beginner",
-  "intermediate",
-  "advanced",
+  "gateway",
+  "professional",
+  "executive",
   "expert",
 ] as const;
 export type DifficultyLevel = (typeof DIFFICULTY_LEVELS)[number];

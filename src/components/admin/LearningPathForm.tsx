@@ -52,7 +52,7 @@ export function LearningPathForm({
       titleAr: initialData?.titleAr ?? "",
       description: initialData?.description ?? "",
       descriptionAr: initialData?.descriptionAr ?? "",
-      difficultyLevel: initialData?.difficultyLevel ?? "beginner",
+      difficultyLevel: initialData?.difficultyLevel ?? "gateway",
       categoryId: initialData?.categoryId ?? "",
       estimatedHours: initialData?.estimatedHours ?? 0,
       isPublished: initialData?.isPublished ?? false,
@@ -154,9 +154,9 @@ export function LearningPathForm({
                 {...register("difficultyLevel")}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               >
-                <option value="beginner">Gateway</option>
-                <option value="intermediate">Professional</option>
-                <option value="advanced">Executive</option>
+                <option value="gateway">Gateway</option>
+                <option value="professional">Professional</option>
+                <option value="executive">Executive</option>
               </select>
             </div>
 

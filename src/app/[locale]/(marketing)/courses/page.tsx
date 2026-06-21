@@ -15,9 +15,9 @@ const VALID_SORTS = new Set([
   "price_desc",
 ]);
 const VALID_DIFFICULTIES = new Set([
-  "beginner",
-  "intermediate",
-  "advanced",
+  "gateway",
+  "professional",
+  "executive",
   "expert",
 ]);
 

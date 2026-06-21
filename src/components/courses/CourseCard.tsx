@@ -34,9 +34,9 @@ export function CourseCard({ course }: CourseCardProps) {
       : course.instructor?.full_name;
 
   const difficultyColors: Record<string, string> = {
-    beginner: "bg-success/10 text-success border-success/20",
-    intermediate: "bg-info/10 text-info border-info/20",
-    advanced: "bg-warning/10 text-warning border-warning/20",
+    gateway: "bg-success/10 text-success border-success/20",
+    professional: "bg-info/10 text-info border-info/20",
+    executive: "bg-warning/10 text-warning border-warning/20",
     expert: "bg-error/10 text-error border-error/20",
   };
 

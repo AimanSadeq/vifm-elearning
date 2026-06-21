@@ -29,7 +29,7 @@ export function CreateCourseForm() {
     short_description_ar: '',
     category_id: '',
     instructor_id: '',
-    difficulty_level: 'beginner' as string,
+    difficulty_level: 'gateway' as string,
     price: '0',
     currency: 'USD',
     is_free: true,
@@ -262,9 +262,9 @@ export function CreateCourseForm() {
                 onChange={(e) => setForm({ ...form, difficulty_level: e.target.value })}
                 className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               >
-                <option value="beginner">Gateway</option>
-                <option value="intermediate">Professional</option>
-                <option value="advanced">Executive</option>
+                <option value="gateway">Gateway</option>
+                <option value="professional">Professional</option>
+                <option value="executive">Executive</option>
               </select>
             </div>
             <div>

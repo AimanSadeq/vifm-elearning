@@ -42,23 +42,23 @@ function getDifficultyMeta(
   // brand for beginner, deepest for expert. Keeps the page on-brand while
   // still giving each level a visually distinct ribbon.
   switch (level) {
-    case "beginner":
+    case "gateway":
       return {
-        label: labelMap.beginner ?? "Gateway",
+        label: labelMap.gateway ?? "Gateway",
         ribbonClasses: "from-brand-300/30 via-transparent",
         stripeClasses: "from-brand-300 to-brand-500",
         pillClasses: "border-brand-200/60 bg-brand-300/15 text-brand-50",
       };
-    case "intermediate":
+    case "professional":
       return {
-        label: labelMap.intermediate ?? "Professional",
+        label: labelMap.professional ?? "Professional",
         ribbonClasses: "from-brand-400/30 via-transparent",
         stripeClasses: "from-brand-400 to-brand-600",
         pillClasses: "border-brand-300/60 bg-brand-400/15 text-brand-100",
       };
-    case "advanced":
+    case "executive":
       return {
-        label: labelMap.advanced ?? "Executive",
+        label: labelMap.executive ?? "Executive",
         ribbonClasses: "from-brand-600/40 via-transparent",
         stripeClasses: "from-brand-600 to-brand-800",
         pillClasses: "border-brand-400/60 bg-brand-500/20 text-brand-100",
@@ -116,9 +116,9 @@ export function CourseDetail({ course, modules }: CourseDetailProps) {
       : course.learning_outcomes;
 
   const difficultyLabels: Record<string, string> = {
-    beginner: t("beginner"),
-    intermediate: t("intermediate"),
-    advanced: t("advanced"),
+    gateway: t("gateway"),
+    professional: t("professional"),
+    executive: t("executive"),
     expert: t("expert"),
   };
   const difficulty = getDifficultyMeta(course.difficulty_level, difficultyLabels);

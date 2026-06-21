@@ -66,7 +66,7 @@ export default function CoursesAnalyticsPage() {
           enrollment_count: (c.enrollment_count as number) || 0,
           average_rating: (c.average_rating as number) || 0,
           status: (c.status as string) || "draft",
-          level: (c.difficulty_level as string) || "beginner",
+          level: (c.difficulty_level as string) || "gateway",
           lessons_count: lessonsRel?.[0]?.count ?? 0,
         };
       });
@@ -96,9 +96,9 @@ export default function CoursesAnalyticsPage() {
           <p className="text-xs text-muted-foreground">
             {(
               {
-                beginner: "Gateway",
-                intermediate: "Professional",
-                advanced: "Executive",
+                gateway: "Gateway",
+                professional: "Professional",
+                executive: "Executive",
                 expert: "Expert",
               } as Record<string, string>
             )[item.level] ?? item.level}

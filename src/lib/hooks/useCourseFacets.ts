@@ -85,7 +85,7 @@ export function useCourseFacets(
         if (c.is_free) freeCount += 1;
       }
 
-      const order = ["beginner", "intermediate", "advanced", "expert"];
+      const order = ["gateway", "professional", "executive", "expert"];
       const availableDifficulties = order.filter(
         (d) => (difficultyCounts[d] ?? 0) > 0
       );

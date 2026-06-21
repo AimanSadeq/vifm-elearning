@@ -214,7 +214,7 @@ export default function CategoryClient({
     filters.difficulty !== "all" ||
     filters.priceRange !== "all";
 
-  const availableDifficulties = ["beginner", "intermediate", "advanced", "expert"].filter(
+  const availableDifficulties = ["gateway", "professional", "executive", "expert"].filter(
     (d) => (facets.difficulties[d] ?? 0) > 0
   );
 

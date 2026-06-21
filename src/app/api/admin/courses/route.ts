@@ -20,7 +20,7 @@ const courseUpsertSchema = z.object({
   instructor_id: z.string().uuid().nullable().optional(),
   status: z.enum(["draft", "published", "archived"]).optional(),
   difficulty_level: z
-    .enum(["beginner", "intermediate", "advanced", "expert"])
+    .enum(["gateway", "professional", "executive", "expert"])
     .nullable()
     .optional(),
   tier_level: z
