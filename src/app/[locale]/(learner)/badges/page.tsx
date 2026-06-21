@@ -55,27 +55,15 @@ export default function MyBadgesPage() {
     }
   }
 
-  // Force a download; falls back to opening the image when the badge host
-  // doesn't allow cross-origin fetch (so the user can still save it manually).
-  async function downloadBadge(b: EarnedBadge) {
-    if (!b.image_url) return;
-    const ext = (b.image_url.split("?")[0].split(".").pop() || "png").slice(0, 4);
-    const filename = `${badgeLabel(b).replace(/\s+/g, "-").toLowerCase()}.${ext}`;
-    try {
-      const res = await fetch(b.image_url);
-      if (!res.ok) throw new Error("fetch failed");
-      const blob = await res.blob();
-      const objectUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = objectUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(objectUrl);
-    } catch {
-      window.open(b.image_url, "_blank", "noopener");
-    }
+  // Download through a same-origin proxy that streams the badge image with an
+  // attachment header — works even when the badge host doesn't send CORS.
+  function downloadBadge(b: EarnedBadge) {
+    const a = document.createElement("a");
+    a.href = `/api/learner/badges/image?vid=${encodeURIComponent(b.verification_id)}`;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   }
 
   useEffect(() => {
@@ -158,20 +146,27 @@ export default function MyBadgesPage() {
             const verifyUrl =
               verifyBase &&
               `${verifyBase.replace(/\/+$/, "")}/verify/${encodeURIComponent(b.verification_id)}`;
-            const viewUrl = verifyUrl || b.image_url;
+            // The list API often omits image_url, so fall back to the badge
+            // service's canonical image endpoint built from the verification id.
+            const imageSrc =
+              b.image_url ||
+              (verifyBase
+                ? `${verifyBase.replace(/\/+$/, "")}/api/verify/${encodeURIComponent(b.verification_id)}/image`
+                : null);
+            const viewUrl = verifyUrl || imageSrc;
             return (
               <Card key={b.verification_id}>
                 <CardContent className="flex flex-col items-center gap-3 p-5 text-center">
-                  {b.image_url ? (
+                  {imageSrc ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={b.image_url}
+                      src={imageSrc}
                       alt={badgeLabel(b)}
-                      className="h-28 w-28 rounded-xl object-contain"
+                      className="h-40 w-40 rounded-xl object-contain"
                     />
                   ) : (
-                    <div className="flex h-28 w-28 items-center justify-center rounded-xl bg-warning/10">
-                      <Trophy className="h-12 w-12 text-warning" />
+                    <div className="flex h-40 w-40 items-center justify-center rounded-xl bg-warning/10">
+                      <Trophy className="h-14 w-14 text-warning" />
                     </div>
                   )}
                   <div>
@@ -215,7 +210,7 @@ export default function MyBadgesPage() {
                       variant="outline"
                       size="sm"
                       className="flex-1"
-                      disabled={!b.image_url}
+                      disabled={!imageSrc}
                       onClick={() => downloadBadge(b)}
                     >
                       <Download className="h-3.5 w-3.5 me-1.5" />
