@@ -27,6 +27,7 @@ export default function MyBadgesPage() {
   const [enabled, setEnabled] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [imgFailed, setImgFailed] = useState<Set<string>>(new Set());
 
   // Native share sheet when available; otherwise copy the link (or open it).
   async function shareBadge(b: EarnedBadge, url: string) {
@@ -59,7 +60,7 @@ export default function MyBadgesPage() {
   // attachment header — works even when the badge host doesn't send CORS.
   function downloadBadge(b: EarnedBadge) {
     const a = document.createElement("a");
-    a.href = `/api/learner/badges/image?vid=${encodeURIComponent(b.verification_id)}`;
+    a.href = `/api/learner/badges/image?vid=${encodeURIComponent(b.verification_id)}&download=1`;
     a.rel = "noopener";
     document.body.appendChild(a);
     a.click();
@@ -146,23 +147,26 @@ export default function MyBadgesPage() {
             const verifyUrl =
               verifyBase &&
               `${verifyBase.replace(/\/+$/, "")}/verify/${encodeURIComponent(b.verification_id)}`;
-            // The list API often omits image_url, so fall back to the badge
-            // service's canonical image endpoint built from the verification id.
-            const imageSrc =
-              b.image_url ||
-              (verifyBase
-                ? `${verifyBase.replace(/\/+$/, "")}/api/verify/${encodeURIComponent(b.verification_id)}/image`
-                : null);
-            const viewUrl = verifyUrl || imageSrc;
+            // Serve the badge image through our proxy (resolves the real image
+            // from the verify page's og:image and avoids CORS). Falls back to
+            // the trophy if the badge service can't produce an image.
+            const imageProxy = `/api/learner/badges/image?vid=${encodeURIComponent(b.verification_id)}`;
+            const showImage = enabled && !imgFailed.has(b.verification_id);
+            const viewUrl = verifyUrl || imageProxy;
             return (
               <Card key={b.verification_id}>
                 <CardContent className="flex flex-col items-center gap-3 p-5 text-center">
-                  {imageSrc ? (
+                  {showImage ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={imageSrc}
+                      src={imageProxy}
                       alt={badgeLabel(b)}
                       className="h-40 w-40 rounded-xl object-contain"
+                      onError={() =>
+                        setImgFailed((prev) =>
+                          new Set(prev).add(b.verification_id),
+                        )
+                      }
                     />
                   ) : (
                     <div className="flex h-40 w-40 items-center justify-center rounded-xl bg-warning/10">
@@ -210,7 +214,7 @@ export default function MyBadgesPage() {
                       variant="outline"
                       size="sm"
                       className="flex-1"
-                      disabled={!imageSrc}
+                      disabled={!showImage}
                       onClick={() => downloadBadge(b)}
                     >
                       <Download className="h-3.5 w-3.5 me-1.5" />
