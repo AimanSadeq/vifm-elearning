@@ -60,6 +60,11 @@ export async function GET() {
               via,
               scanned,
               rawCount: badges.length,
+              // How many completed courses with a badge attached THIS account
+              // has. 0 => this account hasn't completed a badge course (likely
+              // the completion happened on a different account).
+              completedBadgeCourses: selfHeal.length,
+              selfHealOk: selfHeal.filter((r) => r.ok).length,
               externalIds: badges
                 .slice(0, 5)
                 .map((b) => (b as IssuedBadgeWithExternal).external_id ?? null),
