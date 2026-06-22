@@ -79,6 +79,11 @@ export default function DashboardPage() {
 
       const supabase = createClient();
 
+      // Recompute progress from lesson_progress so the cards match the player.
+      await fetch("/api/learner/progress/sync", { method: "POST" }).catch(
+        () => {},
+      );
+
       // Fetch enrollments
       const { data: enrollments } = await supabase
         .from("enrollments")

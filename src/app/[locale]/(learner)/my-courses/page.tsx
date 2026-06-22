@@ -47,6 +47,12 @@ export default function MyCoursesPage() {
       }
 
       const supabase = createClient();
+
+      // Recompute progress from lesson_progress so the cards match the player.
+      await fetch("/api/learner/progress/sync", { method: "POST" }).catch(
+        () => {},
+      );
+
       const { data } = await supabase
         .from("enrollments")
         .select(
