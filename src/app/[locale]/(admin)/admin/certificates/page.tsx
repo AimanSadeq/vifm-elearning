@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { XCircle, CheckCircle } from "lucide-react";
+import { XCircle, CheckCircle, Award, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -29,6 +29,41 @@ export default function AdminCertificatesPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const debouncedSearch = useDebounce(search, 300);
+  const [issuing, setIssuing] = useState(false);
+  const [issueResult, setIssueResult] = useState<string | null>(null);
+
+  const handleIssueMissing = async () => {
+    setIssuing(true);
+    setIssueResult(null);
+    try {
+      const res = await fetch("/api/admin/certificates/issue-missing", {
+        method: "POST",
+      });
+      const { data, error } = await res.json();
+      if (!res.ok || error) {
+        setIssueResult(error ?? "Failed to issue certificates.");
+        return;
+      }
+      const parts = [`Issued ${data.issued}`];
+      if (data.blocked) parts.push(`${data.blocked} blocked by survey`);
+      if (data.failed) parts.push(`${data.failed} failed`);
+      if (data.more) parts.push("more remain — click again");
+      setIssueResult(parts.join(" · "));
+      // Refresh the list to show the new certificates.
+      setPage(0);
+      const params = new URLSearchParams();
+      params.set("page", "0");
+      params.set("pageSize", String(PAGE_SIZE));
+      const listRes = await fetch(`/api/certificates?${params.toString()}`);
+      const listJson = await listRes.json();
+      setCertificates(listJson.data ?? []);
+      setTotalCount(listJson.count ?? 0);
+    } catch {
+      setIssueResult("Failed to issue certificates.");
+    } finally {
+      setIssuing(false);
+    }
+  };
 
   useEffect(() => {
     setPage(0);
@@ -143,9 +178,29 @@ export default function AdminCertificatesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-heading text-2xl font-bold">
-        {t("manageCertificates")}
-      </h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-heading text-2xl font-bold">
+          {t("manageCertificates")}
+        </h1>
+        <div className="flex items-center gap-3">
+          {issueResult && (
+            <span className="text-sm text-muted-foreground">{issueResult}</span>
+          )}
+          <Button
+            variant="outline"
+            onClick={handleIssueMissing}
+            disabled={issuing}
+            title="Issue certificates for completed courses that are missing one"
+          >
+            {issuing ? (
+              <Loader2 className="h-4 w-4 me-2 animate-spin" />
+            ) : (
+              <Award className="h-4 w-4 me-2" />
+            )}
+            Issue missing certificates
+          </Button>
+        </div>
+      </div>
 
       <Card>
         <CardHeader>
