@@ -32,7 +32,14 @@ export async function GET() {
 
     // Self-heal: issue badges for completed courses that have a badge attached
     // but never got one (e.g. badge enabled after the course was completed).
-    const selfHeal = await issueMissingBadges(user.id).catch(() => []);
+    let selfHeal: Awaited<ReturnType<typeof issueMissingBadges>> = [];
+    let selfHealThrew: string | null = null;
+    try {
+      selfHeal = await issueMissingBadges(user.id);
+    } catch (e) {
+      selfHealThrew = e instanceof Error ? e.message : String(e);
+      console.error("[badges] self-heal threw", e);
+    }
     const healErrors = selfHeal.filter((r) => !r.ok);
 
     const { badges, via, scanned } = await getDelegateBadges(user.id);
@@ -72,6 +79,7 @@ export async function GET() {
               completedBadgeCourses: selfHeal.length,
               selfHealOk: selfHeal.filter((r) => r.ok).length,
               selfHealErrors: healErrors,
+              selfHealThrew,
             },
           }
         : {}),
