@@ -117,13 +117,14 @@ export async function userHasCourseAccess(
   // 3. Course instructor
   if (course?.instructor_id && course.instructor_id === userId) return true;
 
-  // 4. Direct enrollment
+  // 4. Direct enrollment (active OR completed — completed learners keep access
+  //    so they can review the course, re-watch videos, and download materials).
   const { data: enrollment } = await client
     .from("enrollments")
     .select("id")
     .eq("user_id", userId)
     .eq("course_id", courseId)
-    .eq("status", "active")
+    .in("status", ["active", "completed"])
     .maybeSingle();
   if (enrollment) return true;
 

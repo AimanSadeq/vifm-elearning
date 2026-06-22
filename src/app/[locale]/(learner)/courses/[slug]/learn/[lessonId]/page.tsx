@@ -203,9 +203,13 @@ export default function LessonPage() {
     }
   }, [nextLesson, locale, slug, router]);
 
-  // Fetch video config on mount
+  // Fetch video config — only for video lessons (avoids a noisy 403/404 on
+  // documents, quizzes, etc.).
   useEffect(() => {
-    if (!lessonId) return;
+    if (!lessonId || currentLesson?.content_type !== "video") {
+      setVideoConfig(null);
+      return;
+    }
     async function fetchConfig() {
       try {
         const res = await fetch(`/api/video/config?lessonId=${lessonId}`);
@@ -218,7 +222,7 @@ export default function LessonPage() {
       }
     }
     fetchConfig();
-  }, [lessonId]);
+  }, [lessonId, currentLesson?.content_type]);
 
   // Fetch signed video URL only for video lessons that actually have a
   // video file. Without this gate the call also fires for documents/
