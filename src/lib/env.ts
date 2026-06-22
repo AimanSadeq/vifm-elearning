@@ -70,8 +70,8 @@ const serverEnvSchema = z.object({
   // --- Cron auth ---
   CRON_SECRET: z.string().optional(),
 
-  // --- Certificate PPTX -> PDF conversion (ConvertAPI) ---
-  CONVERTAPI_SECRET: z.string().optional(),
+  // --- Certificate PPTX -> PDF conversion (CloudConvert) ---
+  CLOUDCONVERT_API_KEY: z.string().optional(),
 
   // --- Rate-limit Redis (optional — falls back to in-memory) ---
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),

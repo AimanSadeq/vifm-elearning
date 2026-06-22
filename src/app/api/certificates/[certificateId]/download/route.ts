@@ -8,7 +8,7 @@ import {
 
 // Serves the learner's certificate as a PDF rendered from the admin template.
 // The template-based .pptx is generated at issuance and stored; here we convert
-// it to PDF (ConvertAPI) and cache the result, so it matches whatever template
+// it to PDF (CloudConvert) and cache the result, so it matches whatever template
 // the course/default uses. Falls back (503) when no converter is configured so
 // the client can use the built-in renderer instead.
 export const runtime = "nodejs";
