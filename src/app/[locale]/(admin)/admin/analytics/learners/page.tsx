@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import { LearnerDetailModal } from "@/components/admin/LearnerDetailModal";
 import { formatRelativeDate } from "@/lib/utils/formatters";
 import { exportToCSV } from "@/lib/utils/csv-export";
 
@@ -40,6 +41,10 @@ export default function LearnersAnalyticsPage() {
   const [totalCompletions, setTotalCompletions] = useState(0);
   const [monthlyData, setMonthlyData] = useState<MonthlyEnrollment[]>([]);
   const [topLearners, setTopLearners] = useState<LearnerRow[]>([]);
+  const [selectedLearner, setSelectedLearner] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   useEffect(() => {
     async function fetchLearners() {
@@ -199,6 +204,21 @@ export default function LearnersAnalyticsPage() {
         </span>
       ),
     },
+    {
+      key: "actions",
+      header: "",
+      render: (item) => (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() =>
+            setSelectedLearner({ id: item.id, name: item.full_name })
+          }
+        >
+          View
+        </Button>
+      ),
+    },
   ];
 
   if (isLoading) {
@@ -280,6 +300,14 @@ export default function LearnersAnalyticsPage() {
           />
         </CardContent>
       </Card>
+
+      {selectedLearner && (
+        <LearnerDetailModal
+          learnerId={selectedLearner.id}
+          learnerName={selectedLearner.name}
+          onClose={() => setSelectedLearner(null)}
+        />
+      )}
     </div>
   );
 }
