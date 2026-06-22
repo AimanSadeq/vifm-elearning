@@ -1,11 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Award, Download, Share2 } from "lucide-react";
+import { Award, Download, Share2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils/formatters";
+import { useAuth } from "@/lib/hooks/useAuth";
+import {
+  downloadCertificatePdf,
+  downloadCertificatePng,
+} from "@/lib/utils/certificate-render";
 import type { Certificate } from "@/types";
 
 interface CertificateCardProps {
@@ -17,11 +23,34 @@ interface CertificateCardProps {
 export function CertificateCard({ certificate }: CertificateCardProps) {
   const locale = useLocale();
   const t = useTranslations("certificates");
+  const { user } = useAuth();
+  const [busy, setBusy] = useState<"pdf" | "png" | null>(null);
 
   const courseName =
     locale === "ar" && certificate.course?.title_ar
       ? certificate.course.title_ar
       : certificate.course?.title ?? "";
+
+  const handleDownload = async (format: "pdf" | "png") => {
+    setBusy(format);
+    try {
+      const data = {
+        learnerName: user?.full_name ?? "",
+        courseName,
+        certificateNumber: certificate.certificate_number,
+        issuedAt: certificate.issued_at,
+        verifyUrl:
+          certificate.verification_url ??
+          `${window.location.origin}/verify/${certificate.verification_code}`,
+      };
+      if (format === "pdf") await downloadCertificatePdf(data);
+      else await downloadCertificatePng(data);
+    } catch {
+      alert("Could not generate the certificate. Please try again.");
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const statusBadge = () => {
     switch (certificate.status) {
@@ -74,19 +103,33 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
         </div>
 
         {certificate.status === "issued" && (
-          <div className="mt-4 flex gap-2">
-            {certificate.pdf_url && (
-              <a
-                href={certificate.pdf_url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4 me-1" />
-                  {t("download")}
-                </Button>
-              </a>
-            )}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={busy !== null}
+              onClick={() => handleDownload("pdf")}
+            >
+              {busy === "pdf" ? (
+                <Loader2 className="h-4 w-4 me-1 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4 me-1" />
+              )}
+              PDF
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={busy !== null}
+              onClick={() => handleDownload("png")}
+            >
+              {busy === "png" ? (
+                <Loader2 className="h-4 w-4 me-1 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4 me-1" />
+              )}
+              PNG
+            </Button>
             <Button variant="outline" size="sm" onClick={handleShare}>
               <Share2 className="h-4 w-4 me-1" />
               Share
