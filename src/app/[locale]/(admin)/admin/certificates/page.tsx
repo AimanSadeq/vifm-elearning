@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { XCircle, CheckCircle, Award, Loader2 } from "lucide-react";
+import { XCircle, CheckCircle, Award, Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -31,6 +31,49 @@ export default function AdminCertificatesPage() {
   const debouncedSearch = useDebounce(search, 300);
   const [issuing, setIssuing] = useState(false);
   const [issueResult, setIssueResult] = useState<string | null>(null);
+  const [regenerating, setRegenerating] = useState(false);
+
+  const handleRegenerate = async () => {
+    if (
+      !confirm(
+        "Re-render ALL certificate files from the current template? Existing certificates keep their number/date; only the design is refreshed.",
+      )
+    )
+      return;
+    setRegenerating(true);
+    setIssueResult(null);
+    let offset = 0;
+    let regenerated = 0;
+    let failed = 0;
+    try {
+      // Loop through all certificates in batches until done.
+      for (let guard = 0; guard < 1000; guard++) {
+        const res = await fetch(
+          `/api/admin/certificates/regenerate?offset=${offset}`,
+          { method: "POST" },
+        );
+        const { data, error } = await res.json();
+        if (!res.ok || error) {
+          setIssueResult(error ?? "Regeneration failed.");
+          return;
+        }
+        regenerated += data.regenerated;
+        failed += data.failed;
+        offset = data.nextOffset;
+        setIssueResult(
+          `Regenerating… ${regenerated}/${data.total}${failed ? ` (${failed} failed)` : ""}`,
+        );
+        if (data.done) break;
+      }
+      setIssueResult(
+        `Regenerated ${regenerated} certificate${regenerated === 1 ? "" : "s"}${failed ? ` · ${failed} failed` : ""}.`,
+      );
+    } catch {
+      setIssueResult("Regeneration failed.");
+    } finally {
+      setRegenerating(false);
+    }
+  };
 
   const handleIssueMissing = async () => {
     setIssuing(true);
@@ -188,8 +231,21 @@ export default function AdminCertificatesPage() {
           )}
           <Button
             variant="outline"
+            onClick={handleRegenerate}
+            disabled={regenerating || issuing}
+            title="Re-render all certificate files from the current template"
+          >
+            {regenerating ? (
+              <Loader2 className="h-4 w-4 me-2 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4 me-2" />
+            )}
+            Regenerate from template
+          </Button>
+          <Button
+            variant="outline"
             onClick={handleIssueMissing}
-            disabled={issuing}
+            disabled={issuing || regenerating}
             title="Issue certificates for completed courses that are missing one"
           >
             {issuing ? (

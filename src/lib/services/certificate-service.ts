@@ -239,3 +239,104 @@ export async function issueCertificate({
 
   return (updated ?? cert) as Certificate;
 }
+
+/**
+ * Resolve the template config for a course: its assigned template, else the
+ * default. Returns undefined when no template exists (the generator then uses
+ * its bundled fallback design).
+ */
+async function resolveTemplateConfig(
+  certificateTemplateId: string | null,
+): Promise<TemplateConfig | undefined> {
+  const toConfig = (t: Record<string, unknown>): TemplateConfig => ({
+    templateKey: t.template_key as TemplateConfig["templateKey"],
+    primaryColor: t.primary_color as string,
+    secondaryColor: t.secondary_color as string,
+    accentColor: t.accent_color as string,
+    logoUrl: (t.logo_url as string | null) ?? null,
+    organizationName: t.organization_name as string,
+    pptxPath: (t.pptx_path as string | null) ?? null,
+    placeholderValues:
+      (t.placeholder_values as Record<string, string> | null) ?? null,
+  });
+
+  if (certificateTemplateId) {
+    const { data: template } = await supabaseAdmin
+      .from("certificate_templates")
+      .select("*")
+      .eq("id", certificateTemplateId)
+      .single();
+    if (template) return toConfig(template);
+  }
+
+  const { data: defaultTemplate } = await supabaseAdmin
+    .from("certificate_templates")
+    .select("*")
+    .eq("is_default", true)
+    .single();
+  return defaultTemplate ? toConfig(defaultTemplate) : undefined;
+}
+
+/**
+ * Re-render an existing certificate's source file from the CURRENT template and
+ * overwrite the stored .pptx, then drop any cached PDF so the next download
+ * re-converts with the new design. Use to apply a new/changed template to old
+ * certificates. The certificate row (number, dates, verification) is unchanged.
+ */
+export async function regenerateCertificateFile(certId: string): Promise<void> {
+  const { data: cert } = await supabaseAdmin
+    .from("certificates")
+    .select(
+      "id, user_id, course_id, certificate_number, issued_at, verification_code, verification_url",
+    )
+    .eq("id", certId)
+    .single();
+  if (!cert) throw new Error("Certificate not found");
+
+  const [{ data: profile }, { data: course }] = await Promise.all([
+    supabaseAdmin
+      .from("profiles")
+      .select("full_name")
+      .eq("id", cert.user_id)
+      .single(),
+    supabaseAdmin
+      .from("courses")
+      .select("title, certificate_template_id")
+      .eq("id", cert.course_id)
+      .single(),
+  ]);
+
+  const templateConfig = await resolveTemplateConfig(
+    course?.certificate_template_id ?? null,
+  );
+  const verificationUrl =
+    cert.verification_url ?? `${APP_URL}/verify/${cert.verification_code}`;
+
+  const { buffer, mimeType, extension } = await generateCertificateFile(
+    {
+      userName: profile?.full_name ?? "Learner",
+      courseName: course?.title ?? "Course",
+      certificateNumber: cert.certificate_number,
+      issuedAt: cert.issued_at,
+      verificationUrl,
+    },
+    templateConfig,
+  );
+
+  const pptxPath = `${cert.user_id}/${cert.id}.${extension}`;
+  await supabaseAdmin.storage
+    .from("certificates")
+    .upload(pptxPath, buffer, { contentType: mimeType, upsert: true });
+  // Drop the cached PDF so the next download re-converts with the new design.
+  await supabaseAdmin.storage
+    .from("certificates")
+    .remove([`${cert.user_id}/${cert.id}.pdf`]);
+
+  const { data: pub } = supabaseAdmin.storage
+    .from("certificates")
+    .getPublicUrl(pptxPath);
+  await supabaseAdmin
+    .from("certificates")
+    .update({ pdf_url: pub.publicUrl, verification_url: verificationUrl })
+    .eq("id", cert.id);
+}
