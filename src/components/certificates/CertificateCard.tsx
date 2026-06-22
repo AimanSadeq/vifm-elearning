@@ -43,8 +43,33 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
           certificate.verification_url ??
           `${window.location.origin}/verify/${certificate.verification_code}`,
       };
-      if (format === "pdf") await downloadCertificatePdf(data);
-      else await downloadCertificatePng(data);
+      if (format === "pdf") {
+        // Prefer the template-rendered PDF (admin .pptx -> PDF via the server).
+        // Fall back to the built-in renderer when no converter is configured
+        // or the source file is missing.
+        try {
+          const res = await fetch(
+            `/api/certificates/${certificate.id}/download`,
+          );
+          if (res.ok) {
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${(certificate.certificate_number || "certificate").replace(/[^a-z0-9-]+/gi, "-")}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            return;
+          }
+        } catch {
+          // network error — fall through to the built-in renderer
+        }
+        await downloadCertificatePdf(data);
+      } else {
+        await downloadCertificatePng(data);
+      }
     } catch {
       alert("Could not generate the certificate. Please try again.");
     } finally {
