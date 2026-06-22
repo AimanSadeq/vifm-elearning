@@ -20,6 +20,7 @@ import { BookmarksPanel } from "@/components/video/BookmarksPanel";
 import { WatchStatsBadge } from "@/components/video/WatchStatsBadge";
 import { QuizGate } from "@/components/quizzes/QuizGate";
 import { CourseSurveyModal } from "@/components/learner/CourseSurveyModal";
+import { CourseCompleteModal } from "@/components/learner/CourseCompleteModal";
 import { AssignmentSubmission } from "@/components/learner/AssignmentSubmission";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { Badge } from "@/components/ui/badge";
@@ -64,6 +65,13 @@ export default function LessonPage() {
   const [surveyModal, setSurveyModal] = useState<
     { courseId: string; required: boolean } | null
   >(null);
+  const [completeModal, setCompleteModal] = useState<{
+    courseId: string;
+  } | null>(null);
+  // Was the course already complete when the page loaded? Lets us celebrate a
+  // fresh completion only, not every revisit. Fires the popup once per session.
+  const wasCompleteOnLoadRef = useRef<boolean | null>(null);
+  const celebratedRef = useRef(false);
   // Tracks per-course whether we've already checked survey status, so we
   // don't fire the GET on every progress tick. Reset to null when course
   // changes.
@@ -110,6 +118,32 @@ export default function LessonPage() {
 
   // Flat list of all lessons for prev/next navigation
   const allLessons = modules.flatMap((m) => m.lessons ?? []);
+
+  // Every lesson done → celebrate. Derived live from progressMap so it fires
+  // no matter how the final lesson was completed (button, video, quiz, etc.).
+  const allLessonsComplete =
+    allLessons.length > 0 &&
+    allLessons.every((l) => progressMap[l.id]?.is_completed);
+
+  useEffect(() => {
+    if (isLoading || !course || allLessons.length === 0) return;
+    if (wasCompleteOnLoadRef.current === null) {
+      // First settled render (lessons + progress loaded) — record the
+      // baseline so we celebrate a fresh completion, not a revisit.
+      wasCompleteOnLoadRef.current = allLessonsComplete;
+      return;
+    }
+    if (
+      allLessonsComplete &&
+      !wasCompleteOnLoadRef.current &&
+      !celebratedRef.current &&
+      !surveyModal // let a pending survey resolve first; popup shows after
+    ) {
+      celebratedRef.current = true;
+      setCompleteModal({ courseId: course.id });
+    }
+  }, [isLoading, course, allLessons.length, allLessonsComplete, surveyModal]);
+
   const currentIndex = allLessons.findIndex((l) => l.id === lessonId);
   const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
   const nextLesson =
@@ -932,6 +966,15 @@ export default function LessonPage() {
           required={surveyModal.required}
           onSubmitted={() => setSurveyModal(null)}
           onClose={() => setSurveyModal(null)}
+        />
+      )}
+
+      {completeModal && (
+        <CourseCompleteModal
+          courseId={completeModal.courseId}
+          courseTitle={course?.title}
+          locale={locale}
+          onClose={() => setCompleteModal(null)}
         />
       )}
     </CoursePlayer>
