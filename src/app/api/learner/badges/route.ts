@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import {
-  badgesClient,
   isBadgesEnabled,
   issueMissingBadges,
+  getDelegateBadges,
 } from "@/lib/services/badges-client";
 import { hasCompletedRequiredSurvey } from "@/lib/services/survey-service";
 
@@ -29,14 +29,7 @@ export async function GET() {
     const selfHeal = await issueMissingBadges(user.id).catch(() => []);
     const healErrors = selfHeal.filter((r) => !r.ok);
 
-    const result = await badgesClient.listBadgesForDelegate(user.id);
-    if (!result.ok) {
-      // External service down — degrade silently so the profile page
-      // still loads. Surface the error so the UI can show a banner.
-      return NextResponse.json({ data: [], enabled: true, error: result.error });
-    }
-
-    const badges = result.data?.data ?? [];
+    const { badges, via, scanned } = await getDelegateBadges(user.id);
 
     // Survey gate — hide a badge only when its course has an unsubmitted
     // required survey. We encode the source course in external_id as
@@ -64,6 +57,8 @@ export async function GET() {
         ? {
             debug: {
               delegateId: user.id,
+              via,
+              scanned,
               rawCount: badges.length,
               externalIds: badges
                 .slice(0, 5)

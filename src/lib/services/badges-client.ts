@@ -468,3 +468,37 @@ export async function issueMissingBadges(
   }
   return results;
 }
+
+/**
+ * Robustly fetch a delegate's badges. First tries the server-side
+ * `?delegate_external_id=` filter; if that returns nothing, scans the full
+ * badge list and filters by delegate_external_id ourselves (the same field the
+ * admin Issued Badges list uses). Guards against the service's delegate filter
+ * silently returning empty. Returns the badges plus a `via` tag for debugging.
+ */
+export async function getDelegateBadges(
+  userId: string,
+): Promise<{ badges: IssuedBadge[]; via: string; scanned: number }> {
+  const direct = await badgesClient.listBadgesForDelegate(userId);
+  const directRows = direct.ok ? (direct.data?.data ?? []) : [];
+  if (directRows.length > 0) {
+    return { badges: directRows, via: "delegate-filter", scanned: 0 };
+  }
+
+  // Fallback: page through all badges and match the delegate ourselves.
+  const matched: IssuedBadge[] = [];
+  let scanned = 0;
+  const PAGE = 100;
+  for (let page = 1; page <= 25; page++) {
+    const res = await badgesClient.listBadges({ page, pageSize: PAGE });
+    if (!res.ok) break;
+    const rows = res.data?.data ?? [];
+    if (rows.length === 0) break;
+    scanned += rows.length;
+    for (const b of rows) {
+      if (b.delegate_external_id === userId) matched.push(b);
+    }
+    if (rows.length < PAGE) break; // last page
+  }
+  return { badges: matched, via: "scan", scanned };
+}
