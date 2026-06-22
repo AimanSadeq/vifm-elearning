@@ -26,7 +26,8 @@ export async function GET() {
 
     // Self-heal: issue badges for completed courses that have a badge attached
     // but never got one (e.g. badge enabled after the course was completed).
-    await issueMissingBadges(user.id).catch(() => {});
+    const selfHeal = await issueMissingBadges(user.id).catch(() => []);
+    const healErrors = selfHeal.filter((r) => !r.ok);
 
     const result = await badgesClient.listBadgesForDelegate(user.id);
     if (!result.ok) {
@@ -53,7 +54,11 @@ export async function GET() {
       if (ok) filtered.push(b);
     }
 
-    return NextResponse.json({ data: filtered, enabled: true });
+    return NextResponse.json({
+      data: filtered,
+      enabled: true,
+      ...(healErrors.length ? { issueDebug: healErrors } : {}),
+    });
   } catch {
     return NextResponse.json(
       { error: "Internal server error" },

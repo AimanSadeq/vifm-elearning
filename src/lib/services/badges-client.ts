@@ -351,8 +351,21 @@ export function badgeImageUrl(verificationId: string): string | null {
  * completions where the badge issuance never fired (e.g. the cert was issued
  * before the badge was enabled). Idempotent at the badges service.
  */
-export async function issueMissingBadges(userId: string): Promise<void> {
-  if (!isBadgesEnabled()) return;
+export interface BadgeSelfHealResult {
+  courseId: string;
+  courseTitle?: string;
+  step: "template" | "issue" | "ok" | "skip";
+  ok: boolean;
+  error?: string;
+}
+
+export async function issueMissingBadges(
+  userId: string,
+): Promise<BadgeSelfHealResult[]> {
+  const results: BadgeSelfHealResult[] = [];
+  if (!isBadgesEnabled()) {
+    return [{ courseId: "-", step: "skip", ok: false, error: "Badges not configured" }];
+  }
 
   const { data: enrollments } = await supabaseAdmin
     .from("enrollments")
@@ -361,7 +374,7 @@ export async function issueMissingBadges(userId: string): Promise<void> {
     )
     .eq("user_id", userId)
     .eq("status", "completed");
-  if (!enrollments?.length) return;
+  if (!enrollments?.length) return results;
 
   const { data: profile } = await supabaseAdmin
     .from("profiles")
@@ -372,6 +385,7 @@ export async function issueMissingBadges(userId: string): Promise<void> {
   const userEmail = profile?.email ?? undefined;
 
   for (const e of enrollments) {
+    const courseId = e.course_id as string;
     const rel = e.course as unknown as
       | {
           title?: string | null;
@@ -385,6 +399,7 @@ export async function issueMissingBadges(userId: string): Promise<void> {
         }>
       | null;
     const course = Array.isArray(rel) ? rel[0] : rel;
+    const courseTitle = course?.title ?? undefined;
     const stored = course?.badge_template_external_id ?? null;
     if (!stored) continue; // no badge attached to this course
 
@@ -394,21 +409,57 @@ export async function issueMissingBadges(userId: string): Promise<void> {
         ? course?.category[0]
         : course?.category;
       const ensured = await ensureCourseBadgeTemplate({
-        courseId: e.course_id as string,
-        courseTitle: course?.title ?? undefined,
+        courseId,
+        courseTitle,
         courseCategory: cat?.name,
       });
-      if (!ensured.ok || !ensured.data?.id) continue;
+      if (!ensured.ok || !ensured.data?.id) {
+        console.warn(
+          `[badge self-heal] template ensure failed course=${courseId}: ${ensured.error}`,
+        );
+        results.push({
+          courseId,
+          courseTitle,
+          step: "template",
+          ok: false,
+          error: ensured.error,
+        });
+        continue;
+      }
       templateId = ensured.data.id;
     }
 
-    await issueCourseBadge({
-      userId,
-      userName,
-      userEmail,
-      courseId: e.course_id as string,
-      courseTitle: course?.title ?? undefined,
-      templateExternalId: templateId,
-    }).catch(() => {});
+    try {
+      const r = await issueCourseBadge({
+        userId,
+        userName,
+        userEmail,
+        courseId,
+        courseTitle,
+        templateExternalId: templateId,
+      });
+      if (!r.ok) {
+        console.warn(
+          `[badge self-heal] issue failed course=${courseId}: ${r.error}`,
+        );
+      }
+      results.push({
+        courseId,
+        courseTitle,
+        step: r.ok ? "ok" : "issue",
+        ok: r.ok,
+        error: r.ok ? undefined : r.error,
+      });
+    } catch (err) {
+      console.warn(`[badge self-heal] issue threw course=${courseId}`, err);
+      results.push({
+        courseId,
+        courseTitle,
+        step: "issue",
+        ok: false,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
   }
+  return results;
 }
