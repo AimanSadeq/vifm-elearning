@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
-// POST /api/courses/[courseId]/review — upsert the learner's course rating
-// (1-5) + optional text. One review per (user, course) via the table's unique
+// POST /api/courses/[id]/review — upsert the learner's course rating (1-5) +
+// optional text. One review per (user, course) via the table's unique
 // constraint, so re-submitting updates the existing one.
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ courseId: string }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const { courseId } = await params;
+  const { id: courseId } = await params;
 
   const supabase = await createServerSupabase();
   const {
