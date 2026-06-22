@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import { BookOpen, PlayCircle, Award, CheckCircle2 } from "lucide-react";
+import { BookOpen, PlayCircle, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -153,16 +152,6 @@ export default function MyCoursesPage() {
                       <div className="flex h-full items-center justify-center bg-brand-50">
                         <BookOpen className="h-10 w-10 text-brand-300" />
                       </div>
-                    )}
-
-                    {isCompleted && (
-                      <Badge
-                        variant="success"
-                        className="absolute end-2 top-2"
-                      >
-                        <Award className="h-3 w-3 me-1" />
-                        {tc("completed")}
-                      </Badge>
                     )}
                   </div>
 
