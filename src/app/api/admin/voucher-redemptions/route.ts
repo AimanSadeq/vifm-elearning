@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
+interface RedemptionRow {
+  id: string;
+  redeemed_at: string;
+  voucher: { code?: string | null; assigned_email?: string | null } | null;
+  user: { email?: string | null; full_name?: string | null } | null;
+  course: { title?: string | null; slug?: string | null } | null;
+}
+
 /**
  * GET /api/admin/voucher-redemptions
  *
@@ -68,7 +76,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Flatten the nested rows into a table-friendly shape.
-    const rows = (data ?? []).map((r: any) => ({
+    const rows = ((data ?? []) as unknown as RedemptionRow[]).map((r) => ({
       id: r.id,
       redeemedAt: r.redeemed_at,
       voucherCode: r.voucher?.code ?? "—",
