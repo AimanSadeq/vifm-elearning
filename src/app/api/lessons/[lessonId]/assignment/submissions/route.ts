@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { getCompletedLessonIds } from "@/lib/services/progress-service";
 import {
   getAssignmentMeta,
   upsertSubmission,
@@ -108,8 +109,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .select("completed_lesson_ids, total_lesson_items")
       .eq("id", enrollment.id)
       .single();
-    const completedIds: string[] = (e?.completed_lesson_ids as string[]) ?? [];
-    if (!completedIds.includes(lessonId)) completedIds.push(lessonId);
+    // Count from lesson_progress (just upserted above), not the lossy array.
+    const completedIds = await getCompletedLessonIds(user.id, meta.courseId);
     const totalItems = e?.total_lesson_items ?? 0;
     const completedItems = completedIds.length;
     const progressPct =

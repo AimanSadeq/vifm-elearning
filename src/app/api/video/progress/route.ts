@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { recalculateAllPathsForUser } from "@/lib/services/learning-path-service";
+import { getCompletedLessonIds } from "@/lib/services/progress-service";
 
 export async function GET(request: NextRequest) {
   try {
@@ -179,13 +180,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (enrollment) {
-      const completedIds: string[] = (enrollment.completed_lesson_ids as string[]) ?? [];
       const lid = lessonId as string;
-
-      // Add to completed list if completed and not already present
-      if (completed && !completedIds.includes(lid)) {
-        completedIds.push(lid);
-      }
+      // Count completed lessons from lesson_progress (just upserted above)
+      // rather than the lossy completed_lesson_ids array.
+      const completedIds = await getCompletedLessonIds(
+        userId as string,
+        courseId as string,
+      );
 
       const totalTime = (enrollment.total_time_spent_seconds ?? 0) + delta;
       const totalItems = enrollment.total_lesson_items ?? 0;

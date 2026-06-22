@@ -8,6 +8,7 @@ import {
 } from "@/lib/services/quiz-scoring";
 import { issueCertificate } from "@/lib/services/certificate-service";
 import { recalculateAllPathsForUser } from "@/lib/services/learning-path-service";
+import { getCompletedLessonIds } from "@/lib/services/progress-service";
 
 interface RouteParams {
   params: Promise<{ quizId: string }>;
@@ -176,13 +177,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         .single();
 
       if (enrollmentData) {
-        const completedIds: string[] =
-          (enrollmentData.completed_lesson_ids as string[]) ?? [];
-        const lid = quiz.lesson_id as string;
-
-        if (!completedIds.includes(lid)) {
-          completedIds.push(lid);
-        }
+        // Count completed lessons from lesson_progress (just upserted above)
+        // rather than the lossy completed_lesson_ids array.
+        const completedIds = await getCompletedLessonIds(
+          user.id,
+          quiz.course_id as string,
+        );
 
         const totalItems = enrollmentData.total_lesson_items ?? 0;
         const completedItems = completedIds.length;

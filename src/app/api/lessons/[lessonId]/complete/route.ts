@@ -8,6 +8,7 @@ import {
   isBadgesEnabled,
 } from "@/lib/services/badges-client";
 import { getCourseSurveyStatus } from "@/lib/services/survey-service";
+import { getCompletedLessonIds } from "@/lib/services/progress-service";
 import {
   issueCertificate,
   SurveyRequiredError,
@@ -91,12 +92,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Update enrollment completed_lesson_ids and progress (skip if admin without enrollment)
     let courseCompleted = false;
     if (enrollment) {
-      const completedIds: string[] =
-        (enrollment.completed_lesson_ids as string[]) ?? [];
-
-      if (!completedIds.includes(lessonId)) {
-        completedIds.push(lessonId);
-      }
+      // Count completed lessons from lesson_progress (the just-completed
+      // lesson was upserted above) rather than the lossy completed_lesson_ids
+      // array — the latter loses concurrent updates and drifts below reality.
+      const completedIds = await getCompletedLessonIds(user.id, courseId);
 
       // enrollment.total_lesson_items is a denormalised counter that's
       // supposed to be kept in sync when modules/lessons change, but
