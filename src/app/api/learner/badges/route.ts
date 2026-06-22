@@ -29,7 +29,7 @@ export async function GET() {
     const selfHeal = await issueMissingBadges(user.id).catch(() => []);
     const healErrors = selfHeal.filter((r) => !r.ok);
 
-    const { badges, via, scanned } = await getDelegateBadges(user.id);
+    const { badges } = await getDelegateBadges(user.id);
 
     // Survey gate — hide a badge only when its course has an unsubmitted
     // required survey. We encode the source course in external_id as
@@ -53,24 +53,6 @@ export async function GET() {
     return NextResponse.json({
       data: filtered,
       enabled: true,
-      ...(filtered.length === 0
-        ? {
-            debug: {
-              delegateId: user.id,
-              via,
-              scanned,
-              rawCount: badges.length,
-              // How many completed courses with a badge attached THIS account
-              // has. 0 => this account hasn't completed a badge course (likely
-              // the completion happened on a different account).
-              completedBadgeCourses: selfHeal.length,
-              selfHealOk: selfHeal.filter((r) => r.ok).length,
-              externalIds: badges
-                .slice(0, 5)
-                .map((b) => (b as IssuedBadgeWithExternal).external_id ?? null),
-            },
-          }
-        : {}),
       ...(healErrors.length ? { issueDebug: healErrors } : {}),
     });
   } catch {
