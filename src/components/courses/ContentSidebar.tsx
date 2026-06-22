@@ -6,7 +6,6 @@ import { useLocale, useTranslations } from "next-intl";
 import {
   CheckCircle2,
   ChevronDown,
-  ChevronLeft,
   Clock,
   ExternalLink,
   Globe,
@@ -65,7 +64,6 @@ export function ContentSidebar({
 }: ContentSidebarProps) {
   const locale = useLocale();
   const t = useTranslations("player");
-  const tCourses = useTranslations("courses");
   const [showSearch, setShowSearch] = useState(false);
   const [expandedModules, setExpandedModules] = useState<Set<string>>(() => {
     const moduleId = modules.find((m) =>
