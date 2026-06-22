@@ -31,9 +31,47 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
       ? certificate.course.title_ar
       : certificate.course?.title ?? "";
 
+  const fileBase = (certificate.certificate_number || "certificate").replace(
+    /[^a-z0-9-]+/gi,
+    "-",
+  );
+
+  // The template-rendered certificate (PDF/PNG) from the server, or null when
+  // the converter isn't configured / no source file exists.
+  const fetchTemplateFile = async (
+    format: "pdf" | "png",
+  ): Promise<Blob | null> => {
+    try {
+      const res = await fetch(
+        `/api/certificates/${certificate.id}/download?format=${format}`,
+      );
+      if (res.ok) return await res.blob();
+    } catch {
+      /* fall through */
+    }
+    return null;
+  };
+
+  const triggerBlobDownload = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   const handleDownload = async (format: "pdf" | "png") => {
     setBusy(format);
     try {
+      // Prefer the template-rendered file; fall back to the built-in renderer.
+      const blob = await fetchTemplateFile(format);
+      if (blob) {
+        triggerBlobDownload(blob, `${fileBase}.${format}`);
+        return;
+      }
       const data = {
         learnerName: user?.full_name ?? "",
         courseName,
@@ -43,33 +81,8 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
           certificate.verification_url ??
           `${window.location.origin}/verify/${certificate.verification_code}`,
       };
-      if (format === "pdf") {
-        // Prefer the template-rendered PDF (admin .pptx -> PDF via the server).
-        // Fall back to the built-in renderer when no converter is configured
-        // or the source file is missing.
-        try {
-          const res = await fetch(
-            `/api/certificates/${certificate.id}/download`,
-          );
-          if (res.ok) {
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${(certificate.certificate_number || "certificate").replace(/[^a-z0-9-]+/gi, "-")}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            URL.revokeObjectURL(url);
-            return;
-          }
-        } catch {
-          // network error — fall through to the built-in renderer
-        }
-        await downloadCertificatePdf(data);
-      } else {
-        await downloadCertificatePng(data);
-      }
+      if (format === "pdf") await downloadCertificatePdf(data);
+      else await downloadCertificatePng(data);
     } catch {
       alert("Could not generate the certificate. Please try again.");
     } finally {
@@ -89,16 +102,31 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
   };
 
   const handleShare = async () => {
-    const verifyUrl = certificate.verification_url ??
+    const verifyUrl =
+      certificate.verification_url ??
       `${window.location.origin}/verify/${certificate.verification_code}`;
+    const title = `Certificate: ${courseName}`;
+    const text = `I earned a certificate for completing ${courseName} at VIFM Academy!`;
+
+    // Prefer sharing the actual certificate image (template PNG) as a file.
+    try {
+      const blob = await fetchTemplateFile("png");
+      if (blob && typeof navigator.canShare === "function") {
+        const file = new File([blob], `${fileBase}.png`, {
+          type: "image/png",
+        });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ title, text, files: [file] });
+          return;
+        }
+      }
+    } catch {
+      // fall through to link sharing
+    }
 
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: `Certificate: ${courseName}`,
-          text: `I earned a certificate for completing ${courseName} at VIFM Academy!`,
-          url: verifyUrl,
-        });
+        await navigator.share({ title, text, url: verifyUrl });
       } catch {
         // User cancelled sharing
       }

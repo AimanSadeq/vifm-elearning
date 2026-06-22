@@ -20,8 +20,9 @@ interface CcTask {
   };
 }
 
-export async function convertPptxToPdf(
+export async function convertPptx(
   pptx: Buffer,
+  format: "pdf" | "png",
   filename = "certificate.pptx",
 ): Promise<Buffer> {
   const key = process.env.CLOUDCONVERT_API_KEY;
@@ -41,7 +42,7 @@ export async function convertPptxToPdf(
           operation: "convert",
           input: "upload",
           input_format: "pptx",
-          output_format: "pdf",
+          output_format: format,
         },
         export: { operation: "export/url", input: "convert" },
       },
