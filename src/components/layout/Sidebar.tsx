@@ -93,6 +93,7 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
             { label: "Invoices", href: "/admin/payments/invoices" },
             { label: "Promo Codes", href: "/admin/promo-codes" },
             { label: "Vouchers", href: "/admin/vouchers" },
+            { label: "Voucher Redemptions", href: "/admin/vouchers/redemptions" },
             { label: "Subscriptions", href: "/admin/subscriptions" },
           ],
         },

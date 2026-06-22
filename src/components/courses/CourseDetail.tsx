@@ -84,12 +84,11 @@ export function CourseDetail({ course, modules }: CourseDetailProps) {
   const t = useTranslations("courses");
   const locale = useLocale();
 
-  // First video lesson flagged as a free preview — powers the "Watch Demo"
-  // CTA. Null when the course has no preview video, which hides the button.
-  const previewLesson =
-    modules
-      .flatMap((m) => m.lessons ?? [])
-      .find((l) => l.is_preview && l.content_type === "video") ?? null;
+  // All video lessons flagged as a free preview — power the "Watch Demo" CTA,
+  // which showcases every preview video. Empty when none, which hides the button.
+  const previewLessons = modules
+    .flatMap((m) => m.lessons ?? [])
+    .filter((l) => l.is_preview && l.content_type === "video");
 
   // Bilingual fallbacks: prefer locale's value, fall back to the other language
   // so AR-only courses render in EN locale and vice versa.
@@ -432,7 +431,7 @@ export function CourseDetail({ course, modules }: CourseDetailProps) {
 
           {/* Right rail — pricing card */}
           <aside className="lg:col-span-1">
-            <CoursePricing course={course} previewLesson={previewLesson} />
+            <CoursePricing course={course} previewLessons={previewLessons} />
           </aside>
         </div>
       </section>

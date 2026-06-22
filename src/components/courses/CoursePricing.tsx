@@ -22,14 +22,14 @@ import type { Course, Enrollment, Lesson } from "@/types";
 interface CoursePricingProps {
   course: Course;
   enrollment?: Enrollment | null;
-  /** First free-preview video lesson; when set, a "Watch Demo" button shows. */
-  previewLesson?: Lesson | null;
+  /** Free-preview video lessons; when non-empty, a "Watch Demo" button shows. */
+  previewLessons?: Lesson[];
 }
 
 export function CoursePricing({
   course,
   enrollment,
-  previewLesson,
+  previewLessons,
 }: CoursePricingProps) {
   const t = useTranslations("courses");
   const tc = useTranslations("common");
@@ -133,8 +133,8 @@ export function CoursePricing({
             </Button>
           </div>
 
-          {/* Secondary CTA — watch the first lesson free */}
-          {previewLesson && (
+          {/* Secondary CTA — watch the free preview videos */}
+          {previewLessons && previewLessons.length > 0 && (
             <div className="mt-3">
               <Button
                 variant="outline"
@@ -144,6 +144,11 @@ export function CoursePricing({
               >
                 <PlayCircle className="h-4 w-4 me-2" />
                 {locale === "ar" ? "شاهد العرض التوضيحي" : "Watch Demo"}
+                {previewLessons.length > 1 && (
+                  <span className="ms-1.5 opacity-70">
+                    ({previewLessons.length})
+                  </span>
+                )}
               </Button>
             </div>
           )}
@@ -170,9 +175,9 @@ export function CoursePricing({
         </div>
       </div>
 
-      {previewLesson && (
+      {previewLessons && previewLessons.length > 0 && (
         <LessonPreviewDialog
-          lesson={previewLesson}
+          lessons={previewLessons}
           courseSlug={course.slug}
           open={demoOpen}
           onOpenChange={setDemoOpen}

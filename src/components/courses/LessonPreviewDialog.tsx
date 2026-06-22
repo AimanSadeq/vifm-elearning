@@ -3,7 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useLocale } from "next-intl";
-import { Loader2, ExternalLink, Sparkles, FileText, ArrowRight } from "lucide-react";
+import {
+  Loader2,
+  ExternalLink,
+  Sparkles,
+  FileText,
+  ArrowRight,
+  PlayCircle,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -11,11 +18,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils/cn";
 import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 import type { Lesson } from "@/types";
 
 interface LessonPreviewDialogProps {
-  lesson: Lesson | null;
+  /** Single preview lesson (used by the course syllabus). */
+  lesson?: Lesson | null;
+  /** All preview lessons (used by "Watch Demo") — renders a playlist. */
+  lessons?: Lesson[];
   courseSlug: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -35,28 +46,41 @@ interface LessonPreviewDialogProps {
  */
 export function LessonPreviewDialog({
   lesson,
+  lessons,
   courseSlug,
   open,
   onOpenChange,
 }: LessonPreviewDialogProps) {
   const locale = useLocale();
   const flags = useFeatureFlags();
+  const list =
+    lessons && lessons.length > 0 ? lessons : lesson ? [lesson] : [];
+  const [activeIndex, setActiveIndex] = useState(0);
+  const active = list[activeIndex] ?? list[0] ?? null;
+  const activeId = active?.id ?? null;
+  const activeType = active?.content_type ?? null;
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isResolving, setIsResolving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Start from the first preview each time the dialog opens.
   useEffect(() => {
-    if (!open || !lesson || lesson.content_type !== "video") {
+    if (open) setActiveIndex(0);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open || !activeId || activeType !== "video") {
       setVideoUrl(null);
       return;
     }
     let cancelled = false;
     setIsResolving(true);
     setError(null);
+    setVideoUrl(null);
     fetch("/api/video/signed-url", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ lessonId: lesson.id }),
+      body: JSON.stringify({ lessonId: activeId }),
     })
       .then((r) => r.json())
       .then((j) => {
@@ -76,14 +100,15 @@ export function LessonPreviewDialog({
     return () => {
       cancelled = true;
     };
-  }, [open, lesson, locale]);
+  }, [open, activeId, activeType, locale]);
 
-  if (!lesson) return null;
+  if (!active) return null;
 
-  const title =
+  const titleOf = (l: Lesson) =>
     locale === "ar"
-      ? lesson.title_ar || lesson.title || ""
-      : lesson.title || lesson.title_ar || "";
+      ? l.title_ar || l.title || ""
+      : l.title || l.title_ar || "";
+  const title = titleOf(active);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -100,7 +125,7 @@ export function LessonPreviewDialog({
 
         {/* Body */}
         <div className="space-y-4">
-          {lesson.content_type === "video" && (
+          {active.content_type === "video" && (
             <div className="aspect-video overflow-hidden rounded-lg bg-black">
               {isResolving ? (
                 <div className="flex h-full items-center justify-center text-white/70">
@@ -112,6 +137,7 @@ export function LessonPreviewDialog({
                 </div>
               ) : videoUrl ? (
                 <video
+                  key={active.id}
                   src={videoUrl}
                   className="h-full w-full"
                   controls
@@ -126,18 +152,52 @@ export function LessonPreviewDialog({
             </div>
           )}
 
-          {lesson.content_type === "document" && lesson.document_url && (
-            <DocumentPreview lesson={lesson} />
+          {active.content_type === "document" && active.document_url && (
+            <DocumentPreview lesson={active} />
           )}
 
-          {lesson.content_type !== "video" &&
-            lesson.content_type !== "document" && (
+          {active.content_type !== "video" &&
+            active.content_type !== "document" && (
               <div className="rounded-lg border bg-muted/30 p-6 text-center text-sm text-muted-foreground">
                 {locale === "ar"
                   ? "هذا الدرس غير قابل للمعاينة في النافذة المنبثقة."
                   : "This lesson type isn't previewable here."}
               </div>
             )}
+
+          {/* Playlist — all preview videos */}
+          {list.length > 1 && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-semibold text-muted-foreground">
+                {locale === "ar"
+                  ? `مقاطع المعاينة (${list.length})`
+                  : `Preview videos (${list.length})`}
+              </p>
+              <div className="max-h-44 divide-y overflow-y-auto rounded-lg border">
+                {list.map((l, i) => (
+                  <button
+                    key={l.id}
+                    type="button"
+                    onClick={() => setActiveIndex(i)}
+                    className={cn(
+                      "flex w-full items-center gap-2 px-3 py-2 text-start text-sm transition-colors",
+                      i === activeIndex
+                        ? "bg-brand-50 font-medium text-brand-700 dark:bg-brand-950/40"
+                        : "hover:bg-muted/50"
+                    )}
+                  >
+                    <PlayCircle className="h-4 w-4 shrink-0" />
+                    <span className="flex-1 truncate">{titleOf(l)}</span>
+                    {i === activeIndex && (
+                      <span className="text-[10px] uppercase tracking-wide text-brand-600">
+                        {locale === "ar" ? "يُعرض" : "Playing"}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Upgrade CTA */}
           <div className="rounded-lg border bg-gradient-to-br from-brand-50 to-amber-50/50 p-4 dark:from-brand-950/30 dark:to-amber-950/20">

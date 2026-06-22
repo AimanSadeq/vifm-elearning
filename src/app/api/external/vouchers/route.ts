@@ -34,9 +34,20 @@ const bodySchema = z.object({
   applicableCourses: z.array(z.string().uuid()).optional(),
 });
 
-function redeemUrlFor(): string {
-  // Generic full-access voucher: the delegate browses, picks a course, and
-  // applies the code at checkout. Point them at the course catalogue.
+async function resolveRedeemUrl(
+  applicableCourses?: string[]
+): Promise<string> {
+  // Course-specific voucher: deep-link to that course so the delegate lands on
+  // the exact course and applies the code at checkout.
+  if (applicableCourses && applicableCourses.length === 1) {
+    const { data: course } = await supabaseAdmin
+      .from("courses")
+      .select("slug")
+      .eq("id", applicableCourses[0])
+      .maybeSingle();
+    if (course?.slug) return `${APP_URL}/en/courses/${course.slug}`;
+  }
+  // Fallback: the catalogue (generic voucher, or course not found).
   return `${APP_URL}/en/courses`;
 }
 
@@ -73,6 +84,8 @@ export async function POST(request: NextRequest) {
   const assignedEmail = email.trim().toLowerCase();
 
   try {
+    const redeemUrl = await resolveRedeemUrl(applicableCourses);
+
     // --- Idempotency: reuse an existing voucher for this external_ref ---
     const { data: existing } = await supabaseAdmin
       .from("vouchers")
@@ -85,7 +98,7 @@ export async function POST(request: NextRequest) {
         data: {
           code: existing.code,
           assignedEmail: existing.assigned_email,
-          redeemUrl: redeemUrlFor(),
+          redeemUrl,
           reused: true,
         },
       });
@@ -128,7 +141,7 @@ export async function POST(request: NextRequest) {
             data: {
               code: raced.code,
               assignedEmail: raced.assigned_email,
-              redeemUrl: redeemUrlFor(),
+              redeemUrl,
               reused: true,
             },
           });
@@ -145,7 +158,7 @@ export async function POST(request: NextRequest) {
       data: {
         code: voucher.code,
         assignedEmail: voucher.assigned_email,
-        redeemUrl: redeemUrlFor(),
+        redeemUrl,
         reused: false,
       },
     });
