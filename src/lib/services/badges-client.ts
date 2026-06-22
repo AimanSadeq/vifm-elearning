@@ -200,12 +200,17 @@ export const badgesClient = {
         email: input.delegateEmail,
         first_name,
         last_name,
-        issued_at: input.issuedAt ?? new Date().toISOString(),
+        // Only send issued_at when explicitly provided. Defaulting to
+        // new Date() made the body change on every retry, so the badges
+        // service rejected the reused Idempotency-Key ("already used with a
+        // different request body"). Omitting it keeps the body deterministic
+        // for a given (course, user); the service stamps issued_at itself.
+        issued_at: input.issuedAt,
         metadata: input.metadata,
       },
-      // Idempotency key prefix bumped to invalidate any pre-fix 409s
-      // stuck from older payload-shape attempts.
-      `v2:${input.externalId}`,
+      // Idempotency key prefix bumped (v2 -> v3) to escape keys already
+      // poisoned by the old volatile-issued_at body shape.
+      `v3:${input.externalId}`,
     );
   },
 
