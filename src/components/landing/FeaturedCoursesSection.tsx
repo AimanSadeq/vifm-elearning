@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { AnimatedSection } from "./AnimatedSection";
@@ -41,8 +41,6 @@ export function FeaturedCoursesSection({
   viewAllText,
   viewAllHref,
 }: FeaturedCoursesSectionProps) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
   const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
@@ -154,7 +152,6 @@ export function FeaturedCoursesSection({
           <AnimatePresence mode="wait">
             <motion.div
               key={currentPage}
-              ref={ref}
               className={cn(
                 "grid gap-6",
                 itemsPerPage === 1 && "grid-cols-1",
@@ -163,7 +160,7 @@ export function FeaturedCoursesSection({
               )}
               variants={prefersReducedMotion ? undefined : containerVariants}
               initial="hidden"
-              animate={isInView ? "visible" : "hidden"}
+              animate="visible"
               exit={{ opacity: 0, transition: { duration: 0.2 } }}
             >
               {visibleCourses.map((course) => (
