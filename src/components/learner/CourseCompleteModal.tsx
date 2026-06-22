@@ -82,7 +82,11 @@ export function CourseCompleteModal({
               : `You've completed ${courseTitle ?? "the course"}. Your certificate is ready on the My Certificates page.`}
           </p>
 
-          <Link href={`/${locale}/certificates`} onClick={onClose}>
+          <Link
+            href={`/${locale}/certificates`}
+            onClick={onClose}
+            className="mt-2 block"
+          >
             <Button className="w-full">
               <Award className="h-4 w-4 me-2" />
               {ar ? "عرض الشهادة" : "View Certificate"}
