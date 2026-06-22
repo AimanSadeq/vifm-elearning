@@ -4,6 +4,49 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { issueCertificate, SurveyRequiredError } from "@/lib/services/certificate-service";
 import { escapeIlike } from "@/lib/utils/escape-search";
 
+/**
+ * Issue certificates for completed, certificate-enabled courses that don't
+ * have one yet. Self-heals older completions where the buggy progress gate
+ * never fired the auto-issue. Idempotent (issueCertificate returns the
+ * existing cert) and survey-gated (blocked ones stay blocked).
+ */
+async function issueMissingCertificates(userId: string) {
+  const { data: enrollments } = await supabaseAdmin
+    .from("enrollments")
+    .select(
+      "id, course_id, course:courses!enrollments_course_id_fkey(certificate_enabled)",
+    )
+    .eq("user_id", userId)
+    .eq("status", "completed");
+  if (!enrollments?.length) return;
+
+  const { data: existing } = await supabaseAdmin
+    .from("certificates")
+    .select("course_id")
+    .eq("user_id", userId);
+  const haveCert = new Set((existing ?? []).map((c) => c.course_id as string));
+
+  for (const e of enrollments) {
+    const courseId = e.course_id as string;
+    if (haveCert.has(courseId)) continue;
+    const rel = e.course as unknown as
+      | { certificate_enabled?: boolean }
+      | { certificate_enabled?: boolean }[]
+      | null;
+    const course = Array.isArray(rel) ? rel[0] : rel;
+    if (!course?.certificate_enabled) continue;
+    try {
+      await issueCertificate({
+        userId,
+        courseId,
+        enrollmentId: e.id as string,
+      });
+    } catch {
+      // SurveyRequiredError or transient — the survey banner covers it.
+    }
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createServerSupabase();
@@ -20,6 +63,10 @@ export async function GET(request: NextRequest) {
       .single();
 
     const isAdmin = profile?.role === "super_admin";
+
+    // Self-heal any missing certificates for this learner's completed courses
+    // before listing, so they appear immediately.
+    await issueMissingCertificates(user.id).catch(() => {});
 
     const params = request.nextUrl.searchParams;
     const page = Math.max(0, Number(params.get("page") ?? "0") || 0);
