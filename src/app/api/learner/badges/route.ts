@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { badgesClient, isBadgesEnabled } from "@/lib/services/badges-client";
+import {
+  badgesClient,
+  isBadgesEnabled,
+  issueMissingBadges,
+} from "@/lib/services/badges-client";
 import { hasCompletedRequiredSurvey } from "@/lib/services/survey-service";
 
 interface IssuedBadgeWithExternal {
@@ -19,6 +23,10 @@ export async function GET() {
     if (!isBadgesEnabled()) {
       return NextResponse.json({ data: [], enabled: false });
     }
+
+    // Self-heal: issue badges for completed courses that have a badge attached
+    // but never got one (e.g. badge enabled after the course was completed).
+    await issueMissingBadges(user.id).catch(() => {});
 
     const result = await badgesClient.listBadgesForDelegate(user.id);
     if (!result.ok) {

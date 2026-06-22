@@ -1,4 +1,5 @@
 import { env } from "@/lib/env";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 /**
  * Thin wrapper around the VIFM Digital Badges external v1 REST API
@@ -342,4 +343,72 @@ export function badgeImageUrl(verificationId: string): string | null {
   const base = env.NEXT_PUBLIC_BADGES_PUBLIC_URL;
   if (!base) return null;
   return `${base.replace(/\/+$/, "")}/api/verify/${encodeURIComponent(verificationId)}/image`;
+}
+
+/**
+ * Issue badges for the learner's completed courses that have a badge attached
+ * (course.badge_template_external_id set) but no badge yet. Self-heals
+ * completions where the badge issuance never fired (e.g. the cert was issued
+ * before the badge was enabled). Idempotent at the badges service.
+ */
+export async function issueMissingBadges(userId: string): Promise<void> {
+  if (!isBadgesEnabled()) return;
+
+  const { data: enrollments } = await supabaseAdmin
+    .from("enrollments")
+    .select(
+      "course_id, course:courses!enrollments_course_id_fkey(title, badge_template_external_id, category:categories(name))",
+    )
+    .eq("user_id", userId)
+    .eq("status", "completed");
+  if (!enrollments?.length) return;
+
+  const { data: profile } = await supabaseAdmin
+    .from("profiles")
+    .select("full_name, email")
+    .eq("id", userId)
+    .single();
+  const userName = profile?.full_name ?? "Learner";
+  const userEmail = profile?.email ?? undefined;
+
+  for (const e of enrollments) {
+    const rel = e.course as unknown as
+      | {
+          title?: string | null;
+          badge_template_external_id?: string | null;
+          category?: { name?: string } | { name?: string }[] | null;
+        }
+      | Array<{
+          title?: string | null;
+          badge_template_external_id?: string | null;
+          category?: { name?: string } | { name?: string }[] | null;
+        }>
+      | null;
+    const course = Array.isArray(rel) ? rel[0] : rel;
+    const stored = course?.badge_template_external_id ?? null;
+    if (!stored) continue; // no badge attached to this course
+
+    let templateId = stored;
+    if (stored === "AUTO") {
+      const cat = Array.isArray(course?.category)
+        ? course?.category[0]
+        : course?.category;
+      const ensured = await ensureCourseBadgeTemplate({
+        courseId: e.course_id as string,
+        courseTitle: course?.title ?? undefined,
+        courseCategory: cat?.name,
+      });
+      if (!ensured.ok || !ensured.data?.id) continue;
+      templateId = ensured.data.id;
+    }
+
+    await issueCourseBadge({
+      userId,
+      userName,
+      userEmail,
+      courseId: e.course_id as string,
+      courseTitle: course?.title ?? undefined,
+      templateExternalId: templateId,
+    }).catch(() => {});
+  }
 }
