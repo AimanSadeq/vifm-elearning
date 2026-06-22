@@ -125,14 +125,7 @@ export function ContentSidebar({
       {/* Header */}
       <div className="flex items-center justify-between border-b px-4 py-3">
         <div className="flex-1 min-w-0">
-          <Link
-            href={`/${locale}/courses/${course.slug}`}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-          >
-            <ChevronLeft className="h-3 w-3 rtl:rotate-180" />
-            {tCourses("overview")}
-          </Link>
-          <h2 className="mt-1 truncate text-sm font-semibold">{courseTitle}</h2>
+          <h2 className="truncate text-sm font-semibold">{courseTitle}</h2>
         </div>
         <Button
           variant="ghost"
