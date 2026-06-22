@@ -126,8 +126,28 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     badge_template_external_id:
       (course as { badge_template_external_id?: string | null })
         .badge_template_external_id ?? '',
+    certificate_template_id:
+      (course as { certificate_template_id?: string | null })
+        .certificate_template_id ?? '',
     status: course.status,
   })
+
+  // Certificate templates for the per-course picker. Empty selection = use the
+  // system Default (the certificate generator falls back to is_default).
+  const [certificateTemplates, setCertificateTemplates] = useState<
+    { id: string; name: string; is_default: boolean }[]
+  >([])
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase
+      .from('certificate_templates')
+      .select('id, name, is_default')
+      .order('name')
+      .then(({ data }) => {
+        if (data) setCertificateTemplates(data as typeof certificateTemplates)
+      })
+  }, [])
 
   // (Badge template picker removed — templates are now auto-resolved by
   // the backend per course via the 'AUTO' sentinel in
@@ -315,6 +335,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
           is_free: courseForm.is_free,
           is_featured: courseForm.is_featured,
           certificate_enabled: courseForm.certificate_enabled,
+          certificate_template_id: courseForm.certificate_template_id || null,
           passing_score: parseInt(courseForm.passing_score) || 70,
           sequential_locking_enabled: courseForm.sequential_locking_enabled,
           badge_template_external_id:
@@ -978,6 +999,18 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                       Add at least one module and one lesson before publishing.
                     </p>
                   )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground">Certificate Template</label>
+                  <select value={courseForm.certificate_template_id} onChange={(e) => setCourseForm({ ...courseForm, certificate_template_id: e.target.value })} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                    <option value="">Default (system template)</option>
+                    {certificateTemplates.map((tpl) => (
+                      <option key={tpl.id} value={tpl.id}>
+                        {tpl.name}{tpl.is_default ? ' (default)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-xs text-muted-foreground">Leave on Default to use the system default template.</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground">Price</label>
