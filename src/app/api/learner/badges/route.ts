@@ -38,14 +38,17 @@ export async function GET() {
 
     const badges = result.data?.data ?? [];
 
-    // Survey gate — filter out badges for courses with an unsubmitted
+    // Survey gate — hide a badge only when its course has an unsubmitted
     // required survey. We encode the source course in external_id as
-    // `${courseId}:${userId}` (see issueCourseBadge), so we can recover
-    // the courseId from the badge without an extra round-trip.
+    // `${courseId}:${userId}` (see issueCourseBadge). Only apply the gate when
+    // the badge actually carries that exact shape; any other id is kept, so we
+    // never accidentally hide a valid badge whose id we can't parse.
     const filtered: typeof badges = [];
     for (const b of badges) {
       const ext = (b as IssuedBadgeWithExternal).external_id;
-      const courseId = ext?.split(":")[0];
+      const parts = ext?.split(":");
+      const courseId =
+        parts && parts.length === 2 && parts[1] === user.id ? parts[0] : null;
       if (!courseId) {
         filtered.push(b);
         continue;
@@ -57,6 +60,17 @@ export async function GET() {
     return NextResponse.json({
       data: filtered,
       enabled: true,
+      ...(filtered.length === 0
+        ? {
+            debug: {
+              delegateId: user.id,
+              rawCount: badges.length,
+              externalIds: badges
+                .slice(0, 5)
+                .map((b) => (b as IssuedBadgeWithExternal).external_id ?? null),
+            },
+          }
+        : {}),
       ...(healErrors.length ? { issueDebug: healErrors } : {}),
     });
   } catch {
