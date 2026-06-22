@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { ChevronLeft, ChevronRight, Globe, ExternalLink, MessageSquare, Bookmark, Lock, Play, CheckCircle, FileSpreadsheet, FileText, Presentation, FileArchive, FileImage, File as FileIcon, Download } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, MessageSquare, Bookmark, Lock, Play, CheckCircle, FileSpreadsheet, FileText, Presentation, FileArchive, FileImage, File as FileIcon, Download } from "lucide-react";
 import { getDocumentMeta, isOfficeKind, type DocumentKind } from "@/lib/utils/document-meta";
 import DOMPurify from "dompurify";
 import { createClient } from "@/lib/supabase/client";
@@ -854,27 +854,6 @@ export default function LessonPage() {
               />
             )}
           </>
-        )}
-
-        {/* Course Website link (inline for quick access) */}
-        {designationSlug && (
-          <Link
-            href={`/${locale}/designations/${designationSlug}?tab=courseWebsite`}
-            className="flex items-center gap-3 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 transition-colors hover:bg-brand-100 dark:border-brand-900 dark:bg-brand-950/30 dark:hover:bg-brand-950/50"
-          >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-900/50">
-              <Globe className="h-5 w-5 text-brand-600 dark:text-brand-400" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-brand-700 dark:text-brand-300">
-                {tp("courseWebsite")}
-              </p>
-              <p className="text-xs text-brand-500 dark:text-brand-400/70">
-                {tp("courseWebsiteDesc")}
-              </p>
-            </div>
-            <ExternalLink className="h-4 w-4 shrink-0 text-brand-400" />
-          </Link>
         )}
 
         {/* Lesson info */}
