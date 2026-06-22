@@ -78,6 +78,12 @@ const serverEnvSchema = z.object({
   BADGES_API_BASE_URL: z.string().url().optional(),
   BADGES_API_KEY: z.string().optional(),
   NEXT_PUBLIC_BADGES_PUBLIC_URL: z.string().url().optional(),
+
+  // --- External voucher creation (OpsSys → this platform) ---
+  // Shared secret the OpsSys training system sends in the `x-api-key` header
+  // to POST /api/external/vouchers and mint email-bound, single-use vouchers
+  // for course delegates. Optional — the endpoint 503s if unset.
+  EXTERNAL_VOUCHER_API_KEY: z.string().optional(),
 });
 
 type ServerEnv = z.infer<typeof serverEnvSchema>;

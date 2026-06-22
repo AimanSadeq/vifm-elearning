@@ -41,6 +41,19 @@ export async function POST(request: NextRequest) {
         data: { valid: false, reason: "Invalid voucher code" },
       });
 
+    // Email-bound voucher: only the assigned recipient can use it. Prevents a
+    // delegate forwarding/sharing their complimentary code with anyone else.
+    if (
+      voucher.assigned_email &&
+      voucher.assigned_email.toLowerCase() !== (user.email ?? "").toLowerCase()
+    )
+      return NextResponse.json({
+        data: {
+          valid: false,
+          reason: "This voucher is assigned to a different email address",
+        },
+      });
+
     // Check start date
     if (voucher.starts_at && new Date(voucher.starts_at) > new Date())
       return NextResponse.json({

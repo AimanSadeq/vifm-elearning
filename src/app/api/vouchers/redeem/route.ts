@@ -43,6 +43,16 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
 
+    // Email-bound voucher: only the assigned recipient can redeem it.
+    if (
+      voucher.assigned_email &&
+      voucher.assigned_email.toLowerCase() !== (user.email ?? "").toLowerCase()
+    )
+      return NextResponse.json(
+        { error: "This voucher is assigned to a different email address" },
+        { status: 403 }
+      );
+
     // Check start date
     if (voucher.starts_at && new Date(voucher.starts_at) > new Date())
       return NextResponse.json(
