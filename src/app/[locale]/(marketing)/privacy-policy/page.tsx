@@ -52,7 +52,7 @@ export default function PrivacyPolicyPage() {
           E-Learning Platform
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Last Updated: February 2026
+          Last Updated: June 2026
         </p>
 
         <div className="mt-10 space-y-10">
