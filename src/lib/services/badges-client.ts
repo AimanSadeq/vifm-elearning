@@ -26,18 +26,32 @@ export interface BadgeTemplate {
 }
 
 export interface IssuedBadge {
-  id: string;
+  // The badges service returns `issued_badge_id` (numeric) — keep `id` optional
+  // for any legacy callers.
+  issued_badge_id?: number;
+  id?: string;
   verification_id: string;
-  template_id: string;
-  // External API returns the template's display name as `template_name`,
-  // with `badge_name` set to the per-issuance override if any.
+  template_id?: number | string;
+  // The source course is encoded on the badge as `template_external_id`
+  // (format `course:{courseId}`), NOT a top-level `external_id`.
+  template_external_id?: string;
+  // Display name lives in `badge_name`; `template_name`/`template_title` kept
+  // for back-compat with older shapes.
   template_name?: string;
   badge_name?: string;
-  /** @deprecated kept for back-compat — use template_name / badge_name. */
+  /** @deprecated kept for back-compat — use badge_name. */
   template_title?: string;
+  tier?: string;
+  category?: string;
+  // The badges service identifies a delegate by EMAIL; external_id is the value
+  // we send but it may map to an existing delegate for the same email.
   delegate_external_id?: string;
   delegate_name?: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
   status: "pending" | "active" | "revoked" | "expired";
+  issue_date?: string;
   issued_at?: string;
   image_url?: string;
 }
@@ -223,14 +237,24 @@ export const badgesClient = {
     return call("GET", `/badges?${q.toString()}`);
   },
 
+  // The badges service paginates by offset/limit (response echoes
+  // `{ total, limit, offset, data }`). Using page/page_size is ignored and
+  // always returns the first page.
   listBadges(params: {
-    page?: number;
-    pageSize?: number;
+    offset?: number;
+    limit?: number;
     status?: string;
-  } = {}): Promise<BadgesResult<{ data: IssuedBadge[]; total?: number }>> {
+  } = {}): Promise<
+    BadgesResult<{
+      data: IssuedBadge[];
+      total?: number;
+      limit?: number;
+      offset?: number;
+    }>
+  > {
     const q = new URLSearchParams();
-    if (params.page !== undefined) q.set("page", String(params.page));
-    if (params.pageSize !== undefined) q.set("page_size", String(params.pageSize));
+    if (params.offset !== undefined) q.set("offset", String(params.offset));
+    if (params.limit !== undefined) q.set("limit", String(params.limit));
     if (params.status) q.set("status", params.status);
     const qs = q.toString();
     return call("GET", `/badges${qs ? `?${qs}` : ""}`);
@@ -470,46 +494,44 @@ export async function issueMissingBadges(
 }
 
 /**
- * Robustly fetch a delegate's badges. First tries the server-side
- * `?delegate_external_id=` filter; if that returns nothing, scans the full
- * badge list and filters by delegate_external_id ourselves (the same field the
- * admin Issued Badges list uses). Guards against the service's delegate filter
- * silently returning empty. Returns the badges plus a `via` tag for debugging.
+ * Robustly fetch a learner's badges. The badges service identifies a delegate
+ * by EMAIL (the external_id we send may map to an existing delegate for the
+ * same email), and it has no working per-delegate filter — so we page through
+ * ALL badges (offset/limit) and match by `delegate_external_id === userId` OR
+ * `email === userEmail`. Matching by email is the reliable key.
  */
 export async function getDelegateBadges(
   userId: string,
+  userEmail?: string | null,
 ): Promise<{ badges: IssuedBadge[]; via: string; scanned: number }> {
-  const direct = await badgesClient.listBadgesForDelegate(userId);
-  const directRows = direct.ok ? (direct.data?.data ?? []) : [];
-  if (directRows.length > 0) {
-    return { badges: directRows, via: "delegate-filter", scanned: 0 };
-  }
-
-  // Fallback: page through all badges and match the delegate ourselves.
-  // NOTE: the service caps page_size (~50), so a page smaller than requested is
-  // NORMAL — it does NOT mean the last page. Keep going until an empty page (or
-  // `total` is reached). Guard against non-advancing pagination by tracking the
-  // first id of each page.
+  const email = userEmail?.trim().toLowerCase() || null;
   const matched: IssuedBadge[] = [];
+  const seen = new Set<string | number>();
   let scanned = 0;
-  let lastFirstId: string | null = null;
-  for (let page = 1; page <= 60; page++) {
-    const res = await badgesClient.listBadges({ page, pageSize: 100 });
+  let offset = 0;
+  const LIMIT = 50;
+
+  for (let i = 0; i < 200; i++) {
+    const res = await badgesClient.listBadges({ offset, limit: LIMIT });
     if (!res.ok) break;
     const rows = res.data?.data ?? [];
-    if (rows.length === 0) break; // reached the end
-
-    const firstId = rows[0]?.id ?? null;
-    if (firstId && firstId === lastFirstId) break; // pagination not advancing
-    lastFirstId = firstId;
+    if (rows.length === 0) break;
 
     scanned += rows.length;
     for (const b of rows) {
-      if (b.delegate_external_id === userId) matched.push(b);
+      const byExt = b.delegate_external_id === userId;
+      const byEmail = email && (b.email ?? "").toLowerCase() === email;
+      if (!byExt && !byEmail) continue;
+      const key = b.issued_badge_id ?? b.verification_id;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      matched.push(b);
     }
 
-    const total = res.data?.total;
-    if (total !== undefined && scanned >= total) break; // fetched everything
+    const total = res.data?.total ?? offset + rows.length;
+    offset += rows.length;
+    if (offset >= total) break;
   }
-  return { badges: matched, via: "scan", scanned };
+
+  return { badges: matched, via: email ? "scan-email" : "scan-ext", scanned };
 }

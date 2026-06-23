@@ -13,7 +13,8 @@ interface EarnedBadge {
   badge_name?: string;
   template_title?: string; // legacy
   status: "pending" | "active" | "revoked" | "expired";
-  issued_at?: string;
+  issue_date?: string;
+  issued_at?: string; // legacy
   image_url?: string;
 }
 
@@ -175,10 +176,12 @@ export default function MyBadgesPage() {
                   )}
                   <div>
                     <p className="font-semibold leading-snug">{badgeLabel(b)}</p>
-                    {b.issued_at && (
+                    {(b.issue_date || b.issued_at) && (
                       <p className="mt-1 text-xs text-muted-foreground">
                         Issued{" "}
-                        {new Date(b.issued_at).toLocaleDateString(undefined, {
+                        {new Date(
+                          (b.issue_date || b.issued_at) as string,
+                        ).toLocaleDateString(undefined, {
                           year: "numeric",
                           month: "short",
                           day: "numeric",

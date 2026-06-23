@@ -11,14 +11,21 @@ export async function GET(request: NextRequest) {
   }
 
   const params = request.nextUrl.searchParams;
-  const page = Math.max(0, Number(params.get("page") ?? "0") || 0);
-  const pageSize = Math.min(
+  // The badges service paginates by offset/limit. Accept either offset or a
+  // page index (page * limit) for backward compatibility with existing callers.
+  const limit = Math.min(
     100,
-    Math.max(1, Number(params.get("pageSize") ?? "25") || 25)
+    Math.max(1, Number(params.get("pageSize") ?? params.get("limit") ?? "25") || 25)
   );
+  const offsetParam = params.get("offset");
+  const page = Math.max(0, Number(params.get("page") ?? "0") || 0);
+  const offset =
+    offsetParam !== null
+      ? Math.max(0, Number(offsetParam) || 0)
+      : page * limit;
   const status = params.get("status") ?? undefined;
 
-  const result = await badgesClient.listBadges({ page, pageSize, status });
+  const result = await badgesClient.listBadges({ offset, limit, status });
   if (!result.ok) {
     return NextResponse.json(
       { error: result.error ?? "Failed to load issued badges" },

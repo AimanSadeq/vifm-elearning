@@ -8,8 +8,8 @@ import {
 import { hasCompletedRequiredSurvey } from "@/lib/services/survey-service";
 import { syncLearnerProgress } from "@/lib/services/progress-service";
 
-interface IssuedBadgeWithExternal {
-  external_id?: string;
+interface BadgeCourseRef {
+  template_external_id?: string;
 }
 
 export async function GET() {
@@ -42,19 +42,24 @@ export async function GET() {
     }
     const healErrors = selfHeal.filter((r) => !r.ok);
 
-    const { badges, via, scanned } = await getDelegateBadges(user.id);
+    // Match by external_id OR email — the badges service keys delegates by
+    // email, so the current account's badges may sit under a different
+    // external_id for the same email.
+    const { badges, via, scanned } = await getDelegateBadges(
+      user.id,
+      user.email,
+    );
 
-    // Survey gate — hide a badge only when its course has an unsubmitted
-    // required survey. We encode the source course in external_id as
-    // `${courseId}:${userId}` (see issueCourseBadge). Only apply the gate when
-    // the badge actually carries that exact shape; any other id is kept, so we
-    // never accidentally hide a valid badge whose id we can't parse.
+    // Survey gate — hide a badge only when its source course has an unsubmitted
+    // required survey. The course is encoded on the badge as
+    // `template_external_id = "course:{courseId}"`. Badges without that shape
+    // are kept (never hide a valid badge we can't map to a course).
     const filtered: typeof badges = [];
     for (const b of badges) {
-      const ext = (b as IssuedBadgeWithExternal).external_id;
-      const parts = ext?.split(":");
-      const courseId =
-        parts && parts.length === 2 && parts[1] === user.id ? parts[0] : null;
+      const ext = (b as BadgeCourseRef).template_external_id;
+      const courseId = ext?.startsWith("course:")
+        ? ext.slice("course:".length)
+        : null;
       if (!courseId) {
         filtered.push(b);
         continue;
