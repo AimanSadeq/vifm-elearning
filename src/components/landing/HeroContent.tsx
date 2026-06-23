@@ -87,7 +87,7 @@ export function HeroContent({
 
         {/* Title with white→white/60 gradient text + staggered blur reveal */}
         <motion.h1
-          className="mt-7 font-heading text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.5rem] xl:text-[4rem]"
+          className="mt-7 font-heading text-4xl font-bold leading-[1.12] tracking-tight sm:text-5xl lg:text-[3.5rem] xl:text-[4rem]"
           variants={animate ? containerVariants : undefined}
           initial={animate ? "hidden" : false}
           animate={animate ? "visible" : undefined}
@@ -95,7 +95,7 @@ export function HeroContent({
           {words.map((word, i) => (
             <motion.span
               key={i}
-              className="inline-block me-[0.3em] bg-gradient-to-br from-white via-white to-white/60 bg-clip-text text-transparent"
+              className="inline-block me-[0.3em] pb-[0.12em] bg-gradient-to-br from-white via-white to-white/60 bg-clip-text text-transparent"
               variants={animate ? wordVariants : undefined}
             >
               {word}
