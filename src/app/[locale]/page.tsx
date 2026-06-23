@@ -257,12 +257,9 @@ export default async function HomePage({
           sectionTitle=""
           sectionSubtitle=""
           features={[
-            { id: "bilingual", title: t("pfBilingualTitle"), description: t("pfBilingualDesc"), highlights: [t("pfBilingualH1"), t("pfBilingualH2"), t("pfBilingualH3")] },
             { id: "videoLearning", title: t("pfVideoTitle"), description: t("pfVideoDesc"), highlights: [t("pfVideoH1"), t("pfVideoH2"), t("pfVideoH3")] },
             { id: "quizzes", title: t("pfQuizzesTitle"), description: t("pfQuizzesDesc"), highlights: [t("pfQuizzesH1"), t("pfQuizzesH2"), t("pfQuizzesH3")] },
-            { id: "cpeTracking", title: t("pfCpeTitle"), description: t("pfCpeDesc"), highlights: [t("pfCpeH1"), t("pfCpeH2"), t("pfCpeH3")] },
             { id: "certificates", title: t("pfCertificatesTitle"), description: t("pfCertificatesDesc"), highlights: [t("pfCertificatesH1"), t("pfCertificatesH2"), t("pfCertificatesH3")] },
-            { id: "assessments", title: t("pfAssessmentsTitle"), description: t("pfAssessmentsDesc"), highlights: [t("pfAssessmentsH1"), t("pfAssessmentsH2"), t("pfAssessmentsH3")] },
           ]}
         />
           </>
