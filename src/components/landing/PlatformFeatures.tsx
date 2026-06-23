@@ -107,7 +107,14 @@ export function PlatformFeatures({
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
   const [mounted, setMounted] = useState(false);
-  const [activeId, setActiveId] = useState(FEATURES[0].id);
+  // Only render features that the caller actually passed data for — the
+  // hardcoded FEATURES list just supplies the icons.
+  const visibleFeatures = FEATURES.filter((f) =>
+    featureData.some((d) => d.id === f.id)
+  );
+  const [activeId, setActiveId] = useState(
+    visibleFeatures[0]?.id ?? FEATURES[0].id
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -118,8 +125,12 @@ export function PlatformFeatures({
       ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
       : true;
 
-  const activeFeature = FEATURES.find((f) => f.id === activeId) ?? FEATURES[0];
-  const activeData = featureData.find((f) => f.id === activeId) ?? featureData[0];
+  const activeFeature =
+    visibleFeatures.find((f) => f.id === activeId) ??
+    visibleFeatures[0] ??
+    FEATURES[0];
+  const activeData =
+    featureData.find((f) => f.id === activeFeature.id) ?? featureData[0];
   const ActiveIcon = activeFeature.icon;
 
   return (
@@ -148,7 +159,7 @@ export function PlatformFeatures({
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
           >
-            {FEATURES.map((feature) => {
+            {visibleFeatures.map((feature) => {
               const Icon = feature.icon;
               const data = featureData.find((f) => f.id === feature.id);
               const isActive = activeId === feature.id;
