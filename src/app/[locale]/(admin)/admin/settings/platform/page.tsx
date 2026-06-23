@@ -25,6 +25,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import {
+  HOME_SECTIONS,
+  HOME_SECTION_SETTING_KEYS,
+  homeSectionSettingKey,
+  resolveHomeSections,
+  type HomeSectionKey,
+} from "@/lib/home-sections";
 
 interface HomeStat {
   key: string;
@@ -84,6 +91,9 @@ export default function AdminPlatformSettingsPage() {
   const [templates, setTemplates] = useState<EmailTemplateRow[]>([]);
   const [showSubscription, setShowSubscription] = useState(false);
   const [showLearningPaths, setShowLearningPaths] = useState(false);
+  const [homeSections, setHomeSections] = useState<
+    Record<HomeSectionKey, boolean>
+  >(() => resolveHomeSections([]));
 
   useEffect(() => {
     (async () => {
@@ -91,9 +101,13 @@ export default function AdminPlatformSettingsPage() {
       const { data } = await supabase
         .from("site_settings")
         .select("key, value")
-        .in("key", SETTING_KEYS as unknown as string[]);
+        .in("key", [
+          ...(SETTING_KEYS as unknown as string[]),
+          ...HOME_SECTION_SETTING_KEYS,
+        ]);
       const map = new Map<string, unknown>();
       for (const row of data ?? []) map.set(row.key as string, row.value);
+      setHomeSections(resolveHomeSections(data ?? []));
 
       setEmailFrom(strOrEmpty(map.get("email_from")));
       setQuizPassingScore(numOrDefault(map.get("default_quiz_passing_score"), 70).toString());
@@ -125,6 +139,10 @@ export default function AdminPlatformSettingsPage() {
         { key: "email_templates", value: templates },
         { key: "feature_subscriptions", value: showSubscription },
         { key: "feature_learning_paths", value: showLearningPaths },
+        ...HOME_SECTIONS.map((s) => ({
+          key: homeSectionSettingKey(s.key),
+          value: homeSections[s.key],
+        })),
       ];
       const { error: err } = await supabase
         .from("site_settings")
@@ -243,6 +261,43 @@ export default function AdminPlatformSettingsPage() {
           <p className="text-xs text-muted-foreground">
             Controls whether these tabs appear in the learner sidebar. Both are
             hidden by default. Save to apply.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Home page sections */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Eye className="h-4 w-4 text-brand-600" />
+            Home page sections
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {HOME_SECTIONS.map((s) => (
+            <label
+              key={s.key}
+              className="flex items-center gap-3 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                checked={homeSections[s.key]}
+                onChange={(e) =>
+                  setHomeSections((prev) => ({
+                    ...prev,
+                    [s.key]: e.target.checked,
+                  }))
+                }
+                className="h-4 w-4 rounded border-border accent-brand-600"
+              />
+              <span className="text-sm">
+                Show <strong>{s.label}</strong>
+              </span>
+            </label>
+          ))}
+          <p className="text-xs text-muted-foreground">
+            Turn any home page section on or off. The hero is always shown. Save
+            to apply.
           </p>
         </CardContent>
       </Card>

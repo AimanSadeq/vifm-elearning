@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import {
+  HOME_SECTION_SETTING_KEYS,
+  resolveHomeSections,
+} from "@/lib/home-sections";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { createServerSupabase } from "@/lib/supabase/server";
@@ -141,6 +145,13 @@ export default async function HomePage({
     .order("created_at", { ascending: false })
     .limit(9);
 
+  // Admin-toggleable home section visibility.
+  const { data: sectionRows } = await supabase
+    .from("site_settings")
+    .select("key, value")
+    .in("key", HOME_SECTION_SETTING_KEYS);
+  const sections = resolveHomeSections(sectionRows ?? []);
+
   return (
     <>
       <Header />
@@ -167,7 +178,7 @@ export default async function HomePage({
         </section>
 
         {/* Categories Section */}
-        {categories.length > 0 && (
+        {sections.categories && categories.length > 0 && (
           <section className="py-16 lg:py-24">
             <div className="container mx-auto px-4">
               <SectionMarker
@@ -189,7 +200,7 @@ export default async function HomePage({
         {/* Featured Courses — marker rendered as a standalone div above the
             section, since FeaturedCoursesSection brings its own <section>
             wrapper with vertical padding. */}
-        {featuredCourses && featuredCourses.length > 0 && (
+        {sections.featured_courses && featuredCourses && featuredCourses.length > 0 && (
           <>
             <div className="container mx-auto px-4 pt-16 lg:pt-20">
               <SectionMarker
@@ -211,6 +222,8 @@ export default async function HomePage({
         )}
 
         {/* Platform Features — Immersive Learning Showcase */}
+        {sections.platform_features && (
+          <>
         <div className="container mx-auto px-4 pt-16 lg:pt-20">
           <SectionMarker
             index="03"
@@ -231,12 +244,17 @@ export default async function HomePage({
             { id: "assessments", title: t("pfAssessmentsTitle"), description: t("pfAssessmentsDesc"), highlights: [t("pfAssessmentsH1"), t("pfAssessmentsH2"), t("pfAssessmentsH3")] },
           ]}
         />
+          </>
+        )}
 
         {/* Social Proof */}
-        <SocialProof sectionTitle={t("trustedBy")} stats={stats} sectionSubtitle={t("socialProofLabel")} />
+        {sections.social_proof && (
+          <SocialProof sectionTitle={t("trustedBy")} stats={stats} sectionSubtitle={t("socialProofLabel")} />
+        )}
 
         {/* Career Pathways — dark section, marker rendered inside the
             component on its own brand-950 canvas to keep contrast clean. */}
+        {sections.career_pathways && (
         <CareerPathways
           markerIndex="04"
           sectionTitle={t("careerPathwaysTitle")}
@@ -267,9 +285,10 @@ export default async function HomePage({
             },
           ]}
         />
+        )}
 
         {/* Certification Programs */}
-        {designations && designations.length > 0 && (
+        {sections.certifications && designations && designations.length > 0 && (
           <>
             <div className="container mx-auto px-4 pt-16 lg:pt-20">
               <SectionMarker
@@ -291,11 +310,12 @@ export default async function HomePage({
         )}
 
         {/* Testimonials */}
-        {testimonials && testimonials.length > 0 && (
+        {sections.testimonials && testimonials && testimonials.length > 0 && (
           <TestimonialsCarousel testimonials={testimonials} locale={locale} />
         )}
 
         {/* CTA */}
+        {sections.cta && (
         <CTASection
           title={t("readyToStart")}
           subtitle={t("joinLearners")}
@@ -320,6 +340,7 @@ export default async function HomePage({
             },
           ]}
         />
+        )}
       </main>
       <Footer />
     </>
