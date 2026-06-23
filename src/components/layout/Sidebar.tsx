@@ -19,6 +19,7 @@ import {
   Trophy,
   ClipboardCheck,
   ListChecks,
+  Inbox,
   Settings,
   ChevronDown,
   PanelLeftClose,
@@ -121,6 +122,7 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
         { icon: ClipboardCheck, label: "Assignments", href: "/admin/assignments" },
         { icon: ListChecks, label: "Surveys", href: "/admin/surveys" },
         { icon: MessageSquare, label: "Testimonials", href: "/admin/testimonials" },
+        { icon: Inbox, label: "Messages", href: "/admin/messages" },
         { icon: Bell, label: t("admin.notifications"), href: "/admin/notifications" },
         { icon: Settings, label: t("admin.settings"), href: "/admin/settings" },
       ];
