@@ -196,10 +196,16 @@ async function fetchFacetsImpl(locale: string): Promise<CatalogFacets> {
       .filter("title", "match", "[A-Za-z]");
   }
 
-  const [{ data: courses }, { count: categoryCount }] = await Promise.all([
+  const [{ data: courses }, { data: publishedCatRows }] = await Promise.all([
     coursesQ,
-    supabase.from("categories").select("*", { count: "exact", head: true }),
+    // Count only categories that actually have a published course.
+    supabase.from("courses").select("category_id").eq("status", "published"),
   ]);
+  const categoryCount = new Set(
+    (publishedCatRows ?? [])
+      .map((r) => (r as { category_id: string | null }).category_id)
+      .filter(Boolean)
+  ).size;
 
   const difficultyCounts: Record<string, number> = {};
   let freeCount = 0;
@@ -221,7 +227,7 @@ async function fetchFacetsImpl(locale: string): Promise<CatalogFacets> {
   return {
     difficultyCounts,
     availableDifficulties,
-    categoryCount: categoryCount ?? 0,
+    categoryCount,
     publishedTotal: courses?.length ?? 0,
     freeCount,
   };

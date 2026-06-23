@@ -13,6 +13,15 @@ import {
 // Map each category to a clean lucide line icon (instead of the DB emoji) so
 // the web matches the mobile app's icon style. Resolved by keyword from the
 // slug + name, so new categories still get a sensible icon (default BookOpen).
+/** True for the "All Courses" catch-all category (no real category page). */
+export function isAllCoursesCategory(
+  slug?: string | null,
+  name?: string | null,
+): boolean {
+  const s = `${slug ?? ""} ${name ?? ""}`.toLowerCase();
+  return s.includes("all course") || s.includes("all-course");
+}
+
 export function iconForCategory(slug: string, name: string): LucideIcon {
   const s = `${slug} ${name}`.toLowerCase();
   if (s.includes("all course") || s.includes("all-course")) return BookOpen;

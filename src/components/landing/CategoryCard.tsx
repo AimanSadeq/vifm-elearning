@@ -3,7 +3,10 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { iconForCategory } from "@/lib/utils/category-icon";
+import {
+  iconForCategory,
+  isAllCoursesCategory,
+} from "@/lib/utils/category-icon";
 
 interface CategoryCardProps {
   name: string;
@@ -30,10 +33,13 @@ export function CategoryCard({
   locale,
 }: CategoryCardProps) {
   const Icon = iconForCategory(slug, name);
+  const href = isAllCoursesCategory(slug, name)
+    ? `/${locale}/courses`
+    : `/${locale}/categories/${slug}`;
 
   return (
     <motion.div variants={cardVariants}>
-      <Link href={`/${locale}/categories/${slug}`} className="group block h-full">
+      <Link href={href} className="group block h-full">
         <motion.div
           className="relative h-full overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-500 hover:border-brand-300 hover:shadow-xl lg:p-8"
           whileHover={{ y: -6 }}

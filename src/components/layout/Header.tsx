@@ -8,7 +8,10 @@ import {
   ChevronDown, BookOpen, Award, Radio,
   ArrowRight, Clock, Video,
 } from "lucide-react";
-import { iconForCategory } from "@/lib/utils/category-icon";
+import {
+  iconForCategory,
+  isAllCoursesCategory,
+} from "@/lib/utils/category-icon";
 import { useState, useRef, useCallback, useEffect, Fragment } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
@@ -199,8 +202,11 @@ export function Header() {
                                 {categories.map((cat) => {
                                   const Icon = iconForCategory(cat.slug, cat.name);
                                   const desc = locale === "ar" ? cat.descriptionAr : cat.description;
+                                  const catHref = isAllCoursesCategory(cat.slug, cat.name)
+                                    ? `/${locale}/courses`
+                                    : `/${locale}/categories/${cat.slug}`;
                                   return (
-                                    <MenuLink key={cat.slug} href={`/${locale}/categories/${cat.slug}`} onClose={closeMenuNow}>
+                                    <MenuLink key={cat.slug} href={catHref} onClose={closeMenuNow}>
                                       <MenuIcon className="bg-secondary text-muted-foreground group-hover:text-brand-600">
                                         <Icon className="h-4 w-4" />
                                       </MenuIcon>
