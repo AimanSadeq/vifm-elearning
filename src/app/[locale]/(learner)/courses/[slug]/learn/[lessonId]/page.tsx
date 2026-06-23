@@ -490,7 +490,7 @@ export default function LessonPage() {
       lockedLessonIds={lockedLessonIds}
       designationSlug={designationSlug}
     >
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="space-y-6">
         {/* Locked state */}
         {currentLessonLocked && (
           <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/50 py-16 gap-4">

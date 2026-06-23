@@ -158,7 +158,15 @@ export function CoursePlayer({
             <Menu className="h-4 w-4" />
           </Button>
         )}
-        <div className={cn("p-4 sm:p-6", isTheaterMode && "px-0 pt-0 pb-6")}>
+        <div
+          className={cn(
+            "mx-auto p-4 sm:p-6",
+            // Give the content more room when the sidebar is hidden so closing
+            // it actually widens the page instead of leaving an empty gap.
+            isSidebarOpen ? "max-w-4xl" : "max-w-6xl",
+            isTheaterMode && "max-w-none px-0 pt-0 pb-6"
+          )}
+        >
           {children}
         </div>
       </main>
