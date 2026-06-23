@@ -2,44 +2,8 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import {
-  ArrowRight,
-  Landmark,
-  Banknote,
-  LineChart,
-  BrainCircuit,
-  Target,
-  Building2,
-  ClipboardList,
-  BookOpen,
-  type LucideIcon,
-} from "lucide-react";
-
-// Map each category to a clean lucide line icon (instead of the DB emoji) so
-// the web matches the mobile app's icon style. Resolved by keyword from the
-// slug + name, so new categories still get a sensible icon (default BookOpen).
-function iconForCategory(slug: string, name: string): LucideIcon {
-  const s = `${slug} ${name}`.toLowerCase();
-  if (s.includes("all course") || s.includes("all-course")) return BookOpen;
-  if (s.includes("finance")) return Landmark;
-  if (s.includes("bank")) return Banknote;
-  if (s.includes("data") || s.includes("analytic")) return LineChart;
-  if (
-    s.includes("artificial") ||
-    s.includes("intelligence") ||
-    s.includes("machine")
-  )
-    return BrainCircuit;
-  if (s.includes("strategy") || s.includes("leadership")) return Target;
-  if (
-    s.includes("real estate") ||
-    s.includes("real-estate") ||
-    s.includes("property")
-  )
-    return Building2;
-  if (s.includes("project")) return ClipboardList;
-  return BookOpen;
-}
+import { ArrowRight } from "lucide-react";
+import { iconForCategory } from "@/lib/utils/category-icon";
 
 interface CategoryCardProps {
   name: string;

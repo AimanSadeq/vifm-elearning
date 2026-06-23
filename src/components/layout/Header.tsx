@@ -6,9 +6,9 @@ import { useLocale, useTranslations } from "next-intl";
 import {
   Menu, X, LogOut, User, LayoutDashboard, Search,
   ChevronDown, BookOpen, Award, Radio, TrendingUp, Building2, Mail,
-  Landmark, BrainCircuit, Target, ShieldCheck, ArrowRight,
-  Sparkles, Clock, Video,
+  ArrowRight, Sparkles, Clock, Video,
 } from "lucide-react";
+import { iconForCategory } from "@/lib/utils/category-icon";
 import { useState, useRef, useCallback, useEffect, Fragment } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
@@ -20,13 +20,6 @@ import { GlobalSearchOverlay } from "./GlobalSearchOverlay";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 type MenuId = "home" | "courses" | "certifications" | "webinars" | null;
-
-const CATEGORY_ICONS: Record<string, React.ElementType> = {
-  landmark: Landmark,
-  "brain-circuit": BrainCircuit,
-  target: Target,
-  "shield-check": ShieldCheck,
-};
 
 interface HeaderCategory {
   name: string;
@@ -189,18 +182,12 @@ export function Header() {
                               <MenuSectionLabel>{t("megaMenuCategories")}</MenuSectionLabel>
                               <div className="mt-3 space-y-0.5">
                                 {categories.map((cat) => {
-                                  const Icon = cat.icon in CATEGORY_ICONS ? CATEGORY_ICONS[cat.icon] : null;
+                                  const Icon = iconForCategory(cat.slug, cat.name);
                                   const desc = locale === "ar" ? cat.descriptionAr : cat.description;
                                   return (
                                     <MenuLink key={cat.slug} href={`/${locale}/categories/${cat.slug}`} onClose={closeMenuNow}>
                                       <MenuIcon style={{ backgroundColor: `${cat.color}15` }}>
-                                        {Icon ? (
-                                          <Icon className="h-4 w-4" style={{ color: cat.color }} />
-                                        ) : cat.icon ? (
-                                          <span className="text-base leading-none" aria-hidden>{cat.icon}</span>
-                                        ) : (
-                                          <Landmark className="h-4 w-4" style={{ color: cat.color }} />
-                                        )}
+                                        <Icon className="h-4 w-4" style={{ color: cat.color }} />
                                       </MenuIcon>
                                       <div className="min-w-0">
                                         <p className="truncate text-sm font-medium">{locale === "ar" ? cat.nameAr : cat.name}</p>
@@ -253,18 +240,12 @@ export function Header() {
                               <MenuSectionLabel>{t("megaMenuCategories")}</MenuSectionLabel>
                               <div className="mt-3 space-y-0.5">
                                 {categories.map((cat) => {
-                                  const Icon = cat.icon in CATEGORY_ICONS ? CATEGORY_ICONS[cat.icon] : null;
+                                  const Icon = iconForCategory(cat.slug, cat.name);
                                   const desc = locale === "ar" ? cat.descriptionAr : cat.description;
                                   return (
                                     <MenuLink key={cat.slug} href={`/${locale}/categories/${cat.slug}`} onClose={closeMenuNow}>
                                       <MenuIcon style={{ backgroundColor: `${cat.color}15` }}>
-                                        {Icon ? (
-                                          <Icon className="h-4 w-4" style={{ color: cat.color }} />
-                                        ) : cat.icon ? (
-                                          <span className="text-base leading-none" aria-hidden>{cat.icon}</span>
-                                        ) : (
-                                          <Landmark className="h-4 w-4" style={{ color: cat.color }} />
-                                        )}
+                                        <Icon className="h-4 w-4" style={{ color: cat.color }} />
                                       </MenuIcon>
                                       <div className="min-w-0">
                                         <p className="truncate text-sm font-medium">{locale === "ar" ? cat.nameAr : cat.name}</p>
