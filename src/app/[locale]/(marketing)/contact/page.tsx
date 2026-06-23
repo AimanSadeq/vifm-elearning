@@ -181,18 +181,24 @@ export default function ContactPage() {
                 <CardContent className="p-5 space-y-3">
                   <h3 className="font-semibold">{office.city}</h3>
                   <div className="space-y-2 text-sm text-muted-foreground">
-                    <p className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 shrink-0" />
-                      {office.address}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 shrink-0" />
-                      {office.phone}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 shrink-0" />
-                      {office.email}
-                    </p>
+                    {office.address?.trim() && (
+                      <p className="flex items-start gap-2">
+                        <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                        {office.address}
+                      </p>
+                    )}
+                    {office.phone?.trim() && (
+                      <p className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 shrink-0" />
+                        {office.phone}
+                      </p>
+                    )}
+                    {office.email?.trim() && (
+                      <p className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 shrink-0" />
+                        {office.email}
+                      </p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
