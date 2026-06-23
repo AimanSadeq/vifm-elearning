@@ -7,7 +7,6 @@ import {
   BarChart3,
   CheckCircle2,
   Clock,
-  Globe,
   GraduationCap,
   Star,
   Video,
@@ -385,11 +384,6 @@ export function CourseDetail({ course, modules }: CourseDetailProps) {
             {/* Details info row */}
             <Section index={nextIndex()} title={t("details")}>
               <div className="grid gap-4 sm:grid-cols-3">
-                <InfoCard
-                  Icon={Globe}
-                  label={t("language")}
-                  value={t("languageValue")}
-                />
                 {course.certificate_enabled && (
                   <InfoCard
                     Icon={Award}

@@ -4,15 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import {
-  Award,
-  BookOpen,
-  Clock,
-  Globe,
-  Loader2,
-  PlayCircle,
-  ShieldCheck,
-} from "lucide-react";
+import { Loader2, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LessonPreviewDialog } from "./LessonPreviewDialog";
 import { formatCurrency } from "@/lib/utils/formatters";
@@ -153,25 +145,6 @@ export function CoursePricing({
             </div>
           )}
 
-          {/* Includes — refined list with icon plates */}
-          <div className="mt-6 space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              {t("includes")}
-            </p>
-
-            {course.duration_hours != null && course.duration_hours > 0 && (
-              <IncludeRow
-                Icon={Clock}
-                label={`${course.duration_hours} ${t("hours")} ${t("ofExpertContent")}`}
-              />
-            )}
-            <IncludeRow Icon={BookOpen} label={t("lifetimeAccess")} />
-            {course.certificate_enabled && (
-              <IncludeRow Icon={Award} label={t("certificateIncluded")} />
-            )}
-            <IncludeRow Icon={Globe} label={t("languageValue")} muted />
-            <IncludeRow Icon={ShieldCheck} label={t("moneyBack")} muted />
-          </div>
         </div>
       </div>
 
@@ -187,31 +160,3 @@ export function CoursePricing({
   );
 }
 
-function IncludeRow({
-  Icon,
-  label,
-  muted = false,
-}: {
-  Icon: React.ElementType;
-  label: string;
-  muted?: boolean;
-}) {
-  return (
-    <div className="flex items-center gap-3 py-1">
-      <span
-        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${
-          muted
-            ? "bg-muted text-muted-foreground"
-            : "bg-brand-50 text-brand-600 dark:bg-brand-950/40"
-        }`}
-      >
-        <Icon className="h-3.5 w-3.5" />
-      </span>
-      <span
-        className={`text-sm ${muted ? "text-muted-foreground" : "text-foreground"}`}
-      >
-        {label}
-      </span>
-    </div>
-  );
-}
