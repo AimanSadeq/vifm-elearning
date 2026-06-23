@@ -79,7 +79,7 @@ export function StatsBar({ stats }: { stats: Stat[] }) {
             >
               <Icon className="h-4 w-4 text-brand-400 shrink-0" />
               <span className="text-sm font-bold text-white tabular-nums">
-                {stat.value}{stat.suffix}
+                {stat.value.toLocaleString()}{stat.suffix}
               </span>
               <span className="text-sm text-brand-300/70 font-medium">
                 {stat.label}

@@ -34,7 +34,7 @@ function Counter({ value, suffix }: { value: number; suffix: string }) {
     requestAnimationFrame(tick);
   }, [isInView, value, prefersReducedMotion]);
 
-  return <span ref={ref} className="tabular-nums">{count}{suffix}</span>;
+  return <span ref={ref} className="tabular-nums">{count.toLocaleString()}{suffix}</span>;
 }
 
 const STAT_ICONS = [Users, BookOpen, TrendingUp, Building2, Globe];

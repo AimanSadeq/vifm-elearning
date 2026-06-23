@@ -40,11 +40,9 @@ export default async function HomePage({
   const t = await getTranslations("landing");
 
   const stats = [
-    { value: 500, suffix: "+", label: t("statProfessionals") },
-    { value: 50, suffix: "+", label: t("statCourses") },
-    { value: 95, suffix: "%", label: t("statSatisfaction") },
-    { value: 20, suffix: "+", label: t("statPartners") },
-    { value: 10, suffix: "+", label: t("statCountries") },
+    { value: 50000, suffix: "+", label: t("statProfessionals") },
+    { value: 125, suffix: "+", label: t("statClients") },
+    { value: 25, suffix: "+", label: t("statYears") },
   ];
 
   // Fetch active testimonials
