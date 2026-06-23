@@ -156,7 +156,10 @@ export function CoursePlayer({
             <Button
               variant="outline"
               size="sm"
-              className="m-3 gap-2 bg-background shadow-sm"
+              // Pull left out of the dashboard container padding (px-4 / lg:px-8)
+              // so the button lines up with the player's left border — where the
+              // course title/sidebar sat before it was closed.
+              className="mt-3 -ms-2 lg:-ms-6 gap-2 bg-background shadow-sm"
               onClick={() => setSidebarOpen(true)}
               aria-label={locale === "ar" ? "إظهار الدروس" : "Show lessons"}
             >
