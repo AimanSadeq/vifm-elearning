@@ -280,8 +280,6 @@ export default async function HomePage({
           markerIndex={marker.career}
           sectionTitle={t("careerPathwaysTitle")}
           sectionSubtitle={t("careerPathwaysSubtitle")}
-          ctaText={t("careerCTA")}
-          ctaHref={`/${locale}/designations`}
           tiers={[
             {
               id: "gateway",

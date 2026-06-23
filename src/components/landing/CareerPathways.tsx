@@ -26,8 +26,8 @@ interface CareerPathwaysProps {
   sectionTitle: string;
   sectionSubtitle: string;
   tiers: TierData[];
-  ctaText: string;
-  ctaHref: string;
+  ctaText?: string;
+  ctaHref?: string;
   /** Numbered index ("04") rendered as a dark-themed SectionMarker inside
    *  this component, since the section's bg-brand-950 canvas would clash
    *  with a light-background marker placed above it. */
@@ -271,17 +271,19 @@ export function CareerPathways({
         </motion.div>
 
         {/* CTA */}
-        <AnimatedSection delay={0.4}>
-          <div className="mt-16 text-center">
-            <Link
-              href={ctaHref}
-              className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-500"
-            >
-              {ctaText}
-              <ArrowRight className="h-4 w-4 rtl:rotate-180" />
-            </Link>
-          </div>
-        </AnimatedSection>
+        {ctaText && ctaHref && (
+          <AnimatedSection delay={0.4}>
+            <div className="mt-16 text-center">
+              <Link
+                href={ctaHref}
+                className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-500"
+              >
+                {ctaText}
+                <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+              </Link>
+            </div>
+          </AnimatedSection>
+        )}
       </div>
     </section>
   );
