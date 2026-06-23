@@ -27,6 +27,10 @@ export function formatCurrency(
   return new Intl.NumberFormat(locale === "ar" ? "ar-AE" : "en-US", {
     style: "currency",
     currency,
+    // Drop the ".00" on whole amounts ($200 instead of $200.00) while still
+    // showing cents when an amount actually has them.
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(amount);
 }
 
