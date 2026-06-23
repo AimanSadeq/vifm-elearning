@@ -145,10 +145,26 @@ export function CoursePlayer({
       {/* Main content */}
       <main
         className={cn(
-          "flex-1 overflow-y-auto",
+          "relative flex-1 overflow-y-auto",
           isTheaterMode && "bg-black"
         )}
       >
+        {/* Reopen button — overlaid in the left gap (zero-height wrapper so it
+            doesn't push the content down), sticky so it stays while scrolling. */}
+        {!isSidebarOpen && !isTheaterMode && (
+          <div className="sticky top-0 z-20 h-0">
+            <Button
+              variant="outline"
+              size="sm"
+              className="m-3 gap-2 bg-background shadow-sm"
+              onClick={() => setSidebarOpen(true)}
+              aria-label={locale === "ar" ? "إظهار الدروس" : "Show lessons"}
+            >
+              <Menu className="h-4 w-4" />
+              {locale === "ar" ? "الدروس" : "Lessons"}
+            </Button>
+          </div>
+        )}
         <div
           className={cn(
             "mx-auto p-4 sm:p-6",
@@ -158,20 +174,6 @@ export function CoursePlayer({
             isTheaterMode && "max-w-none px-0 pt-0 pb-6"
           )}
         >
-          {!isSidebarOpen && !isTheaterMode && (
-            <div className="sticky top-0 z-10 -mt-2 mb-3">
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 bg-background shadow-sm"
-                onClick={() => setSidebarOpen(true)}
-                aria-label={locale === "ar" ? "إظهار الدروس" : "Show lessons"}
-              >
-                <Menu className="h-4 w-4" />
-                {locale === "ar" ? "الدروس" : "Lessons"}
-              </Button>
-            </div>
-          )}
           {children}
         </div>
       </main>
