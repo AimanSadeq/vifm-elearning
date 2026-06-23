@@ -27,10 +27,18 @@ export default async function DesignationsPage() {
   const tierOrder = tiers.map((t) => t.id);
   const tierById = new Map(tiers.map((t) => [t.id, t]));
 
+  // Locale gating (mirrors the course catalog): on the English page, hide
+  // Arabic-language designations whose primary `name` is in Arabic script.
+  const hasArabicScript = (s?: string | null) => /[؀-ۿ]/.test(s ?? "");
+  const localeDesignations =
+    locale === "ar"
+      ? designations
+      : designations.filter((d) => !hasArabicScript(d.name));
+
   const grouped = tierOrder
     .map((tier) => ({
       tier,
-      items: designations.filter((d) => d.metadata?.tier_level === tier),
+      items: localeDesignations.filter((d) => d.metadata?.tier_level === tier),
     }))
     .filter((g) => g.items.length > 0);
 
@@ -50,7 +58,7 @@ export default async function DesignationsPage() {
           <p className="mx-auto mt-4 max-w-2xl text-lg text-white/80">
             {locale === "ar"
               ? `اكتشف ${designations.length} شهادة مهنية معتمدة عبر ثلاثة مستويات من التأسيسي إلى التنفيذي مصممة لتطوير مهاراتك المهنية.`
-              : `Discover ${designations.length} accredited professional designations across three tiers from Gateway to Executive designed to advance your career in finance, AI, and business.`}
+              : `Discover ${localeDesignations.length} accredited professional designations across three tiers from Gateway to Executive designed to advance your career in finance, AI, and business.`}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-white/70">
             {tiers.map((tier, i) => {
