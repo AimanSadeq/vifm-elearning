@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -28,6 +28,7 @@ export default function CheckoutPage() {
   const slug = params.slug as string;
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const t = useTranslations("payments");
 
   const [course, setCourse] = useState<Course | null>(null);
@@ -90,14 +91,18 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleApplyVoucher = async () => {
-    if (!voucherCode || !course) return;
+  const handleApplyVoucher = async (codeArg?: string) => {
+    // codeArg lets callers (e.g. the ?voucher= auto-apply) pass the code
+    // directly, since setVoucherCode state isn't readable in the same tick.
+    // The Apply button passes a MouseEvent, so only accept string args.
+    const code = (typeof codeArg === "string" ? codeArg : voucherCode).trim();
+    if (!code || !course) return;
     setVoucherError("");
 
     const res = await fetch("/api/vouchers/validate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: voucherCode, courseId: course.id }),
+      body: JSON.stringify({ code, courseId: course.id }),
     });
 
     const { data } = await res.json();
@@ -113,6 +118,17 @@ export default function CheckoutPage() {
       setVoucherError(data?.reason ?? "Invalid voucher code");
     }
   };
+
+  // Prefill + auto-apply a voucher passed via ?voucher= (emailed complimentary
+  // course link). Runs once the course has loaded.
+  useEffect(() => {
+    const v = searchParams.get("voucher");
+    if (!v || !course || voucherApplied) return;
+    const code = v.toUpperCase();
+    setVoucherCode(code);
+    void handleApplyVoucher(code);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [course, searchParams]);
 
   const handleRedeemVoucher = async () => {
     if (!voucherId || !course) return;
@@ -377,7 +393,7 @@ export default function CheckoutPage() {
                 ) : (
                   <Button
                     variant="outline"
-                    onClick={handleApplyVoucher}
+                    onClick={() => handleApplyVoucher()}
                     disabled={!voucherCode || promoApplied}
                   >
                     Apply Voucher

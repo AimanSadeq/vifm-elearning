@@ -37,15 +37,16 @@ const bodySchema = z.object({
 async function resolveRedeemUrl(
   applicableCourses?: string[]
 ): Promise<string> {
-  // Course-specific voucher: deep-link to that course so the delegate lands on
-  // the exact course and applies the code at checkout.
+  // Course-specific voucher: deep-link straight to that course's CHECKOUT so
+  // the delegate lands on the enrolment page (the code is appended by the
+  // caller as ?voucher= and auto-applied there).
   if (applicableCourses && applicableCourses.length === 1) {
     const { data: course } = await supabaseAdmin
       .from("courses")
       .select("slug")
       .eq("id", applicableCourses[0])
       .maybeSingle();
-    if (course?.slug) return `${APP_URL}/en/courses/${course.slug}`;
+    if (course?.slug) return `${APP_URL}/en/courses/${course.slug}/checkout`;
   }
   // Fallback: the catalogue (generic voucher, or course not found).
   return `${APP_URL}/en/courses`;
@@ -84,7 +85,10 @@ export async function POST(request: NextRequest) {
   const assignedEmail = email.trim().toLowerCase();
 
   try {
-    const redeemUrl = await resolveRedeemUrl(applicableCourses);
+    const baseRedeemUrl = await resolveRedeemUrl(applicableCourses);
+    // Append the code so the checkout page can prefill + auto-apply it.
+    const redeemUrlFor = (c: string) =>
+      `${baseRedeemUrl}?voucher=${encodeURIComponent(c)}`;
 
     // --- Idempotency: reuse an existing voucher for this external_ref ---
     const { data: existing } = await supabaseAdmin
@@ -98,7 +102,7 @@ export async function POST(request: NextRequest) {
         data: {
           code: existing.code,
           assignedEmail: existing.assigned_email,
-          redeemUrl,
+          redeemUrl: redeemUrlFor(existing.code),
           reused: true,
         },
       });
@@ -141,7 +145,7 @@ export async function POST(request: NextRequest) {
             data: {
               code: raced.code,
               assignedEmail: raced.assigned_email,
-              redeemUrl,
+              redeemUrl: redeemUrlFor(raced.code),
               reused: true,
             },
           });
@@ -158,7 +162,7 @@ export async function POST(request: NextRequest) {
       data: {
         code: voucher.code,
         assignedEmail: voucher.assigned_email,
-        redeemUrl,
+        redeemUrl: redeemUrlFor(voucher.code),
         reused: false,
       },
     });
