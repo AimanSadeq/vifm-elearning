@@ -281,8 +281,6 @@ export default async function HomePage({
           ctaText={t("getStarted")}
           ctaHref={getStartedHref}
           tagline={t("ctaTagline")}
-          secondaryCtaText={t("ctaSecondary")}
-          secondaryCtaHref={`/${locale}/pricing`}
           highlights={[
             {
               icon: "courses",

@@ -15,7 +15,6 @@ import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 import { createClient } from "@/lib/supabase/client";
 import { DESIGNATION_TIERS } from "@/lib/site-content";
 import { cn } from "@/lib/utils/cn";
-import { LanguageSwitcher } from "./LanguageSwitcher";
 import { MobileNav } from "./MobileNav";
 import { GlobalSearchOverlay } from "./GlobalSearchOverlay";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
@@ -418,7 +417,6 @@ export function Header() {
           >
             <Search className="h-5 w-5" />
           </button>
-          <LanguageSwitcher />
           {user && <NotificationBell />}
 
           {isLoading ? null : user ? (
