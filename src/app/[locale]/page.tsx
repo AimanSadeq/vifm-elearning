@@ -67,11 +67,32 @@ export default async function HomePage({
   // section is suppressed below.
   const { data: dbCategories } = await supabase
     .from("categories")
-    .select("name, name_ar, slug, description, description_ar, icon, color")
+    .select("id, name, name_ar, slug, description, description_ar, icon, color")
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
-  const categories = (dbCategories ?? []).map((cat) => ({
+  // Only show categories that have at least one published course (the
+  // "All Courses" catch-all is always kept).
+  const { data: publishedCatRows } = await supabase
+    .from("courses")
+    .select("category_id")
+    .eq("status", "published");
+  const categoriesWithCourses = new Set(
+    (publishedCatRows ?? [])
+      .map((r) => r.category_id)
+      .filter((id): id is string => Boolean(id))
+  );
+  const isAllCoursesCat = (slug?: string | null, name?: string | null) => {
+    const s = `${slug ?? ""} ${name ?? ""}`.toLowerCase();
+    return s.includes("all course") || s.includes("all-course");
+  };
+
+  const categories = (dbCategories ?? [])
+    .filter(
+      (cat) =>
+        categoriesWithCourses.has(cat.id) || isAllCoursesCat(cat.slug, cat.name)
+    )
+    .map((cat) => ({
     iconName: cat.icon ?? "",
     name:
       locale === "ar"

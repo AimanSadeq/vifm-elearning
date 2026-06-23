@@ -46,15 +46,31 @@ export function Header() {
   useEffect(() => {
     let cancelled = false;
     const supabase = createClient();
-    supabase
-      .from("categories")
-      .select("name, name_ar, description, description_ar, slug, icon, color")
-      .eq("is_active", true)
-      .order("sort_order", { ascending: true })
-      .then(({ data }) => {
-        if (cancelled || !data) return;
-        setCategories(
-          data.map((c) => ({
+    (async () => {
+      const [{ data: cats }, { data: pub }] = await Promise.all([
+        supabase
+          .from("categories")
+          .select("id, name, name_ar, description, description_ar, slug, icon, color")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true }),
+        supabase.from("courses").select("category_id").eq("status", "published"),
+      ]);
+      if (cancelled || !cats) return;
+      // Only show categories that have at least one published course (always
+      // keep the "All Courses" catch-all).
+      const withCourses = new Set(
+        (pub ?? []).map((r) => r.category_id).filter(Boolean)
+      );
+      const isAllCourses = (slug?: string | null, name?: string | null) => {
+        const s = `${slug ?? ""} ${name ?? ""}`.toLowerCase();
+        return s.includes("all course") || s.includes("all-course");
+      };
+      setCategories(
+        cats
+          .filter(
+            (c) => withCourses.has(c.id) || isAllCourses(c.slug, c.name)
+          )
+          .map((c) => ({
             name: c.name,
             nameAr: c.name_ar?.trim() ? c.name_ar : c.name,
             description: c.description ?? "",
@@ -63,8 +79,8 @@ export function Header() {
             icon: c.icon ?? "",
             color: c.color ?? "#1E3A5F",
           }))
-        );
-      });
+      );
+    })();
     return () => {
       cancelled = true;
     };
