@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import {
   Menu, X, LogOut, User, LayoutDashboard, Search,
-  ChevronDown, BookOpen, Award, Radio, TrendingUp, Building2, Mail,
+  ChevronDown, BookOpen, Award, Radio, TrendingUp,
   ArrowRight, Sparkles, Clock, Video,
 } from "lucide-react";
 import { iconForCategory } from "@/lib/utils/category-icon";
@@ -113,7 +113,6 @@ export function Header() {
   ];
 
   const MENU_IDS: Record<string, MenuId> = {
-    [`/${locale}`]: "home",
     [`/${locale}/courses`]: "courses",
     [`/${locale}/designations`]: "certifications",
     [`/${locale}/webinars`]: "webinars",
@@ -183,63 +182,6 @@ export function Header() {
                   {activeMenu === menuId && (
                     <div className="absolute start-0 top-full z-50 hidden pt-1 md:block">
                       <div className="rounded-xl border bg-background shadow-xl overflow-hidden">
-                        {menuId === "home" && (
-                          <div className="grid grid-cols-[220px_300px_300px]">
-                            <BrandedPanel
-                              tagline={t("megaMenuTagline")}
-                              title="VIFM Academy"
-                              desc={t("megaMenuDesc")}
-                              ctaText={t("register")}
-                              ctaHref={`/${locale}/register`}
-                              onClose={closeMenuNow}
-                            />
-                            <div className="border-e border-border/50 p-6">
-                              <MenuSectionLabel>{t("megaMenuCategories")}</MenuSectionLabel>
-                              <div className="mt-3 space-y-0.5">
-                                {categories.map((cat) => {
-                                  const Icon = iconForCategory(cat.slug, cat.name);
-                                  const desc = locale === "ar" ? cat.descriptionAr : cat.description;
-                                  return (
-                                    <MenuLink key={cat.slug} href={`/${locale}/categories/${cat.slug}`} onClose={closeMenuNow}>
-                                      <MenuIcon className="bg-secondary text-muted-foreground group-hover:text-brand-600">
-                                        <Icon className="h-4 w-4" />
-                                      </MenuIcon>
-                                      <div className="min-w-0">
-                                        <p className="truncate text-sm font-medium">{locale === "ar" ? cat.nameAr : cat.name}</p>
-                                        {desc && (
-                                          <p className="truncate text-xs text-muted-foreground/70">{desc}</p>
-                                        )}
-                                      </div>
-                                    </MenuLink>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                            <div className="p-6">
-                              <MenuSectionLabel>{t("megaMenuQuickLinks")}</MenuSectionLabel>
-                              <div className="mt-3 space-y-0.5">
-                                {[
-                                  { href: `/${locale}/courses`, icon: BookOpen, label: t("megaMenuCourses"), desc: t("megaMenuCoursesDesc") },
-                                  { href: `/${locale}/designations`, icon: Award, label: t("megaMenuCertifications"), desc: t("megaMenuCertificationsDesc") },
-                                  { href: `/${locale}/webinars`, icon: Radio, label: t("megaMenuWebinars"), desc: t("megaMenuWebinarsDesc") },
-                                  { href: `/${locale}/designations`, icon: TrendingUp, label: t("megaMenuCareer"), desc: t("megaMenuCareerDesc") },
-                                  { href: `/${locale}/about`, icon: Building2, label: t("megaMenuAbout"), desc: t("megaMenuAboutDesc") },
-                                  { href: `/${locale}/contact`, icon: Mail, label: t("megaMenuContact"), desc: t("megaMenuContactDesc") },
-                                ].map((link) => (
-                                  <MenuLink key={link.href + link.label} href={link.href} onClose={closeMenuNow}>
-                                    <MenuIcon className="bg-secondary text-muted-foreground group-hover:text-brand-600">
-                                      <link.icon className="h-4 w-4" />
-                                    </MenuIcon>
-                                    <div className="min-w-0">
-                                      <p className="truncate text-sm font-medium">{link.label}</p>
-                                      <p className="truncate text-xs text-muted-foreground/70">{link.desc}</p>
-                                    </div>
-                                  </MenuLink>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
 
                         {menuId === "courses" && (
                           <div className="grid grid-cols-[220px_300px_280px]">
