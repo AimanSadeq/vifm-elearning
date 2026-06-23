@@ -72,7 +72,10 @@ export function CoursePlayer({
   );
 
   return (
-    <div className="flex h-[calc(100vh-4rem)]">
+    // Break out of the dashboard container's horizontal padding so the player
+    // (sidebar + content) starts at the dashboard's left border — letting the
+    // closed-state "Lessons" button line up where the course title/sidebar sat.
+    <div className="flex h-[calc(100vh-4rem)] -mx-4 lg:-mx-8">
       {/* Desktop Sidebar */}
       {!isMobile && (
         <aside
