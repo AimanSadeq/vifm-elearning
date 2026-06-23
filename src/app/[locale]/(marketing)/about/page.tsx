@@ -8,8 +8,11 @@ import {
   BookOpen,
   Award,
   Globe,
-  Target,
   MapPin,
+  Landmark,
+  Cpu,
+  Home,
+  ClipboardList,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -70,10 +73,10 @@ export default function AboutPage() {
   }));
 
   const domains = [
-    { icon: Target, title: t("domainFinance"), description: t("domainFinanceDesc") },
-    { icon: Globe, title: t("domainStrategy"), description: t("domainStrategyDesc") },
-    { icon: Award, title: t("domainCompliance"), description: t("domainComplianceDesc") },
-    { icon: BookOpen, title: t("domainData"), description: t("domainDataDesc") },
+    { icon: Landmark, title: t("domainFinance"), description: t("domainFinanceDesc") },
+    { icon: Cpu, title: t("domainStrategy"), description: t("domainStrategyDesc") },
+    { icon: Home, title: t("domainCompliance"), description: t("domainComplianceDesc") },
+    { icon: ClipboardList, title: t("domainData"), description: t("domainDataDesc") },
   ];
 
   return (
@@ -101,17 +104,23 @@ export default function AboutPage() {
 
         {/* Stats */}
         <section className="mb-16">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
             {stats.map((stat) => (
-              <Card key={stat.key}>
-                <CardContent className="flex flex-col items-center p-6 text-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50">
-                    <stat.icon className="h-6 w-6 text-brand-600" />
+              <div
+                key={stat.key}
+                className="group relative overflow-hidden rounded-2xl border border-border/50 bg-background p-6 lg:p-8 shadow-sm transition-colors hover:shadow-md"
+              >
+                {/* Accent corner glow */}
+                <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-brand-400/5 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                <div className="relative">
+                  <stat.icon className="h-6 w-6 text-brand-400 mb-4" />
+                  <div className="text-3xl font-bold text-foreground lg:text-4xl">
+                    {stat.value}
                   </div>
-                  <p className="mt-3 text-3xl font-bold">{stat.value}</p>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
-                </CardContent>
-              </Card>
+                  <p className="mt-2 text-sm text-muted-foreground">{stat.label}</p>
+                </div>
+              </div>
             ))}
           </div>
         </section>

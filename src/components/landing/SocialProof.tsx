@@ -87,7 +87,7 @@ export function SocialProof({ sectionTitle, stats, sectionSubtitle }: SocialProo
         {/* Stats grid */}
         <motion.div
           ref={ref}
-          className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 lg:gap-6"
+          className="mt-14 mx-auto grid max-w-4xl grid-cols-1 justify-center gap-4 sm:grid-cols-3 lg:gap-6"
           variants={prefersReducedMotion ? undefined : containerVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
@@ -106,7 +106,7 @@ export function SocialProof({ sectionTitle, stats, sectionSubtitle }: SocialProo
 
                 <div className="relative">
                   <Icon className="h-6 w-6 text-brand-400 mb-4" />
-                  <div className="text-5xl font-bold text-foreground lg:text-6xl">
+                  <div className="text-3xl font-bold text-foreground lg:text-4xl">
                     <Counter value={stat.value} suffix={stat.suffix} />
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">{stat.label}</p>

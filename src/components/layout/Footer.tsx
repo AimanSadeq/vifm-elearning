@@ -149,14 +149,6 @@ export function Footer() {
                   {t("contactUs")}
                 </Link>
               </li>
-              <li>
-                <Link
-                  href={`/${locale}/contact`}
-                  className="text-sm text-brand-300 hover:text-white transition-colors"
-                >
-                  {t("helpCenter")}
-                </Link>
-              </li>
             </ul>
           </div>
 
