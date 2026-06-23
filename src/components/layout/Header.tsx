@@ -87,7 +87,6 @@ export function Header() {
   const navLinks = [
     { href: `/${locale}`, label: t("home") },
     { href: `/${locale}/courses`, label: t("courses") },
-    { href: `/${locale}/designations`, label: t("certifications") },
     { href: `/${locale}/webinars`, label: t("webinars") },
     // Pricing sells subscription plans — hide it when subscriptions are off.
     ...(featureFlags.subscriptions
