@@ -14,6 +14,9 @@ import {
   Cpu,
   Home,
   ClipboardList,
+  Target,
+  BarChart3,
+  Wallet,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -81,6 +84,9 @@ export default function AboutPage() {
     { icon: Cpu, title: t("domainStrategy"), description: t("domainStrategyDesc") },
     { icon: Home, title: t("domainCompliance"), description: t("domainComplianceDesc") },
     { icon: ClipboardList, title: t("domainData"), description: t("domainDataDesc") },
+    { icon: Target, title: t("domainStrategyMgmt"), description: t("domainStrategyMgmtDesc") },
+    { icon: BarChart3, title: t("domainDataAnalytics"), description: t("domainDataAnalyticsDesc") },
+    { icon: Wallet, title: t("domainFinanceAcc"), description: t("domainFinanceAccDesc") },
   ];
 
   return (
