@@ -186,8 +186,8 @@ export function Header() {
                                   const desc = locale === "ar" ? cat.descriptionAr : cat.description;
                                   return (
                                     <MenuLink key={cat.slug} href={`/${locale}/categories/${cat.slug}`} onClose={closeMenuNow}>
-                                      <MenuIcon style={{ backgroundColor: `${cat.color}15` }}>
-                                        <Icon className="h-4 w-4" style={{ color: cat.color }} />
+                                      <MenuIcon className="bg-secondary text-muted-foreground group-hover:text-brand-600">
+                                        <Icon className="h-4 w-4" />
                                       </MenuIcon>
                                       <div className="min-w-0">
                                         <p className="truncate text-sm font-medium">{locale === "ar" ? cat.nameAr : cat.name}</p>
@@ -244,8 +244,8 @@ export function Header() {
                                   const desc = locale === "ar" ? cat.descriptionAr : cat.description;
                                   return (
                                     <MenuLink key={cat.slug} href={`/${locale}/categories/${cat.slug}`} onClose={closeMenuNow}>
-                                      <MenuIcon style={{ backgroundColor: `${cat.color}15` }}>
-                                        <Icon className="h-4 w-4" style={{ color: cat.color }} />
+                                      <MenuIcon className="bg-secondary text-muted-foreground group-hover:text-brand-600">
+                                        <Icon className="h-4 w-4" />
                                       </MenuIcon>
                                       <div className="min-w-0">
                                         <p className="truncate text-sm font-medium">{locale === "ar" ? cat.nameAr : cat.name}</p>
