@@ -28,9 +28,12 @@ export default function WebinarsPage() {
   const locale = useLocale();
   const searchParams = useSearchParams();
 
+  // Live URL value — re-reads on every navigation (including same-page query
+  // changes from the nav menu), unlike a mount-only useMemo.
+  const tabParam = searchParams.get("tab");
+
   const initialTab: Tab = useMemo(() => {
-    const t = searchParams.get("tab");
-    return t === "past" ? "past" : "upcoming";
+    return tabParam === "past" ? "past" : "upcoming";
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const initialPrice: "all" | "free" | "paid" = useMemo(() => {
@@ -40,14 +43,6 @@ export default function WebinarsPage() {
   }, []);
   const initialSearch = useMemo(
     () => searchParams.get("q") ?? searchParams.get("search") ?? "",
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-
-  // If the user arrived from "Upcoming Sessions" we respect that even if there
-  // are no upcoming webinars (auto-switch logic below only kicks in when tab is default).
-  const userSpecifiedTab = useMemo(
-    () => searchParams.has("tab"),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
@@ -91,22 +86,29 @@ export default function WebinarsPage() {
       setUpcoming((upcomingRes.data as Webinar[]) ?? []);
       setPast((pastRes.data as Webinar[]) ?? []);
       setIsLoading(false);
-
-      // Auto-switch to "past" only when the user hasn't explicitly picked a tab
-      // via the URL and there's nothing in "upcoming" to show.
-      if (
-        !userSpecifiedTab &&
-        (upcomingRes.data?.length ?? 0) === 0 &&
-        (pastRes.data?.length ?? 0) > 0
-      ) {
-        setTab("past");
-      }
     }
     fetchWebinars();
     return () => {
       cancelled = true;
     };
-  }, [userSpecifiedTab]);
+  }, []);
+
+  // Keep the active tab in sync with the URL. This fires on same-page nav
+  // (e.g. clicking "Upcoming Sessions" while already viewing "Past"), which a
+  // mount-only initializer would miss. When no tab is in the URL ("All
+  // Webinars") we default to "upcoming", falling back to "past" if there's
+  // nothing upcoming to show.
+  useEffect(() => {
+    if (tabParam === "past" || tabParam === "upcoming") {
+      setTab(tabParam);
+      return;
+    }
+    if (!isLoading && upcoming.length === 0 && past.length > 0) {
+      setTab("past");
+    } else {
+      setTab("upcoming");
+    }
+  }, [tabParam, isLoading, upcoming.length, past.length]);
 
   // Filter helper
   const matches = (w: Webinar) => {
