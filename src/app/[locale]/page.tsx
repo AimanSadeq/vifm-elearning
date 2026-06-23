@@ -345,11 +345,6 @@ export default async function HomePage({
               label: t("ctaHighlightCoursesLabel"),
             },
             {
-              icon: "bilingual",
-              value: t("ctaHighlightBilingualValue"),
-              label: t("ctaHighlightBilingualLabel"),
-            },
-            {
               icon: "region",
               value: t("ctaHighlightRegionValue"),
               label: t("ctaHighlightRegionLabel"),
