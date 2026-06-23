@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import { Menu } from "lucide-react";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,7 @@ export function CoursePlayer({
   } = useCoursePlayerStore();
 
   const { celebrationData, closeCelebration } = useCelebration();
+  const locale = useLocale();
 
   // Detect mobile viewport
   const [isMobile, setIsMobile] = useState(false);
@@ -147,17 +149,6 @@ export function CoursePlayer({
           isTheaterMode && "bg-black"
         )}
       >
-        {!isSidebarOpen && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="fixed start-2 top-20 z-10 h-8 w-8 p-0 bg-background shadow-md border"
-            onClick={() => setSidebarOpen(true)}
-            aria-label="Open sidebar"
-          >
-            <Menu className="h-4 w-4" />
-          </Button>
-        )}
         <div
           className={cn(
             "mx-auto p-4 sm:p-6",
@@ -167,6 +158,20 @@ export function CoursePlayer({
             isTheaterMode && "max-w-none px-0 pt-0 pb-6"
           )}
         >
+          {!isSidebarOpen && !isTheaterMode && (
+            <div className="sticky top-0 z-10 -mt-2 mb-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 bg-background shadow-sm"
+                onClick={() => setSidebarOpen(true)}
+                aria-label={locale === "ar" ? "إظهار الدروس" : "Show lessons"}
+              >
+                <Menu className="h-4 w-4" />
+                {locale === "ar" ? "الدروس" : "Lessons"}
+              </Button>
+            </div>
+          )}
           {children}
         </div>
       </main>
