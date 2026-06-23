@@ -152,6 +152,27 @@ export default async function HomePage({
     .in("key", HOME_SECTION_SETTING_KEYS);
   const sections = resolveHomeSections(sectionRows ?? []);
 
+  // Visibility of the NUMBERED sections (admin toggle + content), and their
+  // sequential marker numbers so "01, 02, 03…" never skip when one is hidden.
+  const show = {
+    categories: sections.categories && categories.length > 0,
+    featured:
+      sections.featured_courses &&
+      !!featuredCourses &&
+      featuredCourses.length > 0,
+    platform: sections.platform_features,
+    career: sections.career_pathways,
+    certifications:
+      sections.certifications && !!designations && designations.length > 0,
+  };
+  let markerCounter = 0;
+  const marker = {} as Record<keyof typeof show, string>;
+  (["categories", "featured", "platform", "career", "certifications"] as const).forEach(
+    (k) => {
+      marker[k] = show[k] ? String(++markerCounter).padStart(2, "0") : "";
+    },
+  );
+
   return (
     <>
       <Header />
@@ -178,11 +199,11 @@ export default async function HomePage({
         </section>
 
         {/* Categories Section */}
-        {sections.categories && categories.length > 0 && (
+        {show.categories && (
           <section className="py-16 lg:py-24">
             <div className="container mx-auto px-4">
               <SectionMarker
-                index="01"
+                index={marker.categories}
                 eyebrow={t("categoriesSubtitle")}
                 title={t("categoriesTitle")}
                 align="center"
@@ -200,11 +221,11 @@ export default async function HomePage({
         {/* Featured Courses — marker rendered as a standalone div above the
             section, since FeaturedCoursesSection brings its own <section>
             wrapper with vertical padding. */}
-        {sections.featured_courses && featuredCourses && featuredCourses.length > 0 && (
+        {show.featured && featuredCourses && (
           <>
             <div className="container mx-auto px-4 pt-16 lg:pt-20">
               <SectionMarker
-                index="02"
+                index={marker.featured}
                 eyebrow={t("featuredCoursesSubtitle")}
                 title={t("featuredCoursesTitle")}
                 align="center"
@@ -222,11 +243,11 @@ export default async function HomePage({
         )}
 
         {/* Platform Features — Immersive Learning Showcase */}
-        {sections.platform_features && (
+        {show.platform && (
           <>
         <div className="container mx-auto px-4 pt-16 lg:pt-20">
           <SectionMarker
-            index="03"
+            index={marker.platform}
             eyebrow={t("platformFeaturesSubtitle")}
             title={t("platformFeaturesTitle")}
             align="center"
@@ -254,9 +275,9 @@ export default async function HomePage({
 
         {/* Career Pathways — dark section, marker rendered inside the
             component on its own brand-950 canvas to keep contrast clean. */}
-        {sections.career_pathways && (
+        {show.career && (
         <CareerPathways
-          markerIndex="04"
+          markerIndex={marker.career}
           sectionTitle={t("careerPathwaysTitle")}
           sectionSubtitle={t("careerPathwaysSubtitle")}
           ctaText={t("careerCTA")}
@@ -288,11 +309,11 @@ export default async function HomePage({
         )}
 
         {/* Certification Programs */}
-        {sections.certifications && designations && designations.length > 0 && (
+        {show.certifications && designations && (
           <>
             <div className="container mx-auto px-4 pt-16 lg:pt-20">
               <SectionMarker
-                index="05"
+                index={marker.certifications}
                 eyebrow={t("certificationProgramsSubtitle")}
                 title={t("certificationProgramsTitle")}
                 align="center"
