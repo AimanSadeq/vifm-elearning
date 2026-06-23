@@ -9,6 +9,7 @@ import {
   Award,
   Globe,
   MapPin,
+  TrendingUp,
   Landmark,
   Cpu,
   Home,
@@ -28,6 +29,9 @@ interface RawStat {
 // Icon mapping keyed by the stat's `key` field, so admins can swap copy
 // freely but icons stay sensible. Unknown keys get a generic Award icon.
 const STAT_ICONS: Record<string, LucideIcon> = {
+  professionals: Users,
+  clients: BookOpen,
+  years: TrendingUp,
   learners: Users,
   courses: BookOpen,
   certificates: Award,
@@ -38,6 +42,7 @@ const STAT_ICONS: Record<string, LucideIcon> = {
 
 export default function AboutPage() {
   const t = useTranslations("about");
+  const tl = useTranslations("landing");
   const locale = useLocale();
   const { offices: rawOffices } = useSiteSettings();
   const [rawStats, setRawStats] = useState<RawStat[] | null>(null);
@@ -52,13 +57,12 @@ export default function AboutPage() {
       .catch(() => {});
   }, []);
 
-  // Defaults map to the original hardcoded values so the page never
-  // renders empty before the fetch resolves.
+  // Defaults mirror the home page's social-proof stats so the two stay in
+  // sync; the page never renders empty before the fetch resolves.
   const stats = (rawStats ?? [
-    { key: "learners", value: "10,000+", label: t("statLearners") },
-    { key: "courses", value: "200+", label: t("statCourses") },
-    { key: "certificates", value: "5,000+", label: t("statCertificates") },
-    { key: "organizations", value: "50+", label: t("statOrganizations") },
+    { key: "professionals", value: "50,000+", label: tl("statProfessionals") },
+    { key: "clients", value: "125+", label: tl("statClients") },
+    { key: "years", value: "25+", label: tl("statYears") },
   ]).map((s) => ({
     key: s.key,
     icon: STAT_ICONS[s.key] ?? Award,
@@ -104,7 +108,7 @@ export default function AboutPage() {
 
         {/* Stats */}
         <section className="mb-16">
-          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+          <div className="mx-auto grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3 lg:gap-6">
             {stats.map((stat) => (
               <div
                 key={stat.key}
