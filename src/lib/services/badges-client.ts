@@ -486,19 +486,30 @@ export async function getDelegateBadges(
   }
 
   // Fallback: page through all badges and match the delegate ourselves.
+  // NOTE: the service caps page_size (~50), so a page smaller than requested is
+  // NORMAL — it does NOT mean the last page. Keep going until an empty page (or
+  // `total` is reached). Guard against non-advancing pagination by tracking the
+  // first id of each page.
   const matched: IssuedBadge[] = [];
   let scanned = 0;
-  const PAGE = 100;
-  for (let page = 1; page <= 25; page++) {
-    const res = await badgesClient.listBadges({ page, pageSize: PAGE });
+  let lastFirstId: string | null = null;
+  for (let page = 1; page <= 60; page++) {
+    const res = await badgesClient.listBadges({ page, pageSize: 100 });
     if (!res.ok) break;
     const rows = res.data?.data ?? [];
-    if (rows.length === 0) break;
+    if (rows.length === 0) break; // reached the end
+
+    const firstId = rows[0]?.id ?? null;
+    if (firstId && firstId === lastFirstId) break; // pagination not advancing
+    lastFirstId = firstId;
+
     scanned += rows.length;
     for (const b of rows) {
       if (b.delegate_external_id === userId) matched.push(b);
     }
-    if (rows.length < PAGE) break; // last page
+
+    const total = res.data?.total;
+    if (total !== undefined && scanned >= total) break; // fetched everything
   }
   return { badges: matched, via: "scan", scanned };
 }
