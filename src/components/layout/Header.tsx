@@ -5,8 +5,8 @@ import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import {
   Menu, X, LogOut, User, LayoutDashboard, Search,
-  ChevronDown, BookOpen, Award, Radio, TrendingUp,
-  ArrowRight, Sparkles, Clock, Video,
+  ChevronDown, BookOpen, Award, Radio,
+  ArrowRight, Clock, Video,
 } from "lucide-react";
 import { iconForCategory } from "@/lib/utils/category-icon";
 import { useState, useRef, useCallback, useEffect, Fragment } from "react";
@@ -184,7 +184,7 @@ export function Header() {
                       <div className="rounded-xl border bg-background shadow-xl overflow-hidden">
 
                         {menuId === "courses" && (
-                          <div className="grid grid-cols-[220px_300px_280px]">
+                          <div className="grid grid-cols-[220px_320px]">
                             <BrandedPanel
                               tagline={t("courseMenuTagline")}
                               title={t("courses")}
@@ -193,7 +193,7 @@ export function Header() {
                               ctaHref={`/${locale}/courses`}
                               onClose={closeMenuNow}
                             />
-                            <div className="border-e border-border/50 p-6">
+                            <div className="p-6">
                               <MenuSectionLabel>{t("megaMenuCategories")}</MenuSectionLabel>
                               <div className="mt-3 space-y-0.5">
                                 {categories.map((cat) => {
@@ -213,27 +213,6 @@ export function Header() {
                                     </MenuLink>
                                   );
                                 })}
-                              </div>
-                            </div>
-                            <div className="p-6">
-                              <MenuSectionLabel>{t("courses")}</MenuSectionLabel>
-                              <div className="mt-3 space-y-0.5">
-                                {[
-                                  { href: `/${locale}/courses`, icon: BookOpen, label: t("courseMenuAllCourses"), desc: t("courseMenuAllCoursesDesc") },
-                                  { href: `/${locale}/courses?price=free`, icon: Sparkles, label: t("courseMenuFree"), desc: t("courseMenuFreeDesc") },
-                                  { href: `/${locale}/courses?sort=newest`, icon: Clock, label: t("courseMenuNew"), desc: t("courseMenuNewDesc") },
-                                  { href: `/${locale}/courses?sort=popular`, icon: TrendingUp, label: t("courseMenuPopular"), desc: t("courseMenuPopularDesc") },
-                                ].map((link) => (
-                                  <MenuLink key={link.label} href={link.href} onClose={closeMenuNow}>
-                                    <MenuIcon className="bg-secondary text-muted-foreground group-hover:text-brand-600">
-                                      <link.icon className="h-4 w-4" />
-                                    </MenuIcon>
-                                    <div className="min-w-0">
-                                      <p className="truncate text-sm font-medium">{link.label}</p>
-                                      <p className="truncate text-xs text-muted-foreground/70">{link.desc}</p>
-                                    </div>
-                                  </MenuLink>
-                                ))}
                               </div>
                             </div>
                           </div>
