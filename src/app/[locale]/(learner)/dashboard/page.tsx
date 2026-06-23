@@ -188,7 +188,7 @@ export default function DashboardPage() {
     }
 
     if (!authLoading) fetchDashboard();
-  }, [user, authLoading]);
+  }, [user, authLoading, locale]);
 
   if (isLoading || authLoading) {
     return (

@@ -106,7 +106,7 @@ export default function WebinarsPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [userSpecifiedTab]);
 
   // Filter helper
   const matches = (w: Webinar) => {

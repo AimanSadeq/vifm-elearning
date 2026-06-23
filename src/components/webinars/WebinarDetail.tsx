@@ -21,7 +21,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { WebinarPricing } from "./WebinarPricing";
 import { WebinarRecordingPlayer } from "./WebinarRecordingPlayer";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { formatDate, formatDuration } from "@/lib/utils/formatters";
+import { formatDuration } from "@/lib/utils/formatters";
 import type { Webinar } from "@/types";
 
 interface WebinarDetailProps {
