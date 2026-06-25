@@ -62,9 +62,18 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // A stale/expired refresh-token cookie makes Supabase's auto-refresh throw
+  // `AuthApiError: Invalid Refresh Token`. That's an expected condition (logged
+  // out, expired session, rotated token) — treat it as "no user" instead of
+  // letting it bubble up as an error in the logs.
+  let user = null;
+  try {
+    ({
+      data: { user },
+    } = await supabase.auth.getUser());
+  } catch {
+    user = null;
+  }
 
   const withAuthCookies = (response: NextResponse) => {
     supabaseResponse.cookies.getAll().forEach((cookie) => {
@@ -81,7 +90,15 @@ export async function middleware(request: NextRequest) {
         ? pathname
         : `/${locale}/dashboard`;
     loginUrl.searchParams.set("redirect", safePath);
-    return withAuthCookies(NextResponse.redirect(loginUrl));
+
+    // Proactively clear any stale Supabase auth cookies so the same invalid
+    // refresh token doesn't trigger a failed refresh on every later request.
+    const redirect = withAuthCookies(NextResponse.redirect(loginUrl));
+    request.cookies
+      .getAll()
+      .filter((c) => c.name.startsWith("sb-"))
+      .forEach((c) => redirect.cookies.delete(c.name));
+    return redirect;
   }
 
   // --- 5. Role-based access control ---

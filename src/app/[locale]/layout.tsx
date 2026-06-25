@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { Open_Sans, Noto_Sans_Arabic, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
@@ -32,6 +33,13 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+
+  // Reject any unsupported locale before it reaches next-intl's provider,
+  // which would otherwise throw "Incorrect locale information provided".
+  if (!(routing.locales as readonly string[]).includes(locale)) {
+    notFound();
+  }
+
   setRequestLocale(locale);
   const messages = await getMessages();
   const isRTL = locale === "ar";

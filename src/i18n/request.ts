@@ -1,13 +1,19 @@
 import { getRequestConfig } from "next-intl/server";
 import { routing } from "./routing";
 
-export default getRequestConfig(async ({ requestLocale }) => {
-  let locale = await requestLocale;
+function isSupportedLocale(value: string | undefined): value is "en" | "ar" {
+  return !!value && (routing.locales as readonly string[]).includes(value);
+}
 
-  // Ensure that a valid locale is used
-  if (!locale || !routing.locales.includes(locale as "en" | "ar")) {
-    locale = routing.defaultLocale;
-  }
+export default getRequestConfig(async ({ requestLocale }) => {
+  const requested = await requestLocale;
+
+  // Guard against any unsupported locale (bots, stale links like `/ar-SA`,
+  // etc.) reaching message resolution and triggering next-intl's
+  // "Incorrect locale information provided" error.
+  const locale = isSupportedLocale(requested)
+    ? requested
+    : routing.defaultLocale;
 
   return {
     locale,
