@@ -108,6 +108,10 @@ export function TestimonialsCarousel({
       ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
       : true;
 
+  // Only run entrance animations once mounted and motion is allowed.
+  // Otherwise cards render at their final (visible) state immediately.
+  const shouldAnimate = mounted && !prefersReducedMotion;
+
   // Responsive items per page
   const [itemsPerPage, setItemsPerPage] = useState(3);
 
@@ -165,6 +169,7 @@ export function TestimonialsCarousel({
 
         {/* Carousel */}
         <div
+          ref={ref}
           className="relative mt-14"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
@@ -193,16 +198,15 @@ export function TestimonialsCarousel({
           <AnimatePresence mode="wait">
             <motion.div
               key={currentPage}
-              ref={ref}
               className={cn(
                 "grid gap-6",
                 itemsPerPage === 1 && "grid-cols-1",
                 itemsPerPage === 2 && "grid-cols-2",
                 itemsPerPage === 3 && "grid-cols-3"
               )}
-              variants={prefersReducedMotion ? undefined : containerVariants}
-              initial="hidden"
-              animate={isInView ? "visible" : "hidden"}
+              variants={shouldAnimate ? containerVariants : undefined}
+              initial={shouldAnimate ? "hidden" : false}
+              animate={!shouldAnimate || isInView ? "visible" : "hidden"}
               exit={{ opacity: 0, transition: { duration: 0.2 } }}
             >
               {visibleTestimonials.map((testimonial) => {
