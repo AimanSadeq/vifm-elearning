@@ -10,25 +10,25 @@ const supabase = createClient(
 
 const testUsers = [
   {
-    email: "admin@vifm.org",
-    password: "Admin@2026!",
+    email: "admin@viftraining.com",
+    password: "Vifm@2017!",
     full_name: "Admin User",
     role: "super_admin",
   },
   {
-    email: "instructor@vifm.org",
+    email: "instructor@viftraining.com",
     password: "Instructor@2026!",
     full_name: "Instructor User",
     role: "instructor",
   },
   {
-    email: "corporate@vifm.org",
+    email: "corporate@viftraining.com",
     password: "Corporate@2026!",
     full_name: "Corporate Admin",
     role: "corporate_admin",
   },
   {
-    email: "learner@vifm.org",
+    email: "learner@viftraining.com",
     password: "Learner@2026!",
     full_name: "Learner User",
     role: "learner",
