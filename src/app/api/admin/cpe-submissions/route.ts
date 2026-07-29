@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase as createClient } from "@/lib/supabase/server";
 
+import { supabaseAdmin } from "@/lib/supabase/admin";
 /**
  * GET /api/admin/cpe-submissions
  * List CPE submissions with optional status filter.
@@ -52,7 +53,11 @@ export async function GET(req: NextRequest) {
     return holder?.user_id as string;
   }).filter(Boolean))];
 
-  const { data: profiles } = await supabase
+  // Other people's email — an administrative read, so it goes through the
+  // service role. `authenticated` is granted only (id, full_name, full_name_ar,
+  // avatar_url) on profiles; the route's super_admin guard above is what
+  // authorises this.
+  const { data: profiles } = await supabaseAdmin
     .from("profiles")
     .select("id, full_name, email")
     .in("id", userIds);

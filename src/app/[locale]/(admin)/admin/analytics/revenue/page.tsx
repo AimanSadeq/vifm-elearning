@@ -19,6 +19,7 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { formatCurrency } from "@/lib/utils/formatters";
 import { exportToCSV } from "@/lib/utils/csv-export";
 
+import { fetchAdminProfiles } from "@/lib/api/admin-profiles";
 interface MonthlyRevenue {
   month: string;
   revenue: number;
@@ -90,7 +91,7 @@ export default function RevenueAnalyticsPage() {
             payment_method,
             paid_at,
             created_at,
-            user:profiles!payments_user_id_fkey(email),
+            user_id,
             course:courses!payments_course_id_fkey(title)
           `
           )
@@ -165,12 +166,26 @@ export default function RevenueAnalyticsPage() {
         }))
       );
 
+      // profiles.email is private to `authenticated` and can no longer be
+      // embedded; resolve the addresses through the service-role route.
+      const emailById = new Map<string, string>();
+      const payerIds = [
+        ...new Set(
+          (recent ?? [])
+            .map((p) => (p as Record<string, unknown>).user_id as string)
+            .filter(Boolean)
+        ),
+      ];
+      if (payerIds.length) {
+        const { rows } = await fetchAdminProfiles({ ids: payerIds, pageSize: payerIds.length });
+        rows.forEach((r) => emailById.set(r.id, r.email ?? ""));
+      }
+
       // Recent payments — prefer paid_at for display
       setRecentPayments(
         (recent ?? []).map((p: Record<string, unknown>) => ({
           id: p.id as string,
-          user_email:
-            ((p.user as Record<string, unknown>)?.email as string) ?? "",
+          user_email: emailById.get(p.user_id as string) ?? "",
           course_title:
             ((p.course as Record<string, unknown>)?.title as string) ?? "",
           amount: p.amount as number,

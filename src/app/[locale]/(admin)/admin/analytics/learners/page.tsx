@@ -19,6 +19,7 @@ import { LearnerDetailModal } from "@/components/admin/LearnerDetailModal";
 import { formatRelativeDate } from "@/lib/utils/formatters";
 import { exportToCSV } from "@/lib/utils/csv-export";
 
+import { countAdminProfiles, fetchAdminProfiles } from "@/lib/api/admin-profiles";
 interface MonthlyEnrollment {
   month: string;
   enrollments: number;
@@ -57,15 +58,10 @@ export default function LearnersAnalyticsPage() {
         { data: enrollments },
         { data: learners },
       ] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("*", { count: "exact", head: true })
-          .eq("role", "learner"),
-        supabase
-          .from("profiles")
-          .select("*", { count: "exact", head: true })
-          .eq("role", "learner")
-          .eq("is_active", true),
+        // role / is_active / email are private on profiles — every read of
+        // them now goes through the service-role admin route.
+        countAdminProfiles({ role: "learner" }).then((count) => ({ count })),
+        countAdminProfiles({ role: "learner", isActive: true }).then((count) => ({ count })),
         supabase
           .from("enrollments")
           .select("*", { count: "exact", head: true })
@@ -73,12 +69,11 @@ export default function LearnersAnalyticsPage() {
         supabase
           .from("enrollments")
           .select("enrolled_at, status"),
-        supabase
-          .from("profiles")
-          .select("id, full_name, email, created_at")
-          .eq("role", "learner")
-          .order("created_at", { ascending: false })
-          .limit(20),
+        fetchAdminProfiles({
+          role: "learner",
+          orderBy: "created_at",
+          pageSize: 20,
+        }).then(({ rows }) => ({ data: rows })),
       ]);
 
       setTotalLearners(learnersCount ?? 0);

@@ -11,6 +11,8 @@ import { z } from "zod";
 //   - action_url is either a relative path (must start with "/") or an
 //     https URL on the same app origin
 //   - channel is whitelisted
+import { getOwnRole } from "@/lib/supabase/own-profile";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 const notificationSchema = z.object({
   userId: z.string().uuid(),
   title: z.string().trim().min(1).max(200),
@@ -118,11 +120,7 @@ export async function POST(request: Request) {
   }
 
   // Check if admin
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+  const profile = { role: await getOwnRole(supabase) };
 
   if (profile?.role !== "super_admin") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -153,7 +151,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const { data, error } = await supabase
+  // Writing a notification for another user is privileged; the super_admin
+  // check above authorises it, and `authenticated` no longer holds INSERT.
+  const { data, error } = await supabaseAdmin
     .from("notifications")
     .insert({
       user_id: parsed.data.userId,

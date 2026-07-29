@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { registerZoomAttendee } from "@/lib/services/zoom";
 import { applyRateLimit } from "@/lib/utils/rate-limit";
 
+import { getOwnProfile } from "@/lib/supabase/own-profile";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -45,7 +47,9 @@ export async function POST(
   const webinarId = id;
 
   // Check if webinar exists
-  const { data: webinar } = await supabase
+  // meeting_id is a join secret and is not granted to `authenticated`; this is
+  // a server route, so it reads the row with the service role.
+  const { data: webinar } = await supabaseAdmin
     .from("webinars")
     .select("id, meeting_id, title, status")
     .eq("id", webinarId)
@@ -72,11 +76,11 @@ export async function POST(
   }
 
   // Register in Zoom (stub)
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("email, full_name")
-    .eq("id", user.id)
-    .single();
+  // Own row, so my_profile — profiles no longer grants `email`.
+  const profile = await getOwnProfile<{ email: string; full_name: string }>(
+    supabase,
+    "email, full_name"
+  );
 
   if (profile && webinar.meeting_id) {
     await registerZoomAttendee({
@@ -86,14 +90,19 @@ export async function POST(
     });
   }
 
-  // Insert registration
-  const { error } = await supabase.from("webinar_registrations").insert({
-    webinar_id: webinarId,
-    user_id: user.id,
+  // Direct INSERT is revoked: a paid webinar could otherwise be joined for
+  // free. register_for_webinar() enforces the price check server-side and is
+  // idempotent on (user, webinar).
+  const { error } = await supabase.rpc("register_for_webinar", {
+    p_webinar_id: webinarId,
   });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const denied = error.code === "42501";
+    return NextResponse.json(
+      { error: denied ? "This webinar requires payment" : error.message },
+      { status: denied ? 402 : 500 }
+    );
   }
 
   return NextResponse.json({ message: "Registered successfully" }, { status: 201 });

@@ -5,9 +5,10 @@ import {
   createSubscriptionFromPayment,
   updatePaymentStatus,
 } from "@/lib/services/enrollment-service";
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { incrementPromoUsage } from "@/lib/services/promo";
 
+import { getOwnRole } from "@/lib/supabase/own-profile";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 interface RouteParams {
   params: Promise<{ paymentId: string }>;
 }
@@ -28,11 +29,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (!user)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+    // Own role — read via my_profile; `profiles.role` is not granted
+    // to `authenticated` any more.
+    const profile = { role: await getOwnRole(supabase) };
 
     if (profile?.role !== "super_admin")
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { formatCurrency, formatRelativeDate } from "@/lib/utils/formatters";
 
+import { countAdminProfiles, fetchAdminProfiles } from "@/lib/api/admin-profiles";
 interface DashboardStats {
   totalRevenue: number;
   activeUsers: number;
@@ -99,10 +100,9 @@ export default function AdminDashboardPage() {
         { data: recentData },
         { data: coursesData },
       ] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("*", { count: "exact", head: true })
-          .eq("is_active", true),
+        // profiles is no longer readable (or filterable) on is_active by
+        // `authenticated`; the count comes from the service-role route.
+        countAdminProfiles({ isActive: true }).then((count) => ({ count })),
         supabase
           .from("enrollments")
           .select("*", { count: "exact", head: true }),
@@ -118,7 +118,8 @@ export default function AdminDashboardPage() {
             id,
             enrolled_at,
             status,
-            user:profiles!enrollments_user_id_fkey(full_name, email),
+            user_id,
+            user:profiles!enrollments_user_id_fkey(full_name),
             course:courses!enrollments_course_id_fkey(title)
           `
           )
@@ -146,14 +147,24 @@ export default function AdminDashboardPage() {
         completionRate,
       });
 
+      // Email is private on profiles, so the embed above can only bring back
+      // the display name. Look the addresses up through the admin route.
+      const emailById = new Map<string, string>();
+      const recentUserIds = [
+        ...new Set((recentData ?? []).map((e) => (e as Record<string, unknown>).user_id as string).filter(Boolean)),
+      ];
+      if (recentUserIds.length) {
+        const { rows } = await fetchAdminProfiles({ ids: recentUserIds, pageSize: recentUserIds.length });
+        rows.forEach((r) => emailById.set(r.id, r.email ?? ""));
+      }
+
       // Map recent enrollments
       const mappedEnrollments: RecentEnrollment[] = (recentData ?? []).map(
         (e: Record<string, unknown>) => ({
           id: e.id as string,
           user_name:
             (e.user as Record<string, unknown>)?.full_name as string ?? "Unknown",
-          user_email:
-            (e.user as Record<string, unknown>)?.email as string ?? "",
+          user_email: emailById.get(e.user_id as string) ?? "",
           course_title:
             (e.course as Record<string, unknown>)?.title as string ?? "Unknown",
           enrolled_at: e.enrolled_at as string,

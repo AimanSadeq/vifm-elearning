@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import type { Webinar } from "@/types";
 
+import { WEBINAR_PUBLIC_COLUMNS } from "@/lib/supabase/columns";
 type Tab = "upcoming" | "past";
 
 const PAGE_SIZE = 12;
@@ -68,7 +69,7 @@ export default function WebinarsPage() {
         supabase
           .from("webinars")
           .select(
-            `*, instructor:profiles!webinars_instructor_id_fkey(full_name, full_name_ar)`
+            `${WEBINAR_PUBLIC_COLUMNS}, instructor:profiles!webinars_instructor_id_fkey(full_name, full_name_ar)`
           )
           .in("status", ["scheduled", "live"])
           .gte("scheduled_at", now)
@@ -76,15 +77,17 @@ export default function WebinarsPage() {
         supabase
           .from("webinars")
           .select(
-            `*, instructor:profiles!webinars_instructor_id_fkey(full_name, full_name_ar)`
+            `${WEBINAR_PUBLIC_COLUMNS}, instructor:profiles!webinars_instructor_id_fkey(full_name, full_name_ar)`
           )
           .eq("status", "completed")
           .order("scheduled_at", { ascending: false }),
       ]);
 
       if (cancelled) return;
-      setUpcoming((upcomingRes.data as Webinar[]) ?? []);
-      setPast((pastRes.data as Webinar[]) ?? []);
+      // supabase-js types a foreign-key embed as an array; the Webinar type
+      // models `instructor` as a single row. Cast through unknown.
+      setUpcoming((upcomingRes.data as unknown as Webinar[]) ?? []);
+      setPast((pastRes.data as unknown as Webinar[]) ?? []);
       setIsLoading(false);
     }
     fetchWebinars();

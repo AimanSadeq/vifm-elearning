@@ -10,6 +10,7 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { WebinarDetail } from "@/components/webinars/WebinarDetail";
 import type { Webinar } from "@/types";
 
+import { WEBINAR_PUBLIC_COLUMNS } from "@/lib/supabase/columns";
 export default function WebinarDetailPage() {
   const params = useParams();
   const webinarId = params.id as string;
@@ -35,7 +36,7 @@ export default function WebinarDetailPage() {
       const { data } = await supabase
         .from("webinars")
         .select(
-          `*, instructor:profiles!webinars_instructor_id_fkey(full_name, full_name_ar, avatar_url)`
+          `${WEBINAR_PUBLIC_COLUMNS}, instructor:profiles!webinars_instructor_id_fkey(full_name, full_name_ar, avatar_url)`
         )
         .eq("id", webinarId)
         .single();

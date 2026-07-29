@@ -74,11 +74,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchProfile = useCallback(
     async (userId: string): Promise<Profile | null> => {
       const supabase = createClient();
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
+      // my_profile, not profiles: the table no longer grants email/phone/role
+      // to `authenticated`, and this needs the caller's full row. The view is
+      // already filtered to auth.uid(), so the userId filter is redundant.
+      const { data } = await supabase.from("my_profile").select("*").maybeSingle();
 
       if (data) return data as Profile;
 
@@ -87,10 +86,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const res = await fetch("/api/auth/ensure-profile", { method: "POST" });
         if (res.ok) {
           const { data: newProfile } = await supabase
-            .from("profiles")
+            .from("my_profile")
             .select("*")
-            .eq("id", userId)
-            .single();
+            .maybeSingle();
           return newProfile as Profile | null;
         }
       } catch {

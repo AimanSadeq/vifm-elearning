@@ -3,6 +3,7 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { recalculateAllPathsForUser } from "@/lib/services/learning-path-service";
 import { getCompletedLessonIds } from "@/lib/services/progress-service";
 
+import { supabaseAdmin } from "@/lib/supabase/admin";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -196,7 +197,11 @@ export async function POST(request: NextRequest) {
       // Check if all lessons in the course are now completed
       const courseCompleted = totalItems > 0 && completedItems >= totalItems;
 
-      await supabase
+      // The client's update grant on enrollments is only
+      // (last_accessed_at, last_lesson_id) — progress and status are derived
+      // server-side now. This route already authenticated the learner, so the
+      // wider write goes through the service role.
+      await supabaseAdmin
         .from("enrollments")
         .update({
           last_lesson_id: lid,

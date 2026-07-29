@@ -16,6 +16,7 @@ import { useDebounce } from "@/lib/hooks/useDebounce";
 import { formatCurrency, formatDate } from "@/lib/utils/formatters";
 import type { Webinar } from "@/types";
 
+import { WEBINAR_PUBLIC_COLUMNS } from "@/lib/supabase/columns";
 const PAGE_SIZE = 25;
 
 export default function AdminWebinarsPage() {
@@ -46,7 +47,7 @@ export default function AdminWebinarsPage() {
         .from("webinars")
         .select(
           `
-          *,
+          ${WEBINAR_PUBLIC_COLUMNS},
           instructor:profiles!webinars_instructor_id_fkey(full_name)
         `,
           { count: "exact" }
@@ -66,7 +67,9 @@ export default function AdminWebinarsPage() {
       }
 
       const { data, count } = await query;
-      setWebinars((data as Webinar[]) ?? []);
+      // supabase-js types a foreign-key embed as an array; the Webinar type
+      // models `instructor` as a single row. Cast through unknown.
+      setWebinars((data as unknown as Webinar[]) ?? []);
       setTotalCount(count ?? 0);
       setIsLoading(false);
     }

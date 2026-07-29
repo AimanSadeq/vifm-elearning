@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/services/email";
 import { z } from "zod";
 
+import { getOwnRole } from "@/lib/supabase/own-profile";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 const bulkEmailSchema = z.object({
   userIds: z.array(z.string().uuid()).min(1).max(500),
   voucherCode: z.string().max(200),
@@ -23,11 +24,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+    // Own role — read via my_profile; `profiles.role` is not granted
+    // to `authenticated` any more.
+    const profile = { role: await getOwnRole(supabase) };
 
     if (!profile || profile.role !== "super_admin") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

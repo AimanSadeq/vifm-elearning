@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
 import { CertificateEditor } from "@/components/admin/cert-editor/CertificateEditor";
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { isSuperAdmin } from "@/lib/services/role";
 import type { CertLayout } from "@/lib/cert-layout/types";
 
+import { getOwnRole } from "@/lib/supabase/own-profile";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 interface PageProps {
   params: Promise<{ locale: string; id: string }>;
 }
@@ -28,11 +29,9 @@ export default async function EditCertificateTemplatePage({ params }: PageProps)
 
   let allowed = isSuperAdmin(user);
   if (!allowed) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+    // Own role — read via my_profile; `profiles.role` is not granted
+    // to `authenticated` any more.
+    const profile = { role: await getOwnRole(supabase) };
     allowed = profile?.role === "super_admin";
   }
   if (!allowed) {

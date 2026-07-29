@@ -16,6 +16,7 @@ import type { Payment } from "@/types";
 import { OFFICES, SUPPORT_EMAIL } from "@/lib/site-content";
 import { computeInvoiceNumber } from "@/lib/utils/invoice";
 
+import { fetchAdminProfiles } from "@/lib/api/admin-profiles";
 interface InvoiceData extends Payment {
   user?: { full_name?: string; email?: string } | null;
   course?: { title?: string; price?: number; currency?: string } | null;
@@ -40,7 +41,7 @@ export default function AdminInvoiceDetailPage() {
       const { data, error } = await supabase
         .from("payments")
         .select(
-          "*, user:profiles!payments_user_id_fkey(full_name, email), course:courses(title, price, currency)"
+          "*, user:profiles!payments_user_id_fkey(full_name), course:courses(title, price, currency)"
         )
         .eq("id", paymentId)
         .maybeSingle();
@@ -48,7 +49,14 @@ export default function AdminInvoiceDetailPage() {
       if (error) {
         reportSupabaseError(error, "Could not load invoice");
       }
-      setPayment(data as InvoiceData | null);
+      // profiles.email is private to `authenticated`; fetch it separately.
+      const invoice = data as (InvoiceData & { user_id?: string }) | null;
+      if (invoice?.user_id) {
+        const { rows } = await fetchAdminProfiles({ ids: [invoice.user_id], pageSize: 1 });
+        if (invoice.user) invoice.user.email = rows[0]?.email ?? undefined;
+      }
+      if (cancelled) return;
+      setPayment(invoice);
       setIsLoading(false);
     }
     load();

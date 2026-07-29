@@ -16,9 +16,6 @@ import {
   ToggleRight,
 } from "lucide-react";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
-import { reportSupabaseError } from "@/lib/utils/supabase-error";
-import { escapeIlike } from "@/lib/utils/escape-search";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { TablePagination } from "@/components/shared/TablePagination";
@@ -45,6 +42,7 @@ import { SendEmailDialog } from "@/components/admin/SendEmailDialog";
 import { BulkImportDialog } from "@/components/admin/BulkImportDialog";
 import type { Profile, UserRole } from "@/types";
 
+import { fetchAdminProfiles, setProfileActive } from "@/lib/api/admin-profiles";
 type UserRow = Pick<
   Profile,
   "id" | "full_name" | "full_name_ar" | "email" | "phone" | "role" | "organization_id" | "language" | "is_active" | "last_login_at" | "created_at"
@@ -81,39 +79,24 @@ export default function AdminUsersPage() {
 
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
-    const supabase = createClient();
 
-    const from = page * PAGE_SIZE;
-    const to = from + PAGE_SIZE - 1;
+    // profiles no longer grants email/phone/role to `authenticated`; this read
+    // goes through the service role behind a server-side role check.
+    const { rows, count, error } = await fetchAdminProfiles({
+      page,
+      pageSize: PAGE_SIZE,
+      orderBy: "created_at",
+      role: roleFilter !== "all" ? roleFilter : undefined,
+      search: debouncedSearch || undefined,
+    });
 
-    let query = supabase
-      .from("profiles")
-      .select(
-        "id, full_name, full_name_ar, email, phone, role, organization_id, language, is_active, last_login_at, created_at",
-        { count: "exact" }
-      )
-      .order("created_at", { ascending: false })
-      .range(from, to);
-
-    if (roleFilter !== "all") {
-      query = query.eq("role", roleFilter);
-    }
-
-    if (debouncedSearch) {
-      const s = escapeIlike(debouncedSearch);
-      query = query.or(
-        `full_name.ilike.%${s}%,email.ilike.%${s}%`
-      );
-    }
-
-    const { data, count, error } = await query;
     if (error) {
-      reportSupabaseError(error, "Could not load users");
+      toast.error(error);
       setUsers([]);
       setTotalCount(0);
     } else {
-      setUsers((data as UserRow[]) ?? []);
-      setTotalCount(count ?? 0);
+      setUsers(rows as UserRow[]);
+      setTotalCount(count);
     }
     setIsLoading(false);
   }, [debouncedSearch, roleFilter, page]);
@@ -141,14 +124,9 @@ export default function AdminUsersPage() {
   };
 
   const handleToggleActive = async (user: UserRow) => {
-    const supabase = createClient();
     const newStatus = !user.is_active;
 
-    const { error } = await supabase
-      .from("profiles")
-      .update({ is_active: newStatus })
-      .eq("id", user.id);
-
+    const error = await setProfileActive(user.id, newStatus);
     if (error) {
       toast.error("Failed to update user status");
       return;

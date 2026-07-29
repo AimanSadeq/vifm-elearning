@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 
+import { getOwnRole } from "@/lib/supabase/own-profile";
 interface RouteParams {
   params: Promise<{ quizId: string }>;
 }
@@ -15,11 +16,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     if (!user)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+    const profile = { role: await getOwnRole(supabase) };
 
     const isAdmin = profile?.role === "super_admin";
 

@@ -9,6 +9,7 @@ import { WebinarForm } from "@/components/admin/WebinarForm";
 import { WebinarRecordingPanel } from "@/components/admin/WebinarRecordingPanel";
 import type { WebinarInput } from "@/lib/utils/validators";
 
+import { WEBINAR_PUBLIC_COLUMNS } from "@/lib/supabase/columns";
 export default function EditWebinarPage() {
   const params = useParams();
   const webinarId = params.id as string;
@@ -23,7 +24,9 @@ export default function EditWebinarPage() {
       const supabase = createClient();
       const { data, error } = await supabase
         .from("webinars")
-        .select("*")
+        // meeting_url / meeting_id are not granted to `authenticated`; this
+        // form does not edit them.
+        .select(WEBINAR_PUBLIC_COLUMNS)
         .eq("id", webinarId)
         .single();
 

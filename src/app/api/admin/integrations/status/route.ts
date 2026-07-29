@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 
+import { getOwnRole } from "@/lib/supabase/own-profile";
 /**
  * Admin-only: returns which payment / email / video integrations are
  * configured server-side. Doesn't leak secret values — only booleans.
@@ -13,11 +14,7 @@ export async function GET() {
   if (!user)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+  const profile = { role: await getOwnRole(supabase) };
   if (profile?.role !== "super_admin")
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 

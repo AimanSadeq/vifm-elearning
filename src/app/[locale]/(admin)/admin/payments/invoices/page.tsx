@@ -17,6 +17,7 @@ import type { Payment } from "@/types";
 import { useLocale } from "next-intl";
 import { computeInvoiceNumber } from "@/lib/utils/invoice";
 
+import { fetchAdminProfiles } from "@/lib/api/admin-profiles";
 type InvoiceRow = Payment & {
   user?: { full_name: string; email?: string };
   course?: { title: string };
@@ -48,7 +49,7 @@ export default function AdminInvoicesPage() {
       let query = supabase
         .from("payments")
         .select(
-          "*, user:profiles!payments_user_id_fkey(full_name, email), course:courses(title)",
+          "*, user:profiles!payments_user_id_fkey(full_name), course:courses(title)",
           { count: "exact" }
         )
         .eq("status", "completed")
@@ -74,7 +75,25 @@ export default function AdminInvoicesPage() {
       const { data, count } = await query;
       // Discard if a newer fetch has superseded this one (rapid filter changes)
       if (cancelled) return;
-      setInvoices((data as InvoiceRow[]) ?? []);
+
+      // profiles.email is private to `authenticated` and can no longer be
+      // embedded; fold it in from the service-role route.
+      const rowsRaw = (data as InvoiceRow[]) ?? [];
+      const payerIds = [
+        ...new Set(
+          rowsRaw.map((r) => (r as unknown as { user_id?: string }).user_id).filter(Boolean) as string[]
+        ),
+      ];
+      if (payerIds.length) {
+        const { rows } = await fetchAdminProfiles({ ids: payerIds, pageSize: payerIds.length });
+        const emailById = new Map(rows.map((r) => [r.id, r.email ?? ""]));
+        rowsRaw.forEach((r) => {
+          const uid = (r as unknown as { user_id?: string }).user_id;
+          if (r.user && uid) r.user.email = emailById.get(uid) ?? undefined;
+        });
+      }
+      if (cancelled) return;
+      setInvoices(rowsRaw);
       setTotalCount(count ?? 0);
       setIsLoading(false);
     }

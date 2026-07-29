@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { userFormSchema } from "@/lib/utils/validators";
 
+import { getOwnRole } from "@/lib/supabase/own-profile";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createServerSupabase();
@@ -18,11 +19,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify super_admin role
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+    // Own role — read via my_profile; `profiles.role` is not granted
+    // to `authenticated` any more.
+    const profile = { role: await getOwnRole(supabase) };
 
     if (!profile || profile.role !== "super_admin") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

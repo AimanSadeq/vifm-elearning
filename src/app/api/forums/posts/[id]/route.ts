@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { getOwnRole } from "@/lib/supabase/own-profile";
 async function createSupabase() {
   const cookieStore = await cookies();
   return createServerClient(
@@ -69,11 +70,7 @@ export async function PUT(
   }
 
   // Check if user is the author or an instructor of the course
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+  const profile = { role: await getOwnRole(supabase) };
 
   const isAuthor = post.author_id === user.id;
   const isAdmin = profile?.role === "super_admin";

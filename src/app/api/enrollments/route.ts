@@ -3,6 +3,7 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { userHasActiveSubscription } from "@/lib/services/access";
 import { applyRateLimit } from "@/lib/utils/rate-limit";
 
+import { supabaseAdmin } from "@/lib/supabase/admin";
 export async function POST(request: NextRequest) {
   try {
     const limited = await applyRateLimit(request, {
@@ -60,37 +61,33 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    // Idempotent: return existing enrollment if any
-    const { data: existing } = await supabase
-      .from("enrollments")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("course_id", courseId)
-      .maybeSingle();
-
-    if (existing) {
-      return NextResponse.json({ data: existing }, { status: 200 });
-    }
-
-    const { data: enrollment, error: enrollError } = await supabase
-      .from("enrollments")
-      .insert({
-        user_id: user.id,
-        course_id: courseId,
-        status: "active",
-        enrolled_at: new Date().toISOString(),
-        metadata: !course.is_free && !isAdmin
-          ? { source: "subscription" }
-          : {},
-      })
-      .select()
-      .single();
+    // Direct INSERT on enrollments is revoked — a client could otherwise write
+    // itself into any paid course. enrol_in_course() is a SECURITY DEFINER RPC
+    // that re-checks free / paid / subscription / staff server-side and is
+    // idempotent: it returns the existing row rather than raising.
+    // enrol_in_course returns `public.enrollments` — a composite, not a set —
+    // so PostgREST hands back the object directly. No .single().
+    const { data: enrollment, error: enrollError } = await supabase.rpc(
+      "enrol_in_course",
+      { p_course_id: courseId }
+    );
 
     if (enrollError) {
+      // 42501 is the RPC's "payment required" / "not authenticated" path.
+      const denied = enrollError.code === "42501";
       return NextResponse.json(
-        { error: `Failed to enroll: ${enrollError.message}` },
-        { status: 500 }
+        { error: denied ? "This course requires payment or an active subscription" : `Failed to enroll: ${enrollError.message}` },
+        { status: denied ? 400 : 500 }
       );
+    }
+
+    // Provenance for the analytics views. enrollments.metadata is not in the
+    // client's update grant, so this goes through the service role.
+    if (!course.is_free && !isAdmin && enrollment) {
+      await supabaseAdmin
+        .from("enrollments")
+        .update({ metadata: { source: "subscription" } })
+        .eq("id", (enrollment as { id: string }).id);
     }
 
     return NextResponse.json({ data: enrollment }, { status: 201 });

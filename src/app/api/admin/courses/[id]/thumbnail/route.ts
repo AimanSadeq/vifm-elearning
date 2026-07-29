@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidateTag } from 'next/cache'
 import { createServerSupabase } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
 
+import { getOwnRole } from '@/lib/supabase/own-profile'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 const BUCKET = 'course-assets'
 const MAX_BYTES = 5 * 1024 * 1024
 const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
@@ -14,13 +15,11 @@ async function authorize(courseId: string) {
   } = await supabase.auth.getUser()
   if (!user) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
+  // Own role — read via my_profile; `profiles.role` is not granted
+  // to `authenticated` any more.
+  const profile = { role: await getOwnRole(supabase) }
 
-  if (!profile || !['super_admin', 'instructor'].includes(profile.role)) {
+  if (!profile.role || !['super_admin', 'instructor'].includes(profile.role)) {
     return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
   }
 

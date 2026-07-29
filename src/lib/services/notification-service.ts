@@ -2,6 +2,14 @@
 
 import { createClient } from "@/lib/supabase/client";
 
+/**
+ * Create an in-app notification for a user.
+ *
+ * This used to INSERT straight into `notifications` with the *browser* client,
+ * which meant any signed-in user could write a notification addressed to
+ * anyone. `authenticated` no longer holds INSERT on that table; the write goes
+ * through /api/notifications, which requires super_admin.
+ */
 export async function createNotification(params: {
   userId: string;
   title: string;
@@ -11,29 +19,18 @@ export async function createNotification(params: {
   channel?: "email" | "whatsapp" | "in_app";
   actionUrl?: string;
 }) {
-  const supabase = createClient();
-
-  const { data, error } = await supabase
-    .from("notifications")
-    .insert({
-      user_id: params.userId,
-      title: params.title,
-      title_ar: params.titleAr || null,
-      body: params.body,
-      body_ar: params.bodyAr || null,
-      channel: params.channel || "in_app",
-      action_url: params.actionUrl || null,
-    })
-    .select()
-    .single();
-
-  if (error) {
-    console.error("Failed to create notification:", error);
-    return null;
+  const res = await fetch("/api/notifications", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    return { data: null, error: body.error ?? `Request failed (${res.status})` };
   }
-
-  return data;
+  return { data: await res.json(), error: null };
 }
+
 
 export async function markAsRead(notificationId: string) {
   const supabase = createClient();

@@ -13,6 +13,7 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import { formatRelativeDate } from "@/lib/utils/formatters";
 
+import { fetchAdminProfiles } from "@/lib/api/admin-profiles";
 interface Employee {
   id: string;
   full_name: string;
@@ -43,21 +44,17 @@ export default function CorporateEmployeesPage() {
       setIsLoading(true);
       const supabase = createClient();
 
-      let query = supabase
-        .from("profiles")
-        .select("id, full_name, email, role, is_active, last_login_at, created_at")
-        .eq("organization_id", user.organization_id)
-        .order("full_name");
-
-      if (debouncedSearch) {
-        const s = escapeIlike(debouncedSearch);
-        query = query.or(
-          `full_name.ilike.%${s}%,email.ilike.%${s}%`
-        );
-      }
-
-      const { data } = await query;
-      setEmployees((data as Employee[]) ?? []);
+      // profiles no longer exposes email/role/is_active to `authenticated`.
+      // The route re-derives the organization from the caller's own row, so a
+      // corporate admin cannot read another company's staff by editing the
+      // request — the organization_id below is a hint, not the authority.
+      const { rows } = await fetchAdminProfiles({
+        organizationId: user.organization_id,
+        orderBy: "full_name",
+        pageSize: 200,
+        search: debouncedSearch || undefined,
+      });
+      setEmployees(rows as unknown as Employee[]);
       setIsLoading(false);
     }
 

@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 
+import { fetchAdminProfiles } from "@/lib/api/admin-profiles";
 interface BadgeTemplate {
   id: string;
   external_id?: string;
@@ -511,11 +512,11 @@ function ManualIssueTab() {
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
       const [usersRes, coursesRes, templatesRes] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("id, full_name, email")
-          .order("full_name", { ascending: true })
-          .limit(500),
+        // email is private on profiles; the picker gets it from the
+        // service-role admin route instead.
+        fetchAdminProfiles({ orderBy: "full_name", pageSize: 200 }).then(
+          ({ rows }) => ({ data: rows })
+        ),
         supabase
           .from("courses")
           .select("id, title")

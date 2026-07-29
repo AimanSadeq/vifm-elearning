@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 
+import { getOwnRole } from "@/lib/supabase/own-profile";
 type SupabaseClient = Awaited<ReturnType<typeof createServerSupabase>>;
 type UserOf<T> = T extends { auth: { getUser: () => Promise<{ data: { user: infer U } }> } }
   ? NonNullable<U>
@@ -28,12 +29,8 @@ export async function requireAdmin(): Promise<AdminGuardResult> {
     };
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-  if (profile?.role !== "super_admin") {
+  const role = await getOwnRole(supabase);
+  if (role !== "super_admin") {
     return {
       ok: false,
       response: NextResponse.json({ error: "Forbidden" }, { status: 403 }),

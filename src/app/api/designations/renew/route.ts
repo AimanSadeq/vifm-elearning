@@ -4,6 +4,7 @@ import { getStripe } from "@/lib/services/stripe";
 import { APP_URL } from "@/lib/env";
 import type Stripe from "stripe";
 
+import { getOwnProfile } from "@/lib/supabase/own-profile";
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createServerSupabase();
@@ -117,11 +118,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch or create Stripe customer
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("email, full_name")
-      .eq("id", user.id)
-      .single();
+    // Own row, so my_profile — profiles no longer grants `email`.
+    const profile = await getOwnProfile<{ email: string; full_name: string }>(
+      supabase,
+      "email, full_name"
+    );
 
     // Check if user already has a Stripe customer ID in subscriptions
     const { data: existingSub } = await supabase

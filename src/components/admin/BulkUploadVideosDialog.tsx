@@ -186,8 +186,10 @@ export function BulkUploadVideosDialog({
     let sortOrder = existingLessonCount
     try {
       const supabase = createClient()
+      // lesson_access, not lessons: the base table is no longer granted to
+      // `authenticated`. The view shows staff every course, draft included.
       const { data: maxRow } = await supabase
-        .from('lessons')
+        .from('lesson_access')
         .select('sort_order')
         .eq('module_id', moduleId)
         .order('sort_order', { ascending: false })

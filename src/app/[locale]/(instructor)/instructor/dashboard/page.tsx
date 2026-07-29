@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { formatRelativeDate } from "@/lib/utils/formatters";
 
+import { fetchAdminProfiles } from "@/lib/api/admin-profiles";
 interface InstructorStats {
   totalCourses: number;
   totalStudents: number;
@@ -100,7 +101,8 @@ export default function InstructorDashboardPage() {
             id,
             enrolled_at,
             status,
-            user:profiles!enrollments_user_id_fkey(full_name, email),
+            user_id,
+            user:profiles!enrollments_user_id_fkey(full_name),
             course:courses!enrollments_course_id_fkey(title)
           `
           )
@@ -108,14 +110,29 @@ export default function InstructorDashboardPage() {
           .order("enrolled_at", { ascending: false })
           .limit(10);
 
+        // profiles.email is private to `authenticated`. The admin-profiles
+        // route lets an instructor resolve it, but only for learners enrolled
+        // in a course they actually teach.
+        const emailById = new Map<string, string>();
+        const studentIds = [
+          ...new Set(
+            (enrollments ?? [])
+              .map((e) => (e as Record<string, unknown>).user_id as string)
+              .filter(Boolean)
+          ),
+        ];
+        if (studentIds.length) {
+          const { rows } = await fetchAdminProfiles({ ids: studentIds, pageSize: studentIds.length });
+          rows.forEach((r) => emailById.set(r.id, r.email ?? ""));
+        }
+
         const mapped: RecentEnrollment[] = (enrollments ?? []).map(
           (e: Record<string, unknown>) => ({
             id: e.id as string,
             user_name:
               (e.user as Record<string, unknown>)?.full_name as string ??
               "Unknown",
-            user_email:
-              (e.user as Record<string, unknown>)?.email as string ?? "",
+            user_email: emailById.get(e.user_id as string) ?? "",
             course_title:
               (e.course as Record<string, unknown>)?.title as string ??
               "Unknown",

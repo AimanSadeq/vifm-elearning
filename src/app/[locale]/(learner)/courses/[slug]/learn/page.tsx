@@ -63,8 +63,10 @@ export default function CourseLearnPage() {
         .single();
 
       if (firstModule) {
+        // lessons is no longer directly readable by `authenticated`;
+        // lesson_access is the granted view over it.
         const { data: firstLesson } = await supabase
-          .from("lessons")
+          .from("lesson_access")
           .select("id")
           .eq("module_id", firstModule.id)
           .order("sort_order")

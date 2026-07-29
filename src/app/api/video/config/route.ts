@@ -10,6 +10,7 @@ import {
 } from "@/lib/utils/constants";
 import { userHasCourseAccess } from "@/lib/services/access";
 
+import { supabaseAdmin } from "@/lib/supabase/admin";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -34,7 +35,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch per-lesson config (including course_id for enrollment check)
-    const { data: lesson, error: lessonError } = await supabase
+    // auto_save_interval_seconds and force_watch_first are not part of the
+    // lesson_access view, and `lessons` is no longer granted to
+    // `authenticated`. The entitlement check below is what gates this, so the
+    // read itself goes through the service role.
+    const { data: lesson, error: lessonError } = await supabaseAdmin
       .from("lessons")
       .select(
         "minimum_watch_percentage, allow_speed_control, allow_download, allow_skipping, auto_save_interval_seconds, force_watch_first, is_preview, module:modules!inner(course_id)"

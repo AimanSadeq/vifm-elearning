@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import {
   convertPptx,
   isPdfConversionConfigured,
@@ -11,6 +10,8 @@ import {
 // we convert it to the requested format (CloudConvert) and cache the result, so
 // it matches whatever template the course/default uses. Falls back (503) when
 // no converter is configured so the client can use the built-in renderer.
+import { getOwnRole } from "@/lib/supabase/own-profile";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 export const runtime = "nodejs";
 
 const BUCKET = "certificates";
@@ -51,11 +52,9 @@ export async function GET(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+  // Own role — read via my_profile; `profiles.role` is not granted
+  // to `authenticated` any more.
+  const profile = { role: await getOwnRole(supabase) };
   const isAdmin = profile?.role === "super_admin";
   if (cert.user_id !== user.id && !isAdmin) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });

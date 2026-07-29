@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { userFormSchema } from "@/lib/utils/validators";
 
+import { getOwnRole } from "@/lib/supabase/own-profile";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 async function authenticateAdmin(request: NextRequest) {
   void request; // cookie-based auth, request not needed
   const supabase = await createServerSupabase();
@@ -14,11 +15,9 @@ async function authenticateAdmin(request: NextRequest) {
 
   if (error || !user) return null;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, role")
-    .eq("id", user.id)
-    .single();
+  // Own role — read via my_profile; `profiles.role` is not granted
+  // to `authenticated` any more.
+  const profile = { role: await getOwnRole(supabase), id: user.id };
 
   if (!profile || profile.role !== "super_admin") return null;
 

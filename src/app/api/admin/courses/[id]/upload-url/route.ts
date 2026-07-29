@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
 import { sanitizeFileName } from '@/lib/supabase/video-storage'
 import { isUuid } from '@/lib/utils/uuid'
 
+import { getOwnRole } from '@/lib/supabase/own-profile'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 const VIDEO_BUCKET = 'course-videos'
 const DOCUMENT_BUCKET = 'course-assets'
 
@@ -52,13 +53,11 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
+    // Own role — read via my_profile; `profiles.role` is not granted
+    // to `authenticated` any more.
+    const profile = { role: await getOwnRole(supabase) }
 
-    if (!profile || !['super_admin', 'instructor'].includes(profile.role)) {
+    if (!profile.role || !['super_admin', 'instructor'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

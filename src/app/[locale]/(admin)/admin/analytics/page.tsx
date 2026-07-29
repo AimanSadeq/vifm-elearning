@@ -25,6 +25,7 @@ import { formatCurrency } from "@/lib/utils/formatters";
 import { exportToCSV } from "@/lib/utils/csv-export";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 
+import { countAdminProfiles } from "@/lib/api/admin-profiles";
 interface MonthlyData {
   month: string;
   revenue: number;
@@ -100,11 +101,8 @@ export default function AnalyticsOverviewPage() {
         supabase
           .from("enrollments")
           .select("*", { count: "exact", head: true }),
-        supabase
-          .from("profiles")
-          .select("*", { count: "exact", head: true })
-          .eq("role", "learner")
-          .eq("is_active", true),
+        // role and is_active are private columns; count via the admin route.
+        countAdminProfiles({ role: "learner", isActive: true }).then((count) => ({ count })),
         supabase
           .from("enrollments")
           .select("id", { count: "exact" })

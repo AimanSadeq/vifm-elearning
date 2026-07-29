@@ -3,6 +3,7 @@ import type { User } from "@supabase/supabase-js";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { isSuperAdmin } from "./role";
 
+import { getOwnRole } from "@/lib/supabase/own-profile";
 /**
  * Centralized auth + super_admin gate for admin route handlers. Returns the
  * user when authorized, or a `NextResponse` to short-circuit the handler with
@@ -27,12 +28,7 @@ export async function requireSuperAdmin(): Promise<
   // for the case where app_metadata.role wasn't synced yet.
   if (isSuperAdmin(user)) return { user };
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-  if (profile?.role === "super_admin") return { user };
+  if ((await getOwnRole(supabase)) === "super_admin") return { user };
 
   return {
     error: NextResponse.json({ error: "Forbidden" }, { status: 403 }),

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { regenerateCertificateFile } from "@/lib/services/certificate-service";
 
+import { getOwnRole } from "@/lib/supabase/own-profile";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 export const runtime = "nodejs";
 
 // Re-render is local (pptx) + a couple of storage ops per cert; bound per call.
@@ -23,11 +24,9 @@ export async function POST(request: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+  // Own role — read via my_profile; `profiles.role` is not granted
+  // to `authenticated` any more.
+  const profile = { role: await getOwnRole(supabase) };
   if (profile?.role !== "super_admin") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

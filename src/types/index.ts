@@ -406,6 +406,7 @@ export interface Webinar {
   instructor_id?: string | null;
   category_id?: string | null;
   status: WebinarStatus;
+  /** Only ever populated from the `webinar_access` view (registered users). */
   meeting_url?: string | null;
   meeting_id?: string | null;
   scheduled_at: string;
@@ -421,7 +422,12 @@ export interface Webinar {
   price: number;
   currency: string;
   tags?: string[] | null;
-  metadata: Record<string, unknown>;
+  /**
+   * Not selected by client queries: `authenticated` holds a column grant on
+   * `webinars` that omits metadata (along with meeting_url / meeting_id), so
+   * `select("*")` would fail. Present for service-role reads only.
+   */
+  metadata?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
   // Relations

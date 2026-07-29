@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { quizSchema } from "@/lib/utils/validators";
 
+import { getOwnRole } from "@/lib/supabase/own-profile";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createServerSupabase();
@@ -19,11 +20,9 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+    // Own role — read via my_profile; `profiles.role` is not granted
+    // to `authenticated` any more.
+    const profile = { role: await getOwnRole(supabase) };
 
     const isAdmin = profile?.role === "super_admin";
 
@@ -60,11 +59,9 @@ export async function POST(request: NextRequest) {
     if (!user)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+    // Own role — read via my_profile; `profiles.role` is not granted
+    // to `authenticated` any more.
+    const profile = { role: await getOwnRole(supabase) };
 
     if (profile?.role !== "super_admin")
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

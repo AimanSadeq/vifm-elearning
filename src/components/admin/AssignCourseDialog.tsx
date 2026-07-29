@@ -77,27 +77,20 @@ export function AssignCourseDialog({
     try {
       const supabase = createClient();
 
-      // Check for existing enrollment
-      const { data: existing } = await supabase
-        .from("enrollments")
-        .select("id")
-        .eq("user_id", userId)
-        .eq("course_id", selectedCourseId)
-        .maybeSingle();
-
-      if (existing) {
-        toast.error("User is already enrolled in this course");
-        return;
-      }
-
-      const { error } = await supabase.from("enrollments").insert({
-        user_id: userId,
-        course_id: selectedCourseId,
-        status: "active",
-        enrolled_at: new Date().toISOString(),
+      // Direct INSERT on enrollments is revoked for `authenticated`; an admin
+      // grant goes through the service-role route, which also handles the
+      // already-enrolled case.
+      const res = await fetch("/api/admin/enrollments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, courseId: selectedCourseId }),
       });
 
-      if (error) throw error;
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        toast.error(body.error ?? "Failed to enroll user");
+        return;
+      }
 
       toast.success("User enrolled in course");
       onOpenChange(false);
