@@ -66,10 +66,10 @@ export default function PrivacyPolicyPage() {
               disclose, and safeguard your information when you access or use the
               VIFM Academy e-learning platform, including our website at{" "}
               <a
-                href="https://learn.viftraining.com"
+                href="https://elearning.viftraining.com"
                 className="text-brand-600 hover:underline"
               >
-                learn.viftraining.com
+                elearning.viftraining.com
               </a>
               , mobile applications, and related services (collectively, the
               &ldquo;Platform&rdquo;).
