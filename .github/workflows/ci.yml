@@ -26,7 +26,7 @@ jobs:
       # Server-only — set as dummy so env validation passes during build.
       # Real values are only configured on Render.
       SUPABASE_SERVICE_ROLE_KEY: ci-placeholder
-      NEXT_PUBLIC_APP_URL: https://learn.viftraining.com
+      NEXT_PUBLIC_APP_URL: https://elearning.viftraining.com
 
     steps:
       - uses: actions/checkout@v4

@@ -217,7 +217,7 @@ export default function AdminPlatformSettingsPage() {
           <Input
             value={emailFrom}
             onChange={(e) => setEmailFrom(e.target.value)}
-            placeholder='VIFM Academy <noreply@learn.viftraining.com>'
+            placeholder='VIFM Academy <noreply@elearning.viftraining.com>'
             className="mt-1"
           />
           <p className="mt-2 text-xs text-muted-foreground">

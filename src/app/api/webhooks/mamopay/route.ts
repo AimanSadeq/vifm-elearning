@@ -23,7 +23,7 @@ import { incrementPromoUsage } from "@/lib/services/promo";
  * the gateway doesn't keep retrying.
  *
  * Configure the webhook URL in MamoPay dashboard → Webhooks:
- *   https://learn.viftraining.com/api/webhooks/mamopay
+ *   https://elearning.viftraining.com/api/webhooks/mamopay
  */
 export async function POST(request: NextRequest) {
   try {
