@@ -47,7 +47,7 @@ export async function PATCH(
       );
     }
 
-    const { password, full_name, full_name_ar, phone, role, organization_id, language, is_active } = parsed.data;
+    const { password, full_name, full_name_ar, phone, role, organization_id, department, language, is_active } = parsed.data;
 
     // Capture the pre-update role so we can write an audit row only when it
     // actually changes — role changes are privileged actions and we want a
@@ -82,6 +82,7 @@ export async function PATCH(
         phone: phone || null,
         role,
         organization_id: organization_id || null,
+        department: department || null,
         language: language || "en",
         is_active,
       })

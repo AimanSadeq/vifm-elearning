@@ -785,6 +785,27 @@
     "noTemplates": "لا توجد قوالب شهادات. أنشئ واحداً للبدء.",
     "selectTemplate": "اختر قالب الشهادة"
   },
+  "myTraining": {
+    "title": "التدريب المعين",
+    "description": "التدريب المعين لك من قبل مؤسستك",
+    "all": "الكل",
+    "open": "مفتوح",
+    "completed": "مكتمل",
+    "noTraining": "لا يوجد تدريب معين",
+    "noTrainingDescription": "عندما تعين لك مؤسستك تدريبا، سيظهر هنا مع تاريخ الاستحقاق.",
+    "dueBy": "الاستحقاق بحلول {date}",
+    "overdue": "متأخر",
+    "dueSoon": "يستحق قريبا",
+    "assigned": "معين",
+    "mandatory": "إلزامي",
+    "optional": "اختياري",
+    "course": "دورة",
+    "learningPath": "مسار تعلم",
+    "start": "ابدأ",
+    "continue": "متابعة",
+    "progress": "التقدم",
+    "completedOn": "اكتمل في {date}"
+  },
   "learningPaths": {
     "title": "مسارات التعلم",
     "all": "الكل",

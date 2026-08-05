@@ -27,7 +27,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 
 /** The only columns this route will ever return. */
 const COLUMNS =
-  "id, full_name, full_name_ar, email, phone, role, organization_id, language, is_active, last_login_at, created_at";
+  "id, full_name, full_name_ar, email, phone, role, organization_id, department, language, is_active, last_login_at, created_at";
 
 const ROLES = ["super_admin", "instructor", "corporate_admin", "learner"];
 const MAX_PAGE_SIZE = 200;

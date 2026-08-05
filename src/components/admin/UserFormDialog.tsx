@@ -29,7 +29,7 @@ import type { Profile } from "@/types";
 interface UserFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user?: Pick<Profile, "id" | "full_name" | "full_name_ar" | "email" | "phone" | "role" | "organization_id" | "language" | "is_active"> | null;
+  user?: Pick<Profile, "id" | "full_name" | "full_name_ar" | "email" | "phone" | "role" | "organization_id" | "department" | "language" | "is_active"> | null;
   onSuccess: () => void;
 }
 
@@ -46,6 +46,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
       phone: user?.phone ?? "",
       role: user?.role ?? "learner",
       organization_id: user?.organization_id ?? null,
+      department: user?.department ?? "",
       language: user?.language ?? "en",
       is_active: user?.is_active ?? true,
       password: "",
@@ -131,10 +132,20 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
             </div>
           </div>
 
-          {/* Phone */}
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
-            <Input id="phone" {...form.register("phone")} />
+          {/* Phone & Department */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input id="phone" {...form.register("phone")} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="department">Department</Label>
+              <Input
+                id="department"
+                placeholder="e.g. Human Capital"
+                {...form.register("department")}
+              />
+            </div>
           </div>
 
           {/* Role & Language */}

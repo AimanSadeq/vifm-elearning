@@ -45,7 +45,7 @@ import type { Profile, UserRole } from "@/types";
 import { fetchAdminProfiles, setProfileActive } from "@/lib/api/admin-profiles";
 type UserRow = Pick<
   Profile,
-  "id" | "full_name" | "full_name_ar" | "email" | "phone" | "role" | "organization_id" | "language" | "is_active" | "last_login_at" | "created_at"
+  "id" | "full_name" | "full_name_ar" | "email" | "phone" | "role" | "organization_id" | "department" | "language" | "is_active" | "last_login_at" | "created_at"
 >;
 
 const ROLE_FILTER_OPTIONS: UserRole[] = [

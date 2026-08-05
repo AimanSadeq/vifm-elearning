@@ -17,6 +17,7 @@ export type AdminProfile = {
   phone: string | null;
   role: string | null;
   organization_id: string | null;
+  department: string | null;
   language: string | null;
   is_active: boolean | null;
   last_login_at: string | null;

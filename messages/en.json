@@ -785,6 +785,27 @@
     "noTemplates": "No certificate templates. Create one to get started.",
     "selectTemplate": "Select Certificate Template"
   },
+  "myTraining": {
+    "title": "Assigned Training",
+    "description": "Training assigned to you by your organization",
+    "all": "All",
+    "open": "Open",
+    "completed": "Completed",
+    "noTraining": "No assigned training",
+    "noTrainingDescription": "When your organization assigns you training, it will appear here with its due date.",
+    "dueBy": "Due by {date}",
+    "overdue": "Overdue",
+    "dueSoon": "Due soon",
+    "assigned": "Assigned",
+    "mandatory": "Mandatory",
+    "optional": "Optional",
+    "course": "Course",
+    "learningPath": "Learning Path",
+    "start": "Start",
+    "continue": "Continue",
+    "progress": "Progress",
+    "completedOn": "Completed on {date}"
+  },
   "learningPaths": {
     "title": "Learning Paths",
     "all": "All",

@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password, full_name, full_name_ar, phone, role, organization_id, language, is_active } = parsed.data;
+    const { email, password, full_name, full_name_ar, phone, role, organization_id, department, language, is_active } = parsed.data;
 
     if (!password) {
       return NextResponse.json(
@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
         phone: phone || null,
         role,
         organization_id: organization_id || null,
+        department: department || null,
         language: language || "en",
         is_active,
       })

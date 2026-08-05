@@ -161,6 +161,83 @@ export async function sendWebinarReminder(params: {
 }
 
 /**
+ * Notify a learner that training was assigned to them. Transactional (bypasses
+ * notification preferences by design — mandatory training must reach the
+ * learner). Template key: `training_assigned`.
+ */
+export async function sendTrainingAssignedEmail(params: {
+  to: string;
+  userName: string;
+  trainingTitle: string;
+  dueDate?: string;
+  trainingUrl: string;
+}): Promise<EmailResult> {
+  const vars = {
+    userName: escapeHtml(params.userName),
+    trainingTitle: escapeHtml(params.trainingTitle),
+    dueDate: escapeHtml(params.dueDate ?? ""),
+    trainingUrl: encodeURI(params.trainingUrl),
+    appUrl: env.NEXT_PUBLIC_APP_URL ?? "",
+  };
+  const tpl = await getEmailTemplate("training_assigned");
+  const subject = tpl?.subject
+    ? applyTemplate(tpl.subject, vars)
+    : `New training assigned: ${params.trainingTitle}`;
+  const dueLine = params.dueDate
+    ? `<p>Please complete it by <strong>${vars.dueDate}</strong>.</p>`
+    : "";
+  const body = tpl?.html
+    ? applyTemplate(tpl.html, vars)
+    : `<h2>${vars.trainingTitle}</h2>
+       <p>Hi ${vars.userName},</p>
+       <p>You have been assigned new training on VIFM Academy.</p>
+       ${dueLine}
+       <p><a href="${vars.trainingUrl}" style="display:inline-block;padding:10px 18px;background:#134BA1;color:#fff;text-decoration:none;border-radius:6px;">Start training</a></p>`;
+  const html = `<div style="font-family: system-ui, sans-serif; line-height: 1.5; max-width: 560px;">${body}</div>`;
+  return send(params.to, subject, html);
+}
+
+/**
+ * Due-soon / overdue reminder for an assigned training. Transactional
+ * (bypasses preferences — completion is mandated by the assigning admin).
+ * Template key: `training_reminder`.
+ */
+export async function sendTrainingReminderEmail(params: {
+  to: string;
+  userName: string;
+  trainingTitle: string;
+  dueDate: string;
+  isOverdue: boolean;
+  trainingUrl: string;
+}): Promise<EmailResult> {
+  const vars = {
+    userName: escapeHtml(params.userName),
+    trainingTitle: escapeHtml(params.trainingTitle),
+    dueDate: escapeHtml(params.dueDate),
+    trainingUrl: encodeURI(params.trainingUrl),
+    statusWord: params.isOverdue ? "overdue" : "due soon",
+    appUrl: env.NEXT_PUBLIC_APP_URL ?? "",
+  };
+  const tpl = await getEmailTemplate("training_reminder");
+  const subject = tpl?.subject
+    ? applyTemplate(tpl.subject, vars)
+    : params.isOverdue
+      ? `Overdue training: ${params.trainingTitle}`
+      : `Reminder: complete ${params.trainingTitle} by ${params.dueDate}`;
+  const statusLine = params.isOverdue
+    ? `<p>This training was due on <strong>${vars.dueDate}</strong> and is now <strong>overdue</strong>.</p>`
+    : `<p>This training is due on <strong>${vars.dueDate}</strong>.</p>`;
+  const body = tpl?.html
+    ? applyTemplate(tpl.html, vars)
+    : `<h2>${vars.trainingTitle}</h2>
+       <p>Hi ${vars.userName},</p>
+       ${statusLine}
+       <p><a href="${vars.trainingUrl}" style="display:inline-block;padding:10px 18px;background:#134BA1;color:#fff;text-decoration:none;border-radius:6px;">Continue training</a></p>`;
+  const html = `<div style="font-family: system-ui, sans-serif; line-height: 1.5; max-width: 560px;">${body}</div>`;
+  return send(params.to, subject, html);
+}
+
+/**
  * Send a marketing/announcement email, gated on the user's marketing_emails
  * preference. Returns { skipped: true } if the user has opted out — callers
  * should treat this as success (not an error).

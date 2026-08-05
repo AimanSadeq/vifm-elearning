@@ -362,6 +362,7 @@ const userFormBase = {
   phone: z.string().optional(),
   role: z.enum(["super_admin", "instructor", "corporate_admin", "learner"]),
   organization_id: z.string().uuid().optional().nullable(),
+  department: z.string().max(120).optional().nullable(),
   language: z.enum(["en", "ar"]).default("en"),
   is_active: z.boolean().default(true),
 };

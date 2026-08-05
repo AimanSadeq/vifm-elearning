@@ -47,6 +47,7 @@ export interface Profile {
   phone?: string | null;
   role: UserRole;
   organization_id?: string | null;
+  department?: string | null;
   language: "en" | "ar";
   timezone: string;
   is_active: boolean;
