@@ -28,6 +28,19 @@ export async function GET() {
 
   if (!completedEnrollments?.length) return NextResponse.json({ data: [] });
 
+  // A course the learner already holds a certificate for is never blocked —
+  // issueCertificate returns the existing one before any gate runs.
+  const { data: issued } = await supabaseAdmin
+    .from("certificates")
+    .select("course_id")
+    .eq("user_id", user.id);
+  const alreadyIssued = new Set((issued ?? []).map((c) => c.course_id));
+
+  const pending = completedEnrollments.filter(
+    (e) => !alreadyIssued.has(e.course_id)
+  );
+  if (!pending.length) return NextResponse.json({ data: [] });
+
   type CourseRef = { title: string; title_ar: string | null; slug: string };
   const blocked: Array<{
     course_id: string;
@@ -39,31 +52,39 @@ export async function GET() {
     requiredScore?: number;
   }> = [];
 
-  for (const e of completedEnrollments) {
-    // Supabase types joined relations as either a single object or an array
-    // depending on schema inference. Normalise here.
-    const c = e.course as unknown as CourseRef | CourseRef[] | null;
-    const course = Array.isArray(c) ? c[0] : c;
-    if (!course) continue;
+  // Fan out per course — a learner with many completed courses would otherwise
+  // pay for each gate check in series.
+  const results = await Promise.all(
+    pending.map(async (e) => {
+      // Supabase types joined relations as either a single object or an array
+      // depending on schema inference. Normalise here.
+      const c = e.course as unknown as CourseRef | CourseRef[] | null;
+      const course = Array.isArray(c) ? c[0] : c;
+      if (!course) return null;
 
-    const surveyStatus = await getCourseSurveyStatus(user.id, e.course_id);
-    if (surveyStatus.blocking) {
-      blocked.push({ course_id: e.course_id, course, reason: "survey" });
-      continue;
-    }
+      const [surveyStatus, checks] = await Promise.all([
+        getCourseSurveyStatus(user.id, e.course_id),
+        getCourseKnowledgeCheckSummary(user.id, e.course_id),
+      ]);
 
-    const checks = await getCourseKnowledgeCheckSummary(user.id, e.course_id);
-    if (!checks.meetsRequirement) {
-      blocked.push({
-        course_id: e.course_id,
-        course,
-        reason: "knowledge_checks",
-        checksRemaining: checks.totalChecks - checks.attemptedChecks,
-        overallPercentage: checks.overallPercentage,
-        requiredScore: checks.requiredScore,
-      });
-    }
-  }
+      if (surveyStatus.blocking) {
+        return { course_id: e.course_id, course, reason: "survey" as const };
+      }
+      if (!checks.meetsRequirement) {
+        return {
+          course_id: e.course_id,
+          course,
+          reason: "knowledge_checks" as const,
+          checksRemaining: checks.totalChecks - checks.attemptedChecks,
+          overallPercentage: checks.overallPercentage,
+          requiredScore: checks.requiredScore,
+        };
+      }
+      return null;
+    })
+  );
+
+  blocked.push(...results.filter((r): r is NonNullable<typeof r> => r !== null));
 
   return NextResponse.json({ data: blocked });
 }
