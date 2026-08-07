@@ -80,8 +80,11 @@ export const VIDEO_DEFAULT_MINIMUM_WATCH_PERCENTAGE = 90;
 export const VIDEO_DEFAULT_AUTO_SAVE_INTERVAL_SECONDS = 30;
 export const VIDEO_DEFAULT_ALLOW_SPEED_CONTROL = true;
 export const VIDEO_DEFAULT_ALLOW_DOWNLOAD = false;
-export const VIDEO_DEFAULT_ALLOW_SKIPPING = true;
-export const VIDEO_DEFAULT_FORCE_WATCH_FIRST = false;
+// Compliance default: a learner cannot fast-forward past the furthest point
+// they have actually watched until the video is completed once. Admins can
+// opt an individual lesson out per lesson in the content editor.
+export const VIDEO_DEFAULT_ALLOW_SKIPPING = false;
+export const VIDEO_DEFAULT_FORCE_WATCH_FIRST = true;
 
 export const VIDEO_BOOKMARK_COLORS = {
   yellow: "#facc15",

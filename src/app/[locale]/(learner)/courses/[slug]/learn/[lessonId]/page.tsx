@@ -570,8 +570,8 @@ export default function LessonPage() {
                     onTimeUpdate={setVideoCurrentTime}
                     watchedSegments={getSegments()}
                     onSegmentUpdate={markSegment}
-                    allowSkipping={videoConfig?.allowSkipping ?? true}
-                    isFirstWatch={videoConfig?.isFirstWatch ?? false}
+                    allowSkipping={videoConfig?.allowSkipping ?? false}
+                    isFirstWatch={videoConfig?.isFirstWatch ?? true}
                     minimumWatchPercentage={videoConfig?.minimumWatchPercentage}
                     autoSaveIntervalSeconds={videoConfig?.autoSaveIntervalSeconds}
                     onPlay={handlePlay}

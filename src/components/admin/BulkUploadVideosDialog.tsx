@@ -153,12 +153,12 @@ export function BulkUploadVideosDialog({
         video_url: ticket.path,
         video_duration_seconds: duration || null,
         duration_minutes: duration ? Math.ceil(duration / 60) : 0,
-        metadata: {
-          allow_speed_control: true,
-          allow_download: false,
-          force_watch_first: false,
-          minimum_watch_percentage: 90,
-        },
+        // Columns, not metadata — /api/video/config reads the columns.
+        allow_speed_control: true,
+        allow_download: false,
+        force_watch_first: true,
+        allow_skipping: false,
+        minimum_watch_percentage: 90,
       }
 
       const { error: insertError } = await supabase.from('lessons').insert(lessonData)

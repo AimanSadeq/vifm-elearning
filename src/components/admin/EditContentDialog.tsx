@@ -30,6 +30,22 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
     assignment_allow_text?: boolean | null
   }
 
+  // Video settings live on the lessons columns — that is what
+  // /api/video/config reads. Lessons saved before
+  // 20260807_video_no_fast_forward kept them in metadata instead, so fall back
+  // to metadata before the hard-coded default.
+  const lessonCols = lesson as unknown as Record<string, unknown>
+  const lessonMeta = (lesson.metadata ?? {}) as Record<string, unknown>
+  function videoSetting<T>(key: string, fallback: T): T {
+    if (lessonCols[key] !== null && lessonCols[key] !== undefined) {
+      return lessonCols[key] as T
+    }
+    if (lessonMeta[key] !== null && lessonMeta[key] !== undefined) {
+      return lessonMeta[key] as T
+    }
+    return fallback
+  }
+
   const [formData, setFormData] = useState({
     title: lesson.title || '',
     title_ar: lesson.title_ar || '',
@@ -37,10 +53,16 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
     description_ar: lesson.description_ar || '',
     is_mandatory: lesson.is_mandatory,
     is_preview: lesson.is_preview,
-    force_watch_first: (lesson.metadata as Record<string, unknown>)?.force_watch_first as boolean ?? false,
-    allow_speed_control: (lesson.metadata as Record<string, unknown>)?.allow_speed_control as boolean ?? true,
-    allow_download: (lesson.metadata as Record<string, unknown>)?.allow_download as boolean ?? false,
-    minimum_watch_percentage: ((lesson.metadata as Record<string, unknown>)?.minimum_watch_percentage as number ?? 90).toString(),
+    // Columns are the source of truth; metadata is only read as a fallback
+    // for lessons saved before 20260807_video_no_fast_forward.
+    // allow_skipping is the flag the player actually clamps on, so prefer it.
+    force_watch_first:
+      typeof lessonCols.allow_skipping === 'boolean'
+        ? !lessonCols.allow_skipping
+        : videoSetting('force_watch_first', true),
+    allow_speed_control: videoSetting('allow_speed_control', true) as boolean,
+    allow_download: videoSetting('allow_download', false) as boolean,
+    minimum_watch_percentage: (videoSetting('minimum_watch_percentage', 90) as number).toString(),
     assignment_instructions: lessonRow.content_html ?? '',
     assignment_max_points:
       lessonRow.assignment_max_points != null
@@ -109,15 +131,16 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
         is_preview: formData.is_preview,
       }
 
-      // Update video settings in metadata
+      // Video settings write to the lessons columns. force_watch_first is the
+      // inverse of allow_skipping; they are written together so they can never
+      // disagree.
       if (lesson.content_type === 'video') {
-        updateData.metadata = {
-          ...(lesson.metadata as Record<string, unknown>),
-          force_watch_first: formData.force_watch_first,
-          allow_speed_control: formData.allow_speed_control,
-          allow_download: formData.allow_download,
-          minimum_watch_percentage: parseInt(formData.minimum_watch_percentage) || 90,
-        }
+        updateData.force_watch_first = formData.force_watch_first
+        updateData.allow_skipping = !formData.force_watch_first
+        updateData.allow_speed_control = formData.allow_speed_control
+        updateData.allow_download = formData.allow_download
+        updateData.minimum_watch_percentage =
+          parseInt(formData.minimum_watch_percentage) || 90
       }
 
       // Update assignment-specific fields
@@ -330,7 +353,7 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
               <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={formData.is_preview} onChange={(e) => setFormData({ ...formData, is_preview: e.target.checked })} className="h-4 w-4 rounded border-border text-primary" /> Free Preview</label>
               {lesson.content_type === 'video' && (
                 <>
-                  <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={formData.force_watch_first} onChange={(e) => setFormData({ ...formData, force_watch_first: e.target.checked })} className="h-4 w-4 rounded border-border text-primary" /> Force First Watch</label>
+                  <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={formData.force_watch_first} onChange={(e) => setFormData({ ...formData, force_watch_first: e.target.checked })} className="h-4 w-4 rounded border-border text-primary" /> Force First Watch (no fast-forward)</label>
                   <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={formData.allow_speed_control} onChange={(e) => setFormData({ ...formData, allow_speed_control: e.target.checked })} className="h-4 w-4 rounded border-border text-primary" /> Allow Speed Control</label>
                   <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={formData.allow_download} onChange={(e) => setFormData({ ...formData, allow_download: e.target.checked })} className="h-4 w-4 rounded border-border text-primary" /> Allow Download</label>
                 </>

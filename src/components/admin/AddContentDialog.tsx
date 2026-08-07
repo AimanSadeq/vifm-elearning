@@ -48,7 +48,7 @@ export function AddContentDialog({
     description_ar: '',
     is_mandatory: true,
     is_preview: false,
-    force_watch_first: false,
+    force_watch_first: true,
     allow_speed_control: true,
     allow_download: false,
     minimum_watch_percentage: '90',
@@ -213,14 +213,16 @@ export function AddContentDialog({
         }
       }
 
-      // Store video settings in metadata
+      // Video settings live on the lessons columns — /api/video/config reads
+      // those, not metadata. force_watch_first is the inverse of
+      // allow_skipping; they are written together so they can never disagree.
       if (contentType === 'video') {
-        lessonData.metadata = {
-          force_watch_first: formData.force_watch_first,
-          allow_speed_control: formData.allow_speed_control,
-          allow_download: formData.allow_download,
-          minimum_watch_percentage: parseInt(formData.minimum_watch_percentage) || 90,
-        }
+        lessonData.force_watch_first = formData.force_watch_first
+        lessonData.allow_skipping = !formData.force_watch_first
+        lessonData.allow_speed_control = formData.allow_speed_control
+        lessonData.allow_download = formData.allow_download
+        lessonData.minimum_watch_percentage =
+          parseInt(formData.minimum_watch_percentage) || 90
       }
 
       const { data: insertedLesson, error: insertError } = await supabase
@@ -633,7 +635,7 @@ export function AddContentDialog({
                     <>
                       <label className="flex items-center gap-3 text-sm">
                         <input type="checkbox" checked={formData.force_watch_first} onChange={(e) => setFormData({ ...formData, force_watch_first: e.target.checked })} className="h-4 w-4 rounded border-border text-primary" />
-                        Force first watch (no skip/fast-forward)
+                        Force first watch (no skip/fast-forward until completed once)
                       </label>
                       <label className="flex items-center gap-3 text-sm">
                         <input type="checkbox" checked={formData.allow_speed_control} onChange={(e) => setFormData({ ...formData, allow_speed_control: e.target.checked })} className="h-4 w-4 rounded border-border text-primary" />
