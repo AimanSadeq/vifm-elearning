@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { issueCertificate, SurveyRequiredError } from "@/lib/services/certificate-service";
+import {
+  issueCertificate,
+  SurveyRequiredError,
+  KnowledgeCheckRequiredError,
+} from "@/lib/services/certificate-service";
 import { escapeIlike } from "@/lib/utils/escape-search";
 
 import { getOwnRole } from "@/lib/supabase/own-profile";
@@ -166,6 +170,12 @@ export async function POST(request: NextRequest) {
     if (err instanceof SurveyRequiredError) {
       return NextResponse.json(
         { error: err.message, code: "SURVEY_REQUIRED" },
+        { status: 409 }
+      );
+    }
+    if (err instanceof KnowledgeCheckRequiredError) {
+      return NextResponse.json(
+        { error: err.message, code: "KNOWLEDGE_CHECKS_REQUIRED" },
         { status: 409 }
       );
     }

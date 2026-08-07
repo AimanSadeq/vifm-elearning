@@ -951,5 +951,30 @@
       "title": "Contact Us",
       "description": "Get in touch with the VIFM Academy team for course enquiries, corporate training, or technical support."
     }
+  },
+  "knowledgeChecks": {
+    "title": "Knowledge Check Results",
+    "overallScore": "Overall Score",
+    "requiredScore": "Required Score",
+    "pointsOf": "{earned} of {total} points",
+    "total": "Checks",
+    "attempted": "Attempted",
+    "passed": "Passed",
+    "notAttempted": "Not attempted yet",
+    "attemptsPassMark": "{attempts} attempt(s) · pass mark {passMark}%",
+    "finalExam": "Final Exam",
+    "take": "Take",
+    "retake": "Retake",
+    "noChecks": "This course has no knowledge checks.",
+    "loadFailed": "Could not load your results.",
+    "certificateIssued": "Certificate issued",
+    "certificatePending": "Your certificate will be issued once the course is complete.",
+    "blockedNotAllAttempted": "{remaining} knowledge check(s) still to complete before your certificate is issued.",
+    "blockedBelowScore": "Your overall score is below the {required}% required for the certificate. Retake a knowledge check to raise it.",
+    "goToOutstanding": "Go to the next knowledge check",
+    "viewCertificate": "View certificate",
+    "viewResults": "View knowledge check results",
+    "blockedHeading": "Complete your knowledge checks to unlock your certificate",
+    "blockedDescription": "These courses are complete but the knowledge check requirement has not been met yet."
   }
 }

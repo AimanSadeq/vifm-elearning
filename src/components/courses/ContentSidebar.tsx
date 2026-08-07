@@ -15,6 +15,7 @@ import {
   FileText,
   HelpCircle,
   Play,
+  ClipboardCheck,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -64,6 +65,7 @@ export function ContentSidebar({
 }: ContentSidebarProps) {
   const locale = useLocale();
   const t = useTranslations("player");
+  const tk = useTranslations("knowledgeChecks");
   const [showSearch, setShowSearch] = useState(false);
   const [expandedModules, setExpandedModules] = useState<Set<string>>(() => {
     const moduleId = modules.find((m) =>
@@ -76,6 +78,14 @@ export function ContentSidebar({
     (locale === "ar"
       ? course.title_ar || course.title
       : course.title || course.title_ar) ?? "";
+
+  const hasKnowledgeChecks = useMemo(
+    () =>
+      modules.some((m) =>
+        (m.lessons ?? []).some((l) => l.content_type === "quiz")
+      ),
+    [modules]
+  );
 
   // Filter lessons by search query
   const filteredModules = useMemo(() => {
@@ -158,6 +168,23 @@ export function ContentSidebar({
           />
         </div>
       </div>
+
+      {/* Knowledge check results — only when the course actually has checks */}
+      {hasKnowledgeChecks && (
+        <div className="border-b px-4 py-2.5">
+          <Link
+            href={`/${locale}/courses/${course.slug}/results`}
+            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          >
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted">
+              <ClipboardCheck className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <span className="flex-1 min-w-0 truncate">
+              {tk("viewResults")}
+            </span>
+          </Link>
+        </div>
+      )}
 
       {/* Course Website Link */}
       {designationSlug && (

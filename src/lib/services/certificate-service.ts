@@ -8,6 +8,7 @@ import {
   isBadgesEnabled,
 } from "./badges-client";
 import { hasCompletedRequiredSurvey } from "./survey-service";
+import { meetsKnowledgeCheckRequirement } from "./knowledge-check-service";
 import type { Certificate } from "@/types";
 
 /** Thrown when the learner hasn't completed a required survey yet. */
@@ -15,6 +16,16 @@ export class SurveyRequiredError extends Error {
   constructor() {
     super("Course survey must be completed before the certificate is issued.");
     this.name = "SurveyRequiredError";
+  }
+}
+
+/** Thrown when the learner hasn't cleared the course's knowledge checks. */
+export class KnowledgeCheckRequiredError extends Error {
+  constructor() {
+    super(
+      "All knowledge checks must be completed at the required score before the certificate is issued."
+    );
+    this.name = "KnowledgeCheckRequiredError";
   }
 }
 
@@ -44,6 +55,12 @@ export async function issueCertificate({
   // the admin manual-issue surface need to handle this rejection.
   const surveyOk = await hasCompletedRequiredSurvey(userId, courseId);
   if (!surveyOk) throw new SurveyRequiredError();
+
+  // Knowledge-check gate — when the course opts in and has published checks,
+  // every check must have been attempted and the weighted aggregate must
+  // clear courses.passing_score.
+  const checksOk = await meetsKnowledgeCheckRequirement(userId, courseId);
+  if (!checksOk) throw new KnowledgeCheckRequiredError();
 
   // Generate certificate number via DB function
   const { data: certNumResult } = await supabaseAdmin.rpc(

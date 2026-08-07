@@ -1,6 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Trophy,
   XCircle,
@@ -8,6 +10,7 @@ import {
   RotateCcw,
   Award,
   Download,
+  ClipboardCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -43,6 +46,10 @@ interface QuizResultsProps {
 
 export function QuizResults({ result, quiz, onRetry }: QuizResultsProps) {
   const tq = useTranslations("quiz");
+  const tk = useTranslations("knowledgeChecks");
+  const locale = useLocale();
+  // The quiz player always renders inside /courses/[slug]/learn/[lessonId].
+  const courseSlug = useParams().slug as string | undefined;
   const data = result as unknown as QuizResultData;
   const percentage = data.percentage ?? 0;
   const passed = data.passed ?? false;
@@ -114,11 +121,19 @@ export function QuizResults({ result, quiz, onRetry }: QuizResultsProps) {
           )}
 
           {/* Actions */}
-          <div className="flex justify-center gap-3 pt-4">
+          <div className="flex flex-wrap justify-center gap-3 pt-4">
             <Button variant="outline" onClick={onRetry}>
               <RotateCcw className="h-4 w-4 me-1" />
               {passed ? tq("viewQuiz") : tq("retryQuiz")}
             </Button>
+            {courseSlug && (
+              <Link href={`/${locale}/courses/${courseSlug}/results`}>
+                <Button variant="outline">
+                  <ClipboardCheck className="h-4 w-4 me-1" />
+                  {tk("viewResults")}
+                </Button>
+              </Link>
+            )}
           </div>
         </CardContent>
       </Card>

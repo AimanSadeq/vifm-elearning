@@ -951,5 +951,30 @@
       "title": "تواصل معنا",
       "description": "تواصل مع فريق أكاديمية VIFM للاستفسار عن الدورات أو التدريب المؤسسي أو الدعم الفني."
     }
+  },
+  "knowledgeChecks": {
+    "title": "نتائج اختبارات المعرفة",
+    "overallScore": "النتيجة الإجمالية",
+    "requiredScore": "النتيجة المطلوبة",
+    "pointsOf": "{earned} من {total} نقطة",
+    "total": "الاختبارات",
+    "attempted": "تمت المحاولة",
+    "passed": "ناجح",
+    "notAttempted": "لم تتم المحاولة بعد",
+    "attemptsPassMark": "{attempts} محاولة · درجة النجاح {passMark}%",
+    "finalExam": "الاختبار النهائي",
+    "take": "ابدأ",
+    "retake": "أعد المحاولة",
+    "noChecks": "لا توجد اختبارات معرفة في هذه الدورة.",
+    "loadFailed": "تعذر تحميل النتائج.",
+    "certificateIssued": "تم إصدار الشهادة",
+    "certificatePending": "سيتم إصدار شهادتك عند إكمال الدورة.",
+    "blockedNotAllAttempted": "يتبقى {remaining} من اختبارات المعرفة قبل إصدار شهادتك.",
+    "blockedBelowScore": "نتيجتك الإجمالية أقل من {required}% المطلوبة للحصول على الشهادة. أعد أحد اختبارات المعرفة لرفعها.",
+    "goToOutstanding": "انتقل إلى اختبار المعرفة التالي",
+    "viewCertificate": "عرض الشهادة",
+    "viewResults": "عرض نتائج اختبارات المعرفة",
+    "blockedHeading": "أكمل اختبارات المعرفة للحصول على شهادتك",
+    "blockedDescription": "اكتملت هذه الدورات ولكن لم يتم استيفاء متطلب اختبارات المعرفة بعد."
   }
 }

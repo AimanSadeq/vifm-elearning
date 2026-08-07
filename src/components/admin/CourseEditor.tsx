@@ -122,6 +122,9 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     is_featured: course.is_featured,
     certificate_enabled: course.certificate_enabled,
     passing_score: course.passing_score?.toString() || '70',
+    require_knowledge_checks:
+      (course as { require_knowledge_checks?: boolean | null })
+        .require_knowledge_checks ?? true,
     sequential_locking_enabled: course.sequential_locking_enabled ?? false,
     badge_template_external_id:
       (course as { badge_template_external_id?: string | null })
@@ -337,6 +340,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
           certificate_enabled: courseForm.certificate_enabled,
           certificate_template_id: courseForm.certificate_template_id || null,
           passing_score: parseInt(courseForm.passing_score) || 70,
+          require_knowledge_checks: courseForm.require_knowledge_checks,
           sequential_locking_enabled: courseForm.sequential_locking_enabled,
           badge_template_external_id:
             courseForm.badge_template_external_id || null,
@@ -1025,6 +1029,23 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                 <div>
                   <label className="block text-sm font-medium text-foreground">Passing Score (%)</label>
                   <input type="number" min="0" max="100" value={courseForm.passing_score} onChange={(e) => setCourseForm({ ...courseForm, passing_score: e.target.value })} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                  <p className="mt-1 text-xs text-muted-foreground">Aggregate pass mark across all knowledge checks in this course.</p>
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="flex items-start gap-3 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={courseForm.require_knowledge_checks}
+                      onChange={(e) => setCourseForm({ ...courseForm, require_knowledge_checks: e.target.checked })}
+                      className="mt-0.5 h-4 w-4 rounded border-border text-primary"
+                    />
+                    <span>
+                      Require knowledge checks for the certificate
+                      <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
+                        The learner must attempt every published knowledge check and reach the passing score above before the certificate is issued. Has no effect on courses without knowledge checks.
+                      </span>
+                    </span>
+                  </label>
                 </div>
                 <div className="sm:col-span-2">
                   <label className="flex items-start gap-3 text-sm">

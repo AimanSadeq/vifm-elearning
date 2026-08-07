@@ -42,6 +42,7 @@ const courseUpsertSchema = z.object({
   designation_id: z.string().uuid().nullable().optional(),
   sequential_locking_enabled: z.boolean().optional(),
   passing_score: z.number().int().min(0).max(100).optional(),
+  require_knowledge_checks: z.boolean().optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
   published_at: z.string().datetime().nullable().optional(),
 });

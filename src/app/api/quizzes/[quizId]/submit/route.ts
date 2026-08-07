@@ -6,7 +6,11 @@ import {
   scoreQuizAttempt,
   type QuestionData,
 } from "@/lib/services/quiz-scoring";
-import { issueCertificate } from "@/lib/services/certificate-service";
+import {
+  issueCertificate,
+  SurveyRequiredError,
+  KnowledgeCheckRequiredError,
+} from "@/lib/services/certificate-service";
 import { recalculateAllPathsForUser } from "@/lib/services/learning-path-service";
 import { getCompletedLessonIds } from "@/lib/services/progress-service";
 
@@ -68,7 +72,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Verify enrollment
     const { data: enrollment } = await supabaseAdmin
       .from("enrollments")
-      .select("id")
+      .select("id, status")
       .eq("user_id", user.id)
       .eq("course_id", quiz.course_id)
       .in("status", ["active", "completed"])
@@ -150,6 +154,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
 
     // Mark quiz lesson as completed on pass
+    let courseCompleted = false;
     if (passed && quiz.lesson_id) {
       const supabase = await createServerSupabase();
 
@@ -190,8 +195,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           totalItems > 0
             ? Math.round((completedItems / totalItems) * 100)
             : 0;
-        const courseCompleted =
-          totalItems > 0 && completedItems >= totalItems;
+        courseCompleted = totalItems > 0 && completedItems >= totalItems;
 
         await supabaseAdmin
           .from("enrollments")
@@ -214,11 +218,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
     }
 
-    // If final exam and passed, issue certificate. Admin smoke-tests can
-    // submit without an enrollment row, so skip cert issuance in that
-    // case — there's nothing to attach the certificate to.
+    // Try to issue the certificate after a passed final exam, and also after
+    // any submission that leaves the course complete — the last outstanding
+    // knowledge check is often what unblocks the gate, and it need not be the
+    // final exam. issueCertificate is idempotent and enforces the survey and
+    // knowledge-check gates itself. Admin smoke-tests can submit without an
+    // enrollment row, so skip issuance there — nothing to attach it to.
     let certificate = null;
-    if (quiz.is_final_exam && passed && enrollment) {
+    let certificateBlockedBy: "survey" | "knowledge_checks" | null = null;
+    const courseIsComplete = courseCompleted || enrollment?.status === "completed";
+    if (enrollment && ((quiz.is_final_exam && passed) || courseIsComplete)) {
       try {
         certificate = await issueCertificate({
           userId: user.id,
@@ -226,7 +235,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           enrollmentId: enrollment.id,
         });
       } catch (err) {
-        console.error("Certificate issuance error:", err);
+        // Both gates are expected outcomes, not errors — report them to the
+        // learner so the results screen can say what is still outstanding.
+        if (err instanceof SurveyRequiredError) {
+          certificateBlockedBy = "survey";
+        } else if (err instanceof KnowledgeCheckRequiredError) {
+          certificateBlockedBy = "knowledge_checks";
+        } else {
+          console.error("Certificate issuance error:", err);
+        }
       }
     }
 
@@ -238,6 +255,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       percentage: result.percentage,
       passed,
       attemptNumber,
+      courseCompleted: Boolean(courseIsComplete),
+      certificateBlockedBy,
       certificate: certificate
         ? {
             id: certificate.id,

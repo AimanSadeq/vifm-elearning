@@ -3,6 +3,7 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import {
   issueCertificate,
   SurveyRequiredError,
+  KnowledgeCheckRequiredError,
 } from "@/lib/services/certificate-service";
 
 import { getOwnRole } from "@/lib/supabase/own-profile";
@@ -76,7 +77,11 @@ export async function POST() {
       });
       issued += 1;
     } catch (err) {
-      if (err instanceof SurveyRequiredError) blocked += 1;
+      if (
+        err instanceof SurveyRequiredError ||
+        err instanceof KnowledgeCheckRequiredError
+      )
+        blocked += 1;
       else failed += 1;
     }
   }

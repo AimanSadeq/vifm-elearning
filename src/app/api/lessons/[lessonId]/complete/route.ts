@@ -12,6 +12,7 @@ import { getCompletedLessonIds } from "@/lib/services/progress-service";
 import {
   issueCertificate,
   SurveyRequiredError,
+  KnowledgeCheckRequiredError,
 } from "@/lib/services/certificate-service";
 
 interface RouteParams {
@@ -160,8 +161,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
               enrollmentId: enrollmentIdForCert,
             });
           } catch (err) {
-            if (err instanceof SurveyRequiredError) {
-              // Expected — cert will issue after survey submission.
+            if (
+              err instanceof SurveyRequiredError ||
+              err instanceof KnowledgeCheckRequiredError
+            ) {
+              // Expected — cert will issue once the survey is submitted or
+              // the outstanding knowledge checks are cleared.
               return;
             }
             console.warn(

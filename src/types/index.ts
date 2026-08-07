@@ -124,7 +124,10 @@ export interface Course {
   certificate_template_id?: string | null;
   designation_id?: string | null;
   sequential_locking_enabled: boolean;
+  /** Aggregate pass mark across the course's knowledge checks, percent. */
   passing_score: number;
+  /** Gate the certificate on the knowledge checks meeting passing_score. */
+  require_knowledge_checks: boolean;
   metadata: Record<string, unknown>;
   published_at?: string | null;
   created_at: string;
