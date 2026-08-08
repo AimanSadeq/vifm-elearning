@@ -4,6 +4,8 @@ interface QuizAnswer {
   questionId: string;
   selectedOptionIds?: string[];
   textAnswer?: string;
+  /** Matching questions: prompt option id -> chosen right-hand item handle. */
+  matches?: Record<string, string>;
 }
 
 interface QuizState {

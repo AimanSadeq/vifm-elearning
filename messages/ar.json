@@ -393,7 +393,11 @@
     "next": "التالي",
     "previous": "السابق",
     "downloadCertificate": "تحميل الشهادة",
-    "pass": "النجاح"
+    "pass": "النجاح",
+    "matchInstructions": "اسحب كل عنصر إلى العبارة التي يتوافق معها — أو انقر على العنصر ثم انقر على صفه.",
+    "matchDropHere": "أفلت العنصر المطابق هنا",
+    "matchAllPlaced": "تم وضع جميع العناصر.",
+    "matchRemove": "إزالة هذا الاقتران"
   },
   "webinars": {
     "upcoming": "الندوات القادمة",

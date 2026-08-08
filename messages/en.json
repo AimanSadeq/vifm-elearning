@@ -393,7 +393,11 @@
     "next": "Next",
     "previous": "Previous",
     "downloadCertificate": "Download Certificate",
-    "pass": "Pass"
+    "pass": "Pass",
+    "matchInstructions": "Drag each item on to the statement it belongs with — or tap an item, then tap its row.",
+    "matchDropHere": "Drop the matching item here",
+    "matchAllPlaced": "All items placed.",
+    "matchRemove": "Remove this pairing"
   },
   "webinars": {
     "upcoming": "Upcoming Webinars",

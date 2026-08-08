@@ -4,13 +4,20 @@ export interface QuestionData {
   id: string;
   question_type: QuestionType;
   points: number;
-  options: { id: string; is_correct: boolean }[];
+  options: {
+    id: string;
+    is_correct: boolean;
+    /** Matching questions: the opaque handle of this row's right-hand item. */
+    matchKey?: string;
+  }[];
 }
 
 export interface AnswerData {
   questionId: string;
   selectedOptionIds?: string[];
   textAnswer?: string;
+  /** Matching questions: prompt option id -> chosen right-hand item handle. */
+  matches?: Record<string, string>;
 }
 
 export interface QuestionResult {
@@ -73,6 +80,18 @@ export function scoreQuizAttempt(
         correct =
           correctSet.size === selectedSet.size &&
           Array.from(correctSet).every((id) => selectedSet.has(id));
+        break;
+      }
+
+      case "matching": {
+        // Every prompt must carry the handle of its own row's right-hand item.
+        // All-or-nothing, consistent with multi_select.
+        const matches = answer.matches ?? {};
+        correct =
+          question.options.length > 0 &&
+          question.options.every(
+            (o) => !!o.matchKey && matches[o.id] === o.matchKey
+          );
         break;
       }
 

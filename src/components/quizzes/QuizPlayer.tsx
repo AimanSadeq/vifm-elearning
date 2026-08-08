@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { MatchingQuestion } from "./MatchingQuestion";
 import type { Quiz, QuizQuestion } from "@/types";
 
 interface QuizPlayerProps {
@@ -226,6 +227,16 @@ export function QuizPlayer({ quiz, questions, onComplete }: QuizPlayerProps) {
                 );
               })}
             </div>
+          )}
+
+          {currentQuestion.question_type === "matching" && (
+            <MatchingQuestion
+              question={currentQuestion}
+              value={currentAnswer?.matches ?? {}}
+              onChange={(matches) =>
+                setAnswer(currentQuestion.id, { matches })
+              }
+            />
           )}
 
           {currentQuestion.question_type === "short_answer" && (
