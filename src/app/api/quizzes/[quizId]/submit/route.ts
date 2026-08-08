@@ -11,6 +11,7 @@ import {
   SurveyRequiredError,
   KnowledgeCheckRequiredError,
 } from "@/lib/services/certificate-service";
+import { matchKeyFor } from "@/lib/services/quiz-match";
 import { recalculateAllPathsForUser } from "@/lib/services/learning-path-service";
 import { getCompletedLessonIds } from "@/lib/services/progress-service";
 
@@ -117,10 +118,18 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       question_type: q.question_type,
       points: Number(q.points),
       options: (q.options ?? []).map(
-        (o: { id: string; is_correct: boolean; option_text: string }) => ({
+        (o: {
+          id: string;
+          is_correct: boolean;
+          option_text: string;
+          match_text?: string | null;
+        }) => ({
           id: o.id,
           is_correct: o.is_correct,
           option_text: o.option_text,
+          // Recomputed here rather than trusted from the client — the handle
+          // the learner submits must hash back to this same row.
+          ...(o.match_text ? { matchKey: matchKeyFor(o.id) } : {}),
         })
       ),
     }));

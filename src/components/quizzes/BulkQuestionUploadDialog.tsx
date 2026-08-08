@@ -24,12 +24,16 @@ type QuestionType =
   | "multiple_choice"
   | "true_false"
   | "short_answer"
-  | "multi_select";
+  | "multi_select"
+  | "matching";
 
 interface ParsedOption {
   optionText: string;
   optionTextAr?: string;
   isCorrect: boolean;
+  /** Matching questions: the partner paired with optionText. */
+  matchText?: string;
+  matchTextAr?: string;
 }
 
 interface ParsedQuestion {
@@ -50,6 +54,7 @@ const QUESTION_TYPES: ReadonlySet<QuestionType> = new Set([
   "true_false",
   "short_answer",
   "multi_select",
+  "matching",
 ]);
 
 const TEMPLATE_ROWS = [
@@ -94,6 +99,17 @@ const TEMPLATE_ROWS = [
     correct_3: true,
     option_4: "CSS",
     correct_4: false,
+  },
+  {
+    question: "Match each ratio to its formula.",
+    type: "matching",
+    points: 2,
+    option_1: "Current Ratio",
+    match_1: "Current Assets / Current Liabilities",
+    option_2: "Gross Margin",
+    match_2: "(Revenue - COGS) / Revenue",
+    option_3: "Debt-to-Equity",
+    match_3: "Total Debt / Total Equity",
   },
 ];
 
@@ -180,11 +196,42 @@ function parseRow(row: Record<string, unknown>, rowNumber: number): ParsedQuesti
     if (!text) continue;
     const textAr = asString(pickField(row, `option_${i}_ar`, `option${i}_ar`));
     const isCorrect = asBool(pickField(row, `correct_${i}`, `correct${i}`));
+    // Matching rows pair option_N with match_N; the pairing IS the answer key,
+    // so those rows are always stored as correct.
+    const matchText = asString(pickField(row, `match_${i}`, `match${i}`));
+    const matchTextAr = asString(pickField(row, `match_${i}_ar`, `match${i}_ar`));
     options.push({
       optionText: text,
       optionTextAr: textAr || undefined,
-      isCorrect,
+      isCorrect: questionType === "matching" ? true : isCorrect,
+      matchText: matchText || undefined,
+      matchTextAr: matchTextAr || undefined,
     });
+  }
+
+  if (questionType === "matching") {
+    if (options.length < 2) {
+      return {
+        rowNumber,
+        ok: false,
+        error: "matching needs at least two pairs (option_1/match_1, option_2/match_2, ...)",
+        questionText,
+        questionType,
+        points,
+      };
+    }
+    const incomplete = options.some((o) => !o.matchText);
+    if (incomplete) {
+      return {
+        rowNumber,
+        ok: false,
+        error: "every option_N in a matching row needs a corresponding match_N",
+        questionText,
+        questionType,
+        points,
+        options,
+      };
+    }
   }
 
   // Validation specific to question types.
@@ -430,13 +477,19 @@ export function BulkQuestionUploadDialog({
                 <p className="font-medium">Expected columns</p>
                 <p className="mt-1 text-muted-foreground">
                   <code>question</code> · <code>type</code>{" "}
-                  (multiple_choice / true_false / short_answer / multi_select)
+                  (multiple_choice / true_false / multi_select / matching)
                   · <code>points</code> · <code>option_1</code> …{" "}
                   <code>option_6</code> · <code>correct_1</code> …{" "}
                   <code>correct_6</code> (TRUE/FALSE) ·{" "}
                   <code>explanation</code>. Arabic columns:{" "}
                   <code>question_ar</code>, <code>option_1_ar</code>,
                   <code>explanation_ar</code>.
+                </p>
+                <p className="mt-2 text-muted-foreground">
+                  For <code>matching</code>, pair each <code>option_N</code>{" "}
+                  (the prompt) with <code>match_N</code> (its partner) —{" "}
+                  <code>correct_N</code> is ignored. Arabic:{" "}
+                  <code>match_1_ar</code> …
                 </p>
                 <Button
                   variant="outline"

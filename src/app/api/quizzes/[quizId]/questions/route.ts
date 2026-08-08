@@ -5,8 +5,19 @@ import { userHasCourseAccess } from "@/lib/services/access";
 
 import { getOwnRole } from "@/lib/supabase/own-profile";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { matchKeyFor, shuffle } from "@/lib/services/quiz-match";
+
 interface RouteParams {
   params: Promise<{ quizId: string }>;
+}
+
+/** quiz_options row as it comes back from the DB, matching columns included. */
+interface MatchableOption {
+  id: string;
+  is_correct: boolean;
+  match_text?: string | null;
+  match_text_ar?: string | null;
+  [key: string]: unknown;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
@@ -88,11 +99,34 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const canSeeAnswers = isAdmin || isInstructor;
     const result = canSeeAnswers
       ? questions
-      : questions?.map((q) => ({
-          ...q,
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          options: (q.options ?? []).map(({ is_correct, ...opt }: { is_correct: boolean; [key: string]: unknown }) => opt),
-        }));
+      : questions?.map((q) => {
+          const options = (q.options ?? []) as MatchableOption[];
+
+          // Matching questions keep both halves of a pair on one row, so the
+          // right-hand column has to be split off, shuffled, and re-keyed with
+          // an opaque handle — otherwise the pairing is readable from the JSON.
+          const matchOptions =
+            q.question_type === "matching"
+              ? shuffle(
+                  options
+                    .filter((o) => o.match_text)
+                    .map((o) => ({
+                      key: matchKeyFor(o.id),
+                      text: o.match_text as string,
+                      text_ar: o.match_text_ar ?? null,
+                    }))
+                )
+              : undefined;
+
+          return {
+            ...q,
+            options: options.map(
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              ({ is_correct, match_text, match_text_ar, ...opt }) => opt
+            ),
+            ...(matchOptions ? { match_options: matchOptions } : {}),
+          };
+        });
 
     return NextResponse.json({ data: result });
   } catch (err) {
@@ -167,6 +201,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         option_text: opt.optionText,
         option_text_ar: opt.optionTextAr ?? null,
         is_correct: opt.isCorrect,
+        match_text: opt.matchText ?? null,
+        match_text_ar: opt.matchTextAr ?? null,
         sort_order: idx,
       }));
 

@@ -233,6 +233,7 @@ export const quizQuestionSchema = z.object({
     "true_false",
     "short_answer",
     "multi_select",
+    "matching",
   ]),
   points: z.number().min(0).default(1),
   explanation: z.string().optional(),
@@ -243,6 +244,9 @@ export const quizQuestionSchema = z.object({
         optionText: z.string().min(1),
         optionTextAr: z.string().optional(),
         isCorrect: z.boolean(),
+        // Matching questions: the right-hand item paired with optionText.
+        matchText: z.string().optional(),
+        matchTextAr: z.string().optional(),
       })
     )
     .optional(),
@@ -255,6 +259,8 @@ export const submitQuizSchema = z.object({
       questionId: z.string().uuid(),
       selectedOptionIds: z.array(z.string().uuid()).optional(),
       textAnswer: z.string().optional(),
+      // Matching: prompt option id -> chosen right-hand item handle.
+      matches: z.record(z.string().uuid(), z.string().max(64)).optional(),
     })
   ),
   timeSpentSeconds: z.number().min(0),

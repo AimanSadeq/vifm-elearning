@@ -13,6 +13,9 @@ interface OptionInput {
   optionText: string;
   optionTextAr: string;
   isCorrect: boolean;
+  /** Matching questions: the partner that pairs with optionText. */
+  matchText?: string;
+  matchTextAr?: string;
 }
 
 interface QuestionFormData {
@@ -40,6 +43,7 @@ const QUESTION_TYPES: { value: QuestionType; label: string }[] = [
   { value: "true_false", label: "True / False" },
   { value: "multi_select", label: "Multi-Select" },
   { value: "short_answer", label: "Short Answer" },
+  { value: "matching", label: "Matching (drag to pair)" },
 ];
 
 const DEFAULT_TRUE_FALSE_OPTIONS: OptionInput[] = [
@@ -63,6 +67,7 @@ export function QuestionForm({
   const [imageUrl, setImageUrl] = useState(initialData?.imageUrl ?? "");
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [questionType, setQuestionType] = useState<QuestionType>(
     initialData?.questionType ?? "multiple_choice"
@@ -84,7 +89,8 @@ export function QuestionForm({
           ])
   );
 
-  const showOptions = questionType !== "short_answer";
+  const isMatching = questionType === "matching";
+  const showOptions = questionType !== "short_answer" && !isMatching;
 
   const handleTypeChange = (type: QuestionType) => {
     setQuestionType(type);
@@ -93,13 +99,22 @@ export function QuestionForm({
     } else if (type === "short_answer") {
       // For short answer, keep one "option" as the accepted answer
       setOptions([{ optionText: "", optionTextAr: "", isCorrect: true }]);
+    } else if (type === "matching") {
+      // Each row is a pair; the pairing itself is the answer key, so
+      // isCorrect is always true and never shown to the author.
+      setOptions([
+        { optionText: "", optionTextAr: "", isCorrect: true, matchText: "", matchTextAr: "" },
+        { optionText: "", optionTextAr: "", isCorrect: true, matchText: "", matchTextAr: "" },
+      ]);
     }
   };
 
   const addOption = () => {
     setOptions([
       ...options,
-      { optionText: "", optionTextAr: "", isCorrect: false },
+      isMatching
+        ? { optionText: "", optionTextAr: "", isCorrect: true, matchText: "", matchTextAr: "" }
+        : { optionText: "", optionTextAr: "", isCorrect: false },
     ]);
   };
 
@@ -153,6 +168,22 @@ export function QuestionForm({
   };
 
   const handleFormSubmit = () => {
+    if (isMatching) {
+      // A pair with only one half filled would render as an unanswerable row,
+      // so reject it here rather than let it reach the learner.
+      const filled = options.filter(
+        (o) => o.optionText.trim() && (o.matchText ?? "").trim()
+      );
+      if (filled.length < 2) {
+        setFormError("A matching question needs at least two complete pairs.");
+        return;
+      }
+      if (filled.length !== options.length) {
+        setFormError("Every pair needs both a prompt and its match.");
+        return;
+      }
+    }
+    setFormError(null);
     onSubmit({
       questionText,
       questionTextAr,
@@ -277,6 +308,80 @@ export function QuestionForm({
           />
         </div>
 
+        {/* Matching pairs */}
+        {isMatching && (
+          <div className="space-y-3">
+            <Label>Pairs</Label>
+            <p className="text-xs text-muted-foreground">
+              Each row is one correct pair. The learner sees the left column in
+              this order and the right column shuffled, and drags each item onto
+              its prompt.
+            </p>
+            {options.map((opt, idx) => (
+              <div
+                key={idx}
+                className="flex items-start gap-2 rounded-md border p-3"
+              >
+                <span className="mt-2.5 w-5 shrink-0 text-xs text-muted-foreground">
+                  {idx + 1}
+                </span>
+                <div className="flex-1 grid gap-2 sm:grid-cols-2">
+                  <Input
+                    placeholder="Prompt / left item (EN)"
+                    value={opt.optionText}
+                    onChange={(e) =>
+                      updateOption(idx, "optionText", e.target.value)
+                    }
+                  />
+                  <Input
+                    placeholder="Matches with / right item (EN)"
+                    value={opt.matchText ?? ""}
+                    onChange={(e) =>
+                      updateOption(idx, "matchText", e.target.value)
+                    }
+                  />
+                  <Input
+                    placeholder="Prompt / left item (AR)"
+                    dir="rtl"
+                    value={opt.optionTextAr}
+                    onChange={(e) =>
+                      updateOption(idx, "optionTextAr", e.target.value)
+                    }
+                  />
+                  <Input
+                    placeholder="Matches with / right item (AR)"
+                    dir="rtl"
+                    value={opt.matchTextAr ?? ""}
+                    onChange={(e) =>
+                      updateOption(idx, "matchTextAr", e.target.value)
+                    }
+                  />
+                </div>
+                {options.length > 2 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 text-destructive"
+                    onClick={() => removeOption(idx)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addOption}
+            >
+              <Plus className="h-4 w-4 me-1" />
+              Add Pair
+            </Button>
+          </div>
+        )}
+
         {/* Options */}
         {showOptions && (
           <div className="space-y-3">
@@ -347,7 +452,7 @@ export function QuestionForm({
         )}
 
         {/* Short answer accepted answers */}
-        {!showOptions && (
+        {questionType === "short_answer" && (
           <div className="space-y-2">
             <Label>Accepted Answer(s)</Label>
             <p className="text-xs text-muted-foreground">
@@ -403,6 +508,8 @@ export function QuestionForm({
             />
           </div>
         </div>
+
+        {formError && <p className="text-sm text-destructive">{formError}</p>}
 
         {/* Actions */}
         <div className="flex justify-end gap-2">

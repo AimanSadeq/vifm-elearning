@@ -63,6 +63,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           option_text: opt.optionText,
           option_text_ar: opt.optionTextAr ?? null,
           is_correct: opt.isCorrect,
+          match_text: opt.matchText ?? null,
+          match_text_ar: opt.matchTextAr ?? null,
           sort_order: idx,
         }));
 

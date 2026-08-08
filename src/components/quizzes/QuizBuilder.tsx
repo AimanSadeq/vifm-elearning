@@ -90,7 +90,13 @@ export function QuizBuilder({ courseId, quizId }: QuizBuilderProps) {
     points: number;
     explanation: string;
     explanationAr: string;
-    options: { optionText: string; optionTextAr: string; isCorrect: boolean }[];
+    options: {
+      optionText: string;
+      optionTextAr: string;
+      isCorrect: boolean;
+      matchText?: string;
+      matchTextAr?: string;
+    }[];
   }) {
     setIsSaving(true);
     try {
@@ -237,6 +243,11 @@ export function QuizBuilder({ courseId, quizId }: QuizBuilderProps) {
                         optionText: o.option_text,
                         optionTextAr: o.option_text_ar ?? "",
                         isCorrect: o.is_correct,
+                        // Carry the matching half through, otherwise editing a
+                        // matching question saves back an empty right column
+                        // (PUT replaces the whole option set).
+                        matchText: o.match_text ?? "",
+                        matchTextAr: o.match_text_ar ?? "",
                       })),
                     }
                   : undefined

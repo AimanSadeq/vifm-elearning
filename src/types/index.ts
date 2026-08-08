@@ -19,7 +19,8 @@ export type QuestionType =
   | "multiple_choice"
   | "true_false"
   | "short_answer"
-  | "multi_select";
+  | "multi_select"
+  | "matching";
 export type NotificationChannel = "email" | "whatsapp" | "in_app";
 export type WebinarStatus = "scheduled" | "live" | "completed" | "cancelled";
 export type ForumPostType = "question" | "discussion" | "announcement";
@@ -313,6 +314,8 @@ export interface QuizQuestion {
   created_at: string;
   // Relations
   options?: QuizOption[];
+  /** Matching questions only, learner-facing: the shuffled right-hand column. */
+  match_options?: QuizMatchOption[];
 }
 
 export interface QuizOption {
@@ -322,6 +325,18 @@ export interface QuizOption {
   option_text_ar?: string | null;
   is_correct: boolean;
   sort_order: number;
+  /** Matching questions: the right-hand item paired with option_text.
+   *  Stripped from learner payloads — see `match_options` on the question. */
+  match_text?: string | null;
+  match_text_ar?: string | null;
+}
+
+/** Right-hand item of a matching question as sent to the learner: shuffled,
+ *  and keyed by an opaque handle so the pairing can't be read off the wire. */
+export interface QuizMatchOption {
+  key: string;
+  text: string;
+  text_ar?: string | null;
 }
 
 export interface QuizAttempt {
