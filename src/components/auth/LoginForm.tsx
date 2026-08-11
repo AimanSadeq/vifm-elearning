@@ -330,7 +330,11 @@ export function LoginForm() {
       <p className="text-center text-sm text-muted-foreground">
         {t("noAccount")}{" "}
         <Link
-          href={`/${locale}/register`}
+          href={
+            rawRedirect
+              ? `/${locale}/register?redirect=${encodeURIComponent(redirectTo)}`
+              : `/${locale}/register`
+          }
           className="font-medium text-brand-600 hover:underline"
         >
           {t("signUp")}

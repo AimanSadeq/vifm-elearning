@@ -85,9 +85,12 @@ export async function middleware(request: NextRequest) {
   // --- 4. Authentication check ---
   if (!user) {
     const loginUrl = new URL(`/${locale}/login`, request.url);
+    // Keep the query string: a shared voucher link is
+    // /courses/x/checkout?voucher=CODE, and dropping the search would send the
+    // learner back to a bare checkout with the code lost.
     const safePath =
       pathname.startsWith("/") && !pathname.startsWith("//")
-        ? pathname
+        ? `${pathname}${request.nextUrl.search}`
         : `/${locale}/dashboard`;
     loginUrl.searchParams.set("redirect", safePath);
 

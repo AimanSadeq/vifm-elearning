@@ -114,7 +114,20 @@ export async function POST(request: NextRequest) {
     phone: phone || null,
     language: preferredLanguage,
   };
-  const redirectTo = `${APP_URL}/api/auth/callback`;
+
+  // Optional post-confirmation destination (e.g. a shared voucher checkout link
+  // the visitor opened before signing up). Only same-origin relative paths —
+  // the callback re-validates before redirecting.
+  const rawNext = (body as { next?: unknown } | null)?.next;
+  const next =
+    typeof rawNext === "string" &&
+    rawNext.startsWith("/") &&
+    !rawNext.startsWith("//")
+      ? rawNext
+      : null;
+  const redirectTo = next
+    ? `${APP_URL}/api/auth/callback?next=${encodeURIComponent(next)}`
+    : `${APP_URL}/api/auth/callback`;
 
   let hashedToken = await generateSignupLink(
     admin,

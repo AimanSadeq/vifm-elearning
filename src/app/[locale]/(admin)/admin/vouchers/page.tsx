@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { reportSupabaseError } from "@/lib/utils/supabase-error";
@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { VoucherForm } from "@/components/admin/VoucherForm";
+import { VoucherLinkDialog } from "@/components/admin/VoucherLinkDialog";
 import { formatDate } from "@/lib/utils/formatters";
 import type { VoucherInput } from "@/lib/utils/validators";
 import type { Voucher, VoucherType } from "@/types";
@@ -25,6 +26,7 @@ export default function AdminVouchersPage() {
   const [editingVoucher, setEditingVoucher] = useState<Voucher | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [page, setPage] = useState(0);
+  const [linkVoucher, setLinkVoucher] = useState<Voucher | null>(null);
 
   useEffect(() => {
     fetchVouchers();
@@ -197,9 +199,19 @@ export default function AdminVouchersPage() {
     {
       key: "actions",
       header: "",
-      className: "w-32",
+      className: "w-40",
       render: (item) => (
         <div className="flex gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            title="Share checkout link"
+            onClick={() => setLinkVoucher(item)}
+            disabled={!item.is_active}
+          >
+            <Link2 className="h-4 w-4" />
+          </Button>
           <Button
             variant="ghost"
             size="sm"
@@ -296,6 +308,14 @@ export default function AdminVouchersPage() {
           />
         </CardContent>
       </Card>
+
+      <VoucherLinkDialog
+        open={linkVoucher !== null}
+        onOpenChange={(open) => {
+          if (!open) setLinkVoucher(null);
+        }}
+        voucher={linkVoucher}
+      />
     </div>
   );
 }

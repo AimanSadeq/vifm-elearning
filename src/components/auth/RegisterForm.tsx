@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +15,15 @@ import { Label } from "@/components/ui/label";
 export function RegisterForm() {
   const t = useTranslations("auth");
   const locale = useLocale();
+  // Carried over from a protected link the visitor tried to open (e.g. a shared
+  // voucher checkout link). It rides the confirmation email so the learner lands
+  // on that page once the account is activated.
+  const searchParams = useSearchParams();
+  const rawRedirect = searchParams.get("redirect");
+  const next =
+    rawRedirect && rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")
+      ? rawRedirect
+      : null;
 
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +47,7 @@ export function RegisterForm() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(next ? { ...data, next } : data),
       });
 
       if (!res.ok) {
@@ -79,7 +89,11 @@ export function RegisterForm() {
           </p>
         </div>
         <Link
-          href={`/${locale}/login`}
+          href={
+            next
+              ? `/${locale}/login?redirect=${encodeURIComponent(next)}`
+              : `/${locale}/login`
+          }
           className="text-sm font-medium text-brand-600 hover:underline"
         >
           {t("signIn")}
@@ -207,7 +221,11 @@ export function RegisterForm() {
       <p className="text-center text-sm text-muted-foreground">
         {t("hasAccount")}{" "}
         <Link
-          href={`/${locale}/login`}
+          href={
+            next
+              ? `/${locale}/login?redirect=${encodeURIComponent(next)}`
+              : `/${locale}/login`
+          }
           className="font-medium text-brand-600 hover:underline"
         >
           {t("signIn")}
