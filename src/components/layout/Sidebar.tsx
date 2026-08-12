@@ -118,6 +118,7 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
             { label: "Revenue", href: "/admin/analytics/revenue" },
             { label: "Learners", href: "/admin/analytics/learners" },
             { label: "Courses", href: "/admin/analytics/courses" },
+            { label: "Effectiveness", href: "/admin/analytics/effectiveness" },
           ],
         },
         { icon: Trophy, label: t("admin.badges"), href: "/admin/badges" },
