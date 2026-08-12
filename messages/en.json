@@ -288,6 +288,7 @@
   "corporate": {
     "dashboard": "Corporate Dashboard",
     "employees": "Employees",
+    "trainingAssignments": "Training Assignments",
     "teamProgress": "Team Progress",
     "licenses": "Licenses",
     "invoices": "Invoices",

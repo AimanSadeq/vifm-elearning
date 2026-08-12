@@ -29,6 +29,12 @@ interface BulkAssignTrainingDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  /**
+   * POST target. The corporate console passes its own org-scoped route;
+   * defaults to the super-admin route. The learner list is scoped
+   * server-side by /api/admin/profiles either way.
+   */
+  endpoint?: string;
 }
 
 interface TargetOption {
@@ -47,6 +53,7 @@ export function BulkAssignTrainingDialog({
   open,
   onOpenChange,
   onSuccess,
+  endpoint = "/api/admin/training-assignments",
 }: BulkAssignTrainingDialogProps) {
   const [targetType, setTargetType] = useState<"course" | "path">("course");
   const [courses, setCourses] = useState<TargetOption[]>([]);
@@ -173,7 +180,7 @@ export function BulkAssignTrainingDialog({
 
     setIsSubmitting(true);
     try {
-      const res = await fetch("/api/admin/training-assignments", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

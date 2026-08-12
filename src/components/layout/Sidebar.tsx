@@ -59,6 +59,7 @@ function getNavItems(role: UserRole, t: (key: string) => string): NavItem[] {
       return [
         { icon: LayoutDashboard, label: t("corporate.dashboard"), href: "/corporate/dashboard" },
         { icon: Users, label: t("corporate.employees"), href: "/corporate/employees" },
+        { icon: ClipboardCheck, label: t("corporate.trainingAssignments"), href: "/corporate/training-assignments" },
         { icon: BarChart3, label: t("corporate.teamProgress"), href: "/corporate/reports" },
         { icon: Key, label: t("corporate.licenses"), href: "/corporate/licenses" },
         { icon: Receipt, label: t("corporate.invoices"), href: "/corporate/invoices" },

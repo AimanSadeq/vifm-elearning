@@ -288,6 +288,7 @@
   "corporate": {
     "dashboard": "لوحة تحكم المؤسسة",
     "employees": "الموظفون",
+    "trainingAssignments": "التدريبات المسندة",
     "teamProgress": "تقدم الفريق",
     "licenses": "التراخيص",
     "invoices": "الفواتير",
