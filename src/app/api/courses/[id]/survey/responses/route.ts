@@ -32,7 +32,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     );
   }
 
-  const result = await getCourseSurveyForLearner(user.id, courseId);
+  const kind =
+    request.nextUrl.searchParams.get("kind") === "followup"
+      ? ("followup" as const)
+      : ("completion" as const);
+  const result = await getCourseSurveyForLearner(user.id, courseId, kind);
   if (!result)
     return NextResponse.json(
       { error: "Survey not found or inactive" },

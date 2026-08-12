@@ -13,7 +13,7 @@ export async function GET() {
   const { data: surveys, error } = await supabaseAdmin
     .from("course_surveys")
     .select(
-      "id, course_id, title, title_ar, is_required, is_active, created_at, course:courses!course_surveys_course_id_fkey(title, title_ar, slug)"
+      "id, course_id, survey_kind, title, title_ar, is_required, is_active, created_at, course:courses!course_surveys_course_id_fkey(title, title_ar, slug)"
     )
     .order("created_at", { ascending: false });
 

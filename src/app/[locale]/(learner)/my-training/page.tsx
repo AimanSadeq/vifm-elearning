@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarClock, CheckCircle2 } from "lucide-react";
+import { CalendarClock, CheckCircle2, MessageSquareText } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { CourseSurveyModal } from "@/components/learner/CourseSurveyModal";
 
 interface AssignmentItem {
   id: string;
@@ -45,6 +46,11 @@ export default function MyTrainingPage() {
   const [progressMap, setProgressMap] = useState<Map<string, number>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "open" | "completed">("all");
+  // course_id -> followup survey id (active), minus ones already answered
+  const [pendingFollowups, setPendingFollowups] = useState<Set<string>>(
+    new Set(),
+  );
+  const [followupCourseId, setFollowupCourseId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -96,6 +102,40 @@ export default function MyTrainingPage() {
         );
       }
       setProgressMap(map);
+
+      // Follow-up surveys: completed course assignments whose course has an
+      // active follow-up survey the learner hasn't answered yet.
+      const completedCourseIds = items
+        .filter((a) => a.status === "completed" && a.course_id)
+        .map((a) => a.course_id as string);
+      if (completedCourseIds.length > 0) {
+        const { data: fSurveys } = await supabase
+          .from("course_surveys")
+          .select("id, course_id")
+          .eq("survey_kind", "followup")
+          .eq("is_active", true)
+          .in("course_id", completedCourseIds);
+        const surveyRows = fSurveys ?? [];
+        if (surveyRows.length > 0) {
+          const { data: responses } = await supabase
+            .from("survey_responses")
+            .select("survey_id")
+            .eq("user_id", user.id)
+            .in(
+              "survey_id",
+              surveyRows.map((s) => s.id),
+            );
+          const answered = new Set((responses ?? []).map((r) => r.survey_id));
+          setPendingFollowups(
+            new Set(
+              surveyRows
+                .filter((s) => !answered.has(s.id))
+                .map((s) => s.course_id as string),
+            ),
+          );
+        }
+      }
+
       setIsLoading(false);
     }
 
@@ -242,9 +282,21 @@ export default function MyTrainingPage() {
                       )}
                     </div>
 
-                    <div className="shrink-0">
+                    <div className="flex shrink-0 items-center gap-2">
                       {isCompleted ? (
-                        <Badge variant="success">{t("completed")}</Badge>
+                        <>
+                          {a.course_id && pendingFollowups.has(a.course_id) && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setFollowupCourseId(a.course_id)}
+                            >
+                              <MessageSquareText className="me-1.5 h-4 w-4" />
+                              {t("followupSurvey")}
+                            </Button>
+                          )}
+                          <Badge variant="success">{t("completed")}</Badge>
+                        </>
                       ) : (
                         <Link href={href}>
                           <Button size="sm">
@@ -259,6 +311,23 @@ export default function MyTrainingPage() {
             );
           })}
         </div>
+      )}
+
+      {followupCourseId && (
+        <CourseSurveyModal
+          courseId={followupCourseId}
+          kind="followup"
+          required={false}
+          onSubmitted={() => {
+            setPendingFollowups((prev) => {
+              const next = new Set(prev);
+              next.delete(followupCourseId);
+              return next;
+            });
+            setFollowupCourseId(null);
+          }}
+          onClose={() => setFollowupCourseId(null)}
+        />
       )}
     </div>
   );

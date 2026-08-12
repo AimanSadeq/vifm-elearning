@@ -6,7 +6,7 @@ interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
-export async function GET(_req: NextRequest, { params }: RouteParams) {
+export async function GET(req: NextRequest, { params }: RouteParams) {
   const supabase = await createServerSupabase();
   const {
     data: { user },
@@ -15,7 +15,11 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id: courseId } = await params;
-  const result = await getCourseSurveyForLearner(user.id, courseId);
+  const kind =
+    req.nextUrl.searchParams.get("kind") === "followup"
+      ? ("followup" as const)
+      : ("completion" as const);
+  const result = await getCourseSurveyForLearner(user.id, courseId, kind);
   if (!result) return NextResponse.json({ data: null });
 
   return NextResponse.json({

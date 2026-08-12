@@ -16,6 +16,8 @@ import type {
 
 interface Props {
   courseId: string;
+  /** completion (default) or the 90-day followup survey. */
+  kind?: "completion" | "followup";
   /** When false, the modal can be dismissed without submitting. */
   required: boolean;
   /**
@@ -28,6 +30,7 @@ interface Props {
 
 export function CourseSurveyModal({
   courseId,
+  kind = "completion",
   required,
   onSubmitted,
   onClose,
@@ -43,7 +46,7 @@ export function CourseSurveyModal({
 
   useEffect(() => {
     let cancelled = false;
-    fetch(`/api/courses/${courseId}/survey`)
+    fetch(`/api/courses/${courseId}/survey?kind=${kind}`)
       .then((r) => r.json())
       .then((j) => {
         if (cancelled) return;
@@ -68,7 +71,7 @@ export function CourseSurveyModal({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId]);
+  }, [courseId, kind]);
 
   const setAnswer = (qid: string, value: SurveyAnswerValue) => {
     setAnswers((prev) => ({ ...prev, [qid]: value }));
@@ -76,7 +79,7 @@ export function CourseSurveyModal({
 
   const submit = async () => {
     setIsSubmitting(true);
-    const res = await fetch(`/api/courses/${courseId}/survey/responses`, {
+    const res = await fetch(`/api/courses/${courseId}/survey/responses?kind=${kind}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ answers }),

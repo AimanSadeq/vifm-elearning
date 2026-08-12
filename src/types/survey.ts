@@ -4,6 +4,13 @@ export type SurveyQuestionType =
   | "free_text"
   | "nps";
 
+/**
+ * completion = post-course survey (gates cert/badge until submitted).
+ * followup   = Kirkpatrick Level 3 behavior survey, invited ~90 days after
+ *              a training assignment is completed.
+ */
+export type SurveyKind = "completion" | "followup";
+
 export interface SurveyChoice {
   label: string;
   label_ar?: string;
@@ -20,6 +27,7 @@ export interface SurveyOptions {
 export interface CourseSurvey {
   id: string;
   course_id: string;
+  survey_kind: SurveyKind;
   title: string | null;
   title_ar: string | null;
   description: string | null;

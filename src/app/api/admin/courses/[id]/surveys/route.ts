@@ -6,7 +6,14 @@ interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
-export async function GET(_req: NextRequest, { params }: RouteParams) {
+/** ?kind=completion (default) | followup — which of the course's surveys. */
+function surveyKind(req: NextRequest): "completion" | "followup" {
+  return req.nextUrl.searchParams.get("kind") === "followup"
+    ? "followup"
+    : "completion";
+}
+
+export async function GET(req: NextRequest, { params }: RouteParams) {
   const guard = await requireAdmin();
   if (!guard.ok) return guard.response;
 
@@ -16,6 +23,7 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
     .from("course_surveys")
     .select("*")
     .eq("course_id", courseId)
+    .eq("survey_kind", surveyKind(req))
     .maybeSingle();
 
   if (error) {
@@ -42,6 +50,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
   const payload = {
     course_id: courseId,
+    survey_kind: surveyKind(request),
     title: body.title ?? null,
     title_ar: body.title_ar ?? null,
     description: body.description ?? null,
@@ -85,6 +94,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     .from("course_surveys")
     .update(update)
     .eq("course_id", courseId)
+    .eq("survey_kind", surveyKind(request))
     .select("*")
     .single();
 
@@ -92,7 +102,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   return NextResponse.json({ data });
 }
 
-export async function DELETE(_req: NextRequest, { params }: RouteParams) {
+export async function DELETE(req: NextRequest, { params }: RouteParams) {
   const guard = await requireAdmin();
   if (!guard.ok) return guard.response;
 
@@ -100,7 +110,8 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
   const { error } = await supabaseAdmin
     .from("course_surveys")
     .delete()
-    .eq("course_id", courseId);
+    .eq("course_id", courseId)
+    .eq("survey_kind", surveyKind(req));
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });

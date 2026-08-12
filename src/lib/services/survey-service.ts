@@ -3,6 +3,7 @@ import type {
   CourseSurvey,
   SurveyAggregate,
   SurveyAnswers,
+  SurveyKind,
   SurveyQuestion,
   SurveyResponse,
 } from "@/types/survey";
@@ -24,6 +25,7 @@ export async function hasCompletedRequiredSurvey(
     .from("course_surveys")
     .select("id, is_required, is_active")
     .eq("course_id", courseId)
+    .eq("survey_kind", "completion")
     .maybeSingle();
 
   if (!survey) return true;
@@ -58,6 +60,7 @@ export async function getCourseSurveyStatus(
     .from("course_surveys")
     .select("id, is_required, is_active")
     .eq("course_id", courseId)
+    .eq("survey_kind", "completion")
     .maybeSingle();
 
   if (!survey) {
@@ -101,11 +104,13 @@ export interface SurveyWithQuestions {
 export async function getCourseSurveyForLearner(
   userId: string,
   courseId: string,
+  kind: SurveyKind = "completion",
 ): Promise<SurveyWithQuestions | null> {
   const { data: survey } = await supabaseAdmin
     .from("course_surveys")
     .select("*")
     .eq("course_id", courseId)
+    .eq("survey_kind", kind)
     .eq("is_active", true)
     .maybeSingle();
 

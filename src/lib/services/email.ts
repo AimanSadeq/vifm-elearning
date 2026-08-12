@@ -238,6 +238,37 @@ export async function sendTrainingReminderEmail(params: {
 }
 
 /**
+ * Invite a learner to the 90-day follow-up survey for training they
+ * completed (Kirkpatrick Level 3). Transactional. Template key:
+ * `training_followup`.
+ */
+export async function sendTrainingFollowupEmail(params: {
+  to: string;
+  userName: string;
+  trainingTitle: string;
+  surveyUrl: string;
+}): Promise<EmailResult> {
+  const vars = {
+    userName: escapeHtml(params.userName),
+    trainingTitle: escapeHtml(params.trainingTitle),
+    surveyUrl: encodeURI(params.surveyUrl),
+    appUrl: env.NEXT_PUBLIC_APP_URL ?? "",
+  };
+  const tpl = await getEmailTemplate("training_followup");
+  const subject = tpl?.subject
+    ? applyTemplate(tpl.subject, vars)
+    : `How has "${params.trainingTitle}" worked out for you?`;
+  const body = tpl?.html
+    ? applyTemplate(tpl.html, vars)
+    : `<h2>${vars.trainingTitle}</h2>
+       <p>Hi ${vars.userName},</p>
+       <p>It has been about 90 days since you completed this training. We would love to hear how you have applied it in your work. The survey takes 2 minutes.</p>
+       <p><a href="${vars.surveyUrl}" style="display:inline-block;padding:10px 18px;background:#134BA1;color:#fff;text-decoration:none;border-radius:6px;">Take the follow-up survey</a></p>`;
+  const html = `<div style="font-family: system-ui, sans-serif; line-height: 1.5; max-width: 560px;">${body}</div>`;
+  return send(params.to, subject, html);
+}
+
+/**
  * Send a marketing/announcement email, gated on the user's marketing_emails
  * preference. Returns { skipped: true } if the user has opted out — callers
  * should treat this as success (not an error).

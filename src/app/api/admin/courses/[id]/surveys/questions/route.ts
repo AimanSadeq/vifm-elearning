@@ -6,11 +6,21 @@ interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
-async function getSurveyId(courseId: string): Promise<string | null> {
+function surveyKind(req: NextRequest): "completion" | "followup" {
+  return req.nextUrl.searchParams.get("kind") === "followup"
+    ? "followup"
+    : "completion";
+}
+
+async function getSurveyId(
+  courseId: string,
+  kind: "completion" | "followup",
+): Promise<string | null> {
   const { data } = await supabaseAdmin
     .from("course_surveys")
     .select("id")
     .eq("course_id", courseId)
+    .eq("survey_kind", kind)
     .maybeSingle();
   return data?.id ?? null;
 }
@@ -20,7 +30,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   if (!guard.ok) return guard.response;
 
   const { id: courseId } = await params;
-  const surveyId = await getSurveyId(courseId);
+  const surveyId = await getSurveyId(courseId, surveyKind(request));
   if (!surveyId)
     return NextResponse.json(
       { error: "Survey does not exist yet for this course" },
@@ -69,7 +79,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   if (!guard.ok) return guard.response;
 
   const { id: courseId } = await params;
-  const surveyId = await getSurveyId(courseId);
+  const surveyId = await getSurveyId(courseId, surveyKind(request));
   if (!surveyId)
     return NextResponse.json({ error: "Survey not found" }, { status: 404 });
 

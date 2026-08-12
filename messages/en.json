@@ -808,7 +808,8 @@
     "start": "Start",
     "continue": "Continue",
     "progress": "Progress",
-    "completedOn": "Completed on {date}"
+    "completedOn": "Completed on {date}",
+    "followupSurvey": "Follow-up survey"
   },
   "learningPaths": {
     "title": "Learning Paths",

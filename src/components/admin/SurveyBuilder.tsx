@@ -19,6 +19,12 @@ import type {
 
 interface Props {
   courseId: string;
+  /**
+   * completion (default): post-course survey gating the certificate.
+   * followup: Kirkpatrick L3 behavior survey sent ~90 days after an
+   * assigned training is completed.
+   */
+  kind?: "completion" | "followup";
 }
 
 const QUESTION_TYPE_LABELS: Record<SurveyQuestionType, string> = {
@@ -38,7 +44,7 @@ const QUESTION_TYPE_ICONS: Record<
   nps: Smile,
 };
 
-export function SurveyBuilder({ courseId }: Props) {
+export function SurveyBuilder({ courseId, kind = "completion" }: Props) {
   const [survey, setSurvey] = useState<CourseSurvey | null>(null);
   const [questions, setQuestions] = useState<SurveyQuestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,10 +53,11 @@ export function SurveyBuilder({ courseId }: Props) {
     null
   );
   const [previewOpen, setPreviewOpen] = useState(false);
+  const kindParam = `?kind=${kind}`;
 
   const load = async () => {
     setIsLoading(true);
-    const res = await fetch(`/api/admin/courses/${courseId}/surveys`);
+    const res = await fetch(`/api/admin/courses/${courseId}/surveys${kindParam}`);
     const j = await res.json();
     setSurvey(j.data ?? null);
     setQuestions(j.questions ?? []);
@@ -60,20 +67,31 @@ export function SurveyBuilder({ courseId }: Props) {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId]);
+  }, [courseId, kind]);
 
   const createSurvey = async () => {
-    const res = await fetch(`/api/admin/courses/${courseId}/surveys`, {
+    const res = await fetch(`/api/admin/courses/${courseId}/surveys${kindParam}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: "Course Feedback",
-        title_ar: "تقييم الدورة",
-        description:
-          "Help us improve share your experience with this course.",
-        is_required: true,
-        is_active: true,
-      }),
+      body: JSON.stringify(
+        kind === "followup"
+          ? {
+              title: "90-Day Follow-Up",
+              title_ar: "متابعة بعد 90 يوما",
+              description:
+                "Tell us how you have applied this training in your work.",
+              is_required: false,
+              is_active: true,
+            }
+          : {
+              title: "Course Feedback",
+              title_ar: "تقييم الدورة",
+              description:
+                "Help us improve share your experience with this course.",
+              is_required: true,
+              is_active: true,
+            },
+      ),
     });
     const j = await res.json();
     if (!res.ok) {
@@ -85,7 +103,7 @@ export function SurveyBuilder({ courseId }: Props) {
   };
 
   const saveSurveyMeta = async (patch: Partial<CourseSurvey>) => {
-    const res = await fetch(`/api/admin/courses/${courseId}/surveys`, {
+    const res = await fetch(`/api/admin/courses/${courseId}/surveys${kindParam}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(patch),
@@ -105,7 +123,7 @@ export function SurveyBuilder({ courseId }: Props) {
       )
     )
       return;
-    const res = await fetch(`/api/admin/courses/${courseId}/surveys`, {
+    const res = await fetch(`/api/admin/courses/${courseId}/surveys${kindParam}`, {
       method: "DELETE",
     });
     if (!res.ok) {
@@ -192,6 +210,7 @@ export function SurveyBuilder({ courseId }: Props) {
         {showQuestionForm && (
           <QuestionEditor
             courseId={courseId}
+            kind={kind}
             initial={editingQuestion}
             onClose={() => {
               setShowQuestionForm(false);
@@ -412,11 +431,13 @@ function SurveyMetaForm({
 
 function QuestionEditor({
   courseId,
+  kind,
   initial,
   onClose,
   onSaved,
 }: {
   courseId: string;
+  kind: "completion" | "followup";
   initial: SurveyQuestion | null;
   onClose: () => void;
   onSaved: () => void;
@@ -462,7 +483,7 @@ function QuestionEditor({
     setIsSaving(true);
     const url = initial
       ? `/api/admin/courses/${courseId}/surveys/questions/${initial.id}`
-      : `/api/admin/courses/${courseId}/surveys/questions`;
+      : `/api/admin/courses/${courseId}/surveys/questions?kind=${kind}`;
     const res = await fetch(url, {
       method: initial ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
