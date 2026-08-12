@@ -1,0 +1,61 @@
+name: Cron - daily maintenance
+
+# Triggers the app's three maintenance endpoints once a day:
+#
+#   training-reminders    completion sync + due-date reminder emails
+#                         (throttled per assignment to at most one per 6 days)
+#   training-followups    Kirkpatrick L3 (90-day) and L4 (180-day) survey
+#                         invitations (followup_sent_at / impact_sent_at guards)
+#   designation-status    CPE designation transitions active -> grace ->
+#                         suspended -> lapsed (set-based, idempotent, no dry mode)
+#
+# All three are idempotent, so an occasional duplicate run is harmless.
+# Requires the CRON_SECRET repo secret to match CRON_SECRET on Render.
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 06:00 Riyadh, daily
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: "Dry run (preview only; designation-status is skipped because it has no dry mode)"
+        type: boolean
+        default: false
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: POST cron endpoints
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          DRY: ${{ inputs.dry }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::CRON_SECRET repo secret is not set"
+            exit 1
+          fi
+          BASE="https://elearning.viftraining.com/api/cron"
+          FAILED=0
+          for route in training-reminders training-followups designation-status; do
+            URL="$BASE/$route"
+            if [ "$DRY" = "true" ]; then
+              if [ "$route" = "designation-status" ]; then
+                echo "== $route: SKIPPED (no dry mode)"
+                continue
+              fi
+              URL="$URL?dry=1"
+            fi
+            echo "== $route"
+            HTTP_CODE=$(curl -sS -o response.json -w "%{http_code}" \
+              -X POST -H "x-cron-secret: $CRON_SECRET" "$URL" || echo "000")
+            echo "HTTP $HTTP_CODE"
+            cat response.json 2>/dev/null || true
+            echo
+            if [ "$HTTP_CODE" != "200" ]; then
+              echo "::error::$route returned HTTP $HTTP_CODE"
+              FAILED=1
+            fi
+          done
+          exit $FAILED
