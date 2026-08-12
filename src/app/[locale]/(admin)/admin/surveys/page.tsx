@@ -24,6 +24,8 @@ interface SurveyRow {
   is_active: boolean;
   created_at: string;
   response_count: number;
+  /** Follow-up surveys only: learners invited by the followups cron. Null for completion surveys. */
+  invited_count: number | null;
   course: { title: string; title_ar: string | null; slug: string } | null;
 }
 
@@ -97,7 +99,19 @@ export default function AdminSurveysPage() {
       key: "responses",
       header: "Responses",
       render: (r) => (
-        <span className="text-sm font-medium">{r.response_count}</span>
+        <div>
+          <span className="text-sm font-medium">{r.response_count}</span>
+          {r.invited_count !== null && (
+            <p className="text-xs text-muted-foreground">
+              of {r.invited_count} invited
+              {r.invited_count > 0 &&
+                ` (${Math.min(
+                  100,
+                  Math.round((r.response_count / r.invited_count) * 100),
+                )}%)`}
+            </p>
+          )}
+        </div>
       ),
     },
     {
