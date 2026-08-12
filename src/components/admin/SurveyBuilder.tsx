@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CourseSurveyModal } from "@/components/learner/CourseSurveyModal";
 import type {
   CourseSurvey,
+  SurveyKind,
   SurveyOptions,
   SurveyQuestion,
   SurveyQuestionType,
@@ -23,8 +24,9 @@ interface Props {
    * completion (default): post-course survey gating the certificate.
    * followup: Kirkpatrick L3 behavior survey sent ~90 days after an
    * assigned training is completed.
+   * impact: Kirkpatrick L4 results survey sent ~180 days after.
    */
-  kind?: "completion" | "followup";
+  kind?: SurveyKind;
 }
 
 const QUESTION_TYPE_LABELS: Record<SurveyQuestionType, string> = {
@@ -80,6 +82,15 @@ export function SurveyBuilder({ courseId, kind = "completion" }: Props) {
               title_ar: "متابعة بعد 90 يوما",
               description:
                 "Tell us how you have applied this training in your work.",
+              is_required: false,
+              is_active: true,
+            }
+          : kind === "impact"
+          ? {
+              title: "6-Month Impact",
+              title_ar: "قياس الأثر بعد 6 أشهر",
+              description:
+                "Tell us what measurable results this training has produced for you and your organization.",
               is_required: false,
               is_active: true,
             }
@@ -437,7 +448,7 @@ function QuestionEditor({
   onSaved,
 }: {
   courseId: string;
-  kind: "completion" | "followup";
+  kind: SurveyKind;
   initial: SurveyQuestion | null;
   onClose: () => void;
   onSaved: () => void;

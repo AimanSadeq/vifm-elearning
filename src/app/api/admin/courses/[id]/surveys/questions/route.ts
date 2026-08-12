@@ -1,20 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api/require-admin";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { parseSurveyKind, type SurveyKind } from "@/types/survey";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
-function surveyKind(req: NextRequest): "completion" | "followup" {
-  return req.nextUrl.searchParams.get("kind") === "followup"
-    ? "followup"
-    : "completion";
+function surveyKind(req: NextRequest): SurveyKind {
+  return parseSurveyKind(req.nextUrl.searchParams.get("kind"));
 }
 
 async function getSurveyId(
   courseId: string,
-  kind: "completion" | "followup",
+  kind: SurveyKind,
 ): Promise<string | null> {
   const { data } = await supabaseAdmin
     .from("course_surveys")

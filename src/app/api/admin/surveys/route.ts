@@ -35,20 +35,25 @@ export async function GET() {
     countMap.set(r.survey_id, (countMap.get(r.survey_id) ?? 0) + 1);
   }
 
-  // Follow-up surveys: how many learners the followups cron has invited so
-  // far (per course), so the UI can show a Kirkpatrick L3 response rate.
-  const followupCourseIds = surveys
-    .filter((s) => s.survey_kind === "followup")
-    .map((s) => s.course_id);
+  // Follow-up/impact surveys: how many learners the cron has invited so far
+  // (per course), so the UI can show Kirkpatrick L3/L4 response rates.
   const invitedMap = new Map<string, number>();
-  if (followupCourseIds.length > 0) {
+  for (const [kind, stampColumn] of [
+    ["followup", "followup_sent_at"],
+    ["impact", "impact_sent_at"],
+  ] as const) {
+    const courseIds = surveys
+      .filter((s) => s.survey_kind === kind)
+      .map((s) => s.course_id);
+    if (courseIds.length === 0) continue;
     const { data: invited } = await supabaseAdmin
       .from("training_assignments")
       .select("course_id")
-      .in("course_id", followupCourseIds)
-      .not("followup_sent_at", "is", null);
+      .in("course_id", courseIds)
+      .not(stampColumn, "is", null);
     for (const r of invited ?? []) {
-      invitedMap.set(r.course_id, (invitedMap.get(r.course_id) ?? 0) + 1);
+      const key = `${r.course_id}:${kind}`;
+      invitedMap.set(key, (invitedMap.get(key) ?? 0) + 1);
     }
   }
 
@@ -57,7 +62,9 @@ export async function GET() {
       ...s,
       response_count: countMap.get(s.id) ?? 0,
       invited_count:
-        s.survey_kind === "followup" ? (invitedMap.get(s.course_id) ?? 0) : null,
+        s.survey_kind === "followup" || s.survey_kind === "impact"
+          ? (invitedMap.get(`${s.course_id}:${s.survey_kind}`) ?? 0)
+          : null,
     })),
   });
 }

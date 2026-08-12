@@ -8,8 +8,14 @@ export type SurveyQuestionType =
  * completion = post-course survey (gates cert/badge until submitted).
  * followup   = Kirkpatrick Level 3 behavior survey, invited ~90 days after
  *              a training assignment is completed.
+ * impact     = Kirkpatrick Level 4 results survey, invited ~180 days after
+ *              a training assignment is completed.
  */
-export type SurveyKind = "completion" | "followup";
+export type SurveyKind = "completion" | "followup" | "impact";
+
+export function parseSurveyKind(value: string | null): SurveyKind {
+  return value === "followup" || value === "impact" ? value : "completion";
+}
 
 export interface SurveyChoice {
   label: string;

@@ -10,14 +10,15 @@ import type {
   CourseSurvey,
   SurveyAnswers,
   SurveyAnswerValue,
+  SurveyKind,
   SurveyQuestion,
   SurveyResponse,
 } from "@/types/survey";
 
 interface Props {
   courseId: string;
-  /** completion (default) or the 90-day followup survey. */
-  kind?: "completion" | "followup";
+  /** completion (default), the 90-day followup, or the 180-day impact survey. */
+  kind?: SurveyKind;
   /** When false, the modal can be dismissed without submitting. */
   required: boolean;
   /**

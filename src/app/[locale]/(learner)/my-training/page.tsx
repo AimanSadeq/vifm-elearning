@@ -46,11 +46,13 @@ export default function MyTrainingPage() {
   const [progressMap, setProgressMap] = useState<Map<string, number>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "open" | "completed">("all");
-  // course_id -> followup survey id (active), minus ones already answered
+  // course_ids with an active followup/impact survey the learner hasn't answered
   const [pendingFollowups, setPendingFollowups] = useState<Set<string>>(
     new Set(),
   );
+  const [pendingImpacts, setPendingImpacts] = useState<Set<string>>(new Set());
   const [followupCourseId, setFollowupCourseId] = useState<string | null>(null);
+  const [impactCourseId, setImpactCourseId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -103,16 +105,17 @@ export default function MyTrainingPage() {
       }
       setProgressMap(map);
 
-      // Follow-up surveys: completed course assignments whose course has an
-      // active follow-up survey the learner hasn't answered yet.
+      // Follow-up (L3) and impact (L4) surveys: completed course assignments
+      // whose course has an active survey of that kind the learner hasn't
+      // answered yet.
       const completedCourseIds = items
         .filter((a) => a.status === "completed" && a.course_id)
         .map((a) => a.course_id as string);
       if (completedCourseIds.length > 0) {
         const { data: fSurveys } = await supabase
           .from("course_surveys")
-          .select("id, course_id")
-          .eq("survey_kind", "followup")
+          .select("id, course_id, survey_kind")
+          .in("survey_kind", ["followup", "impact"])
           .eq("is_active", true)
           .in("course_id", completedCourseIds);
         const surveyRows = fSurveys ?? [];
@@ -126,10 +129,18 @@ export default function MyTrainingPage() {
               surveyRows.map((s) => s.id),
             );
           const answered = new Set((responses ?? []).map((r) => r.survey_id));
+          const pending = surveyRows.filter((s) => !answered.has(s.id));
           setPendingFollowups(
             new Set(
-              surveyRows
-                .filter((s) => !answered.has(s.id))
+              pending
+                .filter((s) => s.survey_kind === "followup")
+                .map((s) => s.course_id as string),
+            ),
+          );
+          setPendingImpacts(
+            new Set(
+              pending
+                .filter((s) => s.survey_kind === "impact")
                 .map((s) => s.course_id as string),
             ),
           );
@@ -295,6 +306,16 @@ export default function MyTrainingPage() {
                               {t("followupSurvey")}
                             </Button>
                           )}
+                          {a.course_id && pendingImpacts.has(a.course_id) && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setImpactCourseId(a.course_id)}
+                            >
+                              <MessageSquareText className="me-1.5 h-4 w-4" />
+                              {t("impactSurvey")}
+                            </Button>
+                          )}
                           <Badge variant="success">{t("completed")}</Badge>
                         </>
                       ) : (
@@ -327,6 +348,23 @@ export default function MyTrainingPage() {
             setFollowupCourseId(null);
           }}
           onClose={() => setFollowupCourseId(null)}
+        />
+      )}
+
+      {impactCourseId && (
+        <CourseSurveyModal
+          courseId={impactCourseId}
+          kind="impact"
+          required={false}
+          onSubmitted={() => {
+            setPendingImpacts((prev) => {
+              const next = new Set(prev);
+              next.delete(impactCourseId);
+              return next;
+            });
+            setImpactCourseId(null);
+          }}
+          onClose={() => setImpactCourseId(null)}
         />
       )}
     </div>

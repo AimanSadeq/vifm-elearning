@@ -6,10 +6,13 @@ import type { SurveyAnswers } from "@/types/survey";
 /**
  * Training effectiveness (Kirkpatrick) rollup for admin analytics.
  *
- * For every course that has a follow-up survey, compares Level 1
- * (completion-survey reaction) against Level 3 (follow-up applied-behavior)
- * ratings, alongside invitation/response funnel numbers from the
- * training-followups cron, plus a 12-month trend of follow-up responses.
+ * For every course that has a follow-up (L3) or impact (L4) survey, reports
+ * the four Kirkpatrick levels side by side:
+ *   L1 reaction  : completion-survey rating/NPS
+ *   L2 learning  : best-attempt quiz scores
+ *   L3 behavior  : follow-up survey rating/NPS + invitation funnel
+ *   L4 results   : impact survey rating/NPS + invitation funnel
+ * plus a 12-month trend of follow-up responses.
  */
 
 interface SurveyScore {
@@ -76,53 +79,198 @@ function scoreSurvey(
   };
 }
 
+interface LearningScore {
+  /** Mean of each learner's best attempt percentage per quiz (0-100). */
+  avgScore: number | null;
+  /** Share of learner-quiz pairs with at least one passed attempt (0-100). */
+  passRate: number | null;
+  learners: number;
+}
+
+/**
+ * Level 2 (learning): best-attempt quiz scores per course, from completed
+ * attempts on published quizzes. Attempts are paginated past the 1000-row cap.
+ */
+async function loadLearningScores(
+  courseIds: string[],
+): Promise<Map<string, LearningScore>> {
+  const scores = new Map<string, LearningScore>();
+  const { data: quizzes } = await supabaseAdmin
+    .from("quizzes")
+    .select("id, course_id")
+    .eq("is_published", true)
+    .in("course_id", courseIds);
+  if (!quizzes || quizzes.length === 0) return scores;
+
+  const quizCourse = new Map(quizzes.map((q) => [q.id, q.course_id]));
+  const quizIds = quizzes.map((q) => q.id);
+
+  type AttemptRow = {
+    quiz_id: string;
+    user_id: string;
+    percentage: number | null;
+    passed: boolean | null;
+  };
+  const attempts: AttemptRow[] = [];
+  const pageSize = 1000;
+  for (let from = 0; ; from += pageSize) {
+    const { data } = await supabaseAdmin
+      .from("quiz_attempts")
+      .select("quiz_id, user_id, percentage, passed")
+      .in("quiz_id", quizIds)
+      .not("completed_at", "is", null)
+      .range(from, from + pageSize - 1);
+    if (!data || data.length === 0) break;
+    attempts.push(...(data as AttemptRow[]));
+    if (data.length < pageSize) break;
+  }
+
+  // Best attempt per (quiz, user) pair.
+  const best = new Map<string, { pct: number | null; passed: boolean }>();
+  for (const a of attempts) {
+    const key = `${a.quiz_id}:${a.user_id}`;
+    const prev = best.get(key);
+    const pct = a.percentage === null ? null : Number(a.percentage);
+    best.set(key, {
+      pct:
+        prev?.pct === undefined || prev.pct === null
+          ? pct
+          : pct === null
+            ? prev.pct
+            : Math.max(prev.pct, pct),
+      passed: (prev?.passed ?? false) || Boolean(a.passed),
+    });
+  }
+
+  const perCourse = new Map<
+    string,
+    { pcts: number[]; passed: number; pairs: number; users: Set<string> }
+  >();
+  for (const [key, b] of best) {
+    const [quizId, userId] = key.split(":");
+    const courseId = quizCourse.get(quizId);
+    if (!courseId) continue;
+    let entry = perCourse.get(courseId);
+    if (!entry) {
+      entry = { pcts: [], passed: 0, pairs: 0, users: new Set() };
+      perCourse.set(courseId, entry);
+    }
+    entry.pairs++;
+    entry.users.add(userId);
+    if (b.pct !== null && Number.isFinite(b.pct)) entry.pcts.push(b.pct);
+    if (b.passed) entry.passed++;
+  }
+
+  for (const [courseId, e] of perCourse) {
+    scores.set(courseId, {
+      avgScore: e.pcts.length
+        ? e.pcts.reduce((s, n) => s + n, 0) / e.pcts.length
+        : null,
+      passRate: e.pairs > 0 ? Math.round((e.passed / e.pairs) * 100) : null,
+      learners: e.users.size,
+    });
+  }
+  return scores;
+}
+
+async function countInvited(
+  courseIds: string[],
+  stampColumn: "followup_sent_at" | "impact_sent_at",
+): Promise<Map<string, number>> {
+  const map = new Map<string, number>();
+  if (courseIds.length === 0) return map;
+  const { data } = await supabaseAdmin
+    .from("training_assignments")
+    .select("course_id")
+    .in("course_id", courseIds)
+    .not(stampColumn, "is", null);
+  for (const r of data ?? []) {
+    map.set(r.course_id, (map.get(r.course_id) ?? 0) + 1);
+  }
+  return map;
+}
+
+const rate = (responded: number, invited: number): number | null =>
+  invited > 0 ? Math.min(100, Math.round((responded / invited) * 100)) : null;
+
 export async function GET() {
   const guard = await requireAdmin();
   if (!guard.ok) return guard.response;
 
-  const { data: followups, error } = await supabaseAdmin
+  type CourseRef = { title: string | null; title_ar: string | null };
+  const { data: surveyRows, error } = await supabaseAdmin
     .from("course_surveys")
     .select(
-      "id, course_id, is_active, course:courses!course_surveys_course_id_fkey(title, title_ar)",
+      "id, course_id, survey_kind, is_active, course:courses!course_surveys_course_id_fkey(title, title_ar)",
     )
-    .eq("survey_kind", "followup");
+    .in("survey_kind", ["followup", "impact"]);
 
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });
 
-  if (!followups || followups.length === 0) {
+  if (!surveyRows || surveyRows.length === 0) {
     return NextResponse.json({
-      totals: { invited: 0, responded: 0, responseRate: 0, avgFollowupRating: null },
+      totals: {
+        invited: 0,
+        responded: 0,
+        responseRate: 0,
+        avgLearningScore: null,
+        avgFollowupRating: null,
+      },
       courses: [],
       monthly: [],
     });
   }
 
-  const courseIds = followups.map((f) => f.course_id);
+  const pickOne = <T,>(v: T | T[] | null | undefined): T | null =>
+    Array.isArray(v) ? (v[0] ?? null) : (v ?? null);
 
-  const [{ data: completions }, { data: invitedRows }] = await Promise.all([
+  interface CourseEntry {
+    course: CourseRef | null;
+    followupId: string | null;
+    impactId: string | null;
+    isActive: boolean;
+  }
+  const byCourse = new Map<string, CourseEntry>();
+  for (const row of surveyRows) {
+    let entry = byCourse.get(row.course_id);
+    if (!entry) {
+      entry = {
+        course: pickOne(row.course as unknown as CourseRef | CourseRef[] | null),
+        followupId: null,
+        impactId: null,
+        isActive: false,
+      };
+      byCourse.set(row.course_id, entry);
+    }
+    if (row.survey_kind === "followup") entry.followupId = row.id;
+    if (row.survey_kind === "impact") entry.impactId = row.id;
+    entry.isActive = entry.isActive || Boolean(row.is_active);
+  }
+  const courseIds = [...byCourse.keys()];
+
+  const [
+    { data: completions },
+    followupInvited,
+    impactInvited,
+    learningByCourse,
+  ] = await Promise.all([
     supabaseAdmin
       .from("course_surveys")
       .select("id, course_id")
       .eq("survey_kind", "completion")
       .in("course_id", courseIds),
-    supabaseAdmin
-      .from("training_assignments")
-      .select("course_id")
-      .in("course_id", courseIds)
-      .not("followup_sent_at", "is", null),
+    countInvited(courseIds, "followup_sent_at"),
+    countInvited(courseIds, "impact_sent_at"),
+    loadLearningScores(courseIds),
   ]);
 
   const completionByCourse = new Map(
     (completions ?? []).map((c) => [c.course_id, c.id]),
   );
-  const invitedByCourse = new Map<string, number>();
-  for (const r of invitedRows ?? []) {
-    invitedByCourse.set(r.course_id, (invitedByCourse.get(r.course_id) ?? 0) + 1);
-  }
 
   const surveyIds = [
-    ...followups.map((f) => f.id),
+    ...surveyRows.map((s) => s.id),
     ...(completions ?? []).map((c) => c.id),
   ];
 
@@ -141,37 +289,44 @@ export async function GET() {
   const qs = (questions ?? []) as QuestionRef[];
   const rs = (responses ?? []) as ResponseRef[];
 
-  const pickOne = <T,>(v: T | T[] | null | undefined): T | null =>
-    Array.isArray(v) ? (v[0] ?? null) : (v ?? null);
-
-  const courses = followups.map((f) => {
-    type CourseRef = { title: string | null; title_ar: string | null };
-    const course = pickOne(f.course as unknown as CourseRef | CourseRef[] | null);
-    const invited = invitedByCourse.get(f.course_id) ?? 0;
-    const followup = scoreSurvey(f.id, qs, rs);
+  const courses = courseIds.map((courseId) => {
+    const entry = byCourse.get(courseId) as CourseEntry;
+    const invited = followupInvited.get(courseId) ?? 0;
+    const followup = scoreSurvey(entry.followupId, qs, rs);
+    const impact = scoreSurvey(entry.impactId, qs, rs);
     const completion = scoreSurvey(
-      completionByCourse.get(f.course_id) ?? null,
+      completionByCourse.get(courseId) ?? null,
       qs,
       rs,
     );
+    const invitedImpact = impactInvited.get(courseId) ?? 0;
     return {
-      courseId: f.course_id,
-      title: course?.title ?? "—",
-      titleAr: course?.title_ar ?? null,
-      isActive: f.is_active,
+      courseId,
+      title: entry.course?.title ?? "—",
+      titleAr: entry.course?.title_ar ?? null,
+      isActive: entry.isActive,
       invited,
       responded: followup.responses,
-      responseRate:
-        invited > 0
-          ? Math.min(100, Math.round((followup.responses / invited) * 100))
-          : null,
+      responseRate: entry.followupId ? rate(followup.responses, invited) : null,
       completion,
+      learning: learningByCourse.get(courseId) ?? {
+        avgScore: null,
+        passRate: null,
+        learners: 0,
+      },
       followup,
+      impact,
+      impactInvited: invitedImpact,
+      impactResponseRate: entry.impactId
+        ? rate(impact.responses, invitedImpact)
+        : null,
     };
   });
 
   // 12-month trend of follow-up responses (count + avg rating per month).
-  const followupIds = new Set(followups.map((f) => f.id));
+  const followupIds = new Set(
+    surveyRows.filter((s) => s.survey_kind === "followup").map((s) => s.id),
+  );
   const followupRatingQs = qs.filter(
     (q) => followupIds.has(q.survey_id) && q.question_type === "rating",
   );
@@ -201,12 +356,26 @@ export async function GET() {
   const totalResponded = courses.reduce((s, c) => s + c.responded, 0);
   const allFollowupRatings = courses
     .map((c) => c.followup)
-    .filter((f) => f.avgRating !== null);
+    .filter((f) => f.avgRating !== null && f.responses > 0);
   const avgFollowupRating = allFollowupRatings.length
     ? allFollowupRatings.reduce(
         (s, f) => s + (f.avgRating as number) * f.responses,
         0,
       ) / allFollowupRatings.reduce((s, f) => s + f.responses, 0)
+    : null;
+
+  const learningRows = courses.filter((c) => c.learning.avgScore !== null);
+  const learningWeight = learningRows.reduce(
+    (s, c) => s + Math.max(1, c.learning.learners),
+    0,
+  );
+  const avgLearningScore = learningRows.length
+    ? learningRows.reduce(
+        (s, c) =>
+          s +
+          (c.learning.avgScore as number) * Math.max(1, c.learning.learners),
+        0,
+      ) / learningWeight
     : null;
 
   return NextResponse.json({
@@ -217,6 +386,7 @@ export async function GET() {
         totalInvited > 0
           ? Math.min(100, Math.round((totalResponded / totalInvited) * 100))
           : 0,
+      avgLearningScore,
       avgFollowupRating,
     },
     courses,

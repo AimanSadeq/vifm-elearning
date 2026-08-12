@@ -809,7 +809,8 @@
     "continue": "متابعة",
     "progress": "التقدم",
     "completedOn": "اكتمل في {date}",
-    "followupSurvey": "استبيان المتابعة"
+    "followupSurvey": "استبيان المتابعة",
+    "impactSurvey": "استبيان الأثر"
   },
   "learningPaths": {
     "title": "مسارات التعلم",

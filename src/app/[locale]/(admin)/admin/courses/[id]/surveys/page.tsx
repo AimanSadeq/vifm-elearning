@@ -12,7 +12,9 @@ export default function AdminCourseSurveyPage() {
   const params = useParams();
   const courseId = params.id as string;
   const locale = useLocale();
-  const [kind, setKind] = useState<"completion" | "followup">("completion");
+  const [kind, setKind] = useState<"completion" | "followup" | "impact">(
+    "completion",
+  );
 
   return (
     <div className="space-y-6">
@@ -27,12 +29,18 @@ export default function AdminCourseSurveyPage() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">
-            {kind === "completion" ? "Course Survey" : "90-Day Follow-Up Survey"}
+            {kind === "completion"
+              ? "Course Survey"
+              : kind === "followup"
+                ? "90-Day Follow-Up Survey"
+                : "6-Month Impact Survey"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {kind === "completion"
               ? "Shown to learners after they complete the course. When marked required, blocks the certificate and badge until submitted."
-              : "Sent to learners about 90 days after they complete assigned training, to measure how they applied it at work (Kirkpatrick Level 3)."}
+              : kind === "followup"
+                ? "Sent to learners about 90 days after they complete assigned training, to measure how they applied it at work (Kirkpatrick Level 3)."
+                : "Sent to learners about 180 days after they complete assigned training, to measure business results the training produced (Kirkpatrick Level 4)."}
           </p>
         </div>
         <div className="flex shrink-0 gap-1 rounded-lg border p-1">
@@ -40,6 +48,7 @@ export default function AdminCourseSurveyPage() {
             [
               ["completion", "Completion"],
               ["followup", "Follow-Up"],
+              ["impact", "Impact"],
             ] as const
           ).map(([k, label]) => (
             <Button

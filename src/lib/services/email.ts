@@ -268,6 +268,32 @@ export async function sendTrainingFollowupEmail(params: {
   return send(params.to, subject, html);
 }
 
+export async function sendTrainingImpactEmail(params: {
+  to: string;
+  userName: string;
+  trainingTitle: string;
+  surveyUrl: string;
+}): Promise<EmailResult> {
+  const vars = {
+    userName: escapeHtml(params.userName),
+    trainingTitle: escapeHtml(params.trainingTitle),
+    surveyUrl: encodeURI(params.surveyUrl),
+    appUrl: env.NEXT_PUBLIC_APP_URL ?? "",
+  };
+  const tpl = await getEmailTemplate("training_impact");
+  const subject = tpl?.subject
+    ? applyTemplate(tpl.subject, vars)
+    : `What results has "${params.trainingTitle}" produced?`;
+  const body = tpl?.html
+    ? applyTemplate(tpl.html, vars)
+    : `<h2>${vars.trainingTitle}</h2>
+       <p>Hi ${vars.userName},</p>
+       <p>It has been about 6 months since you completed this training. We would love to hear what measurable results it has produced for you and your organization. The survey takes 2 minutes.</p>
+       <p><a href="${vars.surveyUrl}" style="display:inline-block;padding:10px 18px;background:#134BA1;color:#fff;text-decoration:none;border-radius:6px;">Take the impact survey</a></p>`;
+  const html = `<div style="font-family: system-ui, sans-serif; line-height: 1.5; max-width: 560px;">${body}</div>`;
+  return send(params.to, subject, html);
+}
+
 /**
  * Send a marketing/announcement email, gated on the user's marketing_emails
  * preference. Returns { skipped: true } if the user has opted out — callers

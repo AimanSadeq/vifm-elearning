@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api/require-admin";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { parseSurveyKind, type SurveyKind } from "@/types/survey";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
-/** ?kind=completion (default) | followup — which of the course's surveys. */
-function surveyKind(req: NextRequest): "completion" | "followup" {
-  return req.nextUrl.searchParams.get("kind") === "followup"
-    ? "followup"
-    : "completion";
+/** ?kind=completion (default) | followup | impact — which of the course's surveys. */
+function surveyKind(req: NextRequest): SurveyKind {
+  return parseSurveyKind(req.nextUrl.searchParams.get("kind"));
 }
 
 export async function GET(req: NextRequest, { params }: RouteParams) {

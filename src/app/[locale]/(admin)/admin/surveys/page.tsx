@@ -17,7 +17,7 @@ import type {
 interface SurveyRow {
   id: string;
   course_id: string;
-  survey_kind: "completion" | "followup";
+  survey_kind: "completion" | "followup" | "impact";
   title: string | null;
   title_ar: string | null;
   is_required: boolean;
@@ -78,8 +78,20 @@ export default function AdminSurveysPage() {
       key: "kind",
       header: "Type",
       render: (r) => (
-        <Badge variant={r.survey_kind === "followup" ? "info" : "secondary"}>
-          {r.survey_kind === "followup" ? "90-Day Follow-Up" : "Completion"}
+        <Badge
+          variant={
+            r.survey_kind === "followup"
+              ? "info"
+              : r.survey_kind === "impact"
+                ? "warning"
+                : "secondary"
+          }
+        >
+          {r.survey_kind === "followup"
+            ? "90-Day Follow-Up"
+            : r.survey_kind === "impact"
+              ? "6-Month Impact"
+              : "Completion"}
         </Badge>
       ),
     },

@@ -6,6 +6,7 @@ import {
   upsertResponse,
   validateAnswers,
 } from "@/lib/services/survey-service";
+import { parseSurveyKind } from "@/types/survey";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -32,10 +33,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     );
   }
 
-  const kind =
-    request.nextUrl.searchParams.get("kind") === "followup"
-      ? ("followup" as const)
-      : ("completion" as const);
+  const kind = parseSurveyKind(request.nextUrl.searchParams.get("kind"));
   const result = await getCourseSurveyForLearner(user.id, courseId, kind);
   if (!result)
     return NextResponse.json(

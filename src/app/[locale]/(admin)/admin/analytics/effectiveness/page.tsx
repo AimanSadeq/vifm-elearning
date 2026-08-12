@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Send, ClipboardCheck, Percent, Star, Download } from "lucide-react";
+import {
+  Send,
+  ClipboardCheck,
+  Percent,
+  Star,
+  GraduationCap,
+  Download,
+} from "lucide-react";
 import { StatCard } from "@/components/analytics/StatCard";
 import { EffectivenessTrendChart } from "@/components/analytics/charts/EffectivenessTrendChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +25,12 @@ interface SurveyScore {
   nps: number | null;
 }
 
+interface LearningScore {
+  avgScore: number | null;
+  passRate: number | null;
+  learners: number;
+}
+
 interface CourseEffectivenessRow {
   courseId: string;
   title: string;
@@ -27,7 +40,11 @@ interface CourseEffectivenessRow {
   responded: number;
   responseRate: number | null;
   completion: SurveyScore;
+  learning: LearningScore;
   followup: SurveyScore;
+  impact: SurveyScore;
+  impactInvited: number;
+  impactResponseRate: number | null;
 }
 
 interface EffectivenessData {
@@ -35,6 +52,7 @@ interface EffectivenessData {
     invited: number;
     responded: number;
     responseRate: number;
+    avgLearningScore: number | null;
     avgFollowupRating: number | null;
   };
   courses: CourseEffectivenessRow[];
@@ -66,6 +84,7 @@ export default function EffectivenessAnalyticsPage() {
     invited: 0,
     responded: 0,
     responseRate: 0,
+    avgLearningScore: null,
     avgFollowupRating: null,
   };
   const courses = data?.courses ?? [];
@@ -98,6 +117,27 @@ export default function EffectivenessAnalyticsPage() {
             <span className="ml-1 text-xs text-muted-foreground">
               ({r.responseRate}%)
             </span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "l2",
+      header: "Learning (L2)",
+      render: (r) => (
+        <div className="text-sm">
+          {r.learning.avgScore === null ? (
+            <span className="text-muted-foreground">—</span>
+          ) : (
+            <>
+              {Math.round(r.learning.avgScore)}%
+              {r.learning.passRate !== null && (
+                <p className="text-xs text-muted-foreground">
+                  {r.learning.passRate}% pass · {r.learning.learners} learner
+                  {r.learning.learners === 1 ? "" : "s"}
+                </p>
+              )}
+            </>
           )}
         </div>
       ),
@@ -137,6 +177,27 @@ export default function EffectivenessAnalyticsPage() {
       ),
     },
     {
+      key: "l4",
+      header: "Results avg (L4)",
+      render: (r) => (
+        <div className="text-sm">
+          {fmtRating(r.impact.avgRating)}
+          {r.impact.avgRating !== null && (
+            <span className="text-xs text-muted-foreground"> /5</span>
+          )}
+          {r.impact.nps !== null && (
+            <p className="text-xs text-muted-foreground">NPS {r.impact.nps}</p>
+          )}
+          {r.impactInvited > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {r.impact.responses} of {r.impactInvited} invited
+              {r.impactResponseRate !== null && ` (${r.impactResponseRate}%)`}
+            </p>
+          )}
+        </div>
+      ),
+    },
+    {
       key: "delta",
       header: "Δ L3−L1",
       render: (r) => {
@@ -167,8 +228,9 @@ export default function EffectivenessAnalyticsPage() {
             Training Effectiveness
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Kirkpatrick evaluation: reaction at completion (Level 1) vs.
-            behavior applied at work ~90 days later (Level 3).
+            Kirkpatrick evaluation: reaction at completion (L1), quiz learning
+            (L2), behavior applied ~90 days later (L3), and business results
+            ~180 days later (L4).
           </p>
         </div>
         <Button
@@ -182,9 +244,15 @@ export default function EffectivenessAnalyticsPage() {
                 responded: c.responded,
                 response_rate: c.responseRate ?? "",
                 reaction_avg_l1: c.completion.avgRating ?? "",
+                learning_avg_l2: c.learning.avgScore ?? "",
+                learning_pass_rate_l2: c.learning.passRate ?? "",
                 applied_avg_l3: c.followup.avgRating ?? "",
+                results_avg_l4: c.impact.avgRating ?? "",
+                impact_invited: c.impactInvited,
+                impact_responded: c.impact.responses,
                 nps_l1: c.completion.nps ?? "",
                 nps_l3: c.followup.nps ?? "",
+                nps_l4: c.impact.nps ?? "",
               })),
               "training-effectiveness",
               [
@@ -193,9 +261,15 @@ export default function EffectivenessAnalyticsPage() {
                 { key: "responded", header: "Responded" },
                 { key: "response_rate", header: "Response rate %" },
                 { key: "reaction_avg_l1", header: "Reaction avg (L1)" },
+                { key: "learning_avg_l2", header: "Learning avg % (L2)" },
+                { key: "learning_pass_rate_l2", header: "Pass rate % (L2)" },
                 { key: "applied_avg_l3", header: "Applied avg (L3)" },
+                { key: "results_avg_l4", header: "Results avg (L4)" },
+                { key: "impact_invited", header: "Impact invited" },
+                { key: "impact_responded", header: "Impact responded" },
                 { key: "nps_l1", header: "NPS (L1)" },
                 { key: "nps_l3", header: "NPS (L3)" },
+                { key: "nps_l4", header: "NPS (L4)" },
               ],
             )
           }
@@ -205,7 +279,7 @@ export default function EffectivenessAnalyticsPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
           icon={Send}
           label="Follow-Ups Invited"
@@ -224,6 +298,17 @@ export default function EffectivenessAnalyticsPage() {
           icon={Percent}
           label="Response Rate"
           value={`${totals.responseRate}%`}
+        />
+        <StatCard
+          icon={GraduationCap}
+          label="Avg Learning Score (L2)"
+          value={
+            totals.avgLearningScore === null
+              ? "—"
+              : `${Math.round(totals.avgLearningScore)}%`
+          }
+          color="text-info"
+          bg="bg-info/10"
         />
         <StatCard
           icon={Star}

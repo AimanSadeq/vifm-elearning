@@ -809,7 +809,8 @@
     "continue": "Continue",
     "progress": "Progress",
     "completedOn": "Completed on {date}",
-    "followupSurvey": "Follow-up survey"
+    "followupSurvey": "Follow-up survey",
+    "impactSurvey": "Impact survey"
   },
   "learningPaths": {
     "title": "Learning Paths",
