@@ -1,104 +1,84 @@
-"use client";
+import type { Metadata } from "next";
+import { createServerSupabase } from "@/lib/supabase/server";
+import CourseDetailClient from "./CourseDetailClient";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { createClient } from "@/lib/supabase/client";
-import { useAuth } from "@/lib/hooks/useAuth";
-import { CourseDetail } from "@/components/courses/CourseDetail";
-import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
-import type { Course, Module } from "@/types";
+interface PageProps {
+  params: Promise<{ locale: string; slug: string }>;
+}
+
+/**
+ * Server wrapper for the course detail page. Its sole job is to emit
+ * per-course SEO metadata (title, description, canonical, hreflang, OG image)
+ * via `generateMetadata` — without it, every course inherited the parent
+ * `courses/layout.tsx` metadata ("All Courses", canonical `/courses`), so all
+ * courses shared one title and canonicalised to the catalogue.
+ *
+ * The interactive UI still lives in the client component, which reads the slug
+ * from the route and fetches its own data. This wrapper renders it unchanged.
+ */
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const isAr = locale === "ar";
+
+  const supabase = await createServerSupabase();
+  const { data: course } = await supabase
+    .from("courses")
+    .select(
+      "title, title_ar, description, description_ar, short_description, short_description_ar, thumbnail_url",
+    )
+    .eq("slug", slug)
+    .eq("status", "published")
+    .maybeSingle();
+
+  const canonical = `/${locale}/courses/${slug}`;
+  const languages = {
+    en: `/en/courses/${slug}`,
+    ar: `/ar/courses/${slug}`,
+  };
+
+  // Unknown / unpublished slug: keep it out of the index rather than emit a
+  // misleading catalogue title. The client component renders its own
+  // "Course not found" state.
+  if (!course) {
+    return {
+      title: isAr ? "الدورة غير موجودة" : "Course Not Found",
+      robots: { index: false, follow: true },
+      alternates: { canonical, languages },
+    };
+  }
+
+  const title =
+    (isAr ? course.title_ar : course.title) || course.title || "Course";
+  const description =
+    (isAr
+      ? course.short_description_ar || course.description_ar
+      : course.short_description || course.description) ||
+    (isAr
+      ? "دورة تدريبية احترافية من أكاديمية VIFM."
+      : "A professional training course from VIFM Academy.");
+
+  const image = course.thumbnail_url || undefined;
+
+  return {
+    title,
+    description,
+    alternates: { canonical, languages },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      type: "website",
+      locale: isAr ? "ar_AE" : "en_US",
+      ...(image ? { images: [{ url: image }] } : {}),
+    },
+    ...(image
+      ? { twitter: { card: "summary_large_image", title, description, images: [image] } }
+      : {}),
+  };
+}
 
 export default function CourseDetailPage() {
-  const params = useParams();
-  const slug = params.slug as string;
-  const t = useTranslations("common");
-  const { user } = useAuth();
-
-  const [course, setCourse] = useState<Course | null>(null);
-  const [modules, setModules] = useState<Module[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  const isAdmin = user?.role === "super_admin";
-
-  useEffect(() => {
-    async function fetchCourseDetail() {
-      const supabase = createClient();
-
-      // Fetch course — admins can view any status, others only published
-      let query = supabase
-        .from("courses")
-        .select(
-          `
-          *,
-          category:categories(id, name, name_ar, slug, color),
-          instructor:profiles!courses_instructor_id_fkey(full_name, full_name_ar, avatar_url)
-        `
-        )
-        .eq("slug", slug);
-
-      if (!isAdmin) {
-        query = query.eq("status", "published");
-      }
-
-      const { data: courseData, error: courseError } = await query.single();
-
-      if (courseError || !courseData) {
-        setError(true);
-        setIsLoading(false);
-        return;
-      }
-
-      setCourse(courseData as Course);
-
-      // Fetch modules with lessons
-      const { data: modulesData } = await supabase
-        .from("modules")
-        .select(
-          `
-          *,
-          lessons(*)
-        `
-        )
-        .eq("course_id", courseData.id)
-        .order("sort_order", { ascending: true });
-
-      if (modulesData) {
-        // Sort lessons within each module
-        const sortedModules = modulesData.map((mod) => ({
-          ...mod,
-          lessons: (mod.lessons ?? []).sort(
-            (a: { sort_order: number }, b: { sort_order: number }) =>
-              a.sort_order - b.sort_order
-          ),
-        }));
-        setModules(sortedModules as Module[]);
-      }
-
-      setIsLoading(false);
-    }
-
-    if (slug) fetchCourseDetail();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug, isAdmin]);
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
-  if (error || !course) {
-    return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center text-center">
-        <h1 className="font-heading text-2xl font-bold">{t("error")}</h1>
-        <p className="mt-2 text-muted-foreground">Course not found.</p>
-      </div>
-    );
-  }
-
-  return <CourseDetail course={course} modules={modules} />;
+  return <CourseDetailClient />;
 }
