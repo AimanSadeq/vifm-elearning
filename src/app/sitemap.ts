@@ -5,16 +5,18 @@ import { APP_URL } from "@/lib/env";
 const SITE_URL = APP_URL;
 const LOCALES = ["en", "ar"] as const;
 
+// Only paths that resolve to real, indexable content. Deliberately excluded:
+//   /categories, /blog — no index route exists (hard 404)
+//   /pricing, /learning-paths — currently client-redirect to home when no
+//     plans/paths are configured, so listing them creates duplicate-of-home
+//     entries. Per-slug /categories/<slug> and /learning-paths/<slug> URLs are
+//     still emitted below from live data when they exist.
 const STATIC_PATHS = [
   "",
   "/courses",
-  "/categories",
-  "/learning-paths",
   "/webinars",
-  "/pricing",
   "/about",
   "/contact",
-  "/blog",
 ];
 
 export const revalidate = 3600;

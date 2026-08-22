@@ -62,6 +62,25 @@ export default function CheckoutPage() {
         .single();
 
       if (data) {
+        // Already enrolled? Skip checkout entirely and send them to the
+        // course — paying a second time for a course they own would be a
+        // duplicate charge. (The payment APIs also reject this server-side.)
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user) {
+          const { data: enrollment } = await supabase
+            .from("enrollments")
+            .select("id")
+            .eq("user_id", user.id)
+            .eq("course_id", data.id)
+            .maybeSingle();
+          if (enrollment) {
+            router.replace(`/${locale}/courses/${slug}/learn`);
+            return;
+          }
+        }
+
         setCourse(data as Course);
         setFinalPrice(Number(data.price));
       }
@@ -69,7 +88,7 @@ export default function CheckoutPage() {
     }
 
     if (slug) fetchCourse();
-  }, [slug]);
+  }, [slug, locale, router]);
 
   const handleApplyPromo = async () => {
     if (!promoCode || !course) return;

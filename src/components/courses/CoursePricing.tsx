@@ -33,7 +33,10 @@ export function CoursePricing({
 
   const handleEnroll = async () => {
     if (!user) {
-      router.push(`/${locale}/login`);
+      // Preserve the course the visitor was about to enrol in so login can
+      // return them here instead of dropping them on the dashboard.
+      const returnTo = `/${locale}/courses/${course.slug}`;
+      router.push(`/${locale}/login?redirect=${encodeURIComponent(returnTo)}`);
       return;
     }
 
