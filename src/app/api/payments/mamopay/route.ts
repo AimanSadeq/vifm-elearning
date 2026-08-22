@@ -168,6 +168,21 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
 
+    // Guard against a duplicate purchase: an already-enrolled learner who
+    // reaches checkout (e.g. via a stale link or the browser back button)
+    // must not be charged again.
+    const { data: existingEnrollment } = await supabaseAdmin
+      .from("enrollments")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("course_id", courseId)
+      .maybeSingle();
+    if (existingEnrollment)
+      return NextResponse.json(
+        { error: "Already enrolled" },
+        { status: 400 }
+      );
+
     const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("full_name, email")
