@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -33,25 +33,51 @@ interface UserFormDialogProps {
   onSuccess: () => void;
 }
 
+const EMPTY_VALUES: UserFormInput = {
+  email: "",
+  full_name: "",
+  full_name_ar: "",
+  phone: "",
+  role: "learner",
+  organization_id: null,
+  department: "",
+  language: "en",
+  is_active: true,
+  password: "",
+};
+
 export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserFormDialogProps) {
   const isEditing = !!user;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<UserFormInput>({
     resolver: zodResolver(isEditing ? userFormSchema : userCreateSchema),
-    defaultValues: {
-      email: user?.email ?? "",
-      full_name: user?.full_name ?? "",
-      full_name_ar: user?.full_name_ar ?? "",
-      phone: user?.phone ?? "",
-      role: user?.role ?? "learner",
-      organization_id: user?.organization_id ?? null,
-      department: user?.department ?? "",
-      language: user?.language ?? "en",
-      is_active: user?.is_active ?? true,
-      password: "",
-    },
+    defaultValues: EMPTY_VALUES,
   });
+
+  // The dialog stays mounted across opens, so `defaultValues` are only read
+  // once. Re-seed the form every time it opens (or the selected user changes)
+  // or an edit would render a blank form and fail validation on save.
+  const { reset } = form;
+  useEffect(() => {
+    if (!open) return;
+    reset(
+      user
+        ? {
+            email: user.email ?? "",
+            full_name: user.full_name ?? "",
+            full_name_ar: user.full_name_ar ?? "",
+            phone: user.phone ?? "",
+            role: user.role ?? "learner",
+            organization_id: user.organization_id ?? null,
+            department: user.department ?? "",
+            language: user.language ?? "en",
+            is_active: user.is_active ?? true,
+            password: "",
+          }
+        : EMPTY_VALUES
+    );
+  }, [open, user, reset]);
 
   const onSubmit = async (data: UserFormInput) => {
     setIsSubmitting(true);

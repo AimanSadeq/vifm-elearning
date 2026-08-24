@@ -375,7 +375,14 @@ const userFormBase = {
 
 export const userFormSchema = z.object({
   ...userFormBase,
-  password: z.string().min(8, "Password must be at least 8 characters").optional(),
+  // Edit form leaves this blank to keep the current password, so an empty
+  // string has to pass — only a non-empty value is length-checked.
+  password: z
+    .union([
+      z.string().min(8, "Password must be at least 8 characters"),
+      z.literal(""),
+    ])
+    .optional(),
 });
 
 export const userCreateSchema = z.object({
