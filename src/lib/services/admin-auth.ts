@@ -89,3 +89,22 @@ export async function adminOwnsLesson(
   if (!lesson?.course_id) return false;
   return adminOwnsCourse(admin, lesson.course_id);
 }
+
+/**
+ * Confirms the admin owns the module's parent course (or is super_admin).
+ */
+export async function adminOwnsModule(
+  admin: AuthorizedAdmin,
+  moduleId: string
+): Promise<boolean> {
+  if (admin.role === "super_admin") return true;
+
+  const { data: mod } = await supabaseAdmin
+    .from("modules")
+    .select("course_id")
+    .eq("id", moduleId)
+    .maybeSingle();
+
+  if (!mod?.course_id) return false;
+  return adminOwnsCourse(admin, mod.course_id);
+}

@@ -51,6 +51,7 @@ import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import { DraggableModuleSection } from './DraggableModuleSection'
 import { AddModuleDialog } from './AddModuleDialog'
+import { EditModuleDialog } from './EditModuleDialog'
 import { AddContentDialog } from './AddContentDialog'
 import { BulkUploadVideosDialog } from './BulkUploadVideosDialog'
 import { EditContentDialog } from './EditContentDialog'
@@ -74,6 +75,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
   const [showAddContent, setShowAddContent] = useState<string | null>(null) // moduleId
   const [showBulkUpload, setShowBulkUpload] = useState<string | null>(null) // moduleId
   const [showAddModule, setShowAddModule] = useState(false)
+  const [editingModule, setEditingModule] = useState<Module | null>(null)
   const [previewLesson, setPreviewLesson] = useState<Lesson | null>(null)
   const [previewVideoSrc, setPreviewVideoSrc] = useState<string | null>(null)
   const [isResolvingPreview, setIsResolvingPreview] = useState(false)
@@ -619,7 +621,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable) return
-      if (e.key !== 'Escape' && (showAddContent || showAddModule || editingLesson || previewLesson || deleteConfirmation || deleteModuleConfirmation)) return
+      if (e.key !== 'Escape' && (showAddContent || showAddModule || editingModule || editingLesson || previewLesson || deleteConfirmation || deleteModuleConfirmation)) return
 
       switch (e.key.toLowerCase()) {
         case 'n':
@@ -632,6 +634,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
           e.preventDefault()
           if (showAddContent) setShowAddContent(null)
           if (showAddModule) setShowAddModule(false)
+          if (editingModule) setEditingModule(null)
           if (editingLesson) setEditingLesson(null)
           if (previewLesson) setPreviewLesson(null)
           if (deleteConfirmation) setDeleteConfirmation(null)
@@ -649,7 +652,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [activeTab, showAddContent, showAddModule, editingLesson, previewLesson, deleteConfirmation, deleteModuleConfirmation, isEditing])
+  }, [activeTab, showAddContent, showAddModule, editingModule, editingLesson, previewLesson, deleteConfirmation, deleteModuleConfirmation, isEditing])
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -1157,6 +1160,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
                       onToggle={toggleModule}
                       onAddLesson={(moduleId) => setShowAddContent(moduleId)}
                       onBulkUpload={(moduleId) => setShowBulkUpload(moduleId)}
+                      onEditModule={(m) => setEditingModule(m)}
                       onDeleteModule={(id, title, lessonCount) =>
                         setDeleteModuleConfirmation({ id, title, lessonCount })
                       }
@@ -1230,6 +1234,18 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
           onClose={() => setShowAddModule(false)}
           onSuccess={() => {
             setShowAddModule(false)
+            refreshModules()
+          }}
+        />
+      )}
+
+      {/* Edit Module Dialog */}
+      {editingModule && (
+        <EditModuleDialog
+          module={editingModule}
+          onClose={() => setEditingModule(null)}
+          onSuccess={() => {
+            setEditingModule(null)
             refreshModules()
           }}
         />

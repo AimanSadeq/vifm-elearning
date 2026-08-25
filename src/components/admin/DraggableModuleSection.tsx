@@ -22,6 +22,7 @@ import {
   Clock,
   GripVertical,
   Loader2,
+  Pencil,
   Plus,
   Star,
   Trash2,
@@ -40,6 +41,7 @@ interface DraggableModuleSectionProps {
   onToggle: (moduleId: string) => void
   onAddLesson: (moduleId: string) => void
   onBulkUpload: (moduleId: string) => void
+  onEditModule: (module: Module & { lessons: Lesson[] }) => void
   onDeleteModule: (moduleId: string, title: string, lessonCount: number) => void
   onLessonDragEnd: (event: DragEndEvent, moduleId: string) => void
   onLessonPreview: (lesson: Lesson) => void
@@ -61,6 +63,7 @@ export function DraggableModuleSection({
   onToggle,
   onAddLesson,
   onBulkUpload,
+  onEditModule,
   onDeleteModule,
   onLessonDragEnd,
   onLessonPreview,
@@ -203,6 +206,14 @@ export function DraggableModuleSection({
               <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Bulk Upload Videos</span>
               <span className="sm:hidden">Bulk</span>
+            </button>
+            <button
+              onClick={() => onEditModule(mod)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-card text-muted-foreground shadow-sm ring-1 ring-border transition-all hover:bg-muted hover:text-foreground hover:shadow-md"
+              title="Edit module name"
+              aria-label={`Edit ${mod.title ?? mod.title_ar ?? "module"}`}
+            >
+              <Pencil className="h-4 w-4" />
             </button>
             <button
               onClick={() => onDeleteModule(mod.id, mod.title ?? mod.title_ar ?? "Untitled module", mod.lessons.length)}
