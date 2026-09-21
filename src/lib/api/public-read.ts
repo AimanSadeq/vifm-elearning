@@ -44,12 +44,18 @@ export function paging(url: URL, { defaultLimit = 20, maxLimit = 50 } = {}) {
 }
 
 /**
- * Escapes a value going into a PostgREST `or=(…ilike…)` filter.
+ * Quotes a value going into a PostgREST `or=(…ilike…)` filter.
  *
  * Unescaped commas and parentheses in a search term do not error — they change
- * the filter's structure, which is how a search box becomes a query-injection
- * point. The app hit exactly this and now escapes on its side too.
+ * the filter's *structure*, which is how a search box becomes a query-injection
+ * point.
+ *
+ * Backslash-escaping them is NOT the fix: PostgREST answers
+ * `failed to parse logic tree` and the search silently returns nothing. The
+ * mechanism it actually defines is to wrap the value in double quotes, escaping
+ * any embedded quote or backslash. (The Flutter client already did this
+ * correctly; this helper did not, and a search for `a,b)c` returned zero rows.)
  */
 export function escapeFilterValue(value: string): string {
-  return value.replace(/[(),\\]/g, (c) => `\\${c}`);
+  return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
 }

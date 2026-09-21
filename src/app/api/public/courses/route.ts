@@ -41,6 +41,7 @@ export async function GET(request: NextRequest) {
 
   const search = url.searchParams.get("search")?.trim();
   if (search) {
+    // The quotes wrap the whole pattern, wildcards included.
     const term = escapeFilterValue(`%${search}%`);
     query = query.or(`title.ilike.${term},title_ar.ilike.${term}`);
   }
