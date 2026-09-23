@@ -17,13 +17,14 @@ export default function EditCoursePage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [instructors, setInstructors] = useState<{ id: string; full_name: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       const supabase = createClient();
 
       // Fetch course with relations
-      const { data: courseData } = await supabase
+      const { data: courseData, error: courseError } = await supabase
         .from("courses")
         .select(
           `*, category:categories(name, name_ar, slug), instructor:profiles!courses_instructor_id_fkey(full_name, full_name_ar, avatar_url)`
@@ -32,25 +33,36 @@ export default function EditCoursePage() {
         .single();
 
       // Fetch modules with lessons
-      const { data: modulesData } = await supabase
+      const { data: modulesData, error: modulesError } = await supabase
         .from("modules")
         .select("*, lessons(*)")
         .eq("course_id", courseId)
         .order("sort_order", { ascending: true });
 
       // Fetch categories
-      const { data: categoriesData } = await supabase
+      const { data: categoriesData, error: categoriesError } = await supabase
         .from("categories")
         .select("*")
         .eq("is_active", true)
         .order("sort_order");
 
       // Fetch instructors
-      const { data: instructorsData } = await supabase
+      const { data: instructorsData, error: instructorsError } = await supabase
         .from("profiles")
         .select("id, full_name")
         .in("role", ["super_admin", "instructor"])
         .eq("is_active", true);
+
+      // A failed read must not look like an empty course, or admins may
+      // re-create content that still exists.
+      const firstError =
+        courseError || modulesError || categoriesError || instructorsError;
+      if (firstError && firstError.code !== "PGRST116") {
+        console.error("Failed to load course editor data", firstError);
+        setLoadError(firstError.message);
+        setIsLoading(false);
+        return;
+      }
 
       if (courseData) {
         setCourse(courseData as Course);
@@ -79,6 +91,15 @@ export default function EditCoursePage() {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
         <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-2 text-center">
+        <p className="font-medium text-destructive">Could not load this course.</p>
+        <p className="text-sm text-muted-foreground">{loadError}</p>
       </div>
     );
   }
