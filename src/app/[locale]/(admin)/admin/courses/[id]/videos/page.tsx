@@ -69,15 +69,23 @@ function LessonRow({
         setUploadProgress(pct)
       );
 
-      const { error } = await supabase
-        .from("lessons")
-        .update({
+      // Writing to `lessons` from the browser is no longer possible either:
+      // the row policy requires `is_admin()`, which reads the JWT claim rather
+      // than `profiles.role`, so a direct update silently matched no rows.
+      const res = await fetch(`/api/admin/lessons/${lesson.id}/video-url`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        // The route validates duration as a positive int, so omit it rather
+        // than sending null when the browser could not read one.
+        body: JSON.stringify({
           video_url: ticket.path,
-          video_duration_seconds: duration ? Math.round(duration) : null,
-        })
-        .eq("id", lesson.id);
-
-      if (error) throw error;
+          ...(duration ? { video_duration_seconds: Math.round(duration) } : {}),
+        }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error ?? `Could not save the video (${res.status})`);
+      }
 
       toast.success(`Video uploaded for "${(lesson.title ?? lesson.title_ar ?? "Untitled lesson")}"`);
       onVideoUpdated();
@@ -353,14 +361,15 @@ export default function BulkVideosPage() {
   const fetchData = async () => {
     const supabase = createClient();
 
-    const [{ data: courseData }, { data: modulesData }] = await Promise.all([
+    // The curriculum comes from the admin API: `lessons` is not SELECT-able by
+    // `authenticated`, and an embed needs the privilege on the embedded table.
+    const [{ data: courseData }, curriculumRes] = await Promise.all([
       supabase.from("courses").select("*").eq("id", courseId).single(),
-      supabase
-        .from("modules")
-        .select("*, lessons(*)")
-        .eq("course_id", courseId)
-        .order("sort_order", { ascending: true }),
+      fetch(`/api/admin/courses/${courseId}/curriculum`),
     ]);
+    const modulesData = curriculumRes.ok
+      ? ((await curriculumRes.json()).modules as ModuleWithLessons[])
+      : null;
 
     if (courseData) {
       setCourse(courseData as Course);

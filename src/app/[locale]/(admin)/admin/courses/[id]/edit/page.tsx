@@ -32,12 +32,17 @@ export default function EditCoursePage() {
         .eq("id", courseId)
         .single();
 
-      // Fetch modules with lessons
-      const { data: modulesData, error: modulesError } = await supabase
-        .from("modules")
-        .select("*, lessons(*)")
-        .eq("course_id", courseId)
-        .order("sort_order", { ascending: true });
+      // Modules + lessons come from the admin API, not from PostgREST.
+      // `lessons` is no longer SELECT-able by `authenticated`, and an embed
+      // needs the privilege on the embedded table too, so the direct query
+      // returned "permission denied for table lessons".
+      const curriculumRes = await fetch(`/api/admin/courses/${courseId}/curriculum`);
+      const curriculumJson = curriculumRes.ok ? await curriculumRes.json() : null;
+      const modulesData: (Module & { lessons: Lesson[] })[] | null =
+          curriculumJson?.modules ?? null;
+      const modulesError = curriculumRes.ok
+        ? null
+        : { message: curriculumJson?.error ?? `Could not load the curriculum (${curriculumRes.status})`, code: "ADMIN_API" };
 
       // Fetch categories
       const { data: categoriesData, error: categoriesError } = await supabase
@@ -46,12 +51,17 @@ export default function EditCoursePage() {
         .eq("is_active", true)
         .order("sort_order");
 
-      // Fetch instructors
-      const { data: instructorsData, error: instructorsError } = await supabase
-        .from("profiles")
-        .select("id, full_name")
-        .in("role", ["super_admin", "instructor"])
-        .eq("is_active", true);
+      // Instructors likewise: `role` and `is_active` are not granted to
+      // `authenticated`, and PostgREST needs the privilege to FILTER on a
+      // column, not just to return it.
+      const instructorsRes = await fetch(
+        "/api/admin/profiles?roles=super_admin,instructor&isActive=true&pageSize=200"
+      );
+      const instructorsJson = instructorsRes.ok ? await instructorsRes.json() : null;
+      const instructorsData = instructorsJson?.rows ?? null;
+      const instructorsError = instructorsRes.ok
+        ? null
+        : { message: instructorsJson?.error ?? `Could not load instructors (${instructorsRes.status})`, code: "ADMIN_API" };
 
       // A failed read must not look like an empty course, or admins may
       // re-create content that still exists.

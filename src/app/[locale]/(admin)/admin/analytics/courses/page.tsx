@@ -49,17 +49,26 @@ export default function CoursesAnalyticsPage() {
             .eq("status", "published"),
           supabase
             .from("courses")
+            // No `lessons:lessons(count)` embed: an aggregate embed still
+            // needs SELECT on `lessons`, which `authenticated` no longer has.
             .select(
-              "id, title, enrollment_count, average_rating, status, difficulty_level, lessons:lessons(count)"
+              "id, title, enrollment_count, average_rating, status, difficulty_level"
             )
             .order("enrollment_count", { ascending: false }),
         ]);
+
+      const lessonCounts: Record<string, number> = await fetch(
+        "/api/admin/courses/lesson-counts"
+      )
+        .then((r) => (r.ok ? r.json() : null))
+        .then((j) => j?.counts ?? {})
+        .catch(() => ({}));
 
       setTotalCourses(total ?? 0);
       setPublishedCourses(published ?? 0);
 
       const mapped = (coursesData ?? []).map((c: Record<string, unknown>) => {
-        const lessonsRel = c.lessons as Array<{ count: number }> | undefined;
+        const lessonCount = lessonCounts[c.id as string] ?? 0;
         return {
           id: c.id as string,
           title: (c.title as string) || "",
@@ -67,7 +76,7 @@ export default function CoursesAnalyticsPage() {
           average_rating: (c.average_rating as number) || 0,
           status: (c.status as string) || "draft",
           level: (c.difficulty_level as string) || "gateway",
-          lessons_count: lessonsRel?.[0]?.count ?? 0,
+          lessons_count: lessonCount,
         };
       });
 

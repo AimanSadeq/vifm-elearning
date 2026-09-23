@@ -91,21 +91,26 @@ export default function AdminNotificationsPage() {
     let userIds: string[] = [];
     let lookupError: string | null = null;
 
+    // Recipient lookup runs server-side. `is_active`, `role` and `email` are
+    // not granted to `authenticated`, and PostgREST needs the privilege to
+    // FILTER on a column, not only to return it — so all three of these
+    // selects now fail against the table directly.
+    const resolveRecipients = async (params: string) => {
+      const res = await fetch(`/api/admin/profiles/ids?${params}`);
+      const json = await res.json().catch(() => null);
+      if (!res.ok) {
+        lookupError = json?.error ?? `Could not resolve recipients (${res.status})`;
+        return [] as string[];
+      }
+      return (json?.ids ?? []) as string[];
+    };
+
     if (recipientType === "all") {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("is_active", true);
-      lookupError = error?.message ?? null;
-      userIds = (data ?? []).map((u) => u.id);
+      userIds = await resolveRecipients("scope=all");
     } else if (recipientType === "role") {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("role", recipientRole)
-        .eq("is_active", true);
-      lookupError = error?.message ?? null;
-      userIds = (data ?? []).map((u) => u.id);
+      userIds = await resolveRecipients(
+        `scope=role&role=${encodeURIComponent(recipientRole)}`
+      );
     } else {
       const email = recipientEmail.trim();
       if (!email) {
@@ -113,14 +118,7 @@ export default function AdminNotificationsPage() {
         toast.error("Enter a recipient email address.");
         return;
       }
-      // ilike is case-insensitive — admins routinely paste mixed-case
-      // addresses; storing always-lowercase isn't enforced.
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id")
-        .ilike("email", email);
-      lookupError = error?.message ?? null;
-      userIds = (data ?? []).map((u) => u.id);
+      userIds = await resolveRecipients(`scope=email&email=${encodeURIComponent(email)}`);
     }
 
     if (lookupError) {

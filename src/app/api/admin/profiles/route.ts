@@ -117,6 +117,17 @@ export async function GET(req: NextRequest) {
     query = query.eq("role", role);
   }
 
+  // `roles=super_admin,instructor` — the console's "pick an instructor" lists
+  // need more than one, and a second round-trip per role is wasteful.
+  const roles = (p.get("roles") ?? "").split(",").map((r) => r.trim()).filter(Boolean);
+  if (roles.length) {
+    const unknown = roles.filter((r) => !ROLES.includes(r));
+    if (unknown.length) {
+      return NextResponse.json({ error: `Unknown role: ${unknown[0]}` }, { status: 400 });
+    }
+    query = query.in("role", roles);
+  }
+
   const isActive = p.get("isActive");
   if (isActive === "true" || isActive === "false") {
     query = query.eq("is_active", isActive === "true");
