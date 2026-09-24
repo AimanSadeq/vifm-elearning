@@ -15,6 +15,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { setLessonVideo } from "@/lib/api/admin-lessons-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,7 +62,6 @@ function LessonRow({
 
     try {
       const { directUpload } = await import("@/lib/uploads/direct-upload");
-      const supabase = createClient();
 
       const duration = await getVideoDuration(file);
 
@@ -72,20 +72,7 @@ function LessonRow({
       // Writing to `lessons` from the browser is no longer possible either:
       // the row policy requires `is_admin()`, which reads the JWT claim rather
       // than `profiles.role`, so a direct update silently matched no rows.
-      const res = await fetch(`/api/admin/lessons/${lesson.id}/video-url`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        // The route validates duration as a positive int, so omit it rather
-        // than sending null when the browser could not read one.
-        body: JSON.stringify({
-          video_url: ticket.path,
-          ...(duration ? { video_duration_seconds: Math.round(duration) } : {}),
-        }),
-      });
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        throw new Error(body?.error ?? `Could not save the video (${res.status})`);
-      }
+      await setLessonVideo(lesson.id, ticket.path, duration);
 
       toast.success(`Video uploaded for "${(lesson.title ?? lesson.title_ar ?? "Untitled lesson")}"`);
       onVideoUpdated();

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLocale } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
+import { deleteLesson, deleteLessons } from '@/lib/api/admin-lessons-client'
 import { toast } from 'sonner'
 import {
   ArrowLeft,
@@ -221,21 +222,21 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
   }, [previewLesson])
 
   // Re-fetch modules from DB (used after CRUD operations)
+  // Same admin API the edit page loads from: a browser `modules` + `lessons(*)`
+  // embed fails with 42501 now that `authenticated` cannot SELECT `lessons`,
+  // which left the list stale after every add/edit/delete.
   const refreshModules = useCallback(async () => {
-    const supabase = createClient()
-    const { data } = await supabase
-      .from('modules')
-      .select('*, lessons(*)')
-      .eq('course_id', course.id)
-      .order('sort_order', { ascending: true })
-    if (data) {
-      const sorted = data.map((m: Module & { lessons: Lesson[] }) => ({
-        ...m,
-        lessons: (m.lessons || []).sort(
-          (a: Lesson, b: Lesson) => a.sort_order - b.sort_order
-        ),
-      })) as (Module & { lessons: Lesson[] })[]
-      setModules(sorted)
+    try {
+      const res = await fetch(`/api/admin/courses/${course.id}/curriculum`)
+      const json = await res.json().catch(() => null)
+      if (!res.ok) {
+        throw new Error(json?.error ?? `Could not reload the curriculum (${res.status})`)
+      }
+      // The route returns lessons already sorted by sort_order.
+      setModules((json?.modules ?? []) as (Module & { lessons: Lesson[] })[])
+    } catch (error) {
+      console.error('Error refreshing modules:', error)
+      toast.error(error instanceof Error ? error.message : 'Could not reload the curriculum')
     }
   }, [course.id])
 
@@ -440,10 +441,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
   const handleDeleteLesson = async (lessonId: string) => {
     setDeletingLessonId(lessonId)
     try {
-      const supabase = createClient()
-      const { error } = await supabase.from('lessons').delete().eq('id', lessonId)
-
-      if (error) throw error
+      await deleteLesson(lessonId)
 
       toast.success('Lesson deleted successfully')
       setDeleteConfirmation(null)
@@ -455,7 +453,7 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
       refreshModules()
     } catch (error) {
       console.error('Error deleting lesson:', error)
-      toast.error('Failed to delete lesson')
+      toast.error(error instanceof Error ? error.message : 'Failed to delete lesson')
     } finally {
       setDeletingLessonId(null)
     }
@@ -491,16 +489,14 @@ export function CourseEditor({ course, modules: initialModules, categories, inst
     if (ids.length === 0) return
     setIsBulkDeleting(true)
     try {
-      const supabase = createClient()
-      const { error } = await supabase.from('lessons').delete().in('id', ids)
-      if (error) throw error
+      await deleteLessons(ids)
       toast.success(`Deleted ${ids.length} lesson${ids.length === 1 ? '' : 's'}`)
       setBulkDeleteOpen(false)
       clearSelection()
       refreshModules()
     } catch (error) {
       console.error('Error bulk deleting lessons:', error)
-      toast.error('Failed to delete lessons')
+      toast.error(error instanceof Error ? error.message : 'Failed to delete lessons')
     } finally {
       setIsBulkDeleting(false)
     }

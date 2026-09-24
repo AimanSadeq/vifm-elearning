@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { X, Loader2, Upload, Video, FileText, CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { createClient } from '@/lib/supabase/client'
 import { directUpload } from '@/lib/uploads/direct-upload'
+import { updateLesson } from '@/lib/api/admin-lessons-client'
 import type { Lesson } from '@/types'
 
 interface EditContentDialogProps {
@@ -120,8 +120,6 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
     setError('')
 
     try {
-      const supabase = createClient()
-
       const updateData: Record<string, unknown> = {
         title: formData.title.trim() || null,
         title_ar: formData.title_ar.trim() || null,
@@ -169,12 +167,9 @@ export function EditContentDialog({ lesson, onClose, onSuccess }: EditContentDia
         }
       }
 
-      const { error: updateError } = await supabase
-        .from('lessons')
-        .update(updateData)
-        .eq('id', lesson.id)
-
-      if (updateError) throw updateError
+      // Through the admin API: `authenticated` can no longer update `lessons`
+      // directly.
+      await updateLesson(lesson.id, updateData)
 
       toast.success('Lesson updated')
       onSuccess()

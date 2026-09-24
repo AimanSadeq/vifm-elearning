@@ -74,23 +74,14 @@ export function DraggableLessonCard({
   const handleFileUpload = async (file: File) => {
     setIsUploading(true)
     try {
-      const { createClient } = await import('@/lib/supabase/client')
       const { directUpload } = await import('@/lib/uploads/direct-upload')
-      const supabase = createClient()
+      const { setLessonVideo } = await import('@/lib/api/admin-lessons-client')
 
       const duration = await getVideoDuration(file)
 
       const ticket = await directUpload(courseId, 'video', file)
 
-      const { error } = await supabase
-        .from('lessons')
-        .update({
-          video_url: ticket.path,
-          video_duration_seconds: duration ? Math.round(duration) : null,
-        })
-        .eq('id', lesson.id)
-
-      if (error) throw error
+      await setLessonVideo(lesson.id, ticket.path, duration)
       onVideoUploaded?.()
     } catch (err) {
       console.error('Video upload failed:', err)

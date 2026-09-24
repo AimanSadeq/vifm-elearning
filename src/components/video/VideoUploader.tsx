@@ -87,25 +87,13 @@ export function VideoUploader({
 
     try {
       const { directUpload } = await import("@/lib/uploads/direct-upload");
-      const { createClient } = await import("@/lib/supabase/client");
-      const supabase = createClient();
+      const { setLessonVideo } = await import("@/lib/api/admin-lessons-client");
 
       const ticket = await directUpload(courseId, "video", file, (pct) =>
         setProgress(pct)
       );
 
-      const { error: updateError } = await supabase
-        .from("lessons")
-        .update({
-          video_url: ticket.path,
-          video_duration_seconds: duration ? Math.round(duration) : null,
-        })
-        .eq("id", lessonId);
-
-      if (updateError) {
-        setError(updateError.message);
-        return;
-      }
+      await setLessonVideo(lessonId, ticket.path, duration);
 
       setProgress(100);
       onUploadComplete(ticket.path);

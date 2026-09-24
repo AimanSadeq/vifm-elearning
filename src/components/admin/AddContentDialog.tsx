@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
 import { X, Save, Loader2, Video, FileText, ClipboardList } from 'lucide-react'
 import { toast } from 'sonner'
-import { createClient } from '@/lib/supabase/client'
 import { directUpload } from '@/lib/uploads/direct-upload'
+import { createLesson, deleteLesson } from '@/lib/api/admin-lessons-client'
 import type { ContentType } from '@/types'
 
 interface AddContentDialogProps {
@@ -171,8 +171,6 @@ export function AddContentDialog({
     setError(null)
 
     try {
-      const supabase = createClient()
-
       const lessonData: Record<string, unknown> = {
         course_id: courseId,
         module_id: moduleId,
@@ -225,12 +223,9 @@ export function AddContentDialog({
           parseInt(formData.minimum_watch_percentage) || 90
       }
 
-      const { data: insertedLesson, error: insertError } = await supabase
-        .from('lessons')
-        .insert(lessonData)
-        .select('id')
-        .single()
-      if (insertError) throw insertError
+      // Lessons are created through the admin API: `authenticated` can no
+      // longer insert into (or read back from) `lessons` directly.
+      const insertedLesson = await createLesson(lessonData)
 
       // Quiz lessons need a paired `quizzes` row, otherwise learners hitting
       // the lesson see "No quiz found". Auto-create one and link it. If the
@@ -276,7 +271,7 @@ export function AddContentDialog({
         if (!quizRes.ok) {
           // Roll back the lesson so we don't leave a content_type='quiz'
           // row pointing at nothing.
-          await supabase.from('lessons').delete().eq('id', insertedLesson.id)
+          await deleteLesson(insertedLesson.id).catch(() => {})
           throw new Error(
             `Could not auto-create the quiz (${quizJson?.error ?? quizRes.status}). Lesson rolled back try again.`
           )

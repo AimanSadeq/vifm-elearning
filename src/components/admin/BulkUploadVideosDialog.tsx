@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
+import { createLesson } from '@/lib/api/admin-lessons-client'
 import { directUpload } from '@/lib/uploads/direct-upload'
 
 interface BulkUploadVideosDialogProps {
@@ -121,8 +122,6 @@ export function BulkUploadVideosDialog({
     row: Row,
     sortOrder: number
   ): Promise<{ ok: boolean; error?: string }> => {
-    const supabase = createClient()
-
     const titleEn = row.title.trim()
     const titleAr = row.title_ar.trim()
 
@@ -161,8 +160,9 @@ export function BulkUploadVideosDialog({
         minimum_watch_percentage: 90,
       }
 
-      const { error: insertError } = await supabase.from('lessons').insert(lessonData)
-      if (insertError) throw insertError
+      // Through the admin API: `authenticated` can no longer insert into
+      // `lessons` directly.
+      await createLesson(lessonData)
 
       updateRow(row.id, { status: 'done', progress: 100 })
       return { ok: true }
