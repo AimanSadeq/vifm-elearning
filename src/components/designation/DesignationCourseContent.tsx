@@ -22,6 +22,7 @@ import {
 import { AnimatedSection } from "@/components/landing/AnimatedSection";
 import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
+import { fetchCurriculum } from "@/lib/api/curriculum-client";
 import {
   courseContentRegistry,
   type CourseModule,
@@ -268,7 +269,7 @@ export function DesignationCourseContent({
       // Find a published course linked to this designation
       const { data: course } = await supabase
         .from("courses")
-        .select("id")
+        .select("id, status")
         .eq("designation_id", designationId)
         .eq("status", "published")
         .limit(1)
@@ -277,22 +278,12 @@ export function DesignationCourseContent({
       if (!course) return;
 
       // Fetch modules with their lessons
-      const { data: modulesData } = await supabase
-        .from("modules")
-        .select("*, lessons(*)")
-        .eq("course_id", course.id)
-        .order("sort_order", { ascending: true });
+      // Through the API: a browser `lessons(*)` embed fails with 42501.
+      // Lessons come back already sorted.
+      const modulesData = await fetchCurriculum(course);
 
       if (modulesData && modulesData.length > 0) {
-        // Sort lessons within each module
-        const sorted = modulesData.map(
-          (m: Module & { lessons: Lesson[] }) => ({
-            ...m,
-            lessons: (m.lessons || []).sort(
-              (a: Lesson, b: Lesson) => a.sort_order - b.sort_order
-            ),
-          })
-        ) as (Module & { lessons: Lesson[] })[];
+        const sorted = modulesData;
 
         // Only use DB modules if they have at least one video lesson
         const hasVideos = sorted.some((m) =>

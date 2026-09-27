@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, ExternalLink, MessageSquare, Bookmark, Lock,
 import { getDocumentMeta, isOfficeKind, type DocumentKind } from "@/lib/utils/document-meta";
 import DOMPurify from "dompurify";
 import { createClient } from "@/lib/supabase/client";
+import { fetchCurriculum } from "@/lib/api/curriculum-client";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useSequentialLocking } from "@/lib/hooks/useSequentialLocking";
 import { useVideoBookmarks } from "@/lib/hooks/useVideoBookmarks";
@@ -371,20 +372,12 @@ export default function LessonPage() {
         if (desig) setDesignationSlug(desig.slug);
       }
 
-      const { data: modulesData } = await supabase
-        .from("modules")
-        .select("*, lessons(*)")
-        .eq("course_id", courseData.id)
-        .order("sort_order");
+      // Through the API: a browser `lessons(*)` embed fails with 42501 now
+      // that `lessons` is not SELECT-able, which showed "Lesson not found."
+      const modulesData = await fetchCurriculum(courseData);
 
       if (modulesData) {
-        const sorted = modulesData.map((mod) => ({
-          ...mod,
-          lessons: (mod.lessons ?? []).sort(
-            (a: { sort_order: number }, b: { sort_order: number }) =>
-              a.sort_order - b.sort_order
-          ),
-        }));
+        const sorted = modulesData;
         setModules(sorted as Module[]);
 
         for (const mod of sorted) {

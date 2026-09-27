@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { fetchCurriculum } from "@/lib/api/curriculum-client";
 import { CourseDetail } from "@/components/courses/CourseDetail";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import type { Course, Module } from "@/types";
@@ -52,29 +53,9 @@ export default function CourseDetailClient() {
 
       setCourse(courseData as Course);
 
-      // Fetch modules with lessons
-      const { data: modulesData } = await supabase
-        .from("modules")
-        .select(
-          `
-          *,
-          lessons(*)
-        `
-        )
-        .eq("course_id", courseData.id)
-        .order("sort_order", { ascending: true });
-
-      if (modulesData) {
-        // Sort lessons within each module
-        const sortedModules = modulesData.map((mod) => ({
-          ...mod,
-          lessons: (mod.lessons ?? []).sort(
-            (a: { sort_order: number }, b: { sort_order: number }) =>
-              a.sort_order - b.sort_order
-          ),
-        }));
-        setModules(sortedModules as Module[]);
-      }
+      // Through the API: a browser `lessons(*)` embed fails with 42501.
+      const modulesData = await fetchCurriculum(courseData);
+      if (modulesData) setModules(modulesData);
 
       setIsLoading(false);
     }
