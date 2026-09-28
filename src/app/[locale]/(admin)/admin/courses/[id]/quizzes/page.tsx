@@ -125,11 +125,11 @@ export default function CourseQuizzesPage() {
     <div className="space-y-6">
       <div>
         <Link
-          href={`/${locale}/admin/courses`}
+          href={`/${locale}/admin/courses/${courseId}/edit`}
           className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
-          Back to Courses
+          Back to Course
         </Link>
         <div className="flex items-center justify-between">
           <div>
