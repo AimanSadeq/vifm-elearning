@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { fetchInstructors } from "@/lib/api/instructors-client";
 import { webinarSchema, type WebinarInput } from "@/lib/utils/validators";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,16 +83,13 @@ export function WebinarForm({ initialData, mode }: WebinarFormProps) {
           .select("id, name, name_ar")
           .eq("is_active", true)
           .order("sort_order"),
-        supabase
-          .from("profiles")
-          .select("id, full_name")
-          .in("role", ["instructor", "super_admin"])
-          .eq("is_active", true)
-          .order("full_name"),
+        // Through the admin API: `role`/`is_active` can't be filtered from
+        // the browser.
+        fetchInstructors(),
       ]);
 
       setCategories((categoriesRes.data as CategoryOption[]) ?? []);
-      setInstructors((instructorsRes.data as InstructorOption[]) ?? []);
+      setInstructors(instructorsRes as InstructorOption[]);
       setIsLoadingData(false);
     }
 

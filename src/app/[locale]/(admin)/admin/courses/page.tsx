@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { fetchInstructors } from "@/lib/api/instructors-client";
 import { reportSupabaseError } from "@/lib/utils/supabase-error";
 import { escapeIlike } from "@/lib/utils/escape-search";
 import { Button } from "@/components/ui/button";
@@ -120,23 +121,20 @@ export default function AdminCoursesPage() {
     async function fetchFilterOptions() {
       const supabase = createClient();
 
-      const [{ data: categoryRows }, { data: instructorRows }] = await Promise.all([
+      // Instructors through the admin API: `role`/`is_active` can't be
+      // filtered from the browser.
+      const [{ data: categoryRows }, instructorRows] = await Promise.all([
         supabase
           .from("categories")
           .select("*")
           .eq("is_active", true)
           .order("sort_order"),
-        supabase
-          .from("profiles")
-          .select("id, full_name")
-          .in("role", ["super_admin", "instructor"])
-          .eq("is_active", true)
-          .order("full_name"),
+        fetchInstructors(),
       ]);
 
       setCategories((categoryRows as Category[]) ?? []);
       setInstructors(
-        (instructorRows as { id: string; full_name: string }[]) ?? []
+        instructorRows.map((i) => ({ id: i.id, full_name: i.full_name ?? "" }))
       );
     }
 

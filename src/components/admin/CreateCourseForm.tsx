@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
+import { fetchInstructors } from '@/lib/api/instructors-client'
 import { toast } from 'sonner'
 import { Loader2, Save } from 'lucide-react'
 import { Toaster } from 'sonner'
@@ -49,14 +50,11 @@ export function CreateCourseForm() {
         .eq('is_active', true)
         .order('sort_order')
 
-      const { data: insts } = await supabase
-        .from('profiles')
-        .select('id, full_name')
-        .in('role', ['super_admin', 'instructor'])
-        .eq('is_active', true)
+      // Through the admin API: `role`/`is_active` can't be filtered from the browser.
+      const insts = await fetchInstructors()
 
       if (cats) setCategories(cats as Category[])
-      if (insts) setInstructors(insts)
+      setInstructors(insts.map((i) => ({ id: i.id, full_name: i.full_name ?? '' })))
       if (cats && cats.length > 0) {
         setForm((prev) => ({ ...prev, category_id: cats[0].id }))
       }
